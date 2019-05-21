@@ -13,8 +13,5 @@ class Index
         return 'hello,' . $name;
     }
 
-    public function demo()
-    {
-        return '11';
-    }
+
 }
