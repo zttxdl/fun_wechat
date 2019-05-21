@@ -15,6 +15,6 @@ class Index
 
     public function demo()
     {
-        return '11';
+        return 'ffff';
     }
 }
