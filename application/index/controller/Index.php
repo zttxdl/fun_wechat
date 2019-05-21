@@ -12,4 +12,9 @@ class Index
     {
         return 'hello,' . $name;
     }
+
+    public function demo()
+    {
+        
+    }
 }
