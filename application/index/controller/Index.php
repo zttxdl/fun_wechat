@@ -1,47 +1,29 @@
 <?php
 namespace app\index\controller;
 
+
+use think\Controller;
 use think\Request;
 
-
-class Index
+class Index extends Controller
 {
     public function index()
     {
-        return 'hello word';
+        $data = ['aaa','dddd'];
+        return json($data);
     }
 
 
-    /**
-     * 方法名称
-     * @params $name 注释
-     * return string
-     */
-    public function hello($name = 'ThinkPHP5')
+    // 获取用户信息
+    public function read($id = 0)
     {
-        return 'hello,' . $name;
-    }
-
-
-    /**
-     * 方法名称
-     * @params $id 注释
-     * return json
-     */
-    public function userInfo(Request $request)
-    {
-        // 代码块的单行注释
-        $user_name = $request->input('post.name');
-        if(!empty($user_name)){
-            return $user_name;
+        $user = ['aaaa','111'];
+        if ($user) {
+            return json($user);
         } else {
-            return '游客';
+            // 抛出HTTP异常 并发送404状态码
+            abort(404,'用户不存在');
         }
-
-        // 另一个注释
-        $user_info = db('user')->get(1);
-        
-        
     }
 
 }
