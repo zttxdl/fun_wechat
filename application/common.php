@@ -42,7 +42,7 @@ if (!function_exists('json_success')) {
  * @return void
  */
 if (!function_exists('json_error')) {
-    function json_error($msg = '',$code = 201)
+    function json_error($msg = '',$code = 400)
     {
         $result = [
             'code' => $code,
@@ -51,5 +51,29 @@ if (!function_exists('json_error')) {
         ];
 
         return json($result);
+    }
+}
+
+//核对手机号码
+if (!function_exists('validate_mobile')) {
+    function validate_mobile($mobile)
+    {
+        if (preg_match("/^1[3456789]{1}\d{9}$/", $mobile)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+//核对密码
+if (!function_exists('validate_password')) {
+    function validate_password($password)
+    {
+        if (preg_match("/^\w{8,20}\$/", $password)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
