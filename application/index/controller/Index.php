@@ -1,6 +1,9 @@
 <?php
 namespace app\index\controller;
 
+use think\Request;
+
+
 class Index
 {
     public function index()
@@ -8,9 +11,26 @@ class Index
         return 'hello word';
     }
 
+
+    /**
+     * 方法名称
+     * @params $name 注释
+     * return string
+     */
     public function hello($name = 'ThinkPHP5')
     {
         return 'hello,' . $name;
+    }
+
+
+    /**
+     * 方法名称
+     * @params $id 注释
+     * return json
+     */
+    public function userInfo(Request $request)
+    {
+        
     }
 
 }
