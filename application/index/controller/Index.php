@@ -6,13 +6,7 @@ use think\Request;
 
 class Index extends Controller
 {
-    public function index()
-    {
-        $data = ['aaa','dddd'];
-        return json($data);
-    }
-
-
+    
     // 获取用户信息
     public function read($id = 0)
     {
