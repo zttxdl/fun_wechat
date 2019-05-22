@@ -11,6 +11,7 @@
 
 // 应用公共文件
 
+define('TokenKey', 'jgdgskhew!$^#&jgjsf128skdhf');
  /**
  * 返回封装后的API成功方法
  * @access protected
