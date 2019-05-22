@@ -30,6 +30,17 @@ class Index
      */
     public function userInfo(Request $request)
     {
+        // 代码块的单行注释
+        $user_name = $request->input('post.name');
+        if(!empty($user_name)){
+            return $user_name;
+        } else {
+            return '游客';
+        }
+
+        // 另一个注释
+        $user_info = db('user')->get(1);
+        
         
     }
 
