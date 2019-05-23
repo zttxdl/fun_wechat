@@ -13,7 +13,7 @@ class Admin extends Controller
      */
     public function index()
     {
-        //
+        return 'yes';
     }
 
 
