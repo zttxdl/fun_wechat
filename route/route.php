@@ -10,4 +10,4 @@
 // +----------------------------------------------------------------------
 
 
-// Route::rule('user','api/Index/read');
+Route::get('admin/index','admin/Admin/index');
