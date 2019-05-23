@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
@@ -17,7 +18,7 @@ return [
     // 应用名称
     'app_name'               => '',
     // 应用地址
-    'app_host'               => '',
+    'app_host'               => 'https://dev.api.hzbin.cn',
     // 应用调试模式
     'app_debug'              => true,
     // 应用Trace
@@ -29,7 +30,7 @@ return [
     // 注册的根命名空间
     'root_namespace'         => [],
     // 默认输出类型
-    'default_return_type'    => 'json',
+    'default_return_type'    => 'html',
     // 默认AJAX 数据返回格式,可选json xml ...
     'default_ajax_return'    => 'json',
     // 默认JSONP格式返回的处理方法
@@ -144,3 +145,4 @@ return [
     'exception_handle'       => '\app\common\exception\Http',
 
 ];
+

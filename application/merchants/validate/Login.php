@@ -25,7 +25,11 @@ class Login extends Validate
      * @var array
      */	
     protected $message = [
-      'account' => '手机号必填|最多不能超过11位|手机号格式不正确',
-      'password'   => '密码必填',
+      'account.require' => '手机号必填',
+      'account.max' => '最多不能超过11位',
+      'account./^1[3456789]{1}\d{9}$/' => '格式错误',
+      'password.require'   => '密码必填',
+      'password.min'   => '最少不能低于8位',
+      'password.max'   => '最多不能超过20位',
     ];
 }

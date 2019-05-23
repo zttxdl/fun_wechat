@@ -3,7 +3,6 @@
 namespace app\admin\controller;
 
 use think\Controller;
-use think\Request;
 
 class Admin extends Controller
 {
@@ -14,7 +13,7 @@ class Admin extends Controller
      */
     public function index()
     {
-        //
+        return 'yes';
     }
 
 
