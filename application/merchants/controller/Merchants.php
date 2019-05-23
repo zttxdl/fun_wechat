@@ -21,6 +21,35 @@ class Merchants extends Controller
      */
     public function createShop(Request $request)
     {
-        $data      = $request->param();
+
+        $data = $request->param();
+        $data['shop_id'] = 1;
+        $data['status'] = 3;
+         $check = $this->validate($request->param(), 'Merchants');
+         if ($check !== true) {
+             return json_error($check);
+         }
+
+        model('ShopInfo')
+        ->where('id',$data['shop_id'])
+        ->update($data);
+
+         $data = model('ShopMoreInfo')
+             ->field('id')
+             ->where('shop_id',$data['shop_id'])
+             ->find();
+         if ($data){
+             model('ShopMoreInfo')
+                 ->where('id',$data['shop_id'])
+                 ->update($data);
+
+         }else{
+             model('ShopMoreInfo')->insert($data);
+
+         }
+
+        return json_success('success');
+
     }
+
 }
