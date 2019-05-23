@@ -8,6 +8,7 @@
 namespace app\common\Auth;
 
 use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 
 
@@ -48,6 +49,13 @@ class JwtAuth
      * @var string
      */
     private $secrect = '@#@#@@#@EWE@3232wewe@!@';
+
+
+    /**
+     * jwt decodeToken
+     * @var
+     */
+    private $decodeToken;
 
     /**
      * 单列模式 jwtAuth句柄
@@ -135,5 +143,13 @@ class JwtAuth
             ->getToken();
 
         return $this;
+    }
+
+    public function decode()
+    {
+        if(!$this->decodeToken){
+            $this->decodeToken = (new Parser())->parse((string)$this->token);
+            $this->uid = $this->decodeToken->getClaim();
+        }
     }
 }
