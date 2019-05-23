@@ -8,7 +8,9 @@
 namespace app\common\Auth;
 
 use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\ValidationData;
 
 
 /**
@@ -48,6 +50,12 @@ class JwtAuth
      * @var string
      */
     private $secrect = '@#@#@@#@EWE@3232wewe@!@';
+
+    /**
+     * decodeToke jwt
+     * @var
+     */
+    private $decodeToken;
 
     /**
      * 单列模式 jwtAuth句柄
@@ -136,4 +144,42 @@ class JwtAuth
 
         return $this;
     }
+
+    /**
+     * decode
+     * @return \Lcobucci\JWT\Token
+     */
+    public function decode()
+    {
+        if(!$this->decodeToken){
+            $this->decodeToken = (new Parser())->parse((string)$this->token);
+            $this->uid = $this->decodeToken->getClaim('uid');
+        }
+
+        return $this->decodeToken;
+    }
+
+    /**
+     * verify
+     * @return bool
+     */
+    public function verify()
+    {
+        $result = $this->decode()->verify(new Sha256(), $this->secrect);
+
+        return $result;
+    }
+    /**
+     * @return bool
+     */
+    public function validate()
+    {
+        $data = new ValidationData();
+        $data->setIssuer($this->iss);
+        $data->setAudience($this->aud);
+
+        return $this->decode()->validate($data);
+    }
+
+
 }

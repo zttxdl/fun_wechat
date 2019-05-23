@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
@@ -144,3 +145,4 @@ return [
     'exception_handle'       => '\app\common\exception\Http',
 
 ];
+

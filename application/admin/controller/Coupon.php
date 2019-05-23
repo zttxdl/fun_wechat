@@ -40,13 +40,23 @@ class Coupon extends Controller
             return $item;
         });
 
-        return json_success(['category_list'=>$category_list,'coupon_list'=>$coupon_list]);
+        return json_success('ok',['category_list'=>$category_list,'coupon_list'=>$coupon_list]);
 
     }
 
 
     /**
-     * 新增优惠券
+     * 展示新增优惠券页面 
+     * 
+     */
+    public function add()
+    {
+        $school_list = '';
+    }
+     
+
+    /**
+     * 保存新增优惠券
      * 
      */
     public function create(Request $request)
@@ -60,7 +70,7 @@ class Coupon extends Controller
         // 验证表单数据
         $check = $this->validate($data, 'Coupon');
         if ($check !== true) {
-            return json_error($check,'201');
+            return json_error($check,201);
         }
 
         // 提交新增表单
@@ -68,7 +78,7 @@ class Coupon extends Controller
         if (!$result) {
             return json_error('添加失败',201);
         }
-        
+
         return json_success('添加成功');
 
     }

@@ -9,7 +9,22 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+
 //商家端
+
+// 管理平台优惠券
+Route::group('a-coupon', function () {
+    Route::get('/index', 'index');
+    Route::get('/info/:id', 'show');
+    Route::get('/add', 'add');
+    Route::post('/create', 'create');
+    Route::get('/edit/:id', 'edit');
+    Route::post('/update', 'update');
+    Route::post('/status', 'status');
+})->prefix('admin/coupon/');
+
+
+//登录注册用户组
 Route::group('merchants',function (){
     Route::rule('login','merchants/Login/login');
     Route::rule('register','merchants/Login/register');
@@ -23,3 +38,8 @@ Route::group('merchants',function (){
 
 });
 
+//後臺登录用戶
+Route::group('user',function (){
+    Route::rule('login','admin/Login/login');
+    Route::rule('info','admin/Login/info')->middleware('Check');
+});
