@@ -9,5 +9,16 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+// 管理平台优惠券
+Route::group('a-coupon', function () {
+    Route::get('/index', 'index');
+    Route::get('/info/:id', 'show');
+    Route::get('/add', 'add');
+    Route::post('/create', 'create');
+    Route::get('/edit/:id', 'edit');
+    Route::post('/update', 'update');
+    Route::post('/status', 'status');
+})->prefix('admin/coupon/');
 
-Route::get('admin/index','admin/Admin/index');
+
+
