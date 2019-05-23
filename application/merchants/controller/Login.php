@@ -5,6 +5,7 @@ namespace app\merchants\controller;
 use think\Controller;
 use app\common\model\ShopInfo;
 use app\common\Auth\JwtAuth;
+use think\Request;
 
 /**
  * 商家登录注册
