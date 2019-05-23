@@ -30,3 +30,9 @@ Route::group('merchants',function (){
         Route::rule('phoneValidate','merchants/Login/phoneValidate');
         Route::rule('getMobileCode','merchants/Login/getMobileCode');
 });
+
+//後臺登录用戶
+Route::group('user',function (){
+    Route::rule('login','admin/Login/login');
+    Route::rule('info','admin/Login/info')->middleware('Check');
+});
