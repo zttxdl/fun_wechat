@@ -11,7 +11,7 @@
 
 // 应用公共文件
 
-define('TokenKey', 'jgdgskhew!$^#&jgjsf128skdhf');
+
  /**
  * 返回封装后的API成功方法
  * @access protected
@@ -21,7 +21,7 @@ define('TokenKey', 'jgdgskhew!$^#&jgjsf128skdhf');
  * @return void
  */
 if (!function_exists('json_success')) {
-    function json_success($data, $msg = '',$code = 200)
+    function json_success($msg = '',$data='',$code = 200)
     {
         $result = [
             'code' => $code,
@@ -42,7 +42,7 @@ if (!function_exists('json_success')) {
  * @return void
  */
 if (!function_exists('json_error')) {
-    function json_error($msg = '',$code = 201)
+    function json_error($msg = '',$code = 400)
     {
         $result = [
             'code' => $code,
@@ -51,5 +51,45 @@ if (!function_exists('json_error')) {
         ];
 
         return json($result);
+    }
+}
+
+//核对手机号码
+if (!function_exists('validate_mobile')) {
+    function validate_mobile($mobile)
+    {
+        if (preg_match("/^1[3456789]{1}\d{9}$/", $mobile)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+//核对密码
+if (!function_exists('validate_password')) {
+    function validate_password($password)
+    {
+        if (preg_match("/^\w{8,20}\$/", $password)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+/**
+ * 随机数字
+ */
+if (!function_exists('numRandCode')) {
+    function numRandCode($length = 6)
+    {
+        $str  = "0123456789";
+        $code = "";
+        for ($i = 0; $i < $length; $i++) {
+            $start = rand(0, 9);
+            $code .= substr($str, $start, 1);
+        }
+        return $code;
     }
 }
