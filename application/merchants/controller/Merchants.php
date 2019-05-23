@@ -21,6 +21,6 @@ class Merchants extends Controller
      */
     public function createShop(Request $request)
     {
-
+        $data      = $request->param();
     }
 }

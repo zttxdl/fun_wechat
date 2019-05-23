@@ -22,3 +22,11 @@ Route::group('a-coupon', function () {
 
 
 
+//登录注册用户组
+Route::group('merchants',function (){
+        Route::rule('login','merchants/Login/login');
+        Route::rule('register','merchants/Login/register');
+        Route::rule('updatePasswor','merchants/Login/updatePasswor');
+        Route::rule('phoneValidate','merchants/Login/phoneValidate');
+        Route::rule('getMobileCode','merchants/Login/getMobileCode');
+});
