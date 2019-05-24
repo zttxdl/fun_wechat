@@ -28,7 +28,7 @@ class Coupon extends Controller
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : null;
     
         // 优惠券列表
-        $coupon_list = Db::name('platform_coupon')->field('id,batch_id,name,user_type,face_value,threshold,start_time,end_time,other_time,limit_use,num,status,type')->where($where)->paginate(1)->each(function ($item, $key) {
+        $coupon_list = Db::name('platform_coupon')->field('id,batch_id,name,user_type,face_value,threshold,start_time,end_time,other_time,limit_use,num,status,type')->where($where)->paginate(10)->each(function ($item, $key) {
             // 优惠券状态
             $item['status'] = config('coupon_status')[$item['status']];
             // 用户类型
@@ -40,8 +40,6 @@ class Coupon extends Controller
             
             return $item;
         });
-
-        
 
         return json_success('ok',['category_list'=>$category_list,'coupon_list'=>$coupon_list]);
 
@@ -93,13 +91,12 @@ class Coupon extends Controller
 
 
     /**
-     * 展示新增优惠券页面 
+     * 展示修改优惠券页面 
      * @param $id  优惠券表主键值
      * 
      */
     public function edit(Request $request,$id)
     {
-        // dump($id);die;
         if (empty((int)$id) ) {
             return json_error('非法参数',201);
         }
@@ -122,7 +119,7 @@ class Coupon extends Controller
 
 
     /**
-     * 修改新增优惠券
+     * 保存修改优惠券
      * 
      */
     public function update(Request $request)
@@ -141,9 +138,9 @@ class Coupon extends Controller
         if ($check !== true) {
             return json_error($check,201);
         }
-        // 提交新增表单
+        // 提交表单
         $result = Db::name('platform_coupon')->update($data);
-        if (!$result) {
+        if ($result === false) {
             return json_error('修改失败',201);
         }
 

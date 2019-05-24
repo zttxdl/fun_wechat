@@ -12,7 +12,9 @@ class Login extends Validate
      *
      * @var array
      */	
-	protected $rule = [];
+	protected $rule = [
+	    'phone' => ''
+    ];
     
     /**
      * 定义错误信息
