@@ -17,8 +17,5 @@ require __DIR__ . '/../thinkphp/base.php';
 
 // 支持事先使用静态方法设置Request对象和Config对象
 
-// 定义配置文件目录和应用目录同级
-define('CONF_PATH', __DIR__.'/../config/');
-
 // 执行应用并响应
 Container::get('app')->run()->send();
