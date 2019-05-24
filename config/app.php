@@ -143,6 +143,8 @@ return [
     'show_error_msg'         => false,
     // 异常处理handle类 留空使用 \think\exception\Handle
     'exception_handle'       => '\app\common\exception\Http',
+    //jwt定义的key
+    'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
 
 ];
 

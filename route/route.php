@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 
 
-//商家端
+
 
 // 管理平台优惠券
 Route::group('a-coupon', function () {
@@ -33,8 +33,12 @@ Route::group('merchants',function (){
     Route::rule('getMobileCode','merchants/Login/getMobileCode');
 
 	Route::rule('createShop','merchants/Merchants/createShop');
+	Route::rule('getSchool','merchants/Merchants/getSchool');
+	Route::rule('getCategory','merchants/Merchants/getCategory');
+	Route::rule('getBack','merchants/Merchants/getBack');
 	//文件上传
 	Route::rule('upload','merchants/Upload/up');
+
 
 });
 

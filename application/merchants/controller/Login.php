@@ -22,12 +22,22 @@ class Login extends Controller
 	public function login(Request $request)
 	{
 		$account       	= $request->param('account');
-        $password     	= $request->param('password');
+        $password     	= $request->param('password','');
+        $vcode     	= $request->param('vcode');
+        $password_type     	= $request->param('password_type');
 
         $check = $this->validate($request->param(), 'Login');
 		if ($check !== true) {
 			return json_error($check);
 		}
+
+        //是否为验证码登录
+        if ($password_type == 'vcode'){
+            $result = model('Alisms', 'service')->checkCode($account, 'register', $vcode);
+            if ( ! $result) {
+                return json_error(model('Alisms', 'service')->getError());
+            }
+        }
 
 		$user  = ShopInfo::field('id,password,status')
                      ->readMaster(true)
@@ -37,18 +47,20 @@ class Login extends Controller
             return json_error('帐户不正确');
         }
 
+
         if ($user->status == 2 ) {
 
             return json_error('帐户锁定');
         }
 
-        if (md5($password) != $user->password) {
-        	return json_error('密码不正确');
+        if ($password_type == 'pwd'){
+            if (md5($password) != $user->password) {
+                return json_error('密码不正确');
+            }
         }
 
-        $jwtAuth = JwtAuth::getInstance();
-        $token = $jwtAuth->setUid('merchants'.$user->id)->encode()->getToken();
-
+        $jwtAuth = new JwtAuth();
+        $token = $jwtAuth->createToken('merchants'.$user->id,604800);
         return json_success('success',[
             'token' => $token
         ]);
@@ -94,12 +106,11 @@ class Login extends Controller
 	        ];
 
 	        if ($result = ShopInfo::create($data)) {
-	        	$jwtAuth = JwtAuth::getInstance();
-		        $token = $jwtAuth->setUid('merchants'.$result->id)->encode()->getToken();
-		        
-		        return json_success('success',[
-		            'token' => $token
-		        ]);
+                $jwtAuth = new JwtAuth();
+                $token = $jwtAuth->createToken('merchants'.$result->id,604800);
+                return json_success('success',[
+                    'token' => $token
+                ]);
 
 		    } else {
 		        return json_error('注册失败');
