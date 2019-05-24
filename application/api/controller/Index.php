@@ -41,8 +41,9 @@ class Index extends Base
                     $exp_time2=86400 * 30; //refresh_token过期时间,这里设置30天
                     $scopes2='role_refresh'; //token标识，刷新access_token
                     $refresh_token = action('createToken',['data'=>$data,'exp_time'=>$exp_time2,'scopes'=>$scopes2]);
-        
+
                  //公用信息
+                $time =time();
                  $token = [
                              'iss' => 'http://www.helloweba.net', //签发者 可选
                              'aud' => 'http://www.helloweba.net', //接收该JWT的一方，可选
