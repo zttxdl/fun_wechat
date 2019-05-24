@@ -43,12 +43,7 @@ Route::group('merchants',function (){
 
 });
 
-<<<<<<< HEAD
-//後臺登录用戶
-Route::group('user',function (){
-    Route::rule('login','admin/Login/login');
-    Route::rule('info','admin/Login/info')->middleware('Check');
-=======
+
 //后台用户模块
 Route::group('admin',function (){
     Route::rule('login','admin/Login/login');//用户登录
@@ -70,6 +65,4 @@ Route::group('admin',function (){
     Route::rule('user/list','admin/User/getList');//会员列表
     Route::rule('user/detail','admin/User/getDetail');//会员详情
     Route::rule('user/recycle','admin/User/recycle');//回收站
-
->>>>>>> ztt
 });
