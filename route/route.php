@@ -12,7 +12,16 @@
 
 
 
-// 管理平台优惠券
+// 管理平台优惠券组
+Route::group('a-advers', function () {
+    Route::get('/index', 'index');
+    Route::get('/edit/:id', 'edit');
+    Route::post('/update', 'update');
+    Route::get('/del/:id', 'delete');
+})->prefix('admin/advers/');
+
+
+// 管理平台优惠券组
 Route::group('a-coupon', function () {
     Route::get('/index', 'index');
     Route::get('/info/:id', 'show');
@@ -25,7 +34,7 @@ Route::group('a-coupon', function () {
 })->prefix('admin/coupon/');
 
 
-//登录注册用户组
+//商家登录注册用户组
 Route::group('merchants',function (){
     Route::rule('login','merchants/Login/login');
     Route::rule('register','merchants/Login/register');
