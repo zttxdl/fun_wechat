@@ -13,7 +13,6 @@ class Http extends Handle
         if ($e instanceof HttpException) {
             $statusCode = $e->getStatusCode();
         }
-
         if (!isset($statusCode)) {
             $statusCode = 500;
         }

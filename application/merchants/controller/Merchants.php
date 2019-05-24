@@ -7,32 +7,20 @@
  */
 namespace  app\merchants\controller;
 
-use think\Controller;
-use app\common\Auth\JwtAuth;
+use app\common\controller\MerchantsBase;
 use think\Request;
 
-class Merchants extends Controller
+class Merchants extends MerchantsBase
 {
-    protected $shop_id;
 
-    //前置操作，验证token
-    protected $beforeActionList = [
-        'valid_token',
-    ];
-
-    public function valid_token()
-    {
-        $token = $this->request->header('api-token','');
-        $jwtAuth = new JwtAuth();
-        $jwt = $jwtAuth->checkToken($token);
-        $this->shop_id = substr($jwt['data'],9);
-    }
+    protected $noNeedLogin = [];
 
     /**
      * 新建商家
      * @param  \think\Request  $request
      * @return \think\Response
      */
+
     public function createShop(Request $request)
     {
         $data = $request->param();

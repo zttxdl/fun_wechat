@@ -43,7 +43,7 @@ if (!function_exists('json_success')) {
  * @return void
  */
 if (!function_exists('json_error')) {
-    function json_error($msg = '',$code = 400)
+    function json_error($msg = '',$code = 201)
     {
         $result = [
             'code' => $code,
@@ -79,18 +79,5 @@ if (!function_exists('validate_password')) {
     }
 }
 
-/**
- * 随机数字
- */
-if (!function_exists('numRandCode')) {
-    function numRandCode($length = 6)
-    {
-        $str  = "0123456789";
-        $code = "";
-        for ($i = 0; $i < $length; $i++) {
-            $start = rand(0, 9);
-            $code .= substr($str, $start, 1);
-        }
-        return $code;
-    }
-}
+
+

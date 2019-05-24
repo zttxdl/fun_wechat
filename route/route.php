@@ -48,3 +48,8 @@ Route::group('user',function (){
     Route::rule('login','admin/Login/login');
     Route::rule('info','admin/Login/info')->middleware('Check');
 });
+
+
+//商家端商品分类
+Route::resource('merchants/GoodsClassify','merchants/GoodsClassify');
+Route::resource('merchants/GoodsAttribute','merchants/GoodsAttribute');

@@ -2,7 +2,7 @@
 
 namespace app\merchants\controller;
 
-use think\Controller;
+use app\common\controller\MerchantsBase;
 use app\common\model\ShopInfo;
 use app\common\Auth\JwtAuth;
 use think\Request;
@@ -10,9 +10,10 @@ use think\Request;
 /**
  * 商家登录注册
  */
-class Login extends Controller
+class Login extends MerchantsBase
 {
-	
+    protected $noNeedLogin = ['*'];
+
 	/**
 	 * 商家登录
 	 * @param  \think\Request  $request
