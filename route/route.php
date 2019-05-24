@@ -9,6 +9,9 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+
+
+
 // 管理平台优惠券
 Route::group('a-coupon', function () {
     Route::get('/index', 'index');
@@ -18,17 +21,26 @@ Route::group('a-coupon', function () {
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');
     Route::post('/status', 'status');
+    Route::get('/shop-list/:id', 'getSchoolShop');
 })->prefix('admin/coupon/');
-
 
 
 //登录注册用户组
 Route::group('merchants',function (){
-        Route::rule('login','merchants/Login/login');
-        Route::rule('register','merchants/Login/register');
-        Route::rule('updatePasswor','merchants/Login/updatePasswor');
-        Route::rule('phoneValidate','merchants/Login/phoneValidate');
-        Route::rule('getMobileCode','merchants/Login/getMobileCode');
+    Route::rule('login','merchants/Login/login');
+    Route::rule('register','merchants/Login/register');
+    Route::rule('updatePasswor','merchants/Login/updatePasswor');
+    Route::rule('phoneValidate','merchants/Login/phoneValidate');
+    Route::rule('getMobileCode','merchants/Login/getMobileCode');
+
+	Route::rule('createShop','merchants/Merchants/createShop');
+	Route::rule('getSchool','merchants/Merchants/getSchool');
+	Route::rule('getCategory','merchants/Merchants/getCategory');
+	Route::rule('getBack','merchants/Merchants/getBack');
+	//文件上传
+	Route::rule('upload','merchants/Upload/up');
+
+
 });
 
 <<<<<<< HEAD

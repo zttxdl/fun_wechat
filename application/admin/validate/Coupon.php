@@ -12,7 +12,14 @@ class Coupon extends Validate
      *
      * @var array
      */	
-	protected $rule = [];
+	protected $rule = [
+        'batch_id'      => 'require',
+        'name'          => 'require|max:20',
+        'face_value'    => 'number',
+        'threshold'     => 'number',
+        'num'           => 'number',
+        'assume_ratio'  => 'number', 
+    ];
     
     /**
      * 定义错误信息
@@ -20,5 +27,14 @@ class Coupon extends Validate
      *
      * @var array
      */	
-    protected $message = [];
+    protected $message = [
+        'batch_id.require'      => '优惠券批次ID不能为空',
+        'name.require'          => '优惠券名称不能为空',
+        'name.max'              => '优惠券名称不能超过20位',
+        'face_value.number'     => '面额格式不正确',
+        'threshold.number'      => '使用门槛格式不正确',
+        'num.number'            => '请填写联系地址',
+        'assume_ratio.number'   => '联系地址最多50个字',
+    ];
+
 }
