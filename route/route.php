@@ -52,8 +52,26 @@ Route::group('merchants',function (){
 
 });
 
-//後臺登录用戶
-Route::group('user',function (){
-    Route::rule('login','admin/Login/login');
-    Route::rule('info','admin/Login/info')->middleware('Check');
+
+//后台用户模块
+Route::group('admin',function (){
+    Route::rule('login','admin/Login/login');//用户登录
+    Route::rule('register','admin/Login/register');//用户注册
+    Route::rule('verify','admin/Login/verify');//验证码
+    Route::rule('index','admin/Admin/index');//后台用户列表
+    Route::rule('add','admin/Admin/add');//后台用户新增
+    Route::rule('edit','admin/Admin/update');//后台用户新增
+
+});
+
+//后台首页模块
+Route::group('admin',function (){
+    Route::rule('index/info','admin/Index/getUserList');
+});
+
+//后台会员模块
+Route::group('admin',function (){
+    Route::rule('user/list','admin/User/getList');//会员列表
+    Route::rule('user/detail','admin/User/getDetail');//会员详情
+    Route::rule('user/recycle','admin/User/recycle');//回收站
 });
