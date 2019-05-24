@@ -11,6 +11,7 @@
 
 // 应用公共文件
 
+use \Firebase\JWT\JWT; //导入JWT
 
  /**
  * 返回封装后的API成功方法
