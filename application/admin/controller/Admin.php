@@ -16,5 +16,15 @@ class Admin extends Controller
         return 'yes';
     }
 
+    public function add()
+    {
+        return 'yes';
+    }
+
+    public function update()
+    {
+        return 'yes';
+    }
+
 
 }

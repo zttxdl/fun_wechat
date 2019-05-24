@@ -17,7 +17,7 @@ class Coupon extends Controller
      * 红包列表
      */
     public function index(Request $request)
-    {
+    {3
         // 经营品类列表
         $category_list = Db::name('manage_category')->where('level',2)->field('id,name')->select();
 
