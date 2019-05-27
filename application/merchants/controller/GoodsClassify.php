@@ -52,7 +52,7 @@ class GoodsClassify extends MerchantsBase
     {
         $data   = $request->param();
         $result = ProductsClassify::update($data, ['id' => $request->param('id')]);
-        return json_success('success',$result);
+        return json_success('success');
     }
 
     /**
@@ -77,6 +77,6 @@ class GoodsClassify extends MerchantsBase
 
         
         $result = ProductsClassify::destroy($id);
-        return json_success('success',$result);
+        return json_success('success');
     }
 }

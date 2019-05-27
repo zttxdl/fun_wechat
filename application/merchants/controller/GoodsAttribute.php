@@ -47,7 +47,7 @@ class GoodsAttribute extends MerchantsBase
         }
 
         $result = ProductAttrClassify::create($data);
-        return json_success('success',$result);
+        return json_success('success');
     }
 
 
@@ -69,7 +69,7 @@ class GoodsAttribute extends MerchantsBase
             return json_error('请先删除标签属性');
         }
         $result = ProductAttrClassify::destroy($id);
-        return json_success('success',$result);
+        return json_success('success');
     }
 
 

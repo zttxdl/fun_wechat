@@ -90,7 +90,7 @@ class Goods extends MerchantsBase
     {
         $data   = $request->param();
         $result = Product::update($data, ['id' => $request->param('id')]);
-        return json_success('success',$result);
+        return json_success('success');
     }
 
     /**
@@ -108,7 +108,7 @@ class Goods extends MerchantsBase
         }
 
         $result = Product::destroy($id);
-        return json_success('success',$result);
+        return json_success('success');
     }
 
     /**
