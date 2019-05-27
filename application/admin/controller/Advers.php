@@ -6,6 +6,12 @@ use think\Controller;
 use think\Request;
 use think\Db;
 
+
+/**
+ * 广告控制器
+ * @author Mike
+ * date 2019/5/24
+ */
 class Advers extends Controller
 {
     /**
@@ -21,7 +27,7 @@ class Advers extends Controller
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : null;
 
         // 广告列表
-        $list = Db::name('advers')->where($where)->paginate(10)->each(function ($item, $key) {
+        $list = Db::name('advers')->where($where)->order('id desc')->paginate(10)->each(function ($item, $key) {
             // 是否启用
             $item['status'] = config('advers_status')[$item['status']];
             // 展示平台
@@ -39,9 +45,9 @@ class Advers extends Controller
      * 展示编辑广告页面 
      * 
      */
-    public function edit(Request $request,$id)
+    public function edit($id)
     {
-        if (empty((int)$id) ) {
+        if (empty((int)$id)) {
             return json_error('非法参数',201);
         }
 
@@ -64,7 +70,7 @@ class Advers extends Controller
     {
         $data = $request->param();
 
-        if (empty((int)$data['id'])) {
+        if (!isset($data['id']) || empty((int)$data['id'])) {
             return json_error('非法参数',201);
         }
 
@@ -76,10 +82,10 @@ class Advers extends Controller
 
         // 提交表单
         $result = Db::name('advers')->update($data);
-        if ($result === false) {
+        if (!$result) {
             return json_error('修改失败',201);
         }
-
+        
         return  json_success('ok');
         
     }
