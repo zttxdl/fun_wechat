@@ -45,7 +45,6 @@ class GoodsAttribute extends MerchantsBase
             }
 
         }
-
         $result = ProductAttrClassify::create($data);
         return json_success('success');
     }
