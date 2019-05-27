@@ -39,7 +39,7 @@ class GoodsAttribute extends MerchantsBase
         $data['shop_id'] = $this->shop_id;
 
         if ($fid){
-            $count = model('ProductAttrClassify')->where('fid',$fid)->count();
+            $count = model('ProductAttrClassify')->where('pid',$fid)->count();
             if ($count >= 3){
                 return json_error('最多添加三个属性');
             }
