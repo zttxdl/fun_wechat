@@ -32,7 +32,7 @@ class Goods extends MerchantsBase
             ->toArray();
         //获取分类
         $class = model('ProductsClassify')
-            ->field('id,name as className')
+            ->field('id as classId,name as className')
             ->where($where)
             ->select()
             ->toArray();
@@ -86,10 +86,10 @@ class Goods extends MerchantsBase
      * @param  int  $id
      * @return \think\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $data   = $request->param();
-        $result = Product::update($data, ['id' => $id]);
+        $result = Product::update($data, ['id' => $request->param('id')]);
         return json_success('success',$result);
     }
 

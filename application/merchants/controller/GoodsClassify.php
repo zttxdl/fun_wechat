@@ -48,10 +48,10 @@ class GoodsClassify extends MerchantsBase
      * @param  int  $id
      * @return \think\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $data   = $request->param();
-        $result = ProductsClassify::update($data, ['id' => $id]);
+        $result = ProductsClassify::update($data, ['id' => $request->param('id')]);
         return json_success('success',$result);
     }
 

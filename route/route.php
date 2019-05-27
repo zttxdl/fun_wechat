@@ -76,8 +76,3 @@ Route::group('admin',function (){
     Route::rule('user/recycle','admin/User/recycle');//回收站
 });
 
-
-//商家端商品分类
-Route::resource('merchants/goods_classify','merchants/GoodsClassify');
-Route::resource('merchants/goods_attribute','merchants/GoodsAttribute');
-Route::resource('merchants/goods','merchants/Goods');
