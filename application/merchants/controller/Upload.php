@@ -2,11 +2,13 @@
 
 namespace app\merchants\controller;
 
-use think\Controller;
+use app\common\controller\MerchantsBase;
 use think\Request;
 
-class Upload extends Controller
+class Upload extends MerchantsBase
 {
+    protected $noNeedLogin = [];
+
     /**
      * 文件上传提交
      *
@@ -26,7 +28,7 @@ class Upload extends Controller
         $info = $file->move('./uploads/');
         if ($info) {
 
-            $data['images'] = config('app_host').'/uploads/'.$info->getSaveName();
+            $data['images'] = '/uploads/'.$info->getSaveName();
             return json_success('文件上传成功',$data['images']);
         } else {
             // 上传失败获取错误信息

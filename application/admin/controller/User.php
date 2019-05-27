@@ -6,6 +6,7 @@ namespace app\admin\controller;
 
 use think\Db;
 use think\facade\Request;
+use think\facade\Validate;
 
 class User
 {
@@ -18,10 +19,23 @@ class User
 
     public function getDetail()
     {
+        $validate = new Validate();
+        if($validate->test($data)){
+            $result = $validate->getError();
+        }
         $uid = Request::param('uid');
 
-        $detail['user_list'] = Db::name('user')->where('id',$uid)->find();
+        if(!$uid) {
+            return json_error('Uid 不能为空');
+        }
+        $result = [];
 
-        return $detail;
+        $result['detail'] = Db::name('user')->where('id',$uid)->field('nickname,phone')->find();
+
+        $result['user_address'] = Db::name('receiving_addr')->where('id',$uid)->find();
+
+        $result['user_coupon'] = Db::name('my_coupon')->where('user_id',$uid)->select();
+
+         return json($result);
     }
 }
