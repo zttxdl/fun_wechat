@@ -4,12 +4,12 @@ namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
 use think\Request;
-use app\common\model\ProductsClassify;
+use app\common\model\TodayDeals;
 
 /**
- * 商品分类模块控制器
+ * 商品模块控制器
  */
-class GoodsClassify extends MerchantsBase
+class TodaySpecial extends MerchantsBase
 {
     protected $noNeedLogin = [];
 
@@ -20,8 +20,13 @@ class GoodsClassify extends MerchantsBase
      */
     public function index()
     {
-        $data = ProductsClassify::all(['shop_id'=>$this->shop_id]);
-        return json_success('success',$data);
+        $today = date('Y-m-d',time());
+        $result = model('TodayDeals')
+            ->where('shop_id',$this->shop_id)
+            ->where('today',$today)
+            ->find();
+
+        return json_success('success',$result);
 
     }
 
@@ -35,7 +40,19 @@ class GoodsClassify extends MerchantsBase
     {
         $data   = $request->param();
         $data['shop_id'] = $this->shop_id;
-        $result = ProductsClassify::create($data);
+        $data['start_time'] = strtotime($request->param('start_time'));
+        $data['end_time'] = strtotime($request->param('end_time'));
+        $data['today'] = date('Y-m-d',$data['start_time']);
+
+        $product = model('Product')
+            ->field('thumb,name,old_price')
+            ->where('id',$data['product_id'])
+            ->find();
+        $data['thumb'] = $product->thumb;
+        $data['name'] = $product->name;
+        $data['old_price'] = $product->old_price;
+
+        $result = TodayDeals::create($data);
 
         return json_success('success',$result);
     }
@@ -51,7 +68,7 @@ class GoodsClassify extends MerchantsBase
     public function update(Request $request, $id)
     {
         $data   = $request->param();
-        $result = ProductsClassify::update($data, ['id' => $id]);
+        $result = TodayDeals::update($data, ['id' => $id]);
         return json_success('success',$result);
     }
 
@@ -63,20 +80,7 @@ class GoodsClassify extends MerchantsBase
      */
     public function delete($id)
     {
-        $result = ProductsClassify::get($id);
-        
-        if ($result->shop_id != $this->shop_id) {
-            return json_error('没有权限删除');
-        }
-
-        $result = ProductsClassify::get(['products_classify_id'=>$id,'delete'=>0]);
-        
-        if ($result) {
-            return json_error('该分类下有商品，静止删除');
-        }
-
-        
-        $result = ProductsClassify::destroy($id);
+        $result = TodayDeals::destroy($id);
         return json_success('success',$result);
     }
 }

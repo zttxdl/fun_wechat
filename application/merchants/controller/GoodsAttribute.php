@@ -59,6 +59,11 @@ class GoodsAttribute extends MerchantsBase
      */
     public function delete($id)
     {
+        $result = ProductAttrClassify::get($id);
+        if ($result->shop_id != $this->shop_id) {
+            return json_error('没有权限删除');
+        }
+
         $result = ProductAttrClassify::get(['pid'=>$id]);
         if ($result){
             return json_error('请先删除标签属性');
