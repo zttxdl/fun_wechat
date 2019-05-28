@@ -26,7 +26,7 @@ class Feedback extends Controller
         $list = Db::name('feedback f')->join('user u','f.user_id = u.id')->where($where)->order('f.id desc')->field('f.content,f.add_time,f.status,f.id,u.nickname,u.phone')
                 ->paginate(10)->each(function ($item, $key) {
                     // 状态
-                    $item['status'] = config('dispose_status')[$item['status']];
+                    $item['mb_status'] = config('dispose_status')[$item['status']];
                     // 日期
                     $item['add_time'] = date('Y-m-d',$item['add_time']);
 
@@ -47,7 +47,7 @@ class Feedback extends Controller
         if (!$info) {
             return json_error('非法参数');
         }
-        $info['status'] = config('dispose_status')[$info['status']];
+        $info['mb_status'] = config('dispose_status')[$info['status']];
         $info['add_time'] = date('Y-m-d',$info['add_time']);
 
         return json_success('ok',['info'=>$info]);

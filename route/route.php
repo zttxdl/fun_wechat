@@ -58,6 +58,19 @@ Route::group('a-intention', function () {
     Route::get('/r-status/:id/:status', 'admin/RiderRecruit/status');
 });
 
+// （骑手）配送管理组
+Route::group('a-rider', function () {
+    // 骑手组
+    Route::get('/index', 'admin/RiderInfo/index');
+    Route::get('/info/:id', 'admin/RiderInfo/show');
+    Route::get('/status/:id/:status', 'admin/RiderInfo/status');
+    // 骑手审核组
+    Route::get('/c-index', 'admin/RiderInfo/checkRiderList');
+    Route::get('/c-info/:id', 'admin/RiderInfo/checkShow');
+    Route::post('/c-status', 'admin/RiderInfo/setCheckStatus');
+
+});
+
 // 用户模块
 Route::group('admin',function (){
     Route::rule('login','admin/Login/login');//用户登录

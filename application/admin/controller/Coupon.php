@@ -31,7 +31,7 @@ class Coupon extends Controller
         $coupon_list = Db::name('platform_coupon')->field('id,batch_id,name,user_type,face_value,threshold,start_time,end_time,other_time,limit_use,num,status,type')
                         ->where($where)->order('id desc')->paginate(10)->each(function ($item, $key) {
                             // 优惠券状态
-                            $item['status'] = config('coupon_status')[$item['status']];
+                            $item['mb_status'] = config('coupon_status')[$item['status']];
                             // 用户类型
                             $item['user_type'] = config('user_type')[$item['user_type']];
                             // 限品类
@@ -206,7 +206,7 @@ class Coupon extends Controller
         }
 
         // 优惠券状态
-        $coupon_info['status'] = config('coupon_status')[$coupon_info['status']];
+        $coupon_info['mb_status'] = config('coupon_status')[$coupon_info['status']];
         // 用户类型
         $coupon_info['user_type'] = config('coupon_status')[$coupon_info['user_type']];
         // 限品类

@@ -28,7 +28,7 @@ class RiderRecruit extends Controller
                 ->field('r.id,r.phone,r.add_time,r.status,u.nickname,s.name as school_name')->order('r.id desc')
                 ->where($where)->paginate(10)->each(function ($item, $key) {
                     $item['add_time'] = date('Y-m-d H:i:s',$item['add_time']);
-                    $item['status'] = config('dispose_status')[$item['status']];
+                    $item['mb_status'] = config('dispose_status')[$item['status']];
                     return $item;
                 });
         return json_success('ok',['list'=>$list]);
