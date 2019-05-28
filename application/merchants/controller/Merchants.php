@@ -100,4 +100,31 @@ class Merchants extends MerchantsBase
 
         return json_success('success',$data);
     }
+
+    /**
+     * 修改密码
+     * @param  \think\Request  $request
+     * @return \think\Response
+     */
+    public function updatePwd(Request $request)
+    {
+        $old_password = $request->param('old_password');
+        $new_password = $request->param('new_password');
+        $true_password = $request->param('true_password');
+
+
+        $data = model('ShopInfo')->where('id',$this->shop_id)->find();
+
+        if (md5($old_password) != $data->password){
+            return json_error('输入的旧密码不正确');
+        }
+
+        if ($new_password != $true_password){
+            return json_error('两次密码不一致');
+        }
+
+        model('ShopInfo')->where('id',$this->shop_id)->update(['password'=>md5($new_password)]);
+
+        return json_success('success');
+    }
 }

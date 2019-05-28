@@ -25,11 +25,11 @@ class Upload extends MerchantsBase
             return json_error($result);
         }
         // 移动到框架应用根目录 目录下
-        $info = $file->move('./uploads/');
+        $info = $file->move('./uploads/merchant/'.$this->shop_id);
         if ($info) {
 
-            $data['images'] = '/uploads/'.$info->getSaveName();
-            return json_success('文件上传成功',$data['images']);
+            $data['images'] = '/uploads/merchant/'.$this->shop_id.'/'.$info->getSaveName();
+            return json_success('文件上传成功',$data);
         } else {
             // 上传失败获取错误信息
             return json_error($file->getError());

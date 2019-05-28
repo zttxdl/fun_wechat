@@ -103,6 +103,7 @@ Route::group('merchants',function (){
 	Route::rule('getBack','merchants/Merchants/getBack');
 	//文件上传
 	Route::rule('upload','merchants/Upload/up');
+	Route::rule('updatePwd','merchants/Merchants/updatePwd');
 
 
 });
