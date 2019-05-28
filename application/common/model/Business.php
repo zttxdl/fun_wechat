@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\admin\model;
+namespace app\common\model;
 
 
 use think\Model;
@@ -15,7 +15,7 @@ class Business extends Model
      */
     public function getSchoolNameById($school_id)
     {
-        $res = Db::name('school')->field('name')->where('id',$school_id);
+        $res = $this->name('school')->field('name')->where('id',$school_id);
         return $res;
     }
 
@@ -27,7 +27,7 @@ class Business extends Model
      */
     public function getBusinessList($page_no,$page_size)
     {
-        $data = Db::name('shop_info')
+        $data = $this->name('shop_info')
             ->where('status',1)
             ->order('id','desc')
             ->page($page_no,$page_size)
@@ -41,8 +41,24 @@ class Business extends Model
      */
     public function getBusinessStock($shop_id)
     {
-        $data = Db::name('product')->where('shop_id',$shop_id)->count('id');
+        $data = $this->name('product')->where('shop_id',$shop_id)->count('id');
         return $data;
+    }
+
+    /**
+     * 获取月销售额
+     */
+    public function getMonthSales()
+    {
+
+    }
+
+    /**
+     * 获取销售总额
+     */
+    public function getCountSales()
+    {
+
     }
 
 

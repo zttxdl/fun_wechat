@@ -3,28 +3,29 @@
 
 namespace app\admin\controller;
 
-
-use think\Db;
-use think\facade\Request;
-use think\Model;
+use think\Request;
 
 class Business
 {
     /**
      * 获取商家列表
      */
-    public function getList()
+    public function getList(Request $request)
     {
-        $page_no = Request::param('page_no');
+        $page_no = $request->param('page_no');
         $page_size = 5;
         $list = Model('Business')->getBusinessList($page_no,$page_size);
+
+
+
+
 
 
         $shop_list = [];
 
 
 
-        return json_success('获取成功',$shop_list);
+        return json_success('获取成功',$list);
     }
 
     /**
