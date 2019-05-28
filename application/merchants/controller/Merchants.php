@@ -84,7 +84,7 @@ class Merchants extends MerchantsBase
      */
     public function getCategory()
     {
-        $data = model('ManageCategory')->select();
+        $data = model('ManageCategory')->field('id,name,img')->select();
 
         return json_success('success',$data);
     }

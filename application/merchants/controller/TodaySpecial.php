@@ -7,7 +7,7 @@ use think\Request;
 use app\common\model\TodayDeals;
 
 /**
- * 商品模块控制器
+ * 商品今天特价模块控制器
  */
 class TodaySpecial extends MerchantsBase
 {
@@ -22,6 +22,7 @@ class TodaySpecial extends MerchantsBase
     {
         $today = date('Y-m-d',time());
         $result = model('TodayDeals')
+            ->field('id,name,product_id,old_price,price,num,limit_buy_num,thumb')
             ->where('shop_id',$this->shop_id)
             ->where('today',$today)
             ->find();
@@ -54,33 +55,8 @@ class TodaySpecial extends MerchantsBase
 
         $result = TodayDeals::create($data);
 
-        return json_success('success',$result);
+        return json_success('success');
     }
 
 
-    /**
-     * 保存更新的资源
-     *
-     * @param  \think\Request  $request
-     * @param  int  $id
-     * @return \think\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $data   = $request->param();
-        $result = TodayDeals::update($data, ['id' => $id]);
-        return json_success('success',$result);
-    }
-
-    /**
-     * 删除指定资源
-     *
-     * @param  int  $id
-     * @return \think\Response
-     */
-    public function delete($id)
-    {
-        $result = TodayDeals::destroy($id);
-        return json_success('success',$result);
-    }
 }
