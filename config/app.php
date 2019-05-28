@@ -146,4 +146,6 @@ return [
     //jwt定义的key
     'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
 
+    
+
 ];

@@ -29,7 +29,7 @@ class Advers extends Controller
         // 广告列表
         $list = Db::name('advers')->where($where)->order('id desc')->paginate(10)->each(function ($item, $key) {
             // 是否启用
-            $item['status'] = config('advers_status')[$item['status']];
+            $item['mb_status'] = config('advers_status')[$item['status']];
             // 展示平台
             $item['platfrom'] = config('show_platfrom')[$item['platfrom']];
 
@@ -53,7 +53,7 @@ class Advers extends Controller
 
         $info = Db::name('advers')->find($id);  
         // 是否启用
-        $info['status'] = config('advers_status')[$info['status']];
+        $info['mb_status'] = config('advers_status')[$info['status']];
         // 展示平台
         $info['platfrom'] = config('show_platfrom')[$info['platfrom']];
 
