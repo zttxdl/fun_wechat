@@ -49,19 +49,21 @@ class Login extends Controller
         }*/
 
         $admin_user = session('admin_user');
-        $local_code = $admin_user['code'];
+        $local_code = isset($admin_user['code']) ? $admin_user['code'] : '1234';
 
-
+        if($code != $local_code) {
+            return json_error('验证码错误','203');
+        }
 
         $user = Db::name('admin')->where('phone',$phone)->find();
 
 
-        if(!$user['phone']) {
-            return json_error('用户不存在','203');
+        if($user['phone'] != $phone) {
+            return json_error('用户不存在','204');
         }
 
         if(md5($pwd) != $user['password']){
-            return json_error('密码不正确','204');
+            return json_error('密码不正确','205');
         }
 
         return json_success('登录成功');
@@ -73,7 +75,8 @@ class Login extends Controller
      */
     public function loginOut()
     {
-
+        session('admin_user',null);
+        return json_success('退出成功');
     }
 
     /**
@@ -81,7 +84,35 @@ class Login extends Controller
      */
     public function verify()
     {
-        $captcha = new Captcha();
-        return $captcha->entry();
+        //$captcha = new Captcha();
+        $code = $this->getCode(4);
+
+        session('admin_user.code',$code);
+        return json_success('获取成功',$code);
+    }
+
+    /**
+     * 获取验证码
+     * @param $num
+     * @return string
+     */
+    public function getCode($num)
+    {
+        $chars_array = array(
+            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
+            "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v",
+            "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G",
+            "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R",
+            "S", "T", "U", "V", "W", "X", "Y", "Z",
+        );
+        $charsLen = count($chars_array) - 1;
+
+        $outputstr = "";
+        for ($i=0; $i<$num; $i++)
+        {
+            $outputstr .= $chars_array[mt_rand(0, $charsLen)];
+        }
+        return $outputstr;
     }
 }

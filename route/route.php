@@ -61,6 +61,7 @@ Route::group('a-intention', function () {
 // 用户模块
 Route::group('admin',function (){
     Route::rule('login','admin/Login/login');//用户登录
+    Route::rule('loginOut','admin/Login/loginOut');//用户登录
     Route::rule('register','admin/Login/register');//用户注册
     Route::rule('verify','admin/Login/verify');//验证码
     Route::rule('index','admin/Admin/index');//后台用户列表

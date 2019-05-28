@@ -6,6 +6,7 @@ namespace app\admin\controller;
 
 use think\Db;
 use think\facade\Request;
+use think\Model;
 
 class Business
 {
@@ -16,10 +17,13 @@ class Business
     {
         $page_no = Request::param('page_no');
         $page_size = 5;
-        $data = Db::name('shop_info')->order('id','desc')->page($page_no,$page_size)->select();
+        $list = Model('Business')->getBusinessList($page_no,$page_size);
 
-        
-        dump($data);
+
+        $shop_list = [];
+
+
+
         return json_success('获取成功',$shop_list);
     }
 
