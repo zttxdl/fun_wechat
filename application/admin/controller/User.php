@@ -12,10 +12,13 @@ class User
 {
     public function getList()
     {
+
         $page_no = Request::param('page_no');
         $page_size = 5;
         $user_list = Db::name('user')->order('id','desc')->page($page_no,$page_size)->select();
-        return json_success('获取成功',$user_list);
+
+        return $user_list;
+
 
     }
 
@@ -66,6 +69,9 @@ class User
             }
         }*/
 
-        return json($result);
+
+
+         return json($result);
+
     }
 }
