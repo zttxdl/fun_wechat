@@ -2,14 +2,14 @@
 
 namespace app\merchants\controller;
 
-use think\Controller;
+use app\common\controller\MerchantsBase;
 use think\Request;
 use app\common\model\ProductsClassify;
 
 /**
  * 商品分类模块控制器
  */
-class GoodsClassify extends Controller
+class GoodsClassify extends MerchantsBase
 {
     protected $noNeedLogin = [];
 
@@ -48,11 +48,11 @@ class GoodsClassify extends Controller
      * @param  int  $id
      * @return \think\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $data   = $request->param();
-        $result = ProductsClassify::update($data, ['id' => $id]);
-        return json_success('success',$result);
+        $result = ProductsClassify::update($data, ['id' => $request->param('id')]);
+        return json_success('success');
     }
 
     /**
@@ -63,7 +63,20 @@ class GoodsClassify extends Controller
      */
     public function delete($id)
     {
+        $result = ProductsClassify::get($id);
+        
+        if ($result->shop_id != $this->shop_id) {
+            return json_error('没有权限删除');
+        }
+
+        $result = ProductsClassify::get(['products_classify_id'=>$id,'delete'=>0]);
+        
+        if ($result) {
+            return json_error('该分类下有商品，请先删除商品');
+        }
+
+        
         $result = ProductsClassify::destroy($id);
-        return json_success('success',$result);
+        return json_success('success');
     }
 }

@@ -61,9 +61,20 @@ class Merchants extends MerchantsBase
      */
     public function getSchool()
     {
-        $data = model('School')->select();
+        // 学区列表
+        $school_district_list = model('School')->field('id,name')->where('level',1)->select()->toArray();
+        // 学校列表
+        $school_list = model('School')->field('id,fid,name')->where('level',2)->select()->toArray();
+        // 组装三维数组
+        foreach ($school_district_list as $k => &$v) {
+            foreach ($school_list as $ko => $vo) {
+                if ($v['id'] == $vo['fid']) {
+                    $v['children'][] = $vo;
+                }
+            }
+        }
 
-        return json_success('success',$data);
+        return json_success('success',$school_district_list);
     }
 
     /**
@@ -73,7 +84,7 @@ class Merchants extends MerchantsBase
      */
     public function getCategory()
     {
-        $data = model('ManageCategory')->select();
+        $data = model('ManageCategory')->field('id,name,img')->select();
 
         return json_success('success',$data);
     }

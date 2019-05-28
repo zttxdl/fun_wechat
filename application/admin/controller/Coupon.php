@@ -28,18 +28,18 @@ class Coupon extends Controller
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : null;
     
         // 优惠券列表
-        $coupon_list = Db::name('platform_coupon')->field('id,batch_id,name,user_type,face_value,threshold,start_time,end_time,other_time,limit_use,num,status,type')->where($where)->paginate(10)->each(function ($item, $key) {
-            // 优惠券状态
-            $item['status'] = config('coupon_status')[$item['status']];
-            // 用户类型
-            $item['user_type'] = config('user_type')[$item['user_type']];
-            // 限品类
-            $item['limit_use'] = Db::name('manage_category')->where('id','in',$item['limit_use'])->value('name');
-            // 有效期
-            $item['type'] == 2 ? $item['indate'] = date('Y-m-d',$item['start_time']).'-'.date('Y-m-d',$item['end_time']) : $item['indate'] = '领取日起'.$item['other_time'].'天';
-            
-            return $item;
-        });
+        $coupon_list = Db::name('platform_coupon')->field('id,batch_id,name,user_type,face_value,threshold,start_time,end_time,other_time,limit_use,num,status,type')
+                        ->where($where)->order('id desc')->paginate(10)->each(function ($item, $key) {
+                            // 优惠券状态
+                            $item['status'] = config('coupon_status')[$item['status']];
+                            // 用户类型
+                            $item['user_type'] = config('user_type')[$item['user_type']];
+                            // 限品类
+                            $item['limit_use'] = Db::name('manage_category')->where('id','in',$item['limit_use'])->value('name');
+                            // 有效期
+                            $item['type'] == 2 ? $item['indate'] = date('Y-m-d',$item['start_time']).'-'.date('Y-m-d',$item['end_time']) : $item['indate'] = '领取日起'.$item['other_time'].'天';
+                            return $item;
+                        });
 
         return json_success('ok',['category_list'=>$category_list,'coupon_list'=>$coupon_list]);
 
@@ -95,7 +95,7 @@ class Coupon extends Controller
      * @param $id  优惠券表主键值
      * 
      */
-    public function edit(Request $request,$id)
+    public function edit($id)
     {
         if (empty((int)$id) ) {
             return json_error('非法参数',201);
@@ -126,7 +126,7 @@ class Coupon extends Controller
     {
         $data = $request->param();
 
-        if (empty((int)$data['id'])) {
+        if (!isset($data['id']) || empty((int)$data['id'])) {
             return json_error('非法参数',201);
         }
         if ($data['type'] == 2) {
@@ -140,10 +140,10 @@ class Coupon extends Controller
         }
         // 提交表单
         $result = Db::name('platform_coupon')->update($data);
-        if ($result === false) {
+        if (!$result) {
             return json_error('修改失败',201);
         }
-
+        
         return json_success('修改成功');
 
     }
@@ -153,7 +153,7 @@ class Coupon extends Controller
      *  获取当前学校的店铺列表
      * 
      */
-    public function getSchoolShop(Request $request,$id)
+    public function getSchoolShop($id)
     {
         if (empty((int)$id)) {
             return json_error('非法参数',201);
@@ -192,7 +192,7 @@ class Coupon extends Controller
      * 优惠券详情 
      * 
      */
-    public function show(Request $request,$id)
+    public function show($id)
     {
         if (empty((int)$id)) {
             return json_error('非法参数',201);

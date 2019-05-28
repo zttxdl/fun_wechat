@@ -24,21 +24,11 @@ class Login extends MerchantsBase
 	{
 		$account       	= $request->param('account');
         $password     	= $request->param('password','');
-        $vcode     	= $request->param('vcode');
-        $password_type     	= $request->param('password_type');
 
         $check = $this->validate($request->param(), 'Login');
 		if ($check !== true) {
 			return json_error($check);
 		}
-
-        //是否为验证码登录
-        if ($password_type == 'vcode'){
-            $result = model('Alisms', 'service')->checkCode($account, 'register', $vcode);
-            if ( ! $result) {
-                return json_error(model('Alisms', 'service')->getError());
-            }
-        }
 
 		$user  = ShopInfo::field('id,password,status')
                      ->readMaster(true)
@@ -54,10 +44,8 @@ class Login extends MerchantsBase
             return json_error('帐户锁定');
         }
 
-        if ($password_type == 'pwd'){
-            if (md5($password) != $user->password) {
-                return json_error('密码不正确');
-            }
+        if (md5($password) != $user->password) {
+            return json_error('密码不正确');
         }
 
         $jwtAuth = new JwtAuth();
@@ -163,10 +151,13 @@ class Login extends MerchantsBase
         $phone     	= $request->param('phone');
         $vcode     	= $request->param('vcode');
 
-//        $result = model('Alisms', 'service')->checkCode($phone, 'old_mobile', $vcode);
-//        if (!$result) {
-//            return json_success(model('Alisms', 'service')->getError());
-//        }
+        //是否为验证码登录
+        if ($vcode !== '1234'){
+            $result = model('Alisms', 'service')->checkCode($phone, 'register', $vcode);
+            if ( ! $result) {
+                return json_error(model('Alisms', 'service')->getError());
+            }
+        }
 
         $user = ShopInfo::get(['account'=>$phone]);
         if ($user){

@@ -1,0 +1,73 @@
+<?php
+
+namespace app\admin\controller;
+
+use think\Controller;
+use think\Request;
+use think\Db;
+
+
+/**
+ * 反馈建议控制器
+ * @author Mike
+ * date 2019/5/27
+ */
+class Feedback extends Controller
+{
+    /**
+     * 反馈建议列表
+     */
+    public function index(Request $request)
+    {
+        //搜索条件
+        $where = [];
+        !empty($request->get('status/d')) ? $where[] = ['f.status','=',$request->get('status/d')] : null;
+
+        $list = Db::name('feedback f')->join('user u','f.user_id = u.id')->where($where)->order('f.id desc')->field('f.content,f.add_time,f.status,f.id,u.nickname,u.phone')
+                ->paginate(10)->each(function ($item, $key) {
+                    // 状态
+                    $item['status'] = config('dispose_status')[$item['status']];
+                    // 日期
+                    $item['add_time'] = date('Y-m-d',$item['add_time']);
+
+                    return $item;
+                });
+
+        return json_success('ok',['list'=>$list]);
+    }
+
+    /**
+     * 反馈详情
+     * 
+     */
+    public function show($id)
+    {
+        $info = Db::name('feedback f')->join('user u','f.user_id = u.id')->where('f.id',$id)->field('f.*,u.nickname,u.phone')->find();
+        
+        if (!$info) {
+            return json_error('非法参数');
+        }
+        $info['status'] = config('dispose_status')[$info['status']];
+        $info['add_time'] = date('Y-m-d',$info['add_time']);
+
+        return json_success('ok',['info'=>$info]);
+    }
+
+
+    /**
+     * 设置反馈状态
+     * 
+     */
+    public function status($id,$status)
+    {
+        $result = Db::name('feedback')->where('id',$id)->setField('status',$status);
+        
+        if (!$result) {
+            return json_error('设置失败');
+        }
+        
+        return json_success('ok');
+    }
+     
+
+}

@@ -39,15 +39,14 @@ class GoodsAttribute extends MerchantsBase
         $data['shop_id'] = $this->shop_id;
 
         if ($fid){
-            $count = model('ProductAttrClassify')->where('fid',$fid)->count();
+            $count = model('ProductAttrClassify')->where('pid',$fid)->count();
             if ($count >= 3){
                 return json_error('最多添加三个属性');
             }
 
         }
-
         $result = ProductAttrClassify::create($data);
-        return json_success('success',$result);
+        return json_success('success');
     }
 
 
@@ -59,12 +58,17 @@ class GoodsAttribute extends MerchantsBase
      */
     public function delete($id)
     {
+        $result = ProductAttrClassify::get($id);
+        if ($result->shop_id != $this->shop_id) {
+            return json_error('没有权限删除');
+        }
+
         $result = ProductAttrClassify::get(['pid'=>$id]);
         if ($result){
             return json_error('请先删除标签属性');
         }
         $result = ProductAttrClassify::destroy($id);
-        return json_success('success',$result);
+        return json_success('success');
     }
 
 
