@@ -29,6 +29,9 @@ class MerchantsBase extends Controller
     protected function valid_token()
     {
         $token = $this->request->header('api-token','');
+        if ($token == ''){
+           return json_error('请输入api-token',500);
+        }
         $jwtAuth = new JwtAuth();
         $jwt = $jwtAuth->checkToken($token);
         $this->shop_id = substr($jwt['data'],9);

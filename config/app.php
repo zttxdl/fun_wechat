@@ -141,6 +141,20 @@ return [
     // 显示错误信息
     'show_error_msg'         => false,
     // 异常处理handle类 留空使用 \think\exception\Handle
-    'exception_handle'       => '\app\common\exception\Http',
+
+//     'exception_handle'       => '\app\common\exception\Http',
+    'exception_handle'       => '',
+    //jwt定义的key
+    'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
+    //阿里云sms
+    'aliyun_sms'              => [
+        'accessKeyId'        => 'LTAIcb85TcMQSaws',
+        'accessSecret'        => 'cCDJVkSrZATCXvY9BuicOHFyb6rzeX',
+        'RegionId'       => 'scn-hangzhou',
+        'SignName'     => '南京合羿科技',
+        'SMSTemplateCode' => 'SMS_158840158',
+        //'SMS_141915147',
+    ],
+
 
 ];
