@@ -5,7 +5,7 @@ namespace app\admin\controller;
 
 use think\Request;
 
-class Business
+class Shop
 {
     /**
      * 获取商家列表
@@ -14,7 +14,9 @@ class Business
     {
         $page_no = $request->param('page_no');
         $page_size = 5;
-        $list = Model('Business')->getBusinessList($page_no,$page_size);
+
+        $list = Model('Shop')->getShopList($page_no,$page_size);
+
 
 
 
