@@ -79,5 +79,19 @@ if (!function_exists('validate_password')) {
     }
 }
 
-
+/**
+ * 随机数字
+ */
+if (!function_exists('numRandCode')) {
+    function numRandCode($length = 6)
+    {
+        $str  = "0123456789";
+        $code = "";
+        for ($i = 0; $i < $length; $i++) {
+            $start = rand(0, 9);
+            $code .= substr($str, $start, 1);
+        }
+        return $code;
+    }
+}
 

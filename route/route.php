@@ -74,6 +74,7 @@ Route::group('a-rider', function () {
 // 用户模块
 Route::group('admin',function (){
     Route::rule('login','admin/Login/login');//用户登录
+    Route::rule('loginOut','admin/Login/loginOut');//用户登录
     Route::rule('register','admin/Login/register');//用户注册
     Route::rule('verify','admin/Login/verify');//验证码
     Route::rule('index','admin/Admin/index');//后台用户列表
@@ -96,6 +97,16 @@ Route::group('admin',function (){
     Route::rule('user/recycle','admin/User/recycle');//回收站
 });
 
+// 商家模块
+Route::group('admin',function (){
+    Route::rule('shop/list','admin/Business/getList');//商家列表
+    Route::rule('shop/detail','admin/Business/getDetail');//商家详情
+    Route::rule('shop/addShop','admin/Business/addShop');//添加店铺
+    Route::rule('shop/addQualification','admin/Business/addQualification');//添加商家资质
+    Route::rule('shop/addAccount','admin/Business/addAccount');//添加收款信息
+    Route::rule('shop/check','admin/Business/check');//商家审核
+});
+
 
 
 
@@ -116,20 +127,12 @@ Route::group('merchants',function (){
 	Route::rule('getBack','merchants/Merchants/getBack');
 	//文件上传
 	Route::rule('upload','merchants/Upload/up');
+	Route::rule('updatePwd','merchants/Merchants/updatePwd');
 
 
 });
 
 
 
-
-
-/*************** 骑手端 *********************************************************************************************/
-
-
-
-
-
-/*************** 用户端 *********************************************************************************************/
 
 

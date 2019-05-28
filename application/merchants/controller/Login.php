@@ -56,6 +56,46 @@ class Login extends MerchantsBase
 	}
 
 
+    /**
+     * 商家登录  验证码登录
+     * @param  \think\Request  $request
+     * @return \think\Response
+     */
+    public function login2(Request $request)
+    {
+        $account       	= $request->param('account','');
+        $vcode     	= $request->param('vcode','');
+
+        if ($account == '' || $vcode == ''){
+            return json_error('用户名和密码不能为空！');
+        }
+
+        $result = model('Alisms', 'service')->checkCode($account, 'login', $vcode);
+        if ( ! $result) {
+            return json_error(model('Alisms', 'service')->getError());
+        }
+
+        $user  = ShopInfo::field('id,password,status')
+            ->readMaster(true)
+            ->where('account', $account)
+            ->find();
+        if ( ! $user) {
+            return json_error('帐户不正确');
+        }
+
+
+        if ($user->status == 2 ) {
+
+            return json_error('帐户锁定');
+        }
+
+        $jwtAuth = new JwtAuth();
+        $token = $jwtAuth->createToken('merchants'.$user->id,604800);
+        return json_success('success',[
+            'token' => $token
+        ]);
+    }
+
 	/**
 	 * 商家注册
 	 * @param  \think\Request  $request
@@ -74,12 +114,12 @@ class Login extends MerchantsBase
 			return json_error($check);
 		}
 
-        if ($vcode != 1234) {
+//        if ($vcode != 1234) {
             $result = model('Alisms', 'service')->checkCode($account, 'register', $vcode);
             if ( ! $result) {
                 return json_error(model('Alisms', 'service')->getError());
             }
-        }
+//        }
 
         //注册会员
         $where['account'] = $account;
@@ -179,6 +219,7 @@ class Login extends MerchantsBase
         $mobile     	= $request->param('phone');
         $type     	= $request->param('type');
 
+
         //判断操作，如果用户当前手机号码不为空则为更换手机号码操作，如果为空则为绑定手机号码操作
         $mobile = trim($mobile);
         //判断手机号是否输入正确
@@ -187,35 +228,26 @@ class Login extends MerchantsBase
         }
 
         //处理手机号是否已注册过会员
-        if ($type == 1) {
+        if ($type == 'register') {
             $map['account'] = $mobile;
             $result        = model('ShopInfo')
                 ->field('account')
                 ->where($map)
                 ->find();
-            if (! $result) {
+            if ($result) {
                 return json_error('此手机号已注册过会员,请更换手机号！');
-            }
-        }else{
-            $map['account'] = $mobile;
-            $result        = model('ShopInfo')
-                ->field('account')
-                ->where($map)
-                ->find();
-            if (! $result) {
-                return json_error('此手机号未注册过会员,请更换手机号！');
             }
         }
 
-
-        return json_success('验证码已发送至 ' . $mobile . ', 5分钟内有效！');
         // 发送短信
-//        $back = model('Alisms', 'service')->sendCode($mobile);
-//        if ($back) {
-//            $this->success('验证码已发送至 ' . $mobile . ', 5分钟内有效！', '');
-//        } else {
-//            $this->error(model('Alisms', 'service')->getError(), '');
-//        }
+        $back = model('Alisms', 'service')->sendCode($mobile,$type);
+
+        if ($back) {
+            return json_success('验证码已发送至 ' . $mobile . ', 5分钟内有效！');
+        } else {
+            return json_error('短信发送失败');
+        }
+
     }
 }
 

@@ -72,7 +72,7 @@ class GoodsClassify extends MerchantsBase
         $result = ProductsClassify::get(['products_classify_id'=>$id,'delete'=>0]);
         
         if ($result) {
-            return json_error('该分类下有商品，静止删除');
+            return json_error('该分类下有商品，请先删除商品');
         }
 
         

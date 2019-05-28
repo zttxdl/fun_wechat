@@ -64,10 +64,29 @@ class JwtAuth
      * @return string $msg 返回消息
      */
     public function checkToken($jwt){
-        $key=config('token_key');;
-        $decoded = JWT::decode($jwt, $key, ['HS256']); //HS256方式，这里要和签发的时候对应
-        $arr = (array)$decoded;
-        return $arr; //返回信息
+        $key=config('token_key');
+
+        try {
+            JWT::$leeway = 60;//当前时间减去60，把时间留点余地
+            $decoded = JWT::decode($jwt, $key, ['HS256']); //HS256方式，这里要和签发的时候对应
+            $arr = (array)$decoded;
+
+            return $arr;
+
+        } catch(\Firebase\JWT\SignatureInvalidException $e) {  //签名不正确
+
+            return json_error('签名不正确-'.$e->getMessage(),'201');
+        }catch(\Firebase\JWT\BeforeValidException $e) {  // 签名在某个时间点之后才能用
+
+            return json_error('签名在某个时间点之后才能用-'.$e->getMessage(),'202');
+        }catch(\Firebase\JWT\ExpiredException $e) {  // token过期
+
+            return json_error('token过期-'.$e->getMessage(),'203');
+        }catch(Exception $e) {  //其他错误
+
+            return json_error('其他错误-'.$e->getMessage(),'299');
+        }
+
     }
 
 

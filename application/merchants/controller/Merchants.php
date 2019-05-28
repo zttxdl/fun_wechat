@@ -61,9 +61,20 @@ class Merchants extends MerchantsBase
      */
     public function getSchool()
     {
-        $data = model('School')->select();
+        // 学区列表
+        $school_district_list = model('School')->field('id,name')->where('level',1)->select()->toArray();
+        // 学校列表
+        $school_list = model('School')->field('id,fid,name')->where('level',2)->select()->toArray();
+        // 组装三维数组
+        foreach ($school_district_list as $k => &$v) {
+            foreach ($school_list as $ko => $vo) {
+                if ($v['id'] == $vo['fid']) {
+                    $v['children'][] = $vo;
+                }
+            }
+        }
 
-        return json_success('success',$data);
+        return json_success('success',$school_district_list);
     }
 
     /**
@@ -73,7 +84,7 @@ class Merchants extends MerchantsBase
      */
     public function getCategory()
     {
-        $data = model('ManageCategory')->select();
+        $data = model('ManageCategory')->field('id,name,img')->select();
 
         return json_success('success',$data);
     }
@@ -88,5 +99,32 @@ class Merchants extends MerchantsBase
         $data = model('Back')->select();
 
         return json_success('success',$data);
+    }
+
+    /**
+     * 修改密码
+     * @param  \think\Request  $request
+     * @return \think\Response
+     */
+    public function updatePwd(Request $request)
+    {
+        $old_password = $request->param('old_password');
+        $new_password = $request->param('new_password');
+        $true_password = $request->param('true_password');
+
+
+        $data = model('ShopInfo')->where('id',$this->shop_id)->find();
+
+        if (md5($old_password) != $data->password){
+            return json_error('输入的旧密码不正确');
+        }
+
+        if ($new_password != $true_password){
+            return json_error('两次密码不一致');
+        }
+
+        model('ShopInfo')->where('id',$this->shop_id)->update(['password'=>md5($new_password)]);
+
+        return json_success('success');
     }
 }
