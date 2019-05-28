@@ -3,11 +3,9 @@
 
 namespace app\admin\controller;
 
-
-use think\App;
 use think\Controller;
-use think\facade\Validate;
 use think\Db;
+use think\facade\Validate;
 use think\captcha\Captcha;
 
 class Login extends Controller
@@ -21,13 +19,34 @@ class Login extends Controller
         $pwd = $this->request->param('pwd');
         $code = $this->request->param('code');
 
-        if(!$phone || !$pwd || !$code) {
-            return json_error('参数不能为空');
+        $data = [
+            'phone' => $phone,
+            'password' => $pwd,
+            'code' => $code,
+
+        ];
+
+        //第一种方法
+        $result = $this->validate($data,'app\admin\validate\Login');
+
+        if(true !== $result){
+           return json_error($result);//输出错误信息
         }
 
-        if(!Validate::regex($phone, "^1\d{10}$")) {
+        /*第二种方法
+         $validate = new \app\admin\validate\Login;
+        if(!$validate->check($data)){
+            $result = $validate->getError();
+            return json_error($result);
+        }*/
+
+        /*if(!$phone || !$pwd || !$code) {
+            return json_error('参数不能为空');
+        }*/
+
+        /*if(!Validate::regex($phone, "^1\d{10}$")) {
             return json_error('手机格式不正确', '202');
-        }
+        }*/
 
         $admin_user = session('admin_user');
         $local_code = $admin_user['code'];

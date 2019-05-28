@@ -83,6 +83,16 @@ Route::group('admin',function (){
     Route::rule('user/recycle','admin/User/recycle');//回收站
 });
 
+// 商家模块
+Route::group('admin',function (){
+    Route::rule('shop/list','admin/Business/getList');//商家列表
+    Route::rule('shop/detail','admin/Business/getDetail');//商家详情
+    Route::rule('shop/addShop','admin/Business/addShop');//添加店铺
+    Route::rule('shop/addQualification','admin/Business/addQualification');//添加商家资质
+    Route::rule('shop/addAccount','admin/Business/addAccount');//添加收款信息
+    Route::rule('shop/check','admin/Business/check');//商家审核
+});
+
 
 
 
@@ -110,14 +120,5 @@ Route::group('merchants',function (){
 
 
 
-
-
-/*************** 骑手端 *********************************************************************************************/
-
-
-
-
-
-/*************** 用户端 *********************************************************************************************/
 
 
