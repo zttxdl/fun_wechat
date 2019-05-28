@@ -14,15 +14,14 @@ class User
     {
 
        $user_list = Db::name('user')->order('id','desc')->select();
+       return json_success('获取成功',$user_list);
 
     }
 
     public function getDetail()
     {
-        $validate = new Validate();
-        if($validate->test($data)){
-            $result = $validate->getError();
-        }
+
+
         $uid = Request::param('uid');
 
         if(!$uid) {
@@ -35,6 +34,7 @@ class User
         $result['user_address'] = Db::name('receiving_addr')->where('id',$uid)->find();
 
         $result['user_coupon'] = Db::name('my_coupon')->where('user_id',$uid)->select();
+
 
          return json($result);
     }

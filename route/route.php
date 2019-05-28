@@ -71,9 +71,9 @@ Route::group('admin',function (){
 
 //后台会员模块
 Route::group('admin',function (){
-    Route::rule('user/list','admin/User/getList');//会员列表
-    Route::rule('user/detail','admin/User/getDetail');//会员详情
-    Route::rule('user/recycle','admin/User/recycle');//回收站
+    Route::rule('list','admin/User/getList');//会员列表
+    Route::rule('detail','admin/User/getDetail');//会员详情
+    Route::rule('recycle','admin/User/recycle');//回收站
 });
 
 
