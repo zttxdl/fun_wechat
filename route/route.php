@@ -105,6 +105,14 @@ Route::group('admin',function (){
     Route::rule('shop/addQualification','admin/Shop/addQualification');//添加商家资质
     Route::rule('shop/addAccount','admin/Shop/addAccount');//添加收款信息
     Route::rule('shop/check','admin/Shop/check');//商家审核
+    Route::rule('shop/sortInfo','admin/Shop/SortInfo');//商家排序列表
+    Route::rule('shop/sort','admin/Shop/Sort');//商家排序
+});
+
+// 订单模块
+Route::group('admin',function (){
+    Route::rule('order/list','admin/Orders/getList');//订单列表
+    Route::rule('order/detail','admin/Orders/getDetail');//订单详情
 });
 
 
