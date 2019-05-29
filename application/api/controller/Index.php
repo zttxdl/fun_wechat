@@ -2,12 +2,19 @@
 
 namespace app\api\controller;
 
+use app\common\controller\ApiBase;
 
-class Index
+class Index extends ApiBase
 {
 
+    protected $noNeedLogin = ['index'];
+
+    //首页
     public function index()
     {
-        return 'hello word';
+        //获取广告位
+
     }
+
+
 }
