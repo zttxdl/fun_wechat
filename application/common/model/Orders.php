@@ -1,16 +1,12 @@
 <?php
 
-
-namespace app\admin\model;
-
+namespace app\common\model;
 
 use think\Model;
-use think\Db;
 
-class Order extends Model
+class Orders extends Model
 {
-    private $table_name = 'orders';
-
+    //
     /**
      * 获取会员消费记录
      * @param $uid

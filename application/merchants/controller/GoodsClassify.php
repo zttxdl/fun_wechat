@@ -37,7 +37,7 @@ class GoodsClassify extends MerchantsBase
         $data['shop_id'] = $this->shop_id;
         $result = ProductsClassify::create($data);
 
-        return json_success('success',$result);
+        return json_success('success');
     }
 
 
