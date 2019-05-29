@@ -38,7 +38,7 @@ class Agreement extends Controller
 
     /**
      * 展示图文协议编辑页面 
-     * 
+     * @param $id 图文协议表主键值
      */
     public function edit($id)
     {
@@ -82,7 +82,7 @@ class Agreement extends Controller
 
     /**
      * 图文协议详情
-     * 
+     * @param $id 图文协议表主键值
      */
     public function show($id)
     {
