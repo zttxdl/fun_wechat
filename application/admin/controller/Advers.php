@@ -15,7 +15,7 @@ use think\Db;
 class Advers extends Controller
 {
     /**
-     * 广告管理控制器
+     * 广告列表
      *
      */
     public function index(Request $request)
@@ -43,7 +43,7 @@ class Advers extends Controller
 
     /**
      * 展示编辑广告页面 
-     * 
+     * @param $id 广告表主键值
      */
     public function edit($id)
     {
@@ -93,7 +93,7 @@ class Advers extends Controller
 
     /**
      * 删除广告 
-     * 
+     * @param $id 广告表主键值
      */
     public function delete($id)
     {

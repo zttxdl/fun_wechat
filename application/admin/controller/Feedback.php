@@ -38,7 +38,7 @@ class Feedback extends Controller
 
     /**
      * 反馈详情
-     * 
+     * @param $id  反馈建议表主键值
      */
     public function show($id)
     {
@@ -56,7 +56,8 @@ class Feedback extends Controller
 
     /**
      * 设置反馈状态
-     * 
+     * @param $id  反馈建议表主键值
+     * @param $status  状态值
      */
     public function status($id,$status)
     {

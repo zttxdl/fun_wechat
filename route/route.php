@@ -29,7 +29,7 @@ Route::group('a-coupon', function () {
     Route::post('/create', 'create');
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');
-    Route::post('/status', 'status');
+    Route::get('/status/:id/:status', 'status');
     Route::get('/shop-list/:id', 'getSchoolShop');
 })->prefix('admin/coupon/');
 

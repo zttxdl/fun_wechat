@@ -36,7 +36,8 @@ class RiderRecruit extends Controller
 
     /**
      * 设置意向骑手的状态
-     *
+     * @param $id  骑手意向表主键值
+     * @param $status  状态值
      */
     public function status($id,$status)
     {
