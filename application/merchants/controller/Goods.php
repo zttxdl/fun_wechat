@@ -75,7 +75,7 @@ class Goods extends MerchantsBase
         $data['shop_id'] = $this->shop_id;
         $result = Product::create($data);
 
-        return json_success('success',$result);
+        return json_success('success');
     }
 
 

@@ -11,9 +11,5 @@ class ProductsClassify extends Model
         'status' => 1,
     ];
 
-    protected $field = [
-        'id'          => 'int',
-        'create_time' => 'int',
-        'update_time' => 'int',
-    ];
+    
 }
