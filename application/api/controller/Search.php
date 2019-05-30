@@ -8,7 +8,7 @@ use think\Db;
 
 class Search extends ApiBase
 {
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['*'];
 
     //搜索页面
     public function index()

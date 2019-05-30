@@ -30,10 +30,7 @@ class ApiBase extends Controller
 
     protected function valid_token()
     {
-        $token = $this->request->header('api-token', '');
-        if ($token == '') {
-            return json_error('请输入api-token', 500);
-        }
+        $token = $this->request->header('api-token');
         $jwtAuth = new JwtAuth();
         $this->auth = $jwtAuth->checkToken($token);
     }
