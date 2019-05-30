@@ -118,11 +118,9 @@ class Index extends ApiBase
     {
         $pagesize = input('pagesize',15);
         $page = input('page',1);
-        $page = ($page-1) * $pagesize;
-
         $list = model('ShopInfo')->getDistance($lat,$lng,$page,$pagesize);
 
-        if (! $list) {
+        if (empty($list)) {
             return [];
         }
 
@@ -157,27 +155,17 @@ class Index extends ApiBase
         $class_id = $request->param('class_id','');
         $pagesize = input('pagesize',15);
         $page = input('page',1);
-        $page = ($page-1) * $pagesize;
 
-        $sql = "SELECT
-            id,shop_name,marks,sales,up_to_send_money,run_time,
-            address,manage_category_id,ping_fee,
-            (
-                ROUND(6371 * acos (
-                    cos ( radians( '".$lat."' ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( '".$lng."' ) ) + sin ( radians( '".$lat."' ) ) * sin( radians( latitude ) ) 
-                ) 
-            )) AS distance 
-        FROM
-            fun_shop_info 
-		WHERE manage_category_id = $class_id
-        HAVING
-            distance < 3 
-        ORDER BY distance 
-        LIMIT $page,$pagesize";
+        $list = model('ShopInfo')
+            ->field("id,shop_name,marks,sales,up_to_send_money,run_time,
+            address,manage_category_id,ping_fee,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),2 ) AS distance ")
+            ->where('manage_category_id','=',$class_id)
+            ->having('distance < 3')
+            ->page($page,$pagesize)
+            ->select()
+            ->toArray();
 
-        $list = Db::query($sql);
-
-        if (! $list){
+        if (empty($list)){
             return json_success('success',$list);
         }
 
