@@ -35,7 +35,7 @@ class School extends Model
      * @param $school_id
      * @return mixed
      */
-    public function getSchoolNameById($school_id)
+    public function getNameById($school_id)
     {
        return  $this->name('school')->where('id',$school_id)->value('name');
 
