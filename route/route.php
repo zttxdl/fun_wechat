@@ -71,16 +71,19 @@ Route::group('a-rider', function () {
 
 });
 
-// 用户模块
+//系统模块
 Route::group('admin',function (){
     Route::rule('login','admin/Login/login');//用户登录
     Route::rule('loginOut','admin/Login/loginOut');//用户退出
     Route::rule('register','admin/Login/register');//用户注册
     Route::rule('verify','admin/Login/verify');//验证码
+});
+
+//权限模块
+Route::group('admin',function (){
     Route::rule('index','admin/Admin/index');//后台用户列表
     Route::rule('add','admin/Admin/add');//后台用户新增
     Route::rule('edit','admin/Admin/update');//后台用户新增
-
 });
 
 
@@ -95,16 +98,27 @@ Route::group('admin',function (){
     Route::rule('user/list','admin/User/getList');//会员列表
     Route::rule('user/detail','admin/User/getDetail');//会员详情
     Route::rule('user/recycle','admin/User/recycle');//回收站
-});
+})->middleware('IsLogin');
 
 // 商家模块
 Route::group('admin',function (){
     Route::rule('shop/list','admin/Shop/getList');//商家列表
-    Route::rule('shop/detail','admin/Shop/getDetail');//商家详情
+    Route::rule('shop/detail','admin/Shop/getDetail2');//商家详情
     Route::rule('shop/addShop','admin/Shop/addShop');//添加店铺
     Route::rule('shop/addQualification','admin/Shop/addQualification');//添加商家资质
     Route::rule('shop/addAccount','admin/Shop/addAccount');//添加收款信息
-    Route::rule('shop/check','admin/Shop/check');//商家审核
+    Route::rule('shop/c-list','admin/Shop/checkList');//商家审核列表
+    Route::rule('shop/c-detail','admin/Shop/checkDetail');//商家审核详情
+    Route::rule('shop/c-show','admin/Shop/checkShow');//商家审核展示
+    Route::rule('shop/c-status','admin/Shop/checkStatus');//商家审核状态
+    Route::rule('shop/sortInfo','admin/Shop/SortInfo');//商家排序列表
+    Route::rule('shop/sort','admin/Shop/Sort');//商家排序
+});
+
+// 订单模块
+Route::group('admin',function (){
+    Route::rule('order/list','admin/Orders/getList');//订单列表
+    Route::rule('order/detail','admin/Orders/getDetail');//订单详情
 });
 
 

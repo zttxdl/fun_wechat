@@ -13,7 +13,7 @@ use think\Request;
 class Merchants extends MerchantsBase
 {
 
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['getSchool','getCategory','getBack'];
 
     /**
      * 新建商家
@@ -64,7 +64,7 @@ class Merchants extends MerchantsBase
         // 学区列表
         $school_district_list = model('School')->field('id,name')->where('level',1)->select()->toArray();
         // 学校列表
-        $school_list = model('School')->field('id,fid,name')->where('level',2)->select()->toArray();
+        $school_list = model('School')->field('id,fid,name,longitude,latitude')->where('level',2)->select()->toArray();
         // 组装三维数组
         foreach ($school_district_list as $k => &$v) {
             foreach ($school_list as $ko => $vo) {
@@ -96,7 +96,7 @@ class Merchants extends MerchantsBase
      */
     public function getBack()
     {
-        $data = model('Back')->select();
+        $data = model('Back')->field('id,name')->select();
 
         return json_success('success',$data);
     }

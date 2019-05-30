@@ -66,6 +66,8 @@ class Login extends Controller
             return json_error('密码不正确','205');
         }
 
+        session('admin_user.phone',$phone);
+
         return json_success('登录成功');
 
     }

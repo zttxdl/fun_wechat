@@ -6,6 +6,15 @@ use think\Model;
 
 class ManageCategory extends Model
 {
+
+    private $table_name = 'manage_category';
+
+    public function getNameById($id)
+    {
+        return $this->where('id',$id)->value('name');
+
+    }
+
     /**
      * 获取经营品类的二级列表
      * 
@@ -16,4 +25,5 @@ class ManageCategory extends Model
         return $list;
     }
      
+
 }
