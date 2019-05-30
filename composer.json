@@ -20,7 +20,8 @@
         "topthink/framework": "5.1.*",
         "firebase/php-jwt": "^5.0",
         "alibabacloud/client": "^1.5",
-        "overtrue/wechat": "~4.0"
+        "overtrue/wechat": "~4.0",
+        "topthink/think-captcha": "v2.0.2"
     },
     "autoload": {
         "psr-4": {

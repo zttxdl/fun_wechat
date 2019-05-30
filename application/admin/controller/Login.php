@@ -86,11 +86,7 @@ class Login extends Controller
      */
     public function verify()
     {
-        //$captcha = new Captcha();
-        $code = $this->getCode(4);
-
-        session('admin_user.code',$code);
-        return json_success('获取成功',$code);
+        return captcha('',config('captcha'));
     }
 
     /**
