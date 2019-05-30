@@ -5,6 +5,7 @@ namespace app\common\controller;
 use think\App;
 use think\Controller;
 use app\common\Auth\JwtAuth;
+use think\facade\Cache;
 use EasyWeChat\Factory;
 
 
@@ -73,4 +74,32 @@ class ApiBase extends Controller
         }
         return $arr;
     }
+
+    /**
+     * 获取缓存
+     * @param $param
+     * @param null $options
+     * @return mixed
+     */
+    public function getDataCache($param, $options = null)
+    {
+        $store = 'file'; //redis,file
+
+        return Cache::store($store)
+            ->get('api_' . $param['name']);
+    }
+
+    /**
+     * 设置缓存
+     * @param $param
+     * @param $data
+     * @param int $options
+     */
+    public function setDataCache($param, $data, $options = 60)
+    {
+        $store = 'file'; //redis,file
+        Cache::store($store)
+            ->set('api_' . $param['name'], $data, $options, $param['tag']);
+    }
+
 }
