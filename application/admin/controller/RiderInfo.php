@@ -40,7 +40,8 @@ class RiderInfo extends Controller
 
     /**
      * 设置骑手状态【禁用】
-     * 
+     * @param $id 骑手信息表主键值
+     * @param $status 禁用状态值
      */
     public function status($id,$status)
     {
@@ -54,7 +55,7 @@ class RiderInfo extends Controller
 
     /**
      * 展示审核骑手详情 
-     * 
+     * @param $id 骑手信息表主键值
      */
     public function checkShow($id)
     {
@@ -67,7 +68,7 @@ class RiderInfo extends Controller
 
     /**
      * 展示审核骑手详情 
-     * 
+     * @param $id 骑手信息表主键值
      */
     public function show($id)
     {
@@ -123,6 +124,7 @@ class RiderInfo extends Controller
     public function setCheckStatus(Request $request)
     {
         $data = $request->post();
+        $data['check_time'] = time();
 
         $result = Db::name('rider_info')->update($data);
         if (!$result) {

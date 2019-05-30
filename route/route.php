@@ -29,7 +29,7 @@ Route::group('a-coupon', function () {
     Route::post('/create', 'create');
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');
-    Route::post('/status', 'status');
+    Route::get('/status/:id/:status', 'status');
     Route::get('/shop-list/:id', 'getSchoolShop');
 })->prefix('admin/coupon/');
 
@@ -100,11 +100,19 @@ Route::group('admin',function (){
 // 商家模块
 Route::group('admin',function (){
     Route::rule('shop/list','admin/Shop/getList');//商家列表
-    Route::rule('shop/detail','admin/Shop/getDetail');//商家详情
+    Route::rule('shop/detail','admin/Shop/getDetail2');//商家详情
     Route::rule('shop/addShop','admin/Shop/addShop');//添加店铺
     Route::rule('shop/addQualification','admin/Shop/addQualification');//添加商家资质
     Route::rule('shop/addAccount','admin/Shop/addAccount');//添加收款信息
     Route::rule('shop/check','admin/Shop/check');//商家审核
+    Route::rule('shop/sortInfo','admin/Shop/SortInfo');//商家排序列表
+    Route::rule('shop/sort','admin/Shop/Sort');//商家排序
+});
+
+// 订单模块
+Route::group('admin',function (){
+    Route::rule('order/list','admin/Orders/getList');//订单列表
+    Route::rule('order/detail','admin/Orders/getDetail');//订单详情
 });
 
 

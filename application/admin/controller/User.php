@@ -44,10 +44,12 @@ class User
         $result['user_detail'] = Db::name('user')->where('id',$uid)->field('nickname,phone,last_login_time,add_time')->find();
         $result['user_detail']['type'] = '普通会员';
         $result['user_detail']['head_img'] = '';
+
+        $data = Model('Orders')->getUserConsume($uid);
         //会员消费总金额
-        $result['user_detail']['total_money'] = Db::name('orders')->where('user_id',$uid)->where('status',1)->count('money');
+        $result['user_detail']['total_money'] = $data['total_money'];
         //累计交易次数
-        $result['user_detail']['order_num'] = Db::name('orders')->where('user_id',$uid)->where('status',1)->count('id');
+        $result['user_detail']['order_num'] = $data['order_num'];
 
         //收货地址信息
         $result['user_address'] = Db::name('receiving_addr')->alias('a')
@@ -68,9 +70,6 @@ class User
                 $result['user_coupon'][] = Db::name('platform_coupon')->where('id',$v['platform_coupon_id'])->field('id,name as coupon_name,face_value,other_time,type,limit_use,threshold')->find();
             }
         }*/
-
-
-
          return json($result);
 
     }

@@ -5,6 +5,9 @@ namespace app\admin\controller;
 use think\Controller;
 use think\Request;
 use think\Db;
+use app\common\model\ManageCategory;
+use app\common\model\School;
+
 
 /**
  * 平台红包控制器
@@ -52,10 +55,15 @@ class Coupon extends Controller
      */
     public function add()
     {
-        // 优惠券的覆盖范围
-        $school_list = $this->getShopList();
+        // 优惠券的覆盖范围 [学校]
+        $sc_model = new School();
+        $school_list = $sc_model->getShopList();
 
-        return json_success('ok',['school_list'=>$school_list]);
+        // 经营品类列表
+        $mg_model = new ManageCategory();
+        $manage_category_list = $mg_model->getManageCategoryList();
+
+        return json_success('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list]);
 
     }
      
@@ -72,6 +80,7 @@ class Coupon extends Controller
             $data['start_time'] = strtotime($data['start_time']);
             $data['end_time'] = strtotime($data['end_time']);
         }
+        $data['surplus_num'] = $data['num'];
 
         // 验证表单数据
         $check = $this->validate($data, 'Coupon');
@@ -108,12 +117,17 @@ class Coupon extends Controller
             $coupon_info['end_time'] = date('Y-m-d',$coupon_info['end_time']);
         }
 
+        // 经营品类列表
+        $mg_model = new ManageCategory();
+        $manage_category_list = $mg_model->getManageCategoryList();
+
         // 优惠券的覆盖范围 [学校]
-        $school_list = $this->getShopList();
+        $sc_model = new School();
+        $school_list = $sc_model->getShopList();
         // 优惠券的覆盖范围 [店铺]
         $shop_list = Db::name('shop_info')->where('school_id',$coupon_info['school_id'])->find();
 
-        return json_success('ok',['coupon_info'=>$coupon_info,'school_list'=>$school_list,'shop_list'=>$shop_list]);
+        return json_success('ok',['coupon_info'=>$coupon_info,'school_list'=>$school_list,'shop_list'=>$shop_list,'manage_category_list'=>$manage_category_list]);
 
     }
 
@@ -129,15 +143,31 @@ class Coupon extends Controller
         if (!isset($data['id']) || empty((int)$data['id'])) {
             return json_error('非法参数',201);
         }
-        if ($data['type'] == 2) {
-            $data['start_time'] = strtotime($data['start_time']);
-            $data['end_time'] = strtotime($data['end_time']);
+        
+        $info = Db::name('platform_coupon')->where('id',$data['id'])->field('num,surplus_num,status')->find();
+        // 当优惠券未发放时，可修改所以
+        if ($info['status'] == 1) {
+            if ($data['type'] == 2) {
+                $data['start_time'] = strtotime($data['start_time']);
+                $data['end_time'] = strtotime($data['end_time']);
+            }
+            // 验证表单数据
+            $check = $this->validate($data, 'Coupon');
+            if ($check !== true) {
+                return json_error($check,201);
+            }
         }
-        // 验证表单数据
-        $check = $this->validate($data, 'Coupon');
-        if ($check !== true) {
-            return json_error($check,201);
+        // 当优惠券已发放时，仅可修改发放量
+        if ($info['status'] == 2) {
+            // 已领取数量
+            $temp = $info['num'] - $info['surplus_num'];
+            if ($data['num'] >= $temp) {
+                $data['surplus_num'] = $data['num'] - $temp;
+            } else {
+                return json_error('发行量不能小于已领取的优惠券数量');
+            }
         }
+        
         // 提交表单
         $result = Db::name('platform_coupon')->update($data);
         if (!$result) {
@@ -151,7 +181,7 @@ class Coupon extends Controller
 
     /**
      *  获取当前学校的店铺列表
-     * 
+     * @param $id 学校表主键值
      */
     public function getSchoolShop($id)
     {
@@ -166,31 +196,8 @@ class Coupon extends Controller
 
 
     /**
-     * 获取优惠券的覆盖区域列表【学校信息】 
-     * 
-     */
-    public function getShopList()
-    {
-        // 学区列表
-        $school_district_list = Db::name('school')->field('id,name')->where('level',1)->select();
-        // 学校列表
-        $school_list = Db::name('school')->field('id,fid,name')->where('level',2)->select();
-        // 组装三维数组
-        foreach ($school_district_list as $k => &$v) {
-            foreach ($school_list as $ko => $vo) {
-                if ($v['id'] == $vo['fid']) {
-                    $v['children'][] = $vo;
-                }
-            }
-        }
-
-        return $school_district_list;
-    }
-
-
-    /**
      * 优惠券详情 
-     * 
+     * @param $id  优惠券表主键值
      */
     public function show($id)
     {
@@ -231,7 +238,22 @@ class Coupon extends Controller
     }
      
      
-     
+     /**
+      * 设置优惠券状态 
+      * @param $id 优惠券主键值
+      * @param $status 状态值
+      */
+     public function status($id,$status)
+     {
+        $result = Db::name('platform_coupon')->where('id',$id)->setField('status',$status);
+
+        if (!$result) {
+            return json_error('设置失败');
+        }
+
+        return json_success('ok');
+     }
+      
      
 
 
