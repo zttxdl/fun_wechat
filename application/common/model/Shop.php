@@ -28,7 +28,15 @@ class Shop extends Model
 
     }
 
-    public function getShopListOne($shop_id)
+    /**
+     * 获取指定商家信息
+     * @param $shop_id
+     * @return array|false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getShopInfo($shop_id)
     {
         $data = $this->name('shop_info')
             ->where('id',$shop_id)
@@ -87,7 +95,9 @@ class Shop extends Model
      * @param $shop_id
      */
     public function getShopDetail($shop_id){
-        $data = $this->name($this->table_name)->field('shop_name,logo_img,link_name,link_tel,manage_category_id,school_id,address')->where('id',$shop_id)->find();
+        $data = $this->name($this->table_name)
+            ->field('shop_name,logo_img,link_name,link_tel,manage_category_id,school_id,address')
+            ->where('id',$shop_id)->find();
         return $data;
     }
 
@@ -100,11 +110,27 @@ class Shop extends Model
     }
 
     /**
+     * 获取店铺更多信息
+     * @param $shop_id
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getShopMoreInfo($shop_id)
+    {
+        $data = $this->name('shop_more_info')->where('shop_id',$shop_id)->select();
+        return $data;
+    }
+
+    /**
      * 获取商家资质
      */
     public function getShopQualification($shop_id)
     {
-        $data = $this->name('shop_more_info')->where('shop_id',$shop_id)->field('business_license,proprietor,hand_card_front,user_name,identity_num,sex,licence')->find();
+        $data = $this->name('shop_more_info')
+            ->where('shop_id',$shop_id)
+            ->field('business_license,proprietor,hand_card_front,user_name,identity_num,sex,licence')
+            ->find();
         return $data;
     }
 
@@ -115,7 +141,10 @@ class Shop extends Model
      */
     public function getAccount($shop_id)
     {
-        $data = $this->name('shop_more_info')->where('shop_id',$shop_id)->field('branch_back,back_hand_name,back_card_num')->find();
+        $data = $this->name('shop_more_info')
+            ->where('shop_id',$shop_id)
+            ->field('branch_back,back_hand_name,back_card_num')
+            ->find();
         return $data;
     }
 
