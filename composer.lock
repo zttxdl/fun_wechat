@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "03def7240b924be1d3e09c92797dd926",
+    "content-hash": "6371a5ddcb721492695b43a5dff76179",
     "packages": [
         {
             "name": "adbario/php-dot-notation",
@@ -922,7 +922,11 @@
                 "weixin",
                 "weixin-sdk"
             ],
+<<<<<<< HEAD
             "time": "2018-09-20T12:46:49+00:00"
+=======
+            "time": "2019-04-11T04:01:36+00:00"
+>>>>>>> a8e50de47c825decffac86316098ffa5a28c90a2
         },
         {
             "name": "pimple/pimple",
