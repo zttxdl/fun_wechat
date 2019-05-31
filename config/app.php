@@ -164,8 +164,7 @@ return [
         //数字验证码
         'codeSet' => '0123456789'
 
-    ]
-
+    ],
 
     'wechat' => [
         'app_id' => 'wxd9a9b3a7bec20988',
