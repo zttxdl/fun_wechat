@@ -94,7 +94,8 @@ class Shop extends Model
      * 获取店铺明细
      * @param $shop_id
      */
-    public function getShopDetail($shop_id){
+    public function getShopDetail($shop_id)
+    {
         $data = $this->name($this->table_name)
             ->field('shop_name,logo_img,link_name,link_tel,manage_category_id,school_id,address')
             ->where('id',$shop_id)->find();

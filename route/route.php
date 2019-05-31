@@ -149,7 +149,9 @@ Route::group('merchants',function (){
 
 //店铺管理
 Route::group('merchants',function (){
-    Route::get('shop/index/:id','merchants/Shop/index');
+    Route::get('shopIndex','merchants/Shop/index');
+    Route::get('shopSetName','merchants/Shop/setShopName');
+    Route::get('shopSetLogo','merchants/Shop/setShopLogo');//修改店铺
 });
 
 

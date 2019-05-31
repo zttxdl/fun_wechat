@@ -39,6 +39,7 @@ class Shop
         return json_success('获取成功',$shop_list);
     }
 
+
     /**
      * 获取商家详情
      */
@@ -137,7 +138,7 @@ class Shop
         $result['shop_information'] = $this->shopModel->getInformation($shop_id);
 
         //在售商品
-        $result['is_oline_goods'] = $this->shopModel->getIsOnlineGoods($shop_id);
+        /*$result['is_oline_goods'] = $this->shopModel->getIsOnlineGoods($shop_id);
 
         foreach ($result['is_oline_goods'] as &$row)
         {
@@ -146,7 +147,7 @@ class Shop
 
                 $row['attrs_name'] = isset($row['attrs_name']) ? $row['attrs_name'] : '--';
             }
-        }
+        }*/
 
         //结算信息
         $result['shop_settle'] = $this->shopModel->getSettle();
@@ -332,11 +333,7 @@ class Shop
         $shop_id = $request->param('shop_id');
         $sort = $request->param('sort');
 
-        if(empty($shop_id)) {
-            return json_error('非法传参','404');
-        }
-
-        if(empty($sort)) {
+        if(empty($shop_id) || empty($sort)) {
             return json_error('非法传参','404');
         }
 

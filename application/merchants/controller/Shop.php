@@ -24,19 +24,31 @@ class Shop
         $shop_id = $request->param('id');
         $shop_info = [];
 
-        $data = Model('Shop')->getShopInfo($shop_id);
+        $result = Model('Shop')->getShopInfo($shop_id);
 
-        foreach ($data as $row)
+//        dump($result);
+        if($result->isEmpty()) {
+            return json_error('暂无店铺信息');
+        }
+
+
+        foreach ($result as $row)
         {
+            if($row['status']) {
+
+            }
             $shop_info = [
-                'shop_name' => '123456',
-                'shop_name' => '23456',
-                'shop_name' => 'wewe',
+                'shop_name' => '123456',//店铺名称
+                'status' => '1',//店铺营业状态
+                'day_order' => '55',//今日订单数
+                'day_sales' => 'wewe',//今日销售额
+                'day_uv' => '20',//今日访客数
+                'order_cancel_num' => '2',//订单取消数量
             ];
         }
 
 
-        return $shop_info;
+        return json_success('获取成功',$shop_info);
     }
 
     /**
@@ -59,6 +71,30 @@ class Shop
         }
 
         return json_error('更新失败');
+    }
+
+    /**
+     * 店铺图标修改
+     */
+    public function setShopLogo()
+    {
+
+    }
+
+    /**
+     * 添加商家资质
+     */
+    public function addQualification()
+    {
+
+    }
+
+    /**
+     * 添加收款信息
+     */
+    public function addAccount()
+    {
+
     }
 
 

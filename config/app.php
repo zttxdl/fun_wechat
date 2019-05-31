@@ -158,11 +158,11 @@ return [
     //验证码设置
     'captcha' => [
         // 验证码字体大小
-        'fontSize' => 25,
+        'fontSize' => 30,
         //验证码位数
-        'length' => 5,
+        'length' => 4,
         //数字验证码
-        'codeSet' => '0123456789'
+//        'codeSet' => '0123456789'
 
     ]
 

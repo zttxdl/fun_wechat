@@ -29,7 +29,8 @@ class Login extends Controller
         //第一种方法
         $result = $this->validate($data,'app\admin\validate\Login');
 
-        if(true !== $result){
+        if(true !== $result)
+        {
            return json_error($result);//输出错误信息
         }
 
@@ -42,27 +43,27 @@ class Login extends Controller
 
         /*if(!$phone || !$pwd || !$code) {
             return json_error('参数不能为空');
-        }*/
-
-        /*if(!Validate::regex($phone, "^1\d{10}$")) {
+        }
+        if(!Validate::regex($phone, "^1\d{10}$")) {
             return json_error('手机格式不正确', '202');
         }*/
-
-        $admin_user = session('admin_user');
-        $local_code = isset($admin_user['code']) ? $admin_user['code'] : '1234';
-
-        if($code != $local_code) {
-            return json_error('验证码错误','203');
+        $data = captcha_check($code);
+        if(!$data)
+        {
+            return json_error('验证码错误');//输出错误信息
         }
+
 
         $user = Db::name('admin')->where('phone',$phone)->find();
 
 
-        if($user['phone'] != $phone) {
+        if($user['phone'] != $phone)
+        {
             return json_error('用户不存在','204');
         }
 
-        if(md5($pwd) != $user['password']){
+        if(md5($pwd) != $user['password'])
+        {
             return json_error('密码不正确','205');
         }
 

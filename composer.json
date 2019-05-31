@@ -21,7 +21,8 @@
         "firebase/php-jwt": "^5.0",
         "alibabacloud/client": "^1.5",
         "overtrue/wechat": "~4.0",
-        "topthink/think-captcha": "2.0.*"
+        "topthink/think-captcha": "2.0.*",
+        "predis/predis": "^1.1"
 
     },
     "autoload": {
