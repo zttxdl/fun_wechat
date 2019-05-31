@@ -6,7 +6,7 @@ use think\App;
 use think\Controller;
 use app\common\Auth\JwtAuth;
 use think\facade\Cache;
-use EasyWeChat\Factory;
+
 
 
 /**

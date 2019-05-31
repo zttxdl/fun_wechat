@@ -157,6 +157,14 @@ return [
     ],
 
 
-    
+    'wechat' => [
+        'app_id' => 'wxd9a9b3a7bec20988',
+        'secret' => '01b452c050e8d6f3c95e16446ae22f07',
+        'response_type' => 'array',
+        'log' => [
+            'level' => 'debug',
+            'file' => __DIR__.'/wechat.log',
+        ],
+    ],
 
 ];
