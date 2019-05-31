@@ -4,82 +4,104 @@ namespace app\api\controller;
 
 use think\Controller;
 use think\Request;
+use app\common\model\ReceivingAddr as ReceiveAddr;
+use app\common\model\School;
 
 class ReceivingAddr extends Controller
 {
     /**
-     * 显示资源列表
-     *
-     * @return \think\Response
+     * 地址列表 
+     * 
      */
-    public function index()
+    public function index($uid)
     {
-        //
+        $model = new ReceiveAddr();
+
+        $list = $model->getReceivingAddrList($uid);
+
+        return json_success('获取收货地址成功',['list'=>$list]);
     }
 
-    /**
-     * 显示创建资源表单页.
-     *
-     * @return \think\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
-     * 保存新建的资源
-     *
-     * @param  \think\Request  $request
-     * @return \think\Response
+     * 保存新增收货地址 
+     * 
      */
-    public function save(Request $request)
+    public function create(Request $request)
     {
-        //
+        $data = $request->param();
+        $data['add_time'] = time();
+        // 验证表单数据
+        $check = $this->validate($data, 'ReceivingAddr');
+        if ($check !== true) {
+            return json_error($check,201);
+        }
+
+        // 提交新增表单
+        $result = $user = ReceiveAddr::create($data,true);
+        if (!$result) {
+            return json_error('添加失败',201);
+        }
+
+        return json_success('添加成功');
     }
 
-    /**
-     * 显示指定的资源
-     *
-     * @param  int  $id
-     * @return \think\Response
-     */
-    public function read($id)
-    {
-        //
-    }
 
     /**
-     * 显示编辑资源表单页.
-     *
-     * @param  int  $id
-     * @return \think\Response
+     * 展示收货页面 
+     * @param $id  收货地址表主键值
+     * 
      */
     public function edit($id)
     {
-        //
+        $info = ReceiveAddr::get($id);
+        $school_model = new School();
+        $info['school_name'] = $school_model->getNameById($info['school_id']);
+        
+        return json_success('获取地址信息成功',['info'=>$info]);
     }
 
+
     /**
-     * 保存更新的资源
-     *
-     * @param  \think\Request  $request
-     * @param  int  $id
-     * @return \think\Response
+     * 保存修改收货地址
+     * 
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $data = $request->param();
+
+        // 验证表单数据
+        $check = $this->validate($data, 'ReceivingAddr');
+        if ($check !== true) {
+            return json_error($check,201);
+        }
+        
+        // 提交表单
+        $result = ReceiveAddr::update($data);
+        if (!$result) {
+            return json_error('修改失败',201);
+        }
+        
+        return json_success('修改成功');
+
     }
 
+
     /**
-     * 删除指定资源
-     *
-     * @param  int  $id
-     * @return \think\Response
+     * 删除收货地址 
+     * 
      */
     public function delete($id)
     {
-        //
+        $result = ReceiveAddr::destroy($id);
+
+        if (!$result) {
+            return json_error('删除失败',201);
+        }
+        
+        return json_success('删除成功');
     }
+     
+     
+     
 }

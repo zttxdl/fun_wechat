@@ -27,4 +27,16 @@ class User extends Model
         $res = $this->name('user')->page($page_no,$page_size)->select();
         return $res;
     }
+
+
+    /**
+     * 获取用户的主键值
+     * @param $openid
+     */
+    public function getUidByOpenId($openid)
+    {
+        $id = $this->where('openid',$openid)->value('id');
+        return $id;
+    }
+
 }
