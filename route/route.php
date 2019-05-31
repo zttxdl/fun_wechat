@@ -147,6 +147,11 @@ Route::group('merchants',function (){
 
 });
 
+//店铺管理
+Route::group('merchants',function (){
+    Route::get('shop/index/:id','merchants/Shop/index');
+});
+
 
 
 

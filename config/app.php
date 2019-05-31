@@ -142,8 +142,8 @@ return [
     'show_error_msg'         => false,
     // 异常处理handle类 留空使用 \think\exception\Handle
 
-//     'exception_handle'       => '\app\common\exception\Http',
-    'exception_handle'       => '',
+     //'exception_handle'       => '\app\common\exception\Http',
+    //'exception_handle'       => '',
     //jwt定义的key
     'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
     //阿里云sms
@@ -155,6 +155,16 @@ return [
         'SMSTemplateCode' => 'SMS_158840158',
         //'SMS_141915147',
     ],
+    //验证码设置
+    'captcha' => [
+        // 验证码字体大小
+        'fontSize' => 25,
+        //验证码位数
+        'length' => 5,
+        //数字验证码
+        'codeSet' => '0123456789'
+
+    ]
 
 
     'wechat' => [
