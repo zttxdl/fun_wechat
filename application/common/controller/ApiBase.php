@@ -6,7 +6,7 @@ use think\App;
 use think\Controller;
 use app\common\Auth\JwtAuth;
 use think\facade\Cache;
-use EasyWeChat\Factory;
+
 
 
 /**
@@ -98,5 +98,7 @@ class ApiBase extends Controller
         Cache::store($store)
             ->set('api_' . $param['name'], $data, $options, $param['tag']);
     }
+
+    
 
 }

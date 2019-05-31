@@ -162,11 +162,60 @@ return [
         //验证码位数
         'length' => 4,
         //数字验证码
+<<<<<<< HEAD
 //        'codeSet' => '0123456789'
-
-    ]
-
-
+=======
+        'codeSet' => '0123456789'
+    ],
     
+    // 微信小程序的用户端账号信息
+    'wx_user'    =>  [
+        'app_id'        => 'your-appid',
+        'secret'        =>  'your-appsecret',
+        'mch_id'        => 'your-mch-id',
+        // API 密钥
+        'key'           => 'key-for-signature', 
+>>>>>>> ba641aadb28d2ae1118166c277c9a670f3129b88
+
+        // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
+        'cert_path'     => 'path/to/your/cert.pem', // XXX: 绝对路径！！！！
+        'key_path'      => 'path/to/your/key',      // XXX: 绝对路径！！！！
+        'notify_url'    => '默认的订单回调地址',     // 你也可以在下单时单独设置来想覆盖它
+        
+        // 下面为可选项
+        // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
+        'response_type' => 'array',
+
+        'log' => [
+            'level' => 'debug',
+            'file' => __DIR__.'/wechat_user.log',
+        ],
+    ],
+
+    // 微信小程序的骑手端账号信息
+    'wx_rider'  =>[
+        'app_id'        => 'your-appid',
+        'secret'        =>  'your-appsecret',
+
+        // 下面为可选项
+        // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
+        'response_type' => 'array',
+
+        'log' => [
+            'level' => 'debug',
+            'file' => __DIR__.'/wechat_rider.log',
+        ],
+    ],
+
+
+    'wechat' => [
+        'app_id' => 'wxd9a9b3a7bec20988',
+        'secret' => '01b452c050e8d6f3c95e16446ae22f07',
+        'response_type' => 'array',
+        'log' => [
+            'level' => 'debug',
+            'file' => __DIR__.'/wechat.log',
+        ],
+    ],
 
 ];

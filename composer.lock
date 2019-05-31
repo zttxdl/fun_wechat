@@ -790,7 +790,15 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/overtrue/wechat/zipball/c365d2f52e25a78b697dddd0ef8a9eb32d02d92b",
                 "reference": "c365d2f52e25a78b697dddd0ef8a9eb32d02d92b",
-                "shasum": ""
+
+                "shasum": "",
+
+                "mirrors": [
+                    {
+                        "url": "https://dl.laravel-china.org/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "easywechat-composer/easywechat-composer": "^1.0",
@@ -839,6 +847,7 @@
                 "weixin-sdk"
             ],
             "time": "2018-09-20T12:46:49+00:00"
+
         },
         {
             "name": "pimple/pimple",

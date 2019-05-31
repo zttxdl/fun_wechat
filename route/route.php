@@ -18,7 +18,7 @@ Route::group('a-advers', function () {
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');
     Route::get('/del/:id', 'delete');
-})->prefix('admin/advers/');
+})->prefix('admin/advers/')->middleware('IsLogin');
 
 
 // 优惠券组
@@ -31,7 +31,7 @@ Route::group('a-coupon', function () {
     Route::post('/update', 'update');
     Route::get('/status/:id/:status', 'status');
     Route::get('/shop-list/:id', 'getSchoolShop');
-})->prefix('admin/coupon/');
+})->prefix('admin/coupon/')->middleware('IsLogin');
 
 // 图文协议组
 Route::group('a-agreement', function () {
@@ -39,14 +39,14 @@ Route::group('a-agreement', function () {
     Route::get('/info/:id', 'show');
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');
-})->prefix('admin/agreement/');
+})->prefix('admin/agreement/')->middleware('IsLogin');
 
 // 反馈建议组
 Route::group('a-feedback', function () {
     Route::get('/index', 'index');
     Route::get('/info/:id', 'show');
     Route::get('/status/:id/:status', 'status');
-})->prefix('admin/feedback/');
+})->prefix('admin/feedback/')->middleware('IsLogin');
 
 // 意向表单组
 Route::group('a-intention', function () {
@@ -56,7 +56,7 @@ Route::group('a-intention', function () {
     // 骑手
     Route::get('/r-index', 'admin/RiderRecruit/index');
     Route::get('/r-status/:id/:status', 'admin/RiderRecruit/status');
-});
+})->middleware('IsLogin');
 
 // （骑手）配送管理组
 Route::group('a-rider', function () {
@@ -69,7 +69,7 @@ Route::group('a-rider', function () {
     Route::get('/c-info/:id', 'admin/RiderInfo/checkShow');
     Route::post('/c-status', 'admin/RiderInfo/setCheckStatus');
 
-});
+})->middleware('IsLogin');
 
 //系统模块
 Route::group('admin',function (){
@@ -84,7 +84,7 @@ Route::group('admin',function (){
     Route::rule('index','admin/Admin/index');//后台用户列表
     Route::rule('add','admin/Admin/add');//后台用户新增
     Route::rule('edit','admin/Admin/update');//后台用户新增
-});
+})->middleware('IsLogin');
 
 
 
@@ -113,7 +113,7 @@ Route::group('admin',function (){
     Route::rule('shop/c-status','admin/Shop/checkStatus');//商家审核状态
     Route::rule('shop/sortInfo','admin/Shop/SortInfo');//商家排序列表
     Route::rule('shop/sort','admin/Shop/Sort');//商家排序
-});
+})->middleware('IsLogin');
 
 // 订单模块
 Route::group('admin',function (){
@@ -154,6 +154,61 @@ Route::group('merchants',function (){
     Route::get('shopSetLogo','merchants/Shop/setShopLogo');//修改店铺
 });
 
+
+
+/*************** 用户端 *********************************************************************************************/
+
+// 登录组
+Route::group('u-login', function () {
+    Route::get('/index', 'index');
+})->prefix('api/login/');
+
+
+// 红包组
+Route::group('u-coupon', function () {
+    Route::get('/index/:uid/:type', 'index');
+
+})->prefix('api/MyCoupon/');
+
+
+// 收货地址组
+Route::group('u-addr', function () {
+    Route::get('/index/:uid', 'index');
+    Route::post('/create', 'create');
+    Route::get('/edit/:id', 'edit');
+    Route::post('/update', 'update');
+    Route::get('/del/:id', 'delete');
+})->prefix('api/ReceivingAddr/');
+
+// 学校地区组
+Route::group('u-school', function () {
+    Route::get('/index', 'index');
+})->prefix('api/school/');
+
+// 经营品类组
+Route::group('u-manage', function () {
+    Route::get('/index', 'index');
+})->prefix('api/ManageCategory/');
+
+// 图文协议组
+Route::group('u-agreement', function () {
+    Route::get('/index/:id', 'index');
+})->prefix('api/agreement/');
+
+// 意见反馈组
+Route::group('u-feedback', function () {
+    Route::post('/create', 'create');
+})->prefix('api/feedback/');
+
+// 入驻招募
+Route::group('u-intention', function () {
+    // 商家入驻
+    Route::get('/m-index', 'api/MerchantEnter/index');
+    Route::post('/m-create', 'api/MerchantEnter/create');
+    // 骑手招募
+    Route::post('/r-create', 'api/RiderRecruit/create');
+
+});
 
 
 

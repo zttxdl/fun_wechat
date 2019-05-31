@@ -4,82 +4,20 @@ namespace app\api\controller;
 
 use think\Controller;
 use think\Request;
+use app\common\model\Agreement as AgreementModel;
+
 
 class Agreement extends Controller
 {
     /**
-     * 显示资源列表
-     *
-     * @return \think\Response
+     * 图文协议详情 
+     * 
      */
-    public function index()
+    public function index($id)
     {
-        //
-    }
-
-    /**
-     * 显示创建资源表单页.
-     *
-     * @return \think\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * 保存新建的资源
-     *
-     * @param  \think\Request  $request
-     * @return \think\Response
-     */
-    public function save(Request $request)
-    {
-        //
-    }
-
-    /**
-     * 显示指定的资源
-     *
-     * @param  int  $id
-     * @return \think\Response
-     */
-    public function read($id)
-    {
-        //
-    }
-
-    /**
-     * 显示编辑资源表单页.
-     *
-     * @param  int  $id
-     * @return \think\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * 保存更新的资源
-     *
-     * @param  \think\Request  $request
-     * @param  int  $id
-     * @return \think\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * 删除指定资源
-     *
-     * @param  int  $id
-     * @return \think\Response
-     */
-    public function delete($id)
-    {
-        //
+        $model = new AgreementModel();
+        $info = $model->getAgreementContent($id);
+        
+        return json_success('获取图文协议成功',['info'=>$info]);
     }
 }
