@@ -161,11 +161,6 @@ return [
         'fontSize' => 30,
         //验证码位数
         'length' => 4,
-        //数字验证码
-<<<<<<< HEAD
-//        'codeSet' => '0123456789'
-=======
-        'codeSet' => '0123456789'
     ],
     
     // 微信小程序的用户端账号信息
@@ -174,8 +169,7 @@ return [
         'secret'        =>  'your-appsecret',
         'mch_id'        => 'your-mch-id',
         // API 密钥
-        'key'           => 'key-for-signature', 
->>>>>>> ba641aadb28d2ae1118166c277c9a670f3129b88
+        'key'           => 'key-for-signature',
 
         // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
         'cert_path'     => 'path/to/your/cert.pem', // XXX: 绝对路径！！！！
