@@ -3,17 +3,24 @@
 namespace app\http\middleware;
 
 use function GuzzleHttp\json_encode;
+use think\Request;
+use app\common\model\User;
 
 class UserAuth
 {
     public function handle($request, \Closure $next)
     {
-        $uid = isset($_SERVER['HTTP_API_TOKEN']) ? $_SERVER['HTTP_API_TOKEN'] : '';
+        $uid = Request::has('uid') ? Request::param('uid') : '';
         
-        if ($uid) {
-            return $next($request);
-        } else {
-            return json_encode('用户没有登录');
+        if (!$uid) {
+            return json_encode('参数出错，暂无登录', 205);
+        } 
+
+        $result = User::find($uid);
+        if (!$result) {
+            return json_error('未查到该用户',201);
         }
+
+        return $next($request);
     }
 }
