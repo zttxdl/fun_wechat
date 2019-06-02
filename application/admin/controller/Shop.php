@@ -319,13 +319,15 @@ class Shop
             if(empty($remark)){
                 return json_error('请填写不通过理由哦');
             }
-            $res = $shopInfo->save([
+            $res = $shopInfo->update([
                 'status' => $status,
                 'remark' => $remark
-            ],['id',$shop_id]);
+            ],['id' => $shop_id]);
+
+        } else {
+            $res = $shopInfo->where('id',$shop_id)->setField('status',$status);
         }
 
-        $res = $shopInfo->where('id',$shop_id)->setField('status',$status);
 
         if($res) {
             return json_success('更新成功');
