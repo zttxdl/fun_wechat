@@ -28,6 +28,6 @@ class Login extends Validate
         'phone.require' => '手机号不能为空',
         'phone.regex' => '手机号格式不正确',
         'password.require' => '密码不能为空',
-        'code.require' => '验证吗不能为空'
+        'code.require' => '验证码不能为空'
     ];
 }

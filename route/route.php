@@ -107,10 +107,10 @@ Route::group('admin',function (){
     Route::rule('shop/addShop','admin/Shop/addShop');//添加店铺
     Route::rule('shop/addQualification','admin/Shop/addQualification');//添加商家资质
     Route::rule('shop/addAccount','admin/Shop/addAccount');//添加收款信息
-    Route::rule('shop/c-list','admin/Shop/checkList');//商家审核列表
-    Route::rule('shop/c-detail','admin/Shop/checkDetail');//商家审核详情
-    Route::rule('shop/c-show','admin/Shop/checkShow');//商家审核展示
-    Route::rule('shop/c-status','admin/Shop/checkStatus');//商家审核状态
+    Route::rule('shop/checkList','admin/Shop/checkList');//商家审核列表
+    Route::rule('shop/checkDetail','admin/Shop/checkDetail');//商家审核详情
+    Route::rule('shop/checkShow','admin/Shop/checkShow');//商家审核展示
+    Route::rule('shop/checkStatus','admin/Shop/checkStatus');//商家审核状态
     Route::rule('shop/sortInfo','admin/Shop/SortInfo');//商家排序列表
     Route::rule('shop/sort','admin/Shop/Sort');//商家排序
 })->middleware('IsLogin');
