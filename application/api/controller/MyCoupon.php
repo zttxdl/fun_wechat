@@ -20,7 +20,7 @@ class MyCoupon extends Controller
      * @param $type  $type = 1，可用红包列表 否则为历史红包 
      * 
      */
-    public function index($uid,$type)
+    public function index($uid,$type=1)
     {
         // 条件
         $type == 1 ? $where[] = ['m.status','=',1] : $where[] = ['m.status','in','2,3'];
