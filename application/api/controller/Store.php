@@ -170,5 +170,16 @@ class Store extends ApiBase
 
     }
 
+    /**
+     * 确认订单，生成订单
+     * @param Request $request
+     * @return bool
+     */
+    public function sureOrder(Request $request)
+    {
+//        $address = $request->param('address');
+//        $shop_id = $request->param('shop_id');
+//        $address = $request->param('address');
 
+    }
 }
