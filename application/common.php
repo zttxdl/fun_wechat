@@ -95,3 +95,40 @@ if (!function_exists('numRandCode')) {
     }
 }
 
+
+/**
+ * 模拟 post 请求
+ * @param $url 
+ */
+if (!function_exists('curl_post')) {  
+    function curl_post($url, $post_data = array()) {
+        if (empty($url)) {
+            return false;
+        }
+        $curl_data=json_encode($post_data);
+
+        $ch = curl_init();//初始化curl
+        curl_setopt($ch, CURLOPT_URL,$url);//抓取指定网页
+        curl_setopt($ch, CURLOPT_HEADER, 0);//设置header
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);//要求结果为字符串且输出到屏幕上
+        curl_setopt($ch, CURLOPT_POST, 1);//post提交方式
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $curl_data);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' .strlen($curl_data)));
+        $data = curl_exec($ch);//运行curl
+        curl_close($ch);
+        
+        return $data;
+    }
+  }
+
+
+/**
+ * 生成唯一订单号
+ * @param string $head  订单头部前缀（用于区分订单）
+ */
+if (!function_exists('build_order_no')) {  
+    function build_order_no()
+    {
+        return date('YmdHis') . substr(implode(null, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
+    }
+}
