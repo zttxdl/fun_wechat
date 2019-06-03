@@ -9,7 +9,7 @@ use app\common\model\ManageCategory as ManageCategoryModel;
 class ManageCategory extends Controller
 {
     /**
-     * 学校地区
+     * 获取经营品类二级列表
      *
      */
     public function index()

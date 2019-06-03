@@ -15,7 +15,7 @@ use app\common\model\User;
 class Member extends Controller
 {
     /**
-     * 个人中心
+     * 我的资料
      * 
      */
     public function index($uid)
@@ -26,5 +26,7 @@ class Member extends Controller
         return json_success('获取用户信息成功',['info'=>$info]);
 
     }
+
+    
      
 }
