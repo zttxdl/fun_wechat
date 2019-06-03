@@ -48,10 +48,10 @@ class Login extends Controller
             return json_error('手机格式不正确', '202');
         }*/
         $data = captcha_check($code);
-        /*if(!$data)
+        if(!$data)
         {
             return json_error('验证码错误');//输出错误信息
-        }*/
+        }
 
 
         $user = model('admin')->where('phone',$phone)->find();
