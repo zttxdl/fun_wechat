@@ -167,9 +167,15 @@ Route::group('merchants',function (){
 
 /*************** 用户端 *********************************************************************************************/
 
-// 登录组
+// 登录注册授权组
 Route::group('u-login', function () {
-    Route::get('/index', 'index');
+    Route::get('/get-auth/:code', 'getAuthInfo');
+    Route::post('/base-create', 'saveUserBaseInfo');
+    Route::post('/check-tel', 'checkUserPhone');
+    Route::get('/send-veriyf', 'getVerify');
+    Route::post('/update-tel', 'setUserPhone');
+    Route::post('/login', 'login');
+    Route::post('/celerity-login', 'celerityLogin');
 })->prefix('api/login/');
 
 
