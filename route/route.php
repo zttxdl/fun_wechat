@@ -9,7 +9,13 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-
+//解决跨域问题
+header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Headers:Origin, X-Requested-With, Content-Type, Accept");
+header('Access-Control-Allow-Methods: POST,GET');
+if(request()->isOptions()){
+    exit();
+}
 
 /*************** 管理平台端 *********************************************************************************************/
 // 广告组
@@ -90,14 +96,14 @@ Route::group('admin',function (){
 
 // 首页模块
 Route::group('admin',function (){
-    Route::rule('index/info','admin/Index/getUserList');
+    Route::rule('indexInfo','admin/Index/getUserList');
 });
 
 // 会员模块
 Route::group('admin',function (){
-    Route::rule('user/list','admin/User/getList');//会员列表
-    Route::rule('user/detail','admin/User/getDetail');//会员详情
-    Route::rule('user/recycle','admin/User/recycle');//回收站
+    Route::rule('userList','admin/User/getList');//会员列表
+    Route::rule('userDetail','admin/User/getDetail');//会员详情
+    Route::rule('userRecycle','admin/User/recycle');//回收站
 })->middleware('IsLogin');
 
 // 商家模块
@@ -150,8 +156,11 @@ Route::group('merchants',function (){
 //店铺管理
 Route::group('merchants',function (){
     Route::get('shopIndex','merchants/Shop/index');
-    Route::get('shopSetName','merchants/Shop/setShopName');//修改店铺名称
-    Route::get('shopSetLogo','merchants/Shop/setShopLogo');//修改店铺Logo
+    Route::get('shopSetName','merchants/Shop/setName');//修改店铺名称
+    Route::get('shopSetLogo','merchants/Shop/setLogo');//修改店铺Logo
+    Route::get('shopInfo','merchants/Shop/info');//商家信息
+    Route::get('shopSetInfo','merchants/Shop/setInfo');//设置商家信息
+    Route::get('shopMoreInfo','merchants/Shop/moreInfo');//入驻信息
 });
 
 
