@@ -13,11 +13,22 @@ class ReceivingAddr extends Controller
      * 地址列表 
      * 
      */
-    public function index($uid)
+    public function index($uid,$lat='',$lng='')
     {
-        $model = new ReceiveAddr();
+        if ($lat == '' & $lng == ''){
+            $list = model('ReceiveAddr')->getReceivingAddrList($uid);
 
-        $list = $model->getReceivingAddrList($uid);
+        }else{
+            $list = model('ReceiveAddr')->getReceivingAddrList($uid);
+            foreach ($list as &$value) {
+                $value['beyond'] = 0;
+                $distance = pc_sphere_distance($lat,$lng,$value['latitude'],$value['longitude']);
+                if ($$distance > 3000){
+                    $value['beyond'] = 1;
+                }
+            }
+        }
+
 
         return json_success('获取收货地址成功',['list'=>$list]);
     }
@@ -36,6 +47,13 @@ class ReceivingAddr extends Controller
         if ($check !== true) {
             return json_error($check,201);
         }
+
+        $school_id = $request->param('school_id');
+        $school_name = model('')->getNameById($school_id);
+        $address = $school_name.$request->param('area_detail');
+        $location = get_location($address);
+        $data['latitude'] = $location['lat'];
+        $data['longitude'] = $location['lng'];
 
         // 提交新增表单
         $result = $user = ReceiveAddr::create($data,true);

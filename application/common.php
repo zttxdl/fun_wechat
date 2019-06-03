@@ -132,3 +132,39 @@ if (!function_exists('build_order_no')) {
         return date('YmdHis') . substr(implode(null, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
     }
 }
+
+
+/**
+ * 计算两个经纬度之间距离的方法
+ */
+if (!function_exists('pc_sphere_distance')) {
+    // 返回值的单位为米
+    function pc_sphere_distance($lat1, $lon1, $lat2, $lon2, $radius = 6371000) {
+        $rad = doubleval(M_PI/180.0);
+        $lat1 = doubleval($lat1) * $rad;
+        $lon1 = doubleval($lon1) * $rad;
+        $lat2 = doubleval($lat2) * $rad;
+        $lon2 = doubleval($lon2) * $rad;
+        $theta = $lon2 - $lon1;
+        $dist = acos(sin($lat1) * sin($lat2) + cos($lat1) * cos($lat2) * cos($theta));
+        return $dist * $radius * 1000;
+    }
+}
+
+
+/**
+ * 物理地址逆解析
+ */
+if (!function_exists('get_location')) {
+    function get_location($address){
+        $make_key = '5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T';
+        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$make_key;
+        $jsondata=json_decode(file_get_contents($url),true);
+        $data['lat'] = $jsondata['result']['location']['lat'];
+        $data['lng'] = $jsondata['result']['location']['lng'];
+
+        return $data;
+    }
+}
+
+
