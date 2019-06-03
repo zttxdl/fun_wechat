@@ -11,5 +11,11 @@ namespace app\merchants\controller;
 
 class Comment
 {
+    /**
+     * 评价管理
+     */
+    public function Index()
+    {
 
+    }
 }

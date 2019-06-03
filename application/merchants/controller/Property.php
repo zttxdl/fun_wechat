@@ -12,4 +12,27 @@ namespace app\merchants\controller;
 class Property
 {
 
+    /**
+     * 我的资产
+     */
+    public function myProperty()
+    {
+
+    }
+
+    /**
+     * 收支明细
+     */
+    public function receiptPay()
+    {
+
+    }
+
+    /**
+     * 提现
+     */
+    public function withdraw()
+    {
+
+    }
 }

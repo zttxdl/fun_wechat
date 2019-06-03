@@ -16,7 +16,7 @@ class IsLogin
             if($phone) {
                 return $next($request);
             } else {
-                return json_error('用户未登录','500');
+                return json_error('用户未登录');
             }
         }catch (ErrorException $e){
             json_error($e->getMessage(),$e->getCode());
