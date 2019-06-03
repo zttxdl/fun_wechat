@@ -90,35 +90,35 @@ Route::group('admin',function (){
 
 // 首页模块
 Route::group('admin',function (){
-    Route::rule('index/info','admin/Index/getUserList');
+    Route::rule('indexInfo','admin/Index/getUserList');
 });
 
 // 会员模块
 Route::group('admin',function (){
-    Route::rule('user/list','admin/User/getList');//会员列表
-    Route::rule('user/detail','admin/User/getDetail');//会员详情
-    Route::rule('user/recycle','admin/User/recycle');//回收站
+    Route::rule('userList','admin/User/getList');//会员列表
+    Route::rule('userDetail','admin/User/getDetail');//会员详情
+    Route::rule('userRecycle','admin/User/recycle');//回收站
 })->middleware('IsLogin');
 
 // 商家模块
 Route::group('admin',function (){
-    Route::rule('shop/list','admin/Shop/getList');//商家列表
-    Route::rule('shop/detail','admin/Shop/getDetail2');//商家详情
-    Route::rule('shop/addShop','admin/Shop/addShop');//添加店铺
-    Route::rule('shop/addQualification','admin/Shop/addQualification');//添加商家资质
-    Route::rule('shop/addAccount','admin/Shop/addAccount');//添加收款信息
-    Route::rule('shop/c-list','admin/Shop/checkList');//商家审核列表
-    Route::rule('shop/c-detail','admin/Shop/checkDetail');//商家审核详情
-    Route::rule('shop/c-show','admin/Shop/checkShow');//商家审核展示
-    Route::rule('shop/c-status','admin/Shop/checkStatus');//商家审核状态
-    Route::rule('shop/sortInfo','admin/Shop/SortInfo');//商家排序列表
-    Route::rule('shop/sort','admin/Shop/Sort');//商家排序
+    Route::rule('shopList','admin/Shop/getList');//商家列表
+    Route::rule('shopDetail','admin/Shop/getDetail2');//商家详情
+    Route::rule('shopAddShop','admin/Shop/addShop');//添加店铺
+    Route::rule('shopAddQualification','admin/Shop/addQualification');//添加商家资质
+    Route::rule('shopAddAccount','admin/Shop/addAccount');//添加收款信息
+    Route::rule('shopCheckList','admin/Shop/checkList');//商家审核列表
+    Route::rule('shopCheckDetail','admin/Shop/checkDetail');//商家审核详情
+    Route::rule('shopCheckShow','admin/Shop/checkShow');//商家审核展示
+    Route::rule('shopCheckStatus','admin/Shop/checkStatus');//商家审核状态
+    Route::rule('shopSortInfo','admin/Shop/SortInfo');//商家排序列表
+    Route::rule('shopSort','admin/Shop/Sort');//商家排序
 })->middleware('IsLogin');
 
 // 订单模块
 Route::group('admin',function (){
-    Route::rule('order/list','admin/Orders/getList');//订单列表
-    Route::rule('order/detail','admin/Orders/getDetail');//订单详情
+    Route::rule('orderList','admin/Orders/getList');//订单列表
+    Route::rule('orderDetail','admin/Orders/getDetail');//订单详情
 });
 
 
@@ -150,8 +150,11 @@ Route::group('merchants',function (){
 //店铺管理
 Route::group('merchants',function (){
     Route::get('shopIndex','merchants/Shop/index');
-    Route::get('shopSetName','merchants/Shop/setShopName');
-    Route::get('shopSetLogo','merchants/Shop/setShopLogo');//修改店铺
+    Route::get('shopSetName','merchants/Shop/setName');//修改店铺名称
+    Route::get('shopSetLogo','merchants/Shop/setLogo');//修改店铺Logo
+    Route::get('shopInfo','merchants/Shop/info');//商家信息
+    Route::get('shopSetInfo','merchants/Shop/setInfo');//设置商家信息
+    Route::get('shopMoreInfo','merchants/Shop/moreInfo');//入驻信息
 });
 
 

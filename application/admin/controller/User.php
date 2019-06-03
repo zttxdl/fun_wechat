@@ -17,7 +17,7 @@ class User
         $page_size = 5;
         $user_list = Db::name('user')->order('id','desc')->page($page_no,$page_size)->select();
 
-        return $user_list;
+        return json_success('获取成功',$user_list);
 
 
     }
@@ -70,7 +70,7 @@ class User
                 $result['user_coupon'][] = Db::name('platform_coupon')->where('id',$v['platform_coupon_id'])->field('id,name as coupon_name,face_value,other_time,type,limit_use,threshold')->find();
             }
         }*/
-         return json($result);
+         return json_success('获取成功',$result);
 
     }
 }

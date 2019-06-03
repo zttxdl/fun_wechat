@@ -55,7 +55,7 @@ class Shop
      * 修改店铺名称
      * @param Request $request
      */
-    public function setShopName(Request $request)
+    public function setName(Request $request)
     {
         $shop_id = $request->param('shop_id');
         $shop_name = $request->param('shop_name');
@@ -76,10 +76,118 @@ class Shop
     /**
      * 店铺图标修改
      */
-    public function setShopLogo()
+    public function setLogo()
     {
 
     }
+
+    /**
+     * 店铺营业状态
+     * @param Request $request
+     * @return \think\response\Json
+     */
+    public function setOpenStatus(Request $request)
+    {
+        $shop_id = $request->param('shop_id');
+        $shop_name = $request->param('shop_name');
+        $open_status = $request->param('open_status');
+
+        if(empty($shop_id) || empty($open_status)) {
+            json_error('非法传参','404');
+        }
+
+        $res = Model('shopInfo')->where('id',$shop_id)->setField('open_status',$open_status);
+
+        if($res) {
+            return json_success('更新成功');
+        }
+
+        return json_error('更新失败');
+
+    }
+
+    /**
+     * 商家信息
+     */
+    public function info()
+    {
+
+    }
+
+    /**
+     * 商家信息设置
+     */
+    public function setInfo()
+    {
+
+    }
+
+    /**
+     *营业时间修改
+     */
+    public function setOpenTime()
+    {
+
+    }
+
+    /**
+     * 商家更多信息
+     */
+    public function moreInfo(Request $request)
+    {
+        $shop_id = $request->param('shop_id');
+
+        if(!$shop_id) {
+            return json_error('非法传参','404');
+        }
+
+        $result = [];
+
+        $shop_info = $this->shopModel->getShopInfo($shop_id);
+
+        foreach ($shop_info as $row)
+        {
+            //店铺信息
+            $result['shop_info']['shop_name'] = $row['shop_name'];
+            $result['shop_info']['logo_img'] = $row['logo_img'];
+            $result['shop_info']['link_name'] = $row['link_name'];
+            $result['shop_info']['link_tel'] = $row['link_tel'];
+            $result['shop_info']['address'] = $row['address'];
+            $result['shop_info']['school'] = Model('School')->getNameById($row['school_id']);
+            $result['shop_info']['manage_category_name'] = Model('ManageCategory')->getNameById($row['manage_category_id']);
+        }
+
+        $shop_more_info = $this->shopModel->getShopMoreInfo($shop_id);
+        //dump($shop_more_info);
+        //商家资质
+        $shop_qualification = [];
+
+        //收款信息
+        $shop_account = [];
+
+        foreach ($shop_more_info as $row)
+        {
+            $shop_qualification['business_license'] = $row['business_license'];
+            $shop_qualification['proprietor'] = $row['proprietor'];
+            $shop_qualification['hand_card_front'] = $row['hand_card_front'];
+            $shop_qualification['user_name'] = $row['user_name'];
+            $shop_qualification['identity_num'] = $row['identity_num'];
+            $shop_qualification['sex'] = $row['sex'];
+            $shop_qualification['licence'] = $row['licence'];
+
+            $shop_account['branch_back'] = $row['branch_back'];
+            $shop_account['back_hand_name'] = $row['back_hand_name'];
+            $shop_account['back_card_num'] = $row['back_card_num'];
+        }
+
+        $result['shop_qualification'] = $shop_qualification;
+        $result['shop_account'] = $shop_account;
+
+        return json_success('获取成功',$result);
+    }
+
+
+
 
     /**
      * 添加商家资质

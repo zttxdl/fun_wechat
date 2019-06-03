@@ -6,6 +6,7 @@ namespace app\admin\controller;
 //use think\Model;
 use think\Model;
 use think\Request;
+use think\Db;
 
 class Shop
 {
@@ -24,17 +25,22 @@ class Shop
         $page_no = $request->param('page_no');
         $page_size = 5;
 
-        $shop_list = model('Shop')->getShopList($page_no,$page_size);
+        $shop_list = model('ShopInfo')
+            ->alias('a')
+            ->join('school b','a.school_id = b.id')
+            ->join('product c','a.id = c.shop_id')
+            ->field(['a.id','a.shop_name','a.logo_img','a.link_name','a.link_tel','b.name'=>'school_name','from_unixtime(a.add_time)'=>'add_time','count(c.id)'=>'goods_num'])
+            ->select();
         //$shop_list = $list;
 
-        foreach ($shop_list as &$row)
-        {
-            if($row['id']) {
-                unset($row['password']);
-                $row['school_name'] = Model('School')->getNameById($row['id']);
-                $row['shop_stock'] = Model('Shop')->getShopStock($row['id']);
-            }
-        }
+//        foreach ($shop_list as &$row)
+//        {
+//            if($row['id']) {
+//                $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
+//                $row['school_name'] = Model('School')->getNameById($row['school_id']);
+//                $row['shop_stock'] = Model('Shop')->getShopStock($row['id']);
+//            }
+//        }
 
         return json_success('获取成功',$shop_list);
     }
@@ -191,8 +197,32 @@ class Shop
             return json_error('非法传参','404');
         }
 
-        $data  =  $this->shopModel->getShopList($page_no,$page_size);
+        $data = model('shopInfo')
+                            ->alias('a')
+                            ->join('ManageCategory b','a.manage_category_id = b.id')
+                            ->join('school c','a.school_id = c.id')
+                            ->field(['a.logo_img','a.shop_name','a.link_name','a.link_tel','a.status','b.name'=>'manage_category_name','c.name'=>'school_name'])
+                            ->select();
 
+        $shop_check_list = [];
+
+        foreach ($data as $row){
+            $shop_check_list[] = [
+                'logo_img' => $row['logo_img'],
+                'shop_name' => $row['shop_name'],
+                'link_name' => $row['link_name'],
+                'link_tel' => $row['link_tel'],
+                'manage_category_name' => $row['manage_category_name'],
+                'school_name' => $row['school_name'],
+                'status' => config('shop_check_status')[$row['status']]
+
+            ];
+        }
+
+        /*
+         * 影响效率 太慢
+         */
+        /*$data  =  $this->shopModel->getShopList($page_no,$page_size);
         $shop_check_list = [];
         foreach ($data as $row)
         {
@@ -206,7 +236,7 @@ class Shop
                 'status' => config('shop_check_status')[$row['status']]
 
             ];
-        }
+        }*/
 
         return json_success('查询成功',$shop_check_list);
 
@@ -277,12 +307,27 @@ class Shop
     {
         $shop_id = $request->param('shop_id');
         $status = $request->param('status');
+        $remark = $request->param('remark');
 
         if(empty($shop_id) || empty($status)){
             return json_error('非法传参','404');
         }
 
-        $res = Model('ShopInfo')->where('id',$shop_id)->setField('status',$status);
+        $shopInfo = Model('ShopInfo');
+
+        if($status == '4') {
+            if(empty($remark)){
+                return json_error('请填写不通过理由哦');
+            }
+            $res = $shopInfo->update([
+                'status' => $status,
+                'remark' => $remark
+            ],['id' => $shop_id]);
+
+        } else {
+            $res = $shopInfo->where('id',$shop_id)->setField('status',$status);
+        }
+
 
         if($res) {
             return json_success('更新成功');

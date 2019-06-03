@@ -54,20 +54,23 @@ class Login extends Controller
         }
 
 
-        $user = Db::name('admin')->where('phone',$phone)->find();
+        $user = model('admin')->where('phone',$phone)->find();
 
 
-        if($user['phone'] != $phone)
+        if(!$user)
         {
-            return json_error('用户不存在','204');
+            return json_error('用户不存在');
         }
 
-        if(md5($pwd) != $user['password'])
+        if(md5($pwd) != $user->password)
         {
-            return json_error('密码不正确','205');
+            return json_error('密码不正确');
         }
 
         session('admin_user.phone',$phone);
+
+        //记录登录时间
+        model('admin')->where('phone',$phone)->setField('last_login_time',date("Y-m-d H:i:s",time()));
 
         return json_success('登录成功');
 
