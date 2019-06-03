@@ -9,13 +9,7 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
-//解决跨域问题
-header('Access-Control-Allow-Origin: *');
-header("Access-Control-Allow-Headers:Origin, X-Requested-With, Content-Type, Accept");
-header('Access-Control-Allow-Methods: POST,GET');
-if(request()->isOptions()){
-    exit();
-}
+
 
 /*************** 管理平台端 *********************************************************************************************/
 // 广告组

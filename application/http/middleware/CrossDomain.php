@@ -8,7 +8,7 @@
 
 namespace app\http\middleware;
 
-
+//解决跨域问题
 class CrossDomain
 {
     public function handle($request, \Closure $next)
