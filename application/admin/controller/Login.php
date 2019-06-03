@@ -7,17 +7,18 @@ use think\Controller;
 use think\Db;
 use think\facade\Validate;
 use think\captcha\Captcha;
+use think\Request;
 
 class Login extends Controller
 {
     /**
      * 登录
      */
-    public function login()
+    public function login(Request $request)
     {
-        $phone = $this->request->param('phone');
-        $pwd = $this->request->param('pwd');
-        $code = $this->request->param('code');
+        $phone = $request->param('phone');
+        $pwd = $request->param('pwd');
+        $code = $request->param('code');
 
         $data = [
             'phone' => $phone,
