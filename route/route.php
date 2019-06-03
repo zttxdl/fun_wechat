@@ -8,7 +8,10 @@
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
-
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Authorization, Content-Type, If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since, X-Requested-With');
+header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE');
+/*header('Access-Control-Max-Age: 1728000');*/
 
 
 /*************** 管理平台端 *********************************************************************************************/
@@ -149,7 +152,7 @@ Route::group('merchants',function (){
 
 //店铺管理
 Route::group('merchants',function (){
-    Route::get('shopIndex','merchants/Shop/index');
+    Route::get('shopIndex','merchants/Shop/index');//店铺管理首页
     Route::get('shopSetName','merchants/Shop/setName');//修改店铺名称
     Route::get('shopSetLogo','merchants/Shop/setLogo');//修改店铺Logo
     Route::get('shopInfo','merchants/Shop/info');//商家信息
