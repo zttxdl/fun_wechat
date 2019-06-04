@@ -16,10 +16,10 @@ class ReceivingAddr extends Controller
     public function index($uid,$lat='',$lng='')
     {
         if ($lat == '' & $lng == ''){
-            $list = model('ReceiveAddr')->getReceivingAddrList($uid);
+            $list = model('ReceivingAddr')->getReceivingAddrList($uid);
 
         }else{
-            $list = model('ReceiveAddr')->getReceivingAddrList($uid);
+            $list = model('ReceivingAddr')->getReceivingAddrList($uid);
             foreach ($list as &$value) {
                 $value['beyond'] = 0;
                 $distance = pc_sphere_distance($lat,$lng,$value['latitude'],$value['longitude']);
