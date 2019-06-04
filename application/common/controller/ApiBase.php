@@ -23,9 +23,9 @@ class ApiBase extends Controller
         $action = $this->request->action();
 
         //判断是否要登录验证
-        if (!$this->match($action)) {
-            $this->valid_token();
-        }
+//        if (!$this->match($action)) {
+//            $this->valid_token();
+//        }
     }
 
     protected function valid_token()
