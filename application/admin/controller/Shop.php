@@ -293,7 +293,7 @@ class Shop
             $shop_qualification['hand_card_front'] = $row['hand_card_front'];
             $shop_qualification['user_name'] = $row['user_name'];
             $shop_qualification['identity_num'] = $row['identity_num'];
-            $shop_qualification['sex'] = $row['sex'];
+            $shop_qualification['sex'] = config('sex')[$row['sex']];
             $shop_qualification['licence'] = $row['licence'];
 
             $shop_account['branch_back'] = $row['branch_back'];
