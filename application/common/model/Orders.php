@@ -17,4 +17,44 @@ class Orders extends Model
         $data['order_num'] = $this->name('orders')->where('user_id',$uid)->where('status',1)->count('id');
         return $data;
     }
+
+    /**
+     * 获取唯一订单号
+     */
+    public function getOrderSn()
+    {
+
+    }
+
+    /**
+     * 新增订单
+     */
+    public function addOrder()
+    {
+
+    }
+
+    /**
+     * 取消订单
+     */
+    public function cancelOrder()
+    {
+
+    }
+
+    /**
+     * 订单列表
+     */
+    public function orderList()
+    {
+
+    }
+
+    /**
+     * 订单详情
+     */
+    public function orderDetail()
+    {
+
+    }
 }
