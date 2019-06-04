@@ -169,8 +169,8 @@ return [
     ],
     // 微信小程序的用户端账号信息
     'wx_user'    =>  [
-        'app_id'        => 'your-appid',
-        'secret'        =>  'your-appsecret',
+        'app_id'        => 'wx7e84dbf300d4764d',
+        'secret'        =>  '7c6bd82277d5b1d7f77c05d4cb1987b7',
         'mch_id'        => 'your-mch-id',
         // API 密钥
         'key'           => 'key-for-signature',
@@ -202,17 +202,6 @@ return [
         'log' => [
             'level' => 'debug',
             'file' => __DIR__.'/wechat_rider.log',
-        ],
-    ],
-
-
-    'wechat' => [
-        'app_id' => 'wxd9a9b3a7bec20988',
-        'secret' => '01b452c050e8d6f3c95e16446ae22f07',
-        'response_type' => 'array',
-        'log' => [
-            'level' => 'debug',
-            'file' => __DIR__.'/wechat.log',
         ],
     ],
 
