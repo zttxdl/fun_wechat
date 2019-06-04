@@ -27,6 +27,7 @@ class Login extends Controller
 
         // curl 请求
         $result = test_curl($url);
+        dump($result);die;
         //判断连接是否成功
         if ($result[0] != 200) {
             return json_error('连接微信服务器失败',201);
