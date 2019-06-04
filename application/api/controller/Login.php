@@ -20,17 +20,13 @@ class Login extends Controller
     public function getAuthInfo(Request $request)
     {
         $code = $request->param('code');
-        $app_id = config('wx_user.app_id');
-        $app_secret = config('wx_user.secret');
+        $app_id = config('wx_user')['app_id'];
+        $app_secret = config('wx_user')['secret'];
         
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
         // curl 请求
-        $result = test_curl($url);
-        dump($app_id);
-        dump($app_secret);
-
-        dump($result);die;
+        $result = curl_post($url);
         //判断连接是否成功
         if ($result[0] != 200) {
             return json_error('连接微信服务器失败',201);

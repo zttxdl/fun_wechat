@@ -192,8 +192,8 @@ return [
 
     // 微信小程序的骑手端账号信息
     'wx_rider'  =>[
-        'app_id'        => 'your-appid',
-        'secret'        =>  'your-appsecret',
+        'app_id'        => 'wx51ecddea44f0ffed',
+        'secret'        =>  '90a92131b5844dc7498d28b510386d97',
 
         // 下面为可选项
         // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
