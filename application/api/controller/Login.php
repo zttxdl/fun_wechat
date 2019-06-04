@@ -26,7 +26,7 @@ class Login extends Controller
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
         // curl 请求
-        $result = curl_post($url);
+        $result = test_curl($url);
         //判断连接是否成功
         if ($result[0] != 200) {
             return json_error('连接微信服务器失败',201);
