@@ -207,13 +207,14 @@ class Shop
                             ->alias('a')
                             ->join('ManageCategory b','a.manage_category_id = b.id')
                             ->join('school c','a.school_id = c.id')
-                            ->field(['a.logo_img','a.shop_name','a.link_name','a.link_tel','a.status','b.name'=>'manage_category_name','c.name'=>'school_name'])
+                            ->field(['a.id,a.logo_img','a.shop_name','a.link_name','a.link_tel','a.status','b.name'=>'manage_category_name','c.name'=>'school_name'])
                             ->select();
 
         $shop_check_list = [];
 
         foreach ($data as $row){
             $shop_check_list[] = [
+                'shop_id' => $row['id'],
                 'logo_img' => $row['logo_img'],
                 'shop_name' => $row['shop_name'],
                 'link_name' => $row['link_name'],

@@ -29,9 +29,9 @@ class Orders extends Model
     /**
      * 新增订单
      */
-    public function addOrder()
+    public function addOrder($data)
     {
-
+        $this->name('orders')->insert($data);
     }
 
     /**
