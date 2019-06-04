@@ -8,6 +8,7 @@
 namespace app\api\controller;
 
 use app\common\controller\ApiBase;
+use think\Exception;
 use think\Request;
 
 class Store extends ApiBase
@@ -177,9 +178,32 @@ class Store extends ApiBase
      */
     public function sureOrder(Request $request)
     {
-//        $address = $request->param('address');
-//        $shop_id = $request->param('shop_id');
-//        $address = $request->param('address');
+
+        $order = $request->param('order');//主表
+        $detail = $request->param('detail');//明细
+
+        $order = [
+            'order_sn' => build_order_no(),//订单
+            'user_id' => $order['user_id'],
+            'shop_id' => $order['shop_id'],
+            'money' => $order['money'],//实付金额
+            'total_money' => $order['total_money'],//订单总价
+            ''
+
+        ];
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     }
 }

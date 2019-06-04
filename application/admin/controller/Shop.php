@@ -23,10 +23,11 @@ class Shop
     public function getList(Request $request)
     {
         $page_no = $request->param('page_no');
-        $page_size = 5;
+        $page_size = config('page_size');
 
         $shop_list = model('ShopInfo')
             ->alias('a')
+            ->page($page_no,$page_size)
             ->join('school b','a.school_id = b.id')
             ->join('product c','a.id = c.shop_id')
             ->field(['a.id','a.shop_name','a.logo_img','a.link_name','a.link_tel','b.name'=>'school_name','from_unixtime(a.add_time)'=>'add_time','count(c.id)'=>'goods_num'])
@@ -129,7 +130,7 @@ class Shop
             $shop_qualification['hand_card_front'] = $row['hand_card_front'];
             $shop_qualification['user_name'] = $row['user_name'];
             $shop_qualification['identity_num'] = $row['identity_num'];
-            $shop_qualification['sex'] = $row['sex'];
+            $shop_qualification['sex'] = config('sex')[$row['sex']];
             $shop_qualification['licence'] = $row['licence'];
 
             $shop_account['branch_back'] = $row['branch_back'];
@@ -142,21 +143,27 @@ class Shop
 
         //补充信息
         $result['shop_information'] = $this->shopModel->getInformation($shop_id);
-
         //在售商品
-        /*$result['is_oline_goods'] = $this->shopModel->getIsOnlineGoods($shop_id);
+        $result['is_oline_goods'] = $this->shopModel->getIsOnlineGoods($shop_id);
+
+//        exit;
 
         foreach ($result['is_oline_goods'] as &$row)
         {
-            if($row['attrs_ids']) {
-                $row['attrs_name'] = $this->shopModel->getGoodsAttrName($row['attrs_ids']);
+            if($row['attr_ids']) {
+                $res = $this->shopModel->getGoodsAttrName($row['attr_ids'])->toArray();
 
-                $row['attrs_name'] = isset($row['attrs_name']) ? $row['attrs_name'] : '--';
+                $res = array_column($res,'name');
+                $row['attr_names'] = implode(",",$res);
+                //dump($res);exit;
+
+                $row['attr_names'] = isset($row['attr_names']) ? $row['attr_names'] : '--';
             }
-        }*/
+        }
 
         //结算信息
         $result['shop_settle'] = $this->shopModel->getSettle();
+//        dump($result);
         return json_success('获取成功',$result);
     }
 
@@ -201,13 +208,14 @@ class Shop
                             ->alias('a')
                             ->join('ManageCategory b','a.manage_category_id = b.id')
                             ->join('school c','a.school_id = c.id')
-                            ->field(['a.logo_img','a.shop_name','a.link_name','a.link_tel','a.status','b.name'=>'manage_category_name','c.name'=>'school_name'])
+                            ->field(['a.id,a.logo_img','a.shop_name','a.link_name','a.link_tel','a.status','b.name'=>'manage_category_name','c.name'=>'school_name'])
                             ->select();
 
         $shop_check_list = [];
 
         foreach ($data as $row){
             $shop_check_list[] = [
+                'id' => $row['id'],
                 'logo_img' => $row['logo_img'],
                 'shop_name' => $row['shop_name'],
                 'link_name' => $row['link_name'],
@@ -285,7 +293,7 @@ class Shop
             $shop_qualification['hand_card_front'] = $row['hand_card_front'];
             $shop_qualification['user_name'] = $row['user_name'];
             $shop_qualification['identity_num'] = $row['identity_num'];
-            $shop_qualification['sex'] = $row['sex'];
+            $shop_qualification['sex'] = config('sex')[$row['sex']];
             $shop_qualification['licence'] = $row['licence'];
 
             $shop_account['branch_back'] = $row['branch_back'];

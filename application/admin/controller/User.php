@@ -58,6 +58,17 @@ class User
             ->field('a.name,a.phone,b.sex,c.name as school_name ,a.area_detail')
             ->select();
 
+        foreach ($result['user_address'] as $row) {
+            $result['user_address'] = [
+                'name' => $row['name'],
+                'phone' => $row['phone'],
+                'sex' => config('sex')[$row['sex']],
+                'school_name' => $row['school_name'],
+                'area_detail' => $row['area_detail']
+
+            ];
+        }
+
         //$result['user_coupon'] = [];
         //红包信息
         $result['user_coupon'] = Db::name('my_coupon')->alias('a')

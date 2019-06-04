@@ -49,7 +49,7 @@ class ReceivingAddr extends Controller
         }
 
         $school_id = $request->param('school_id');
-        $school_name = model('')->getNameById($school_id);
+        $school_name = model('School')->getNameById($school_id);
         $address = $school_name.$request->param('area_detail');
         $location = get_location($address);
         $data['latitude'] = $location['lat'];
