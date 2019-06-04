@@ -17,8 +17,9 @@ class Login extends Controller
      * 授权获取openid、session_key信息
      * 
      */
-    public function getAuthInfo($code)
+    public function getAuthInfo(Request $request)
     {
+        $code = $request->param('code');
         $app_id = config('wx_user.app_id');
         $app_secret = config('wx_user.secret');
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
@@ -55,6 +56,7 @@ class Login extends Controller
         $list['img'] = $data['avatarUrl'];
         $list['openid'] = $data['openid'];
         $list['sex'] = $data['gender'];
+        $list['invitation_id'] = $data['invitation_id'];
         $list['add_time'] = time();
 
         // 存入数据
@@ -88,7 +90,7 @@ class Login extends Controller
 
 
     /**
-     * 发送手机号验证码 
+     * 获取手机号验证码 
      * 
      */
     public function getVerify(Request $request)
@@ -104,36 +106,6 @@ class Login extends Controller
         }
         return json_success('验证码已发送至 ' . $phone . ', 5分钟内有效！');
 
-    }
-
-
-    /**
-     * 更换手机号【保存】
-     * 
-     */
-    public function setUserPhone(Request $request)
-    {
-        $uid = $request->param('uid');
-        $phone = $request->param('phone');
-        $code  = $request->param('code');
-        $type  = $request->param('type');
-
-        // 校验验证码
-        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
-        if (!$result) {
-            return json_error(model('Alisms', 'service')->getError());
-        }
-
-        // 更新数据
-        $user = User::get($uid);
-        $user->phone = $phone;
-        $res = $user->save();
-        if (!$res) {
-            return json_error('更换失败');
-        }
-        $user_info = User::get($uid);
-        return json_success('更换成功',['user_info'=>$user_info]);
-        
     }
 
 
@@ -161,13 +133,14 @@ class Login extends Controller
         }
         // 更新数据
         $res = User::where('openid',$openid)->save([
-            'phone' =>  $phone
+            'phone' =>  $phone,
+            'last_login_time'   =>  time()
         ]);
         
         if (!$res) {
             return json_error('登录或注册失败');
         }
-        $user_info = User::get($uid);
+        $user_info = User::where('id','=',$uid)->field('id,img,nickname,phone')->find();
 
         return json_success('登录或注册成功',['user_info'=>$user_info]);
         
@@ -186,7 +159,10 @@ class Login extends Controller
 
         // 解密手机号
         $data = $this->getWechatPhone($encrypted_data,$code,$iv);
-        
+        if ($data['code'] != 200) {
+            return json_error($data['msg'],$data['code']);
+        }
+
         // 存表处理
         // 判断openid是否存在
         $uid = User::where('openid',$data['openid'])->value('id');
@@ -195,13 +171,14 @@ class Login extends Controller
         }
         // 更新数据
         $res = User::where('openid',$data['openid'])->save([
-            'phone' =>  $data['phone']
+            'phone' =>  $data['phone'],
+            'last_login_time'   =>  time()
         ]);
         
         if (!$res) {
             return json_error('快捷登录失败');
         }
-        $user_info = User::get($uid);
+        $user_info = User::where('id','=',$uid)->field('id,img,nickname,phone')->find();
 
         return json_success('快捷登录成功',['user_info'=>$user_info]);
 
@@ -224,28 +201,33 @@ class Login extends Controller
         $result = curl_post($url);
         //判断连接是否成功
         if ($result[0] != 200) {
-            return json_error('连接微信服务器失败',201);
+            $res = ['code'=>201,'msg'=>'连接微信服务器失败'];
+            return $res;
         }
         //将返回的json处理成数组
         $wxResult = json_decode($result[1], true);
         if (empty($wxResult)) {
-            return json_error('获取session_key，openID时异常，微信内部错误',202);
+            $res = ['code'=>202,'msg'=>'获取session_key，openID时异常，微信内部错误'];
+            return $res;
         } 
         //判断返回的结果中是否有错误码
         if (isset($wxResult['errcode'])) {
-            return json_error($wxResult['errmsg'], $wxResult['errcode']);
+            $res = ['code'=>$wxResult['errcode'],'msg'=>$wxResult['errmsg']];
+            return $res;
         }
 
+        // 解密
         $recod = json_decode($wxResult);
-        $wx = new wxBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
+        $wx = new WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
             $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
         if ($errCode == 0) {
             $data = json_decode($data, true);
-            $res = ['phone'=>$data['phoneNumber'],'openid'=>$recod->openid];
-            return $res;
+            $res = ['code'=>200,'phone'=>$data['phoneNumber'],'openid'=>$recod->openid];
         } else {
-            return json_error('请求失败');
+            $res = ['code'=>203,'msg'=>'请求失败'];
         }
+        return $res;
+
     }
 
      

@@ -10,12 +10,11 @@ class UserAuth
 {
     public function handle($request, \Closure $next)
     {
-        $uid = Request::has('uid') ? Request::param('uid') : '';
-        
+        $uid = $request->has('uid') ? $request->param('uid') : '';
         if (!$uid) {
-            return json_encode('参数出错，暂无登录', 205);
+            return json_error('参数出错，暂无登录', 205);
         } 
-
+        
         $result = User::find($uid);
         if (!$result) {
             return json_error('未查到该用户',201);
