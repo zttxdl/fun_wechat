@@ -179,15 +179,21 @@ class Store extends ApiBase
     public function sureOrder(Request $request)
     {
 
-        $orders = $request->param('order');//主表
-        $details = $request->param('detail');//明细
-        $settlements = $request->param('settlement');//结算信息
-        $address = $request->param('address');//收货地址
+        $order = $request->param('order');//主表
+        $detail = $request->param('detail');//明细
 
-        if(empty($order['order_sn'])) {
+        $order = [
+            'order_sn' => build_order_no(),//订单
+            'user_id' => $order['user_id'],
+            'shop_id' => $order['shop_id'],
+            'money' => $order['money'],//实付金额
+            'total_money' => $order['total_money'],//订单总价
+            ''
 
-            return json_error('订单号不能为空');
-        }
+        ];
+
+
+
 
 
 

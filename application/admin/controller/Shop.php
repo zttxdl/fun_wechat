@@ -23,10 +23,11 @@ class Shop
     public function getList(Request $request)
     {
         $page_no = $request->param('page_no');
-        $page_size = 5;
+        $page_size = config('page_size');
 
         $shop_list = model('ShopInfo')
             ->alias('a')
+            ->page($page_no,$page_size)
             ->join('school b','a.school_id = b.id')
             ->join('product c','a.id = c.shop_id')
             ->field(['a.id','a.shop_name','a.logo_img','a.link_name','a.link_tel','b.name'=>'school_name','from_unixtime(a.add_time)'=>'add_time','count(c.id)'=>'goods_num'])
@@ -207,13 +208,14 @@ class Shop
                             ->alias('a')
                             ->join('ManageCategory b','a.manage_category_id = b.id')
                             ->join('school c','a.school_id = c.id')
-                            ->field(['a.logo_img','a.shop_name','a.link_name','a.link_tel','a.status','b.name'=>'manage_category_name','c.name'=>'school_name'])
+                            ->field(['a.id,a.logo_img','a.shop_name','a.link_name','a.link_tel','a.status','b.name'=>'manage_category_name','c.name'=>'school_name'])
                             ->select();
 
         $shop_check_list = [];
 
         foreach ($data as $row){
             $shop_check_list[] = [
+                'id' => $row['id'],
                 'logo_img' => $row['logo_img'],
                 'shop_name' => $row['shop_name'],
                 'link_name' => $row['link_name'],
