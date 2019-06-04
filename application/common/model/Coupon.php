@@ -22,9 +22,9 @@ class Coupon extends Model
     }
 
     /**
-     * 获取优惠券详情
+     * 获取优惠券信息
      */
-    public function getCouponDetail($coupon_code)
+    public function getCouponInfo($coupon_code)
     {
 
     }

@@ -6,6 +6,7 @@ use think\Controller;
 use think\Request;
 use think\captcha\Captcha;
 use app\common\model\User;
+use wx_auth_phone\WXBizDataCrypt;
 
 /**
  * 用户登录控制器
@@ -13,17 +14,17 @@ use app\common\model\User;
 class Login extends Controller
 {
     /**
-     * 授权获取openid 
+     * 授权获取openid、session_key信息
      * 
      */
-    public function getOpenid($code)
+    public function getAuthInfo($code)
     {
         $app_id = config('wx_user.app_id');
         $app_secret = config('wx_user.secret');
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
         // curl 请求
-        $result = http_curl($url,'post');
+        $result = curl_post($url);
         //判断连接是否成功
         if ($result[0] != 200) {
             return json_error('连接微信服务器失败',201);
@@ -39,7 +40,7 @@ class Login extends Controller
         if (isset($wxResult['errcode'])) {
             return json_error($wxResult['errmsg'], $wxResult['errcode']);
         }
-        return json_success('获取 openid 成功',['openid'=>$wxResult['openid']]);
+        return json_success('获取 openid 成功',['auth_result'=>$wxResult]);
     }
 
 
@@ -128,16 +129,16 @@ class Login extends Controller
         $user->phone = $phone;
         $res = $user->save();
         if (!$res) {
-            return json_error('失败');
+            return json_error('更换失败');
         }
         $user_info = User::get($uid);
-        return json_success('成功',['user_info'=>$user_info]);
+        return json_success('更换成功',['user_info'=>$user_info]);
         
     }
 
 
     /**
-     * 登录|注册 
+     * 使用其他手机号登录|注册 
      * 
      */
     public function login(Request $request)
@@ -171,6 +172,83 @@ class Login extends Controller
         return json_success('登录或注册成功',['user_info'=>$user_info]);
         
     }
+
+
+    /**
+     * 微信用户快捷登录 
+     * 
+     */
+    public function celerityLogin(Request $request)
+    {
+        $encrypted_data = $request->param('encryptedData');
+        $code = $request->param('code');
+        $iv = $request->param('iv');
+
+        // 解密手机号
+        $data = $this->getWechatPhone($encrypted_data,$code,$iv);
+        
+        // 存表处理
+        // 判断openid是否存在
+        $uid = User::where('openid',$data['openid'])->value('id');
+        if (!$uid) {
+            return json_error('非法参数');
+        }
+        // 更新数据
+        $res = User::where('openid',$data['openid'])->save([
+            'phone' =>  $data['phone']
+        ]);
+        
+        if (!$res) {
+            return json_error('快捷登录失败');
+        }
+        $user_info = User::get($uid);
+
+        return json_success('快捷登录成功',['user_info'=>$user_info]);
+
+    }
+     
+    
+
+    /**
+     * 获取微信手机号 
+     * 
+     */
+    public function getWechatPhone($encrypted_data,$code,$iv)
+    {
+        $app_id = config('wx_user.app_id');
+        $app_secret = config('wx_user.secret');
+
+        $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
+
+        // curl 请求
+        $result = curl_post($url);
+        //判断连接是否成功
+        if ($result[0] != 200) {
+            return json_error('连接微信服务器失败',201);
+        }
+        //将返回的json处理成数组
+        $wxResult = json_decode($result[1], true);
+        if (empty($wxResult)) {
+            return json_error('获取session_key，openID时异常，微信内部错误',202);
+        } 
+        //判断返回的结果中是否有错误码
+        if (isset($wxResult['errcode'])) {
+            return json_error($wxResult['errmsg'], $wxResult['errcode']);
+        }
+
+        $recod = json_decode($wxResult);
+        $wx = new wxBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
+            $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
+        if ($errCode == 0) {
+            $data = json_decode($data, true);
+            $res = ['phone'=>$data['phoneNumber'],'openid'=>$recod->openid];
+            return $res;
+        } else {
+            return json_error('请求失败');
+        }
+    }
+
+     
      
      
      
