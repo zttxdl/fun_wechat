@@ -174,7 +174,7 @@ class Shop extends Model
      */
     public function getGoodsAttrName($attr_ids = '')
     {
-        $res = $this->name('product_attr_classify')->whereIn('id',$attr_ids)->select();
+        $res = $this->name('product_attr_classify')->field('name')->whereIn('id',$attr_ids)->select();
         return $res;
     }
 

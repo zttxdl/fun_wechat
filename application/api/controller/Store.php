@@ -8,6 +8,7 @@
 namespace app\api\controller;
 
 use app\common\controller\ApiBase;
+use think\Exception;
 use think\Request;
 
 class Store extends ApiBase
@@ -177,9 +178,26 @@ class Store extends ApiBase
      */
     public function sureOrder(Request $request)
     {
-//        $address = $request->param('address');
-//        $shop_id = $request->param('shop_id');
-//        $address = $request->param('address');
+
+        $orders = $request->param('order');//主表
+        $details = $request->param('detail');//明细
+        $settlements = $request->param('settlement');//结算信息
+        $address = $request->param('address');//收货地址
+
+        if(empty($order['order_sn'])) {
+
+            return json_error('订单号不能为空');
+        }
+
+
+
+
+
+
+
+
+
+
 
     }
 }

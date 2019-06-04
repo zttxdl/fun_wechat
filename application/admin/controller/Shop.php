@@ -129,7 +129,7 @@ class Shop
             $shop_qualification['hand_card_front'] = $row['hand_card_front'];
             $shop_qualification['user_name'] = $row['user_name'];
             $shop_qualification['identity_num'] = $row['identity_num'];
-            $shop_qualification['sex'] = $row['sex'];
+            $shop_qualification['sex'] = config('sex')[$row['sex']];
             $shop_qualification['licence'] = $row['licence'];
 
             $shop_account['branch_back'] = $row['branch_back'];
@@ -142,21 +142,27 @@ class Shop
 
         //补充信息
         $result['shop_information'] = $this->shopModel->getInformation($shop_id);
-
         //在售商品
-        /*$result['is_oline_goods'] = $this->shopModel->getIsOnlineGoods($shop_id);
+        $result['is_oline_goods'] = $this->shopModel->getIsOnlineGoods($shop_id);
+
+//        exit;
 
         foreach ($result['is_oline_goods'] as &$row)
         {
-            if($row['attrs_ids']) {
-                $row['attrs_name'] = $this->shopModel->getGoodsAttrName($row['attrs_ids']);
+            if($row['attr_ids']) {
+                $res = $this->shopModel->getGoodsAttrName($row['attr_ids'])->toArray();
 
-                $row['attrs_name'] = isset($row['attrs_name']) ? $row['attrs_name'] : '--';
+                $res = array_column($res,'name');
+                $row['attr_names'] = implode(",",$res);
+                //dump($res);exit;
+
+                $row['attr_names'] = isset($row['attr_names']) ? $row['attr_names'] : '--';
             }
-        }*/
+        }
 
         //结算信息
         $result['shop_settle'] = $this->shopModel->getSettle();
+//        dump($result);
         return json_success('获取成功',$result);
     }
 
