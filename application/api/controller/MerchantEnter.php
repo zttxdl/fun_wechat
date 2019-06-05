@@ -26,7 +26,7 @@ class MerchantEnter extends Controller
         }
 
         // 判断当前用户是否已有提交
-        $res = MerchantEnterModel::get($data['user_id']);
+        $res = MerchantEnterModel::where('user_id','=',$data['user_id'])->value('id');
         if ($res) {
             return json_error('您已提交过申请');
         }

@@ -18,7 +18,7 @@ class RiderInfo extends Controller
         // 搜索条件
         $where= [];
         !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
-        $where[] = ['status','=',3];
+        $where[] = ['status','in','3,4'];
 
         $list = Db::name('rider_info')->where($where)->field('id,name,link_tel,status,add_time,last_login_time')->order('id desc')
                 ->paginate(10)->each(function ($item, $key) {

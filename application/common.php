@@ -122,21 +122,6 @@ if (!function_exists('curl_post')) {
   }
 
 
-  /**
-   * test_curl
-   */
-  function test_curl($url)
-  {
-    $ch = curl_init();
-    curl_setopt($ch,CURLOPT_URL,$url);
-    curl_setopt($ch,CURLOPT_HEADER,0);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-    $res = curl_exec($ch);  
-    curl_close($ch);  
-    return $res;
-  }
-
 /**
  * 生成唯一订单号
  * @param string $head  订单头部前缀（用于区分订单）
