@@ -24,7 +24,7 @@ class RiderRecruit extends Controller
         }
 
         // 判断当前用户是否已有提交
-        $res = RiderRecruitModel::get($data['user_id']);
+        $res = RiderRecruitModel::where('user_id','=',$data['user_id'])->value('id');
         if ($res) {
             return json_error('您已提交过申请');
         }

@@ -10,7 +10,7 @@ class UserAuth
 {
     public function handle($request, \Closure $next)
     {
-        $uid = $request->has('uid') ? $request->param('uid') : '';
+        $uid = $request->header('user-auth');
         if (!$uid) {
             return json_error('参数出错，暂无登录', 205);
         } 

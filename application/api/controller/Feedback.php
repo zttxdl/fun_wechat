@@ -31,7 +31,7 @@ class Feedback extends Controller
             Cache::store('redis')->inc($key);  
             $count = Cache::store('redis')->get($key);  
             if($count > 3){  
-                return json_error('您已提交多次，我们会竭力改进');
+                return json_error('您已提交多次，我们会竭力改进',202);
             }  
         }else{   
             Cache::store('redis')->set($key,1,3600*24);  

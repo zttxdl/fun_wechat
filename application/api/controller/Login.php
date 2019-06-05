@@ -27,7 +27,7 @@ class Login extends Controller
 
         // curl 请求
         $result = curl_post($url);
-        // 有问题！！！！！！！
+  
         $wxResult = json_decode($result, true);
         // dump($wxResult);die;
         // 此处针对curl请求的返回数据的判断有问题，先注释掉，等后期调整
