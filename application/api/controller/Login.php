@@ -26,21 +26,9 @@ class Login extends Controller
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
         // curl 请求
-        $result = http_curl($url,'POST');
+        $result = curl_post($url,'POST');
   
-        // $wxResult = json_decode($result, true);
-        dump($result);die;
-        // 此处针对curl请求的返回数据的判断有问题，先注释掉，等后期调整
-        //判断连接是否成功
-        if ($result[0] != 200) {
-            return json_error('连接微信服务器失败',201);
-        }
-
-        //将返回的json处理成数组
-        $wxResult = json_decode($result[1], true);
-        if (empty($wxResult)) {
-            return json_error('获取session_key，openID时异常，微信内部错误',202);
-        } 
+        $wxResult = json_decode($result, true);
 
         //判断返回的结果中是否有错误码
         if (isset($wxResult['errcode'])) {
@@ -205,18 +193,6 @@ class Login extends Controller
         // curl 请求
         $result = curl_post($url);
         $wxResult = json_decode($result, true);
-        // 此处针对curl请求的返回数据的判断有问题，先注释掉，等后期调整
-        // //判断连接是否成功
-        // if ($result[0] != 200) {
-        //     $res = ['code'=>201,'msg'=>'连接微信服务器失败'];
-        //     return $res;
-        // }
-        // //将返回的json处理成数组
-        // $wxResult = json_decode($result[1], true);
-        // if (empty($wxResult)) {
-        //     $res = ['code'=>202,'msg'=>'获取session_key，openID时异常，微信内部错误'];
-        //     return $res;
-        // } 
 
         //判断返回的结果中是否有错误码
         if (isset($wxResult['errcode'])) {
