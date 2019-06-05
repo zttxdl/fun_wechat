@@ -26,7 +26,7 @@ class Login extends Controller
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
         // curl 请求
-        $result = test_curl($url);
+        $result = curl_post($url);
         // 有问题！！！！！！！
         dump($result);die;
 
