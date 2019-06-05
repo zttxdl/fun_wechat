@@ -29,7 +29,7 @@ class Login extends Controller
         $result = curl_post($url);
         // 有问题！！！！！！！
         $wxResult = json_decode($result, true);
-        dump($wxResult);die;
+        // dump($wxResult);die;
         // 此处针对curl请求的返回数据的判断有问题，先注释掉，等后期调整
         // //判断连接是否成功
         // if ($result[0] != 200) {
