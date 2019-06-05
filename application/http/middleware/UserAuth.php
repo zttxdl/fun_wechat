@@ -2,7 +2,6 @@
 
 namespace app\http\middleware;
 
-use function GuzzleHttp\json_encode;
 use think\Request;
 use app\common\model\User;
 
