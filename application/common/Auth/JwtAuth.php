@@ -4,9 +4,9 @@ namespace app\common\Auth;
 
 use \Firebase\JWT\JWT; //导入JWT
 
-
 class JwtAuth
 {
+    use \traits\controller\Jump;
 
     /**
      * 头部 公共参数
@@ -74,13 +74,13 @@ class JwtAuth
             return $arr;
 
         } catch(\Firebase\JWT\SignatureInvalidException $e) {  //签名不正确
-            return json_error('签名不正确-'.$e->getMessage(),'201');
+            $this->error('签名不正确','','201');
         }catch(\Firebase\JWT\BeforeValidException $e) {  // 签名在某个时间点之后才能用
-            return json_error('签名在某个时间点之后才能用-'.$e->getMessage(),'202');
-        }catch(\Firebase\JWT\ExpiredException $e) {  // token过期
-            return json_error('token过期-'.$e->getMessage(),'203');
+            $this->error('签名在某个时间点之后才能用','','202');
+        }catch(\Firebase\JWT\ExpiredException $e) {
+            $this->error('token过期，请重新登录','','203');
         }catch(Exception $e) {  //其他错误
-            return json_error('其他错误-'.$e->getMessage(),'299');
+            $this->error('其他错误','','299');
         }
 
     }

@@ -149,6 +149,7 @@ Route::group('merchants',function (){
 	//文件上传
 	Route::rule('upload','merchants/Upload/up');
 	Route::rule('updatePwd','merchants/Merchants/updatePwd');
+	Route::rule('getEvaluation','merchants/Merchants/getEvaluation');
 
 
 });
