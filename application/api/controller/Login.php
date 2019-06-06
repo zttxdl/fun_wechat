@@ -8,6 +8,7 @@ use think\captcha\Captcha;
 use app\common\model\User;
 use wx_auth_phone\WXBizDataCrypt;
 
+
 /**
  * 用户登录控制器
  */
@@ -202,7 +203,7 @@ class Login extends Controller
 
         // 解密
         $recod = json_decode($result);
-        // include_once './../extend/extend/wx_auth_phone/WXBizDataCrypt.php';
+
         $wx = new WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
             $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
         if ($errCode == 0) {
