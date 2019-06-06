@@ -6,6 +6,8 @@ use think\Controller;
 use think\Request;
 use think\captcha\Captcha;
 use app\common\model\User;
+use wx_auth_phone\WXBizDataCrypt;
+
 
 /**
  * 用户登录控制器
@@ -51,6 +53,11 @@ class Login extends Controller
         $list['invitation_id'] = $data['invitation_id'];
         $list['add_time'] = time();
 
+        // 判断当前用户是否已授权
+        $id = User::where('openid','=',$data['openid'])->count('id');
+        if ($id) {
+            return json_error('该用户已授权！不需要再次授权');
+        }
         // 存入数据
         $result = User::create($list);
         if(!$result) {
@@ -201,8 +208,8 @@ class Login extends Controller
 
         // 解密
         $recod = json_decode($result);
-         include_once './../extend/wx_auth_phone/wxBizDataCrypt.php';
-        $wx = new \WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
+
+        $wx = new WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
             $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
         if ($errCode == 0) {
             $data = json_decode($data, true);

@@ -230,7 +230,7 @@ class Coupon extends Controller
         $coupon_used_list = Db::name('my_coupon mc')
                             ->join('user u','mc.user_id = u.id')   
                             ->join('platform_coupon pc','mc.platform_coupon_id = pc.id')
-                            ->field('pc.id,pc.name,pc.face_value,u.nickname,u.phone,mc.indate,mc.order_num,mc.status')
+                            ->field('pc.id,pc.name,pc.face_value,u.nickname,u.phone,mc.indate,mc.order_sn,mc.status')
                             ->select();
 
         return json_success('ok',['coupon_info'=>$coupon_info,'shop_info'=>$shop_info,'coupon_used_list'=>$coupon_used_list]);

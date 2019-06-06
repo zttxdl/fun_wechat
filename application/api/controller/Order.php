@@ -217,15 +217,32 @@ class Order extends ApiBase
     {
         Db::startTrans();
         try {
+            $orders = model('orders')->where('orders_sn',$orders_sn)->find();
+
+
             //处理的业务逻辑，更新订单
+            model('orders')
+                ->where('orders_sn',$orders_sn)
+                ->update(['status'=>2,'pay_status'=>1,'pay_time'=>time(),'trade_no'=>$wx_id]);
+
+
+
 
             //更新库存
 
+
+
             //更新红包信息
+            if($orders['platform_coupon_id']) {
+                model('myCoupon')->where('platform_coupon_id',$orders['platform_coupon_id'])
+                    ->update(['status'=>'2','order_sn'=>$orders_sn]);
+            }
+
             Db::commit();
         } catch (\Throwable $e) {
             Db::rollback();
-            return json_error($e->getMessage());
+            $this->error($e->getMessage());
+            //return json_error($e->getMessage());
         }
 
         return true;

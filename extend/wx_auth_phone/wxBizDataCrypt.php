@@ -1,7 +1,5 @@
 <?php
-
-include 'errorCode.php';
-
+namespace wx_auth_phone;
 
 /**
  * 对微信小程序用户加密数据的解密示例代码.
@@ -13,6 +11,11 @@ class WXBizDataCrypt
     private $appid;
 	private $sessionKey;
 
+	public static $OK = 0;
+	public static $IllegalAesKey = -41001;
+	public static $IllegalIv = -41002;
+	public static $IllegalBuffer = -41003;
+	public static $DecodeBase64Error = -41004;
 	/**
 	 * 构造函数
 	 * @param $sessionKey string 用户在小程序登录后获取的会话密钥
@@ -22,6 +25,7 @@ class WXBizDataCrypt
 	{
 		$this->sessionKey = $sessionKey;
 		$this->appid = $appid;
+
 	}
 
 
@@ -36,13 +40,13 @@ class WXBizDataCrypt
 	public function decryptData( $encryptedData, $iv, &$data )
 	{
 		if (strlen($this->sessionKey) != 24) {
-			return ErrorCode::$IllegalAesKey;
+			return $this->IllegalAesKey;
 		}
 		$aesKey=base64_decode($this->sessionKey);
 
         
 		if (strlen($iv) != 24) {
-			return ErrorCode::$IllegalIv;
+			return $this->IllegalIv;
 		}
 		$aesIV=base64_decode($iv);
 
@@ -53,14 +57,14 @@ class WXBizDataCrypt
 		$dataObj=json_decode( $result );
 		if( $dataObj  == NULL )
 		{
-			return ErrorCode::$IllegalBuffer;
+			return $this->IllegalBuffer;
 		}
 		if( $dataObj->watermark->appid != $this->appid )
 		{
-			return ErrorCode::$IllegalBuffer;
+			return $this->IllegalBuffer;
 		}
 		$data = $result;
-		return ErrorCode::$OK;
+		return $this->OK;
 	}
 
 }
