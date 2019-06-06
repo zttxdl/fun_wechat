@@ -155,31 +155,10 @@ return [
         'SMSTemplateCode' => 'SMS_158840158',
         //'SMS_141915147',
     ],
-    //验证码设置
-    'captcha' => [
-        // 验证码字体大小
-        'fontSize' => 30,
-        //验证码位数
-        'length' => 4,
-    ],
-    'sex' => [
-        1 => '男',
-        0 => '女',
-        2 => '保密'
-    ],
     // 微信小程序的用户端账号信息
     'wx_user'    =>  [
         'app_id'        => 'wx7e84dbf300d4764d',
         'secret'        =>  '7c6bd82277d5b1d7f77c05d4cb1987b7',
-        'mch_id'        => 'your-mch-id',
-        // API 密钥
-        'key'           => 'key-for-signature',
-
-        // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
-        'cert_path'     => 'path/to/your/cert.pem', // XXX: 绝对路径！！！！
-        'key_path'      => 'path/to/your/key',      // XXX: 绝对路径！！！！
-        'notify_url'    => '默认的订单回调地址',     // 你也可以在下单时单独设置来想覆盖它
-        
         // 下面为可选项
         // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
         'response_type' => 'array',
@@ -215,5 +194,4 @@ return [
         'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
         'sandbox' => false,
     ]
-
 ];

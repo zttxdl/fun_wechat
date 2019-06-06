@@ -10,22 +10,130 @@ namespace app\api\controller;
 use app\common\controller\ApiBase;
 use EasyWeChat\Factory;
 use think\Db;
+use think\facade\Config;
 use think\Request;
 
 
 class Order extends ApiBase
 {
 
-    //订单列表
-    public function index()
+    /**
+     * 订单列表
+     * @param Request $request
+     * @return \think\response\Json
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getList(Request $request)
     {
+        //dump($request->param());
+        //$this->param_empty($request->param());
+        $page_size = config('page_size');
+        $page_no = $request->param('page_no');
+        $user_id = $request->param('user_id');
 
+        if(empty($user_id)) {
+            return json_error('非法传参');
+        }
+
+
+        $data = model('orders')->alias('a')
+                ->leftJoin('shopInfo b','a.shop_id = b.id')
+                ->leftJoin('ordersInfo c','a.id = c.id')
+                ->field(['a.id','a.orders_sn','a.num','FROM_UNIXTIME( a.add_time, "%Y-%m-%d %H:%i" )'=> 'add_time','a.status','a.money','b.link_tel','b.logo_img','b.shop_name','c.product_id'])
+                ->where('user_id',$user_id)
+                ->page($page_no,$page_size)
+                ->select();
+
+        //dump($data);
+        $result = [];
+        foreach ($data as $row) {
+            $product_name = model('Product')->getNameById($row['product_id']);
+            $result[] = [
+                'id' => $row['id'],
+                'orders_sn' => $row['orders_sn'],
+                'num' => $row['num'],
+                'add_time' => $row['add_time'],
+                'status' => config('order_status')[$row['status']],
+                //'status' => $row['status'],
+                'money' => $row['money'],
+                'logo_img' => $row['logo_img'],
+                'shop_name' => $row['shop_name'],
+                'product_name' => $product_name,
+                'shop_tel' => $row['link_tel']
+            ];
+        }
+
+        return json_success('获取成功',$result);
     }
+
+    /**
+     * 订单明细
+     * @param Request $request
+     */
+    public function getDetail(Request $request)
+    {
+        $orders_id = $request->param('orders_id');
+
+        if(!$orders_id) {
+            return json_error('非法传参');
+        }
+
+        $result = [];
+        $data = Db::name('ordersInfo')->where('orders_id',$orders_id)->select();
+
+        $result['detail'] = $data;
+
+        foreach ($result['detail'] as $row) {
+            $result['platform_discount']['id'] = $row['platform_coupon_id'];
+            $result['platform_discount']['face_value'] = $row['platform_coupon_money'];
+            $result['shop_discount']['id'] = $row['shop_discounts_id'];
+            $result['shop_discount']['face_value'] = $row['shop_discounts_money'];
+        }
+
+        $orders = Db::name('orders')->alias('a')
+            ->leftJoin('rider_info b','a.rider_id = b.id')
+            ->field('a.*,b.name,b.link_tel')
+            ->where('a.id',$orders_id)
+            ->find();
+
+        $result['ping_info'] = [
+            'address' => $orders['address'],
+            'name' => $orders['name'],
+            'link_tel' => $orders['link_tel'],
+            'ping_time' => '尽快送达',
+            'ping_type' => '平台配送',
+        ];
+
+        $result['orders'] = [
+            'orders_sn' => $orders['orders_sn'],
+            'add_time' => date("Y-m-d H:i",$orders['add_time']),
+            'pay_type' => '在现支付',
+            'pint_fee' => $orders['ping_fee'],
+            'box_money' => $orders['box_money'],
+        ];
+        if(in_array($orders['status'],[2,5,6])) { //商家接单 和 骑手取货配货显示时间 送达时间
+            $result['time'] = $orders['plan_arrive_time'];
+        }
+
+        $result['order_status'] = config('order_status')[$orders['status']];
+
+        return json_success('获取成功',$result);
+    }
+
+
 
     //订单支付真实
     public function orderPayment(Request $request)
     {
         $orders_sn = $request->param('orders_sn');
+
+
+        if(!$orders_sn){
+
+            return json_error('订单号不能为空');
+        }
 
         $order = model('Orders')->where('orders_sn',$orders_sn)->find();
 
@@ -47,12 +155,14 @@ class Order extends ApiBase
         $data['price'] = $order->money;
 
         //小程序 wxd9b1802338a9bcf4
-        $app_id="wxd9b1802338a9bcf4";
+        $app_id = "wx7e84dbf300d4764d";
+        $mch_id = "1538416851";
+        $key = "";
         $config = [
             // 必要配置
             'app_id'             => $app_id,
-            'mch_id'             => '1511931261',
-            'key'                => '10S9a3A3EdF2a60e04cb1b8G8b507AF4',   // API 密钥
+            'mch_id'             => $mch_id,
+            'key'                => $key,   // API 密钥
             // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
             'cert_path'          => '', // XXX: 绝对路径！！！！
             'key_path'           => '',      // XXX: 绝对路径！！！！
@@ -62,7 +172,10 @@ class Order extends ApiBase
 
         $app = Factory::payment($config);
 //        $openid= $this->auth->openid;
-        $openid= 'oyXQr5P_Y9ZjpEfUum3RTQn5ReZM';
+        $openid = model('user')->where('id',$order['user_id'])->value('openid');
+        //$openid= 'oyXQr5P_Y9ZjpEfUum3RTQn5ReZM';
+
+
         $ip   = request()->ip();
         $result = $app->order->unify([
             'body' => '商品支付',
@@ -121,11 +234,10 @@ class Order extends ApiBase
         Db::startTrans();
         try {
             //处理的业务逻辑，更新订单
-            $fre = model('Orders')->where('orders_sn',$orders_sn)->update(['pay_status'=>1,'pay_time'=>time(),'trade_no'=>$wx_id,'update_time'=>time()]);
-            if(!$fre){
-                $this->error('订单更新失败');
-            }
 
+            //更新库存
+
+            //更新红包信息
             Db::commit();
         } catch (\Throwable $e) {
             Db::rollback();

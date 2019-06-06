@@ -3,20 +3,21 @@
 namespace app\common\model;
 
 use think\Model;
+use think\Db;
 
-class Coupon extends Model
+class MyCoupon extends Model
 {
     //获取单条优惠券记录
-    public function getOneCoupon($coupon_cdoe)
+    public function getOneCoupon($id)
     {
-        $data = Db::name('coupon')->where('coupon_code',$coupon_cdoe)->find();
+        $data = $this->where('id',$id)->find();
         return $data;
     }
 
     /**
      * 获取优惠券详情
      */
-    public function getCouponDetail($coupon_code)
+    public function getCouponDetail($id)
     {
 
     }
@@ -24,9 +25,16 @@ class Coupon extends Model
     /**
      * 获取优惠券信息
      */
-    public function getCouponInfo($coupon_code)
+    public function getCouponInfo($id)
     {
 
+    }
+
+    /**
+     * 新增优惠券信息
+     */
+    public function addCouponInfo($data){
+        return $this->insert($data);
     }
 
 }

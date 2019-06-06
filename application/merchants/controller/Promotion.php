@@ -9,7 +9,7 @@
 namespace app\merchants\controller;
 
 
-class Promotion
+class Promotion extends MerchantsBase
 {
     /**
      * 活动管理

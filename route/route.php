@@ -161,7 +161,7 @@ Route::group('merchants',function (){
     Route::get('shopSetLogo','merchants/Shop/setLogo');//修改店铺Logo
     Route::get('shopInfo','merchants/Shop/info');//商家信息
     Route::get('shopSetInfo','merchants/Shop/setInfo');//设置商家信息
-    Route::get('shopMoreInfo','merchants/Shop/moreInfo');//入驻信息
+    Route::post('shopMoreInfo','merchants/Shop/moreInfo');//入驻信息
 });
 
 
@@ -229,6 +229,20 @@ Route::group('u-intention', function () {
 
 })->middleware('UserAuth');
 
+
+//订单
+Route::group('api',function () {
+    //提交订单
+    Route::post('shopAddOrder','api/Store/sureOrder');
+    //订单列表
+    Route::post('getOrderList','api/Order/getList');
+    //订单详情
+    Route::post('getOrderDetail','api/Order/getDetail');
+    //退款
+    Route::post('orderRefund','api/Order/orderRefund');
+    //微信支付
+    Route::post('orderPayment','api/Order/OrderPayment');
+});
 
 
 

@@ -23,7 +23,7 @@ class Orders extends Model
      */
     public function getOrderSn()
     {
-
+        return date('YmdHis') . substr(implode(null, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
     }
 
     /**
@@ -31,7 +31,7 @@ class Orders extends Model
      */
     public function addOrder($data)
     {
-        $this->name('orders')->insert($data);
+        return $this->name('orders')->insertGetId($data);
     }
 
     /**
@@ -56,5 +56,19 @@ class Orders extends Model
     public function orderDetail()
     {
 
+    }
+
+    /**
+     * 添加订单详情
+     */
+    public function addOrderDetail($data)
+    {
+        return $this->name('orders_info')->insertAll($data);
+    }
+
+
+    public function getOrderList($page_no, $page_size)
+    {
+        return $this->name('orders')->page($page_no,$page_size)->select();
     }
 }
