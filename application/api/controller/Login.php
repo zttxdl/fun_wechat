@@ -125,7 +125,7 @@ class Login extends Controller
             return json_error('非法参数');
         }
         // 更新数据
-        $res = User::where('openid',$openid)->save([
+        $res = User::where('openid',$openid)->update([
             'phone' =>  $phone,
             'last_login_time'   =>  time()
         ]);
@@ -163,7 +163,7 @@ class Login extends Controller
             return json_error('非法参数');
         }
         // 更新数据
-        $res = User::where('openid',$data['openid'])->save([
+        $res = User::where('openid',$data['openid'])->update([
             'phone' =>  $data['phone'],
             'last_login_time'   =>  time()
         ]);
@@ -185,8 +185,8 @@ class Login extends Controller
      */
     public function getWechatPhone($encrypted_data,$code,$iv)
     {
-        $app_id = config('wx_user.app_id');
-        $app_secret = config('wx_user.secret');
+        $app_id = config('wx_user')['app_id'];
+        $app_secret = config('wx_user')['secret'];
 
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
@@ -194,14 +194,15 @@ class Login extends Controller
         $result = curl_post($url);
         $wxResult = json_decode($result, true);
 
-        //判断返回的结果中是否有错误码
+        // 判断返回的结果中是否有错误码
         if (isset($wxResult['errcode'])) {
             $res = ['code'=>$wxResult['errcode'],'msg'=>$wxResult['errmsg']];
             return $res;
         }
 
         // 解密
-        $recod = json_decode($wxResult);
+        $recod = json_decode($result);
+        // include_once './../extend/extend/wx_auth_phone/WXBizDataCrypt.php';
         $wx = new WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
             $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
         if ($errCode == 0) {
