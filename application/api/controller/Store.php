@@ -8,6 +8,7 @@
 namespace app\api\controller;
 
 use app\common\controller\ApiBase;
+use think\Db;
 use think\Exception;
 use think\Request;
 use think\Db;
@@ -15,7 +16,6 @@ use think\Db;
 class Store extends ApiBase
 {
     protected $noNeedLogin = ['*'];
-
     //获取商家详情-菜单
     public function index(Request $request)
     {
@@ -83,6 +83,59 @@ class Store extends ApiBase
     public function getEvaluation(Request $request)
     {
         $shop_id = $request->param('shop_id');
+        $page = $request->param('page',1);
+        $pagesize = $request->param('pagesize',20);
+        $order = $request->param('order');
+        $tips_id = $request->param('tips_id');
+
+
+
+        $where[] = ['shop_id','=',$shop_id];
+
+
+        $count = model('ShopComments')->where($where)->count();
+        $sum = model('ShopComments')->where($where)->sum('star');
+
+        if ($count != 0){
+            $data['star'] = round($sum / $count,2);
+        }else{
+            $data['star'] = 0;
+        }
+        //获取评价标签
+        $data['tips'] = Db::query("SELECT a.tips_id,a.comments_id,b.`name`,COUNT(a.tips_id) as conuts  FROM fun_shop_comments_tips as a 
+LEFT JOIN fun_tips as b  ON a.tips_id = b.id 
+LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop_id GROUP BY a.tips_id");
+
+        if ($tips_id){
+            $where[] = ['c.tips_id','=',$tips_id];
+        }
+
+        if ($order){
+            $time = time() - 86400*30;
+            $where[] = ['a.add_time','>',$time];
+        }
+
+        $list = Db::table('fun_shop_comments a ')
+            ->join('fun_user b','a.user_id = b.id ')
+            ->join('fun_shop_comments_tips c','a.id = c.comments_id')
+            ->field('a.id,a.star,a.add_time,a.content,b.headimgurl,b.nickname')
+            ->where($where)
+            ->order('add_time desc')
+            ->page($page,$pagesize)
+            ->select();
+
+        foreach ($list as &$value){
+            $value['add_time'] = date('Y-m-d',$value['add_time']);
+            $value['topis'] = Db::table('fun_shop_comments_tips a')
+                ->join('fun_tips b','a.tips_id = b.id')
+                ->field('b.name')
+                ->where('a.comments_id',$value['id'])
+                ->select();
+        }
+
+        $data['list']  =$list;
+
+        return json_success('success',$data);
 
 
     }

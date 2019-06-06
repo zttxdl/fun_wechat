@@ -20,9 +20,10 @@ class MyCoupon extends Controller
      * @param $type  $type = 1，可用红包列表 否则为历史红包 
      * 
      */
-    public function index($uid,$type=1)
+    public function index(Request $request,$uid)
     {
         // 条件
+        $type = $request->get('type');
         $type == 1 ? $where[] = ['m.status','=',1] : $where[] = ['m.status','in','2,3'];
         $where[] = ['m.id','=',$uid];
         

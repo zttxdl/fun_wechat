@@ -2,7 +2,6 @@
 
 namespace app\http\middleware;
 
-use function GuzzleHttp\json_encode;
 use think\Request;
 use app\common\model\User;
 
@@ -10,12 +9,11 @@ class UserAuth
 {
     public function handle($request, \Closure $next)
     {
-        $uid = Request::has('uid') ? Request::param('uid') : '';
-        
+        $uid = $request->header('user-auth');
         if (!$uid) {
-            return json_encode('参数出错，暂无登录', 205);
+            return json_error('参数出错，暂无登录', 205);
         } 
-
+        
         $result = User::find($uid);
         if (!$result) {
             return json_error('未查到该用户',201);

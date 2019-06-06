@@ -142,7 +142,7 @@ return [
     'show_error_msg'         => false,
     // 异常处理handle类 留空使用 \think\exception\Handle
 
-     //'exception_handle'       => '\app\common\exception\Http',
+//     'exception_handle'       => '\app\common\exception\Http',
     //'exception_handle'       => '',
     //jwt定义的key
     'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
@@ -157,8 +157,8 @@ return [
     ],
     // 微信小程序的用户端账号信息
     'wx_user'    =>  [
-        'app_id'        => 'your-appid',
-        'secret'        =>  'your-appsecret',
+        'app_id'        => 'wx7e84dbf300d4764d',
+        'secret'        =>  '7c6bd82277d5b1d7f77c05d4cb1987b7',
         'mch_id'        => 'your-mch-id',
         // API 密钥
         'key'           => 'key-for-signature',
@@ -180,8 +180,8 @@ return [
 
     // 微信小程序的骑手端账号信息
     'wx_rider'  =>[
-        'app_id'        => 'your-appid',
-        'secret'        =>  'your-appsecret',
+        'app_id'        => 'wx51ecddea44f0ffed',
+        'secret'        =>  '90a92131b5844dc7498d28b510386d97',
 
         // 下面为可选项
         // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
@@ -190,17 +190,6 @@ return [
         'log' => [
             'level' => 'debug',
             'file' => __DIR__.'/wechat_rider.log',
-        ],
-    ],
-
-
-    'wechat' => [
-        'app_id' => 'wxd9a9b3a7bec20988',
-        'secret' => '01b452c050e8d6f3c95e16446ae22f07',
-        'response_type' => 'array',
-        'log' => [
-            'level' => 'debug',
-            'file' => __DIR__.'/wechat.log',
         ],
     ],
 ];

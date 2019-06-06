@@ -149,6 +149,7 @@ Route::group('merchants',function (){
 	//文件上传
 	Route::rule('upload','merchants/Upload/up');
 	Route::rule('updatePwd','merchants/Merchants/updatePwd');
+	Route::rule('getEvaluation','merchants/Merchants/getEvaluation');
 
 
 });
@@ -169,20 +170,23 @@ Route::group('merchants',function (){
 
 // 登录注册授权组
 Route::group('u-login', function () {
-    Route::get('/get-auth/:code', 'getAuthInfo');
+    Route::get('/get-auth', 'getAuthInfo');
     Route::post('/base-create', 'saveUserBaseInfo');
     Route::post('/check-tel', 'checkUserPhone');
-    Route::get('/send-veriyf', 'getVerify');
-    Route::post('/update-tel', 'setUserPhone');
+    Route::post('/send-veriyf', 'getVerify');
     Route::post('/login', 'login');
     Route::post('/celerity-login', 'celerityLogin');
 })->prefix('api/login/');
 
+// 用户中心
+Route::group('u-member', function () {
+    Route::get('/index/:uid', 'index');
+    Route::post('/update-tel', 'setUserPhone');
+})->prefix('api/Member/')->middleware('UserAuth');
 
 // 红包组
 Route::group('u-coupon', function () {
-    Route::get('/index/:uid/:type', 'index');
-
+    Route::get('/index/:uid', 'index');
 })->prefix('api/MyCoupon/')->middleware('UserAuth');
 
 
@@ -225,6 +229,7 @@ Route::group('u-intention', function () {
 
 })->middleware('UserAuth');
 
+
 //订单
 Route::group('api',function () {
     //提交订单
@@ -238,7 +243,6 @@ Route::group('api',function () {
     //微信支付
     Route::post('orderPayment','api/Order/OrderPayment');
 });
-
 
 
 

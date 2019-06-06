@@ -20,13 +20,38 @@ class Member extends Controller
      */
     public function index($uid)
     {
-        $user_model = new User();
-        $info = $user_model->getUserInfo($uid);
-
+        $info = model('User')->getUserInfo($uid);
         return json_success('获取用户信息成功',['info'=>$info]);
 
     }
 
     
-     
+    /**
+     * 更换手机号【保存】
+     * 
+     */
+    public function setUserPhone(Request $request)
+    {
+        $uid = $request->param('uid');
+        $phone = $request->param('phone');
+        $code  = $request->param('code');
+        $type  = $request->param('type');
+
+        // 校验验证码
+        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
+        if (!$result) {
+            return json_error(model('Alisms', 'service')->getError());
+        }
+
+        // 更新数据
+        $user = User::get($uid);
+        $user->phone = $phone;
+        $res = $user->save();
+        if (!$res) {
+            return json_error('更换失败');
+        }
+        $user_info = User::get($uid);
+        return json_success('更换成功',['user_info'=>$user_info]);
+        
+    }
 }

@@ -16,10 +16,10 @@ class ReceivingAddr extends Controller
     public function index($uid,$lat='',$lng='')
     {
         if ($lat == '' & $lng == ''){
-            $list = model('ReceiveAddr')->getReceivingAddrList($uid);
+            $list = model('ReceivingAddr')->getReceivingAddrList($uid);
 
         }else{
-            $list = model('ReceiveAddr')->getReceivingAddrList($uid);
+            $list = model('ReceivingAddr')->getReceivingAddrList($uid);
             foreach ($list as &$value) {
                 $value['beyond'] = 0;
                 $distance = pc_sphere_distance($lat,$lng,$value['latitude'],$value['longitude']);
@@ -47,7 +47,7 @@ class ReceivingAddr extends Controller
         if ($check !== true) {
             return json_error($check,201);
         }
-
+        // 将物理地址逆解析为经纬度
         $school_id = $request->param('school_id');
         $school_name = model('School')->getNameById($school_id);
         $address = $school_name.$request->param('area_detail');
@@ -56,7 +56,7 @@ class ReceivingAddr extends Controller
         $data['longitude'] = $location['lng'];
 
         // 提交新增表单
-        $result = $user = ReceiveAddr::create($data,true);
+        $result = ReceiveAddr::create($data,true);
         if (!$result) {
             return json_error('添加失败',201);
         }
@@ -66,7 +66,7 @@ class ReceivingAddr extends Controller
 
 
     /**
-     * 展示收货页面 
+     * 展示编辑收货页面 
      * @param $id  收货地址表主键值
      * 
      */
@@ -93,6 +93,14 @@ class ReceivingAddr extends Controller
         if ($check !== true) {
             return json_error($check,201);
         }
+
+        // 将物理地址逆解析为经纬度
+        $school_id = $request->param('school_id');
+        $school_name = model('School')->getNameById($school_id);
+        $address = $school_name.$request->param('area_detail');
+        $location = get_location($address);
+        $data['latitude'] = $location['lat'];
+        $data['longitude'] = $location['lng'];
         
         // 提交表单
         $result = ReceiveAddr::update($data);

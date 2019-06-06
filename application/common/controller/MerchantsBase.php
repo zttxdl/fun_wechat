@@ -26,12 +26,15 @@ class MerchantsBase extends Controller
         }
     }
 
-    protected function valid_token()
+    public function valid_token()
     {
         $token = $this->request->header('api-token','');
         $jwtAuth = new JwtAuth();
+
         $jwt = $jwtAuth->checkToken($token);
+
         $this->shop_id = substr($jwt['data'],9);
+
     }
 
     /**

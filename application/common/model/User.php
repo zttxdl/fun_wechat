@@ -12,7 +12,7 @@ class User extends Model
      */
     public function getUserInfo($uid)
     {
-        $res = $this->name('user')->where('uid',$uid)->find();
+        $res = $this->name('user')->where('id',$uid)->find();
         return $res;
     }
 
