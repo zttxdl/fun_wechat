@@ -83,7 +83,7 @@ class Coupon extends Controller
         $data['surplus_num'] = $data['num'];
 
         // 验证表单数据
-        $check = $this->validate($data, 'MyCoupon');
+        $check = $this->validate($data, 'Coupon');
         if ($check !== true) {
             return json_error($check,201);
         }
@@ -152,7 +152,7 @@ class Coupon extends Controller
                 $data['end_time'] = strtotime($data['end_time']);
             }
             // 验证表单数据
-            $check = $this->validate($data, 'MyCoupon');
+            $check = $this->validate($data, 'Coupon');
             if ($check !== true) {
                 return json_error($check,201);
             }
