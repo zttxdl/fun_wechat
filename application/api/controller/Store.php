@@ -11,7 +11,6 @@ use app\common\controller\ApiBase;
 use think\Db;
 use think\Exception;
 use think\Request;
-use think\Db;
 
 class Store extends ApiBase
 {
