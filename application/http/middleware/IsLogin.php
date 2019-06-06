@@ -19,7 +19,7 @@ class IsLogin
                 return json_error('用户未登录');
             }
         }catch (ErrorException $e){
-            json_error($e->getMessage(),$e->getCode());
+            return json_error($e->getMessage());
         }
 
     }

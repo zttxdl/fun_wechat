@@ -53,6 +53,11 @@ class Login extends Controller
         $list['invitation_id'] = $data['invitation_id'];
         $list['add_time'] = time();
 
+        // 判断当前用户是否已授权
+        $id = User::where('openid','=',$data['openid'])->count('id');
+        if ($id) {
+            return json_error('该用户已授权！不需要再次授权');
+        }
         // 存入数据
         $result = User::create($list);
         if(!$result) {
