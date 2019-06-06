@@ -83,6 +83,10 @@ class Order extends ApiBase
         $result = [];
         $data = Db::name('ordersInfo')->where('orders_id',$orders_id)->select();
 
+        if(!$data) {
+            $this->error('暂无数据');
+        }
+
         $result['detail'] = $data;
 
         foreach ($result['detail'] as $row) {
@@ -112,6 +116,7 @@ class Order extends ApiBase
             'pay_type' => '在现支付',
             'pint_fee' => $orders['ping_fee'],
             'box_money' => $orders['box_money'],
+            'money' => $orders['money']
         ];
         if(in_array($orders['status'],[2,5,6])) { //商家接单 和 骑手取货配货显示时间 送达时间
             $result['time'] = $orders['plan_arrive_time'];
