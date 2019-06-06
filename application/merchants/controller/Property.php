@@ -9,7 +9,7 @@
 namespace app\merchants\controller;
 
 
-class Property
+class Property extends MerchantsBase
 {
 
     /**

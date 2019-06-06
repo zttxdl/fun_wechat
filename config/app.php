@@ -155,18 +155,6 @@ return [
         'SMSTemplateCode' => 'SMS_158840158',
         //'SMS_141915147',
     ],
-    //验证码设置
-    'captcha' => [
-        // 验证码字体大小
-        'fontSize' => 30,
-        //验证码位数
-        'length' => 4,
-    ],
-    'sex' => [
-        1 => '男',
-        0 => '女',
-        2 => '保密'
-    ],
     // 微信小程序的用户端账号信息
     'wx_user'    =>  [
         'app_id'        => 'your-appid',
@@ -215,5 +203,4 @@ return [
             'file' => __DIR__.'/wechat.log',
         ],
     ],
-
 ];

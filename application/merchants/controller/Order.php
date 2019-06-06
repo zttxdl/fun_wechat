@@ -9,7 +9,7 @@
 namespace app\merchants\controller;
 
 
-class Order
+class Order extends MerchantsBase
 {
 
     /**

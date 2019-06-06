@@ -10,6 +10,7 @@ namespace app\api\controller;
 use app\common\controller\ApiBase;
 use think\Exception;
 use think\Request;
+use think\Db;
 
 class Store extends ApiBase
 {
@@ -181,29 +182,133 @@ class Store extends ApiBase
 
         $order = $request->param('order');//主表
         $detail = $request->param('detail');//明细
+        $platform_discount = $request->param('platform_discount');//平台活动
+        $shop_discount = $request->param('shop_discount');//店铺活动
 
-        $order = [
-            'order_sn' => build_order_no(),//订单
-            'user_id' => $order['user_id'],
-            'shop_id' => $order['shop_id'],
-            'money' => $order['money'],//实付金额
-            'total_money' => $order['total_money'],//订单总价
-            ''
+        /*dump($order);
+        dump($detail);
+        dump($platform_discount);
+        dump($shop_discount);*/
 
+
+        if(!$order || !$detail || !$platform_discount || !$shop_discount) {
+            return json_error('非法传参');
+        }
+
+        $orders_sn = build_order_no();//生成唯一订单号
+
+
+        //启动事务
+        Db::startTrans();
+        try{
+            $orderData = [
+                'orders_sn' => $orders_sn,//订单
+                'user_id' => isset($order['user_id']) ? $order['user_id'] : 0,
+                'shop_id' => isset($order['shop_id']) ? $order['shop_id'] : 0,
+                'money' => isset($order['money']) ? (float)$order['money'] : 0.00,//实付金额
+                'total_money' => isset($order['total_money']) ? (float)$order['total_money'] : 0.00,//订单总价
+                'box_money' => isset($order['box_money']) ? (float)$order['box_money'] : 0.00,//订单参盒费
+                'ping_fee' => isset($order['ping_fee']) ? (float)$order['ping_fee'] : 0.00,//订单配送费
+                'pay_mode' => $order['pay_mode'],//支付方式
+                'address' => isset($order['address']) ? $order['address'] : '',//配送地址
+                'num' => isset($order['num']) ? $order['num'] : '',//商品总数
+                'message' => isset($order['remark']) ? $order['remark'] : '',//订单备注
+                'source' => 1,//订单来源
+                'add_time' => time(),//订单创建时间
+            ];
+
+            $orders_id = model('Orders')->addOrder($orderData);
+
+            if(!$orders_id) {
+                throw new \Exception('订单添加失败');
+            }
+
+
+            $detailData = [];
+            $product_money = 0;//商品单价
+
+            foreach ($detail as $row) {
+
+                $product_money = $row['money'];
+
+                $product_info = model('Product')->geProductById($row['product_id'])->toArray();
+                //dump($product_info);
+
+                if($product_info['type'] == 2 && count($row['num']) > 1) {//优惠商品
+                    $product_money = $product_info['price'] + ($product_info['old_price'] * ($row['num'] - 1));//优惠商品第二价按原价算
+                }
+
+                $detailData[] = [
+                    'orders_id' => $orders_id,
+                    'orders_sn' => $orders_sn,
+                    'product_id' => $row['product_id'],
+                    'num' => $row['num'],
+                    'money' => $product_money,
+                    'box_money' => $row['box_money'],
+                    'platform_coupon_id' => isset($platform_discount['id']) ? $platform_discount['id'] : 0,
+                    'platform_coupon_money' => isset($platform_discount['face_value']) ? (float)$platform_discount['face_value'] : 0.00,
+                    'shop_discounts_id' => isset($shop_discount['id']) ? $shop_discount['id'] : 0,
+                    'shop_discounts_money' => isset($shop_discount['face_value']) ? (float)$shop_discount['face_value'] : 0.00
+                ];
+            }
+
+
+            $res = model('Orders')->addOrderDetail($detailData);
+
+            //dump($res);
+
+            if(!$res) {
+                throw new \Exception('明细添加失败');
+            }
+
+            Db::commit();
+            $result['orders_id'] = $orders_id;
+            $result['orders_sn'] = $orders_sn;
+            return json_success('提交成功',$result);
+
+        } catch (\Exception $e) {
+            Db::rollback();
+            return json_error($e->getMessage());
+        }
+
+    }
+
+    public function test()
+    {
+        $data['order'] = [
+            'money' => 200,
+            'total_money' => 230,
+            'pay_mode' => 0,
+            'address' => '清河南园北园',
+            'num' => '5',
+            'remark' => '微麻,微辣',
+        ];
+        $data['detail'] = [
+          [
+              'product_id'=>'1',
+              'name'=>'1',
+              'money'=>'100'
+          ],
+          [
+              'product_id'=>'2',
+              'name'=>'2',
+              'money'=>'50'
+          ],
+          [
+              'product_id'=>'3',
+              'name'=>'3',
+              'money'=>'10'
+          ]
+        ];
+        $data['platform_discount'] = [
+            'platform_coupon_id' => 1,
+            'platform_coupon_money' => 10
+        ];
+        $data['shop_discounts_money'] = [
+            'shop_discounts_id' => 1,
+            'shop_discounts_money' => 10,
         ];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return json($data);
     }
 }

@@ -11,7 +11,7 @@ namespace app\merchants\controller;
 
 use think\Request;
 
-class Shop
+class Shop extends MerchantsBase
 {
     /**
      * 店铺管理

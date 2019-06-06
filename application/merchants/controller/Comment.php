@@ -9,7 +9,7 @@
 namespace app\merchants\controller;
 
 
-class Comment
+class Comment extends MerchantsBase
 {
     /**
      * 评价管理
