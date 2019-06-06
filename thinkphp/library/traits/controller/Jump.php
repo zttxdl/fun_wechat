@@ -27,76 +27,30 @@ trait Jump
     protected $app;
 
     /**
-     * 操作成功跳转的快捷方法
-     * @access protected
-     * @param  mixed     $msg 提示信息
-     * @param  string    $url 跳转的URL地址
-     * @param  mixed     $data 返回的数据
-     * @param  integer   $wait 跳转等待时间
-     * @param  array     $header 发送的Header信息
-     * @return void
+     * 操作成功返回的数据
+     * @param string $msg    提示信息
+     * @param mixed  $data   要返回的数据
+     * @param int    $code   错误码，默认为1
+     * @param string $type   输出类型
+     * @param array  $header 发送的 Header 信息
      */
-    protected function success($msg = '', $url = null, $data = '', $wait = 3, array $header = [])
+    protected function success($msg = '', $data = null, $code = 200, $type = null, array $header = [])
     {
-        if (is_null($url) && isset($_SERVER["HTTP_REFERER"])) {
-            $url = $_SERVER["HTTP_REFERER"];
-        } elseif ('' !== $url) {
-            $url = (strpos($url, '://') || 0 === strpos($url, '/')) ? $url : Container::get('url')->build($url);
-        }
+        $this->result($data, $code, $msg, $type, $header);
 
-        $result = [
-            'code' => 1,
-            'msg'  => $msg,
-            'data' => $data,
-            'url'  => $url,
-            'wait' => $wait,
-        ];
-
-        $type = $this->getResponseType();
-        // 把跳转模板的渲染下沉，这样在 response_send 行为里通过getData()获得的数据是一致性的格式
-        if ('html' == strtolower($type)) {
-            $type = 'jump';
-        }
-
-        $response = Response::create($result, $type)->header($header)->options(['jump_template' => $this->app['config']->get('dispatch_success_tmpl')]);
-
-        throw new HttpResponseException($response);
     }
 
     /**
-     * 操作错误跳转的快捷方法
-     * @access protected
-     * @param  mixed     $msg 提示信息
-     * @param  string    $url 跳转的URL地址
-     * @param  mixed     $data 返回的数据
-     * @param  integer   $wait 跳转等待时间
-     * @param  array     $header 发送的Header信息
-     * @return void
+     * 操作失败返回的数据
+     * @param string $msg    提示信息
+     * @param mixed  $data   要返回的数据
+     * @param int    $code   错误码，默认为0
+     * @param string $type   输出类型
+     * @param array  $header 发送的 Header 信息
      */
-    protected function error($msg = '', $url = null, $data = '', $wait = 3, array $header = [])
+    protected function error($msg = '', $data = null, $code = 201, $type = null, array $header = [])
     {
-        $type = $this->getResponseType();
-        if (is_null($url)) {
-            $url = $this->app['request']->isAjax() ? '' : 'javascript:history.back(-1);';
-        } elseif ('' !== $url) {
-            $url = (strpos($url, '://') || 0 === strpos($url, '/')) ? $url : $this->app['url']->build($url);
-        }
-
-        $result = [
-            'code' => 0,
-            'msg'  => $msg,
-            'data' => $data,
-            'url'  => $url,
-            'wait' => $wait,
-        ];
-
-        if ('html' == strtolower($type)) {
-            $type = 'jump';
-        }
-
-        $response = Response::create($result, $type)->header($header)->options(['jump_template' => $this->app['config']->get('dispatch_error_tmpl')]);
-
-        throw new HttpResponseException($response);
+        $this->result($data, $code, $msg, $type, $header);
     }
 
     /**

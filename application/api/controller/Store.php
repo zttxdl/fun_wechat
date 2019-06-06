@@ -267,6 +267,12 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
                 'message' => isset($order['remark']) ? $order['remark'] : '',//订单备注
                 'source' => 1,//订单来源
                 'add_time' => time(),//订单创建时间
+                //店铺优惠信息
+                'shop_discounts_id' => isset($shop_discount['id']) ? $shop_discount['id']: 0,
+                'shop_discounts_money' => isset($shop_discount['face_value']) ? $shop_discount['face_value'] : 0.00,
+                //平台优惠信息
+                'platform_coupon_id' => isset($platform_discount['id']) ? $platform_discount['id'] : 0 ,
+                'platform_coupon_money' => isset($platform_discount['face_value']) ? $platform_discount['face_value'] : 0.00,
             ];
 
             $orders_id = model('Orders')->addOrder($orderData);
@@ -277,7 +283,15 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
 
             $detailData = [];
-            $product_money = 0;//商品单价
+            $total_money = $order['total_money'];//订单总价
+            $money = $order['money'];//订单结算金额
+            $order_discount = $orderData['shop_discounts_money'] + $orderData['platform_coupon_money'];//订单优惠金额
+            $product_money = 0;//商品最终结算金额
+
+            if($money != ($total_money - $order_discount)) {
+                throw new \Exception('订单结算金额不正确');
+            }
+
 
             foreach ($detail as $row) {
 
@@ -286,8 +300,15 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
                 $product_info = model('Product')->geProductById($row['product_id'])->toArray();
                 //dump($product_info);
 
-                if($product_info['type'] == 2 && count($row['num']) > 1) {//优惠商品
-                    $product_money = $product_info['price'] + ($product_info['old_price'] * ($row['num'] - 1));//优惠商品第二价按原价算
+
+
+                if($product_info['type'] == 2 && $row['num'] > 1) {//优惠商品
+                    $product_money = $product_info['price'] + ($product_info['old_price'] * ($row['num'] - 1));//优惠商品第二件按原价算
+                }
+
+                //如果订单包含 商家或者店铺优惠均摊到 商品结算金额
+                if($orderData['shop_discounts_id'] || $orderData['platform_coupon_id']){
+                    $product_money = (float)(($product_money/$order['total_money']) * ($order['money'] - $order['total_money'] - $order['ping_fee']));
                 }
 
                 $detailData[] = [
@@ -316,11 +337,11 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             Db::commit();
             $result['orders_id'] = $orders_id;
             $result['orders_sn'] = $orders_sn;
-            return json_success('提交成功',$result);
+            $this->success('提交成功',$result);
 
         } catch (\Exception $e) {
             Db::rollback();
-            return json_error($e->getMessage());
+            $this->error($e->getMessage());
         }
 
     }
