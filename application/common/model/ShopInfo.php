@@ -11,7 +11,7 @@ class ShopInfo extends Model
     {
 
         $list = $this->field("id,shop_name,marks,sales,up_to_send_money,run_time,
-            address,manage_category_id,ping_fee,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),2 ) AS distance ")
+            address,manage_category_id,ping_fee,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
             ->having('distance < 3')
             ->page($page,$pagesize)
             ->select()
