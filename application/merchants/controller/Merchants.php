@@ -8,6 +8,7 @@
 namespace  app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
+use think\Db;
 use think\Request;
 
 class Merchants extends MerchantsBase
@@ -28,7 +29,7 @@ class Merchants extends MerchantsBase
         $data['status'] = 3;
         $check = $this->validate($request->param(), 'Merchants');
         if ($check !== true) {
-            return json_error($check);
+            $this->error($check);
         }
 
         model('ShopInfo')
@@ -126,5 +127,56 @@ class Merchants extends MerchantsBase
         model('ShopInfo')->where('id',$this->shop_id)->update(['password'=>md5($new_password)]);
 
         return json_success('success');
+    }
+
+    /**
+     * 评价管理
+     * @param Request $request
+     * @return \think\response\Json
+     */
+
+    public function getEvaluation(Request $request)
+    {
+        $page = $request->param('page',1);
+        $pagesize = $request->param('pagesize',20);
+        $type = $request->param('type');
+
+        $where[] = ['shop_id','=',$this->shop_id];
+
+
+        $count = model('ShopComments')->where($where)->count();
+        $sum = model('ShopComments')->where($where)->sum('star');
+        if ($count != 0){
+            $data['star'] = round($sum / $count,2);
+        }else{
+            $data['star'] = 0;
+        }
+
+
+        if ($type){
+            $where[] = ['type','=',$type];
+        }
+
+        $list = Db::table('fun_shop_comments a ')
+            ->join('fun_user b','a.user_id = b.id ')
+            ->field('a.id,a.star,a.add_time,a.content,b.headimgurl,b.nickname')
+            ->where($where)
+            ->order('add_time desc')
+            ->page($page,$pagesize)
+            ->select();
+
+        foreach ($list as &$value){
+            $value['add_time'] = date('Y-m-d',$value['add_time']);
+            $value['topis'] = Db::table('fun_shop_comments_tips a')
+                ->join('fun_tips b','a.tips_id = b.id')
+                ->field('b.name')
+                ->where('a.comments_id',$value['id'])
+                ->select();
+        }
+
+        $data['list']  =$list;
+
+        return json_success('success',$data);
+
     }
 }

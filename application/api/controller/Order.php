@@ -115,6 +115,7 @@ class Order extends ApiBase
         }
     }
 
+    //微信支付回调处理业务
     public function returnResult($orders_sn,$wx_id)
     {
         Db::startTrans();
@@ -122,7 +123,7 @@ class Order extends ApiBase
             //处理的业务逻辑，更新订单
             $fre = model('Orders')->where('orders_sn',$orders_sn)->update(['pay_status'=>1,'pay_time'=>time(),'trade_no'=>$wx_id,'update_time'=>time()]);
             if(!$fre){
-                throw new \Exception('订单更新失败');
+                $this->error('订单更新失败');
             }
 
             Db::commit();
@@ -132,6 +133,56 @@ class Order extends ApiBase
         }
 
         return true;
+    }
+
+    //评价
+    public function addEvaluation(Request $request)
+    {
+        $orders_id = $request->param('orders_id');
+        $shop_id = $request->param('shop_id');
+        $star = $request->param('star');
+        $content = $request->param('content','');
+        $tips_ids = $request->param('tips_ids','');
+        $type = $request->param('type');
+
+        $data = [
+            'orders_id'=>$orders_id,
+            'shop_id'=>$shop_id,
+            'star'=>$star,
+            'content'=>$content,
+            'user_id'=>1,
+            'type'=>$type,
+            'add_time'=>time(),
+        ];
+        $ret = model('ShopComments')->where('orders_id',$orders_id)->find();
+
+        if ($ret){
+            return json_error('该商品已评价');
+        }
+
+        $id = model('ShopComments')->insertGetId($data);
+
+        if ($tips_ids){
+            $res = explode(',',$tips_ids);
+            $com = [];
+            foreach ($res as $v) {
+                $com[] = ['comments_id'=>$id,'tips_id'=>$v];
+            }
+
+            model('ShopCommentsTips')->insertAll($com);
+        }
+        //改变商品状态
+        model('Orders')->where('id',$orders_id)->update(['status'=>9,'update_time'=>time()]);
+
+        return json_success('success');
+    }
+
+    //获取评价标签
+    public function getTips()
+    {
+        $list = model('Tips')->select();
+
+        return json_success('success',$list);
     }
 
 }
