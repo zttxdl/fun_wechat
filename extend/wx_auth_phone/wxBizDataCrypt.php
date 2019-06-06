@@ -1,7 +1,6 @@
 <?php
-namespace wx_auth_phone;
 
-use wx_auth_phone\ErrorCode;
+include 'errorCode.php';
 
 
 /**

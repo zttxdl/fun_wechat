@@ -1,5 +1,4 @@
 <?php
-namespace wx_auth_phone;
 
 /**
  * error code 说明.
@@ -20,5 +19,3 @@ class ErrorCode
 	public static $IllegalBuffer = -41003;
 	public static $DecodeBase64Error = -41004;
 }
-
-?>
