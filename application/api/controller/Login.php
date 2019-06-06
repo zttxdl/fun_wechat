@@ -201,7 +201,7 @@ class Login extends Controller
         }
 
         // 解密
-        $recod = json_decode($wxResult);
+        $recod = json_decode($result);
         $wx = new WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
             $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
         if ($errCode == 0) {
