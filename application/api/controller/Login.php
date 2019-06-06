@@ -185,8 +185,8 @@ class Login extends Controller
      */
     public function getWechatPhone($encrypted_data,$code,$iv)
     {
-        $app_id = config('wx_user.app_id');
-        $app_secret = config('wx_user.secret');
+        $app_id = config('wx_user')['app_id'];
+        $app_secret = config('wx_user')['secret'];
 
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
@@ -194,7 +194,7 @@ class Login extends Controller
         $result = curl_post($url);
         $wxResult = json_decode($result, true);
 
-        //判断返回的结果中是否有错误码
+        // 判断返回的结果中是否有错误码
         if (isset($wxResult['errcode'])) {
             $res = ['code'=>$wxResult['errcode'],'msg'=>$wxResult['errmsg']];
             return $res;

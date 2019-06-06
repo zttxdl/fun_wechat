@@ -4,6 +4,9 @@ namespace app\rider\controller;
 
 use think\Controller;
 use think\Request;
+use app\common\model\RiderInfo;
+use wx_auth_phone\WXBizDataCrypt;
+
 
 /**
  * 骑手登录注册
@@ -17,8 +20,8 @@ class Login extends Controller
     public function getAuthInfo(Request $request)
     {
         $code = $request->param('code');
-        $app_id = config('wx_rider')['app_id'];
-        $app_secret = config('wx_rider')['secret'];
+        $app_id = config('wx_mike')['app_id'];
+        $app_secret = config('wx_mike')['secret'];
         
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
@@ -50,7 +53,7 @@ class Login extends Controller
         $list['add_time'] = time();
 
         // 存入数据
-        $result = User::create($list);
+        $result = RiderInfo::create($list);
         if(!$result) {
             return json_error('授权入表失败');
         }
@@ -117,12 +120,12 @@ class Login extends Controller
         }
 
         // 判断openid是否存在
-        $uid = User::where('openid',$openid)->value('id');
+        $uid = RiderInfo::where('openid',$openid)->value('id');
         if (!$uid) {
             return json_error('非法参数');
         }
         // 更新数据
-        $res = User::where('openid',$openid)->save([
+        $res = RiderInfo::where('openid',$openid)->save([
             'phone' =>  $phone,
             'last_login_time'   =>  time()
         ]);
@@ -130,7 +133,7 @@ class Login extends Controller
         if (!$res) {
             return json_error('登录或注册失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
+        $user_info = RiderInfo::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
 
         return json_success('登录或注册成功',['user_info'=>$user_info]);
         
@@ -155,12 +158,12 @@ class Login extends Controller
 
         // 存表处理
         // 判断openid是否存在
-        $uid = User::where('openid',$data['openid'])->value('id');
+        $uid = RiderInfo::where('openid',$data['openid'])->value('id');
         if (!$uid) {
             return json_error('非法参数');
         }
         // 更新数据
-        $res = User::where('openid',$data['openid'])->save([
+        $res = RiderInfo::where('openid',$data['openid'])->save([
             'phone' =>  $data['phone'],
             'last_login_time'   =>  time()
         ]);
@@ -168,7 +171,7 @@ class Login extends Controller
         if (!$res) {
             return json_error('快捷登录失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
+        $user_info = RiderInfo::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
 
         return json_success('快捷登录成功',['user_info'=>$user_info]);
 
@@ -182,8 +185,8 @@ class Login extends Controller
      */
     public function getWechatPhone($encrypted_data,$code,$iv)
     {
-        $app_id = config('wx_user.app_id');
-        $app_secret = config('wx_user.secret');
+        $app_id = config('wx_mike')['app_id'];
+        $app_secret = config('wx_mike')['secret'];
 
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 

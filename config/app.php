@@ -192,4 +192,10 @@ return [
             'file' => __DIR__.'/wechat_rider.log',
         ],
     ],
+
+    // 仅供本人测试使用
+    'wx_mike'  =>[
+        'app_id'        => 'wxeee3b70a6b0cd505',
+        'secret'        =>  'e3526bec1f07ebae5af36bdc78a7e456',
+    ],
 ];
