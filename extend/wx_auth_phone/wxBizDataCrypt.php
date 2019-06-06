@@ -1,5 +1,4 @@
 <?php
-namespace wx_auth_phone;
 
 
 /**
