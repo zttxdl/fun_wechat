@@ -132,48 +132,32 @@ class Order extends ApiBase
 
         if(!$orders_sn){
 
-            return json_error('订单号不能为空');
+            $this->error('订单号不能为空');
         }
 
         $order = model('Orders')->where('orders_sn',$orders_sn)->find();
 
         if(!$order){
-            return json_error('订单id错误');
+            $this->error('订单id错误');
         }
 
         if($order->user_id != 1){
-            return json_error('非法操作');
+            $this->error('非法操作');
         }
         if($order->pay_status==1){
-            return  json_error('订单已支付');
+            $this->error('订单已支付');
         }
 
 //        if((time()-$order->add_time) > 15*60){//15分钟失效
-//            return  json_error('订单已失效');
+//            $this->error('订单已失效');
 //        }
-//        dump($_SERVER);exit;
         $data['price'] = $order->money;
 
-        //小程序 wxd9b1802338a9bcf4
-        $app_id = "wx7e84dbf300d4764d";
-        $mch_id = "1538416851";
-        $key = "";
-        $config = [
-            // 必要配置
-            'app_id'             => $app_id,
-            'mch_id'             => $mch_id,
-            'key'                => $key,   // API 密钥
-            // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
-            'cert_path'          => '', // XXX: 绝对路径！！！！
-            'key_path'           => '',      // XXX: 绝对路径！！！！
-            'notify_url'         => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/order/wxNotify',     // 你也可以在下单时单独设置来想覆盖它
-            'sandbox' => false
-        ];
-
+        $config = config('wx_pay');
+        $app_id = config('wx_pay')['app_id'];
         $app = Factory::payment($config);
-//        $openid= $this->auth->openid;
-        $openid = model('user')->where('id',$order['user_id'])->value('openid');
-        //$openid= 'oyXQr5P_Y9ZjpEfUum3RTQn5ReZM';
+//        $openid = model('user')->where('id',$order['user_id'])->value('openid');
+        $openid= 'o2pfj5FQLRFUf3O-aLtXKsVekMfo';
 
 
         $ip   = request()->ip();
@@ -193,10 +177,10 @@ class Order extends ApiBase
             $result['package']="prepay_id=".$result['prepay_id'];
             $result['paySign']=MD5("appId=".$app_id."&nonceStr=".$result['nonce_str']."&package=".$result['package']."&signType=MD5&timeStamp=".$result['timeStamp']."&key=10S9a3A3EdF2a60e04cb1b8G8b507AF4");
 
-            return json_success('success',$result);
+            $this->success('success',$result);
         }else{
 
-             return json_error('下单失败'.$result['err_code_des']);
+             $this->error('下单失败'.$result['err_code_des']);
         }
 
     }
