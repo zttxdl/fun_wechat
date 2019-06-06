@@ -7,7 +7,7 @@ use think\Model;
 class ShopInfo extends Model
 {
     //获取周边3公里的商家
-	public function getDistance($lat,$lng,$page=0,$pagesize=15)
+	public function getDistance($lat,$lng,$page=1,$pagesize=15)
     {
 
         $list = $this->field("id,shop_name,marks,sales,up_to_send_money,run_time,
