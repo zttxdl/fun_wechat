@@ -52,6 +52,12 @@ class Login extends Controller
         $list['invitation_id'] = $data['invitation_id'];
         $list['add_time'] = time();
 
+        // 判断当前用户是否已授权
+        $id = RiderInfo::where('openid','=',$data['openid'])->count('id');
+        if ($id) {
+            return json_error('该用户已授权！不需要再次授权，直接跳转至登录页面');
+        }
+
         // 存入数据
         $result = RiderInfo::create($list);
         if(!$result) {
