@@ -246,3 +246,21 @@ Route::group('api',function () {
 
 
 
+
+
+/*************** 骑手端 *********************************************************************************************/
+// 登录注册授权组
+Route::group('r-login', function () {
+    Route::get('/get-auth', 'getAuthInfo');
+    Route::post('/base-create', 'saveUserBaseInfo');
+    Route::post('/check-tel', 'checkUserPhone');
+    Route::post('/send-veriyf', 'getVerify');
+    Route::post('/login', 'login');
+    Route::post('/celerity-login', 'celerityLogin');
+})->prefix('rider/Login/');
+
+
+// 收货地址组
+Route::group('r-addr', function () {
+    Route::get('/index/:uid', 'index');
+})->prefix('rider/ReceivingAddr/')->middleware('RiderAuth');
