@@ -46,7 +46,7 @@ class Login extends Controller
     {
         $data = $request->post();
         $list['nickname'] = $data['nickName'];
-        $list['img'] = $data['avatarUrl'];
+        $list['headimgurl'] = $data['avatarUrl'];
         $list['openid'] = $data['openid'];
         $list['sex'] = $data['gender'];
         $list['invitation_id'] = $data['invitation_id'];
