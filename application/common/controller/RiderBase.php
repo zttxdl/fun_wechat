@@ -12,7 +12,7 @@ use think\facade\Cache;
 /**
  * 商品规格属性模块控制器
  */
-class ApiBase extends Controller
+class RiderBase extends Controller
 {
     protected $noNeedLogin = [];
     protected $auth;
@@ -34,6 +34,7 @@ class ApiBase extends Controller
         $jwtAuth = new JwtAuth();
         $jwt = $jwtAuth->checkToken($token);
         $this->auth =$jwt['data'];
+
     }
 
     /**
@@ -84,7 +85,7 @@ class ApiBase extends Controller
         $store = 'file'; //redis,file
 
         return Cache::store($store)
-            ->get('api_' . $param['name']);
+            ->get('rider_' . $param['name']);
     }
 
     /**
@@ -97,7 +98,7 @@ class ApiBase extends Controller
     {
         $store = 'file'; //redis,file
         Cache::store($store)
-            ->set('api_' . $param['name'], $data, $options, $param['tag']);
+            ->set('rider_' . $param['name'], $data, $options, $param['tag']);
     }
 
     

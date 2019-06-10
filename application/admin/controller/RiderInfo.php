@@ -103,7 +103,8 @@ class RiderInfo extends Controller
         // 搜索条件
         $where= [];
         !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
-        !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : $where[] = ['status','=',1];
+        !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : $where[] = ['status','notin','0,4'];
+
 
         $list = Db::name('rider_info')->where($where)->field('id,nickname,name,headimgurl,link_tel,identity_num,hand_card_img,status')->order('id desc')->paginate(10)
                 ->each(function ($item, $key) {

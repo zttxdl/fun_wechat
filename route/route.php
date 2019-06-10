@@ -206,13 +206,13 @@ Route::group('u-member', function () {
 
 // 红包组
 Route::group('u-coupon', function () {
-    Route::get('/index/:uid', 'index');
+    Route::get('/index', 'index');
 })->prefix('api/MyCoupon/');
 
 
 // 收货地址组
 Route::group('u-addr', function () {
-    Route::get('/index/:uid', 'index');
+    Route::get('/index', 'index');
     Route::post('/create', 'create');
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');
@@ -282,9 +282,9 @@ Route::group('r-login', function () {
 
 // 骑手中心组
 Route::group('r-member', function () {
-    Route::get('/index/:rid', 'index');
+    Route::get('/index', 'index');
     Route::post('/update-tel', 'setRiderPhone');
     Route::post('/apply', 'applyRider');
-    Route::get('/edit/:rid', 'edit');
+    Route::get('/edit', 'edit');
     Route::post('/uodate', 'uodate');
 })->prefix('rider/Member/')->middleware('RiderAuth');

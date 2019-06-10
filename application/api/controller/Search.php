@@ -21,7 +21,6 @@ class Search extends ApiBase
             ->limit(8)
             ->select();
         $data['history'] = model('Search')
-            ->distinct(true)
             ->field('keywords')
             ->where('user_id',$user_id)
             ->order('add_time','desc')
@@ -38,12 +37,19 @@ class Search extends ApiBase
         $keywords = $request->param('keywords');
         $lat = $request->param('latitude');
         $lng = $request->param('longitude');
-        $pagesize = input('pagesize',15);
-        $page = input('page',1);
+        $pagesize = $request->param('pagesize',15);
+        $page = $request->param('page',1);
 
         //记录历史搜索
         $data = ['user_id'=>$user_id,'keywords'=>$keywords,'add_time'=>time()];
-        model('Search')->insert($data);
+        $where[] = ['user_id','=',$user_id];
+        $where[] = ['keywords','=',$keywords];
+        $find = model('Search')->where($where)->find();
+        if ($find){
+            model('Search')->where($where)->update(['add_time'=>time()]);
+        }else{
+            model('Search')->insert($data);
+        }
 
         //搜索周边
         $list = Db::name('shop_info a')
@@ -72,9 +78,20 @@ class Search extends ApiBase
                 ->select();
         }
 
-        $this->success($list);
+        $this->success('success',$list);
 
     }
 
+    //删除搜索记录
+    public function delete($id)
+    {
+        $where[] = ['user_id','=',$this->auth->id];
+        $id = model('Search')->where($where)->delete();
+        if ($id){
+            $this->success('删除成功');
+        }else{
+            $this->error('删除失败');
+        }
+    }
 
 }
