@@ -66,7 +66,12 @@ class Orders extends Model
         return $this->name('orders_info')->insertAll($data);
     }
 
-
+    /**
+     * 获取订单列表
+     * @param $page_no
+     * @param $page_size
+     * @return mixed
+     */
     public function getOrderList($page_no, $page_size)
     {
         return $this->name('orders')->page($page_no,$page_size)->select();

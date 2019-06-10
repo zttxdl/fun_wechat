@@ -16,7 +16,7 @@ use think\Request;
 
 class Order extends ApiBase
 {
-
+    protected $noNeedLogin = [];
     /**
      * 订单列表
      * @param Request $request
@@ -31,7 +31,8 @@ class Order extends ApiBase
         //$this->param_empty($request->param());
         $page_size = config('page_size');
         $page_no = $request->param('page_no');
-        $user_id = $request->param('user_id');
+        $user_id = $this->auth->id;
+//        $user_id = $request->param('user_id');
 
         if(!$user_id || !$page_no) {
             $this->error('非法传参');
