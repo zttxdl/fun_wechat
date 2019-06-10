@@ -23,7 +23,6 @@ class Index extends ApiBase
         $data['recommend'] = $this->getRecommendList($lat,$lng);
 
         $this->success('success',$data);
-        $this->error('','','');
     }
 
 
