@@ -241,7 +241,14 @@ class Order extends ApiBase
 
 
 
-            //更新库存
+            //更新商家收支明细表
+            $data = [
+                'shop_id' => $orders['shop_id'],
+                'current_money' => $orders['money'],
+                'type' => 1,
+                'balance_money' =>
+            ];
+            model('IncomeExpenditure')->add();
 
 
 

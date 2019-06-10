@@ -9,10 +9,13 @@
 namespace app\merchants\controller;
 
 
+use app\common\controller\MerchantsBase;
+use think\Controller;
 use think\Request;
 
 class Shop extends MerchantsBase
 {
+    protected $noNeedLogin = ['*'];
     /**
      * 店铺管理
      * @param Request $request
