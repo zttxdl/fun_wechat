@@ -21,7 +21,7 @@ class Member extends Controller
     public function index($uid)
     {
         $info = model('User')->getUserInfo($uid);
-        $this->succes('获取用户信息成功',['info'=>$info]);
+        $this->success('获取用户信息成功',['info'=>$info]);
 
     }
 
@@ -51,7 +51,7 @@ class Member extends Controller
             $this->error('更换失败');
         }
         $user_info = User::get($uid);
-        $this->succes('更换成功',['user_info'=>$user_info]);
+        $this->success('更换成功',['user_info'=>$user_info]);
         
     }
 }

@@ -73,7 +73,7 @@ class Login extends Controller
         //记录登录时间
         model('admin')->where('phone',$phone)->setField('last_login_time',date("Y-m-d H:i:s",time()));
 
-        $this->succes('登录成功');
+        $this->success('登录成功');
 
     }
 
@@ -83,7 +83,7 @@ class Login extends Controller
     public function loginOut()
     {
         session('admin_user',null);
-        $this->succes('退出成功');
+        $this->success('退出成功');
     }
 
     /**

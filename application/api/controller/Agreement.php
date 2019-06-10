@@ -18,6 +18,6 @@ class Agreement extends Controller
         $model = new AgreementModel();
         $info = $model->getAgreementContent($id);
         
-        $this->succes('获取图文协议成功',['info'=>$info]);
+        $this->success('获取图文协议成功',['info'=>$info]);
     }
 }

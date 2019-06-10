@@ -5,7 +5,6 @@ namespace app\rider\controller;
 use think\Controller;
 use think\Request;
 use app\common\model\RiderInfo;
-use wx_auth_phone\WXBizDataCrypt;
 
 
 /**
@@ -34,7 +33,7 @@ class Login extends Controller
         if (isset($wxResult['errcode'])) {
             $this->error($wxResult['errmsg'],$wxResult['errcode']);
         }
-        $this->succes('获取 openid 成功',['auth_result'=>$wxResult]);
+        $this->success('获取 openid 成功',['auth_result'=>$wxResult]);
     }
 
 
@@ -42,7 +41,7 @@ class Login extends Controller
      * 授权时，存储 openid 等用户相关信息 
      * 
      */
-    public function saveUserBaseInfo(Request $request)
+    public function saveRiderBaseInfo(Request $request)
     {
         $data = $request->post();
         $list['nickname'] = $data['nickName'];
@@ -65,7 +64,7 @@ class Login extends Controller
         if(!$result) {
             $this->error('授权入表失败');
         }
-        $this->succes('授权入表成功');
+        $this->success('授权入表成功');
         
     }
      
@@ -75,7 +74,7 @@ class Login extends Controller
      * 校验当前的手机号的验证码 
      * 
      */
-    public function checkUserPhone(Request $request)
+    public function checkRiderPhone(Request $request)
     {
         $phone = $request->param('phone');
         $code  = $request->param('code');
@@ -85,7 +84,7 @@ class Login extends Controller
         if (!$result) {
             $this->error(model('Alisms', 'service')->getError());
         }
-        $this->succes('验证通过');
+        $this->success('验证通过');
 
     }
 
@@ -105,7 +104,7 @@ class Login extends Controller
         if (!$back) {
             $this->error('短信发送失败');
         }
-        $this->succes('验证码已发送至 ' . $phone . ', 5分钟内有效！');
+        $this->success('验证码已发送至 ' . $phone . ', 5分钟内有效！');
 
     }
 
@@ -128,8 +127,8 @@ class Login extends Controller
         }
 
         // 判断openid是否存在
-        $uid = RiderInfo::where('openid',$openid)->value('id');
-        if (!$uid) {
+        $rid = RiderInfo::where('openid',$openid)->value('id');
+        if (!$rid) {
             $this->error('非法参数');
         }
         // 更新数据
@@ -141,9 +140,10 @@ class Login extends Controller
         if (!$res) {
             $this->error('登录或注册失败');
         }
-        $user_info = RiderInfo::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
+        $rider_info = RiderInfo::where('id','=',$rid)->find();
 
-        $this->succes('登录或注册成功',['user_info'=>$user_info]);
+        $this->success('登录或注册成功',['rider_info'=>$rider_info]);
+
         
     }
 
@@ -166,8 +166,8 @@ class Login extends Controller
 
         // 存表处理
         // 判断openid是否存在
-        $uid = RiderInfo::where('openid',$data['openid'])->value('id');
-        if (!$uid) {
+        $rid = RiderInfo::where('openid',$data['openid'])->value('id');
+        if (!$rid) {
             $this->error('非法参数');
         }
         // 更新数据
@@ -179,9 +179,9 @@ class Login extends Controller
         if (!$res) {
             $this->error('快捷登录失败');
         }
-        $user_info = RiderInfo::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
+        $rider_info = RiderInfo::where('id','=',$rid)->find();
 
-        $this->succes('快捷登录成功',['user_info'=>$user_info]);
+        $this->success('快捷登录成功',['user_info'=>$user_info]);
 
     }
      

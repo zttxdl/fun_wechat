@@ -9,7 +9,7 @@ class RiderAuth
 {
     public function handle($request, \Closure $next)
     {
-        $uid = $request->header('user-auth');
+        $uid = $request->header('rider-auth');
         if (!$uid) {
             $this->error('参数出错，暂无登录', 205);
         } 

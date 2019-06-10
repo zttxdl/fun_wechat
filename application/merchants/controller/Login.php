@@ -50,7 +50,7 @@ class Login extends MerchantsBase
 
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken('merchants'.$user->id,604800);
-        $this->succes('success',[
+        $this->success('success',[
             'token' => $token
         ]);
 	}
@@ -91,7 +91,7 @@ class Login extends MerchantsBase
 
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken('merchants'.$user->id,604800);
-        $this->succes('success',[
+        $this->success('success',[
             'token' => $token
         ]);
     }
@@ -137,7 +137,7 @@ class Login extends MerchantsBase
 	        if ($result = ShopInfo::create($data)) {
                 $jwtAuth = new JwtAuth();
                 $token = $jwtAuth->createToken('merchants'.$result->id,604800);
-                $this->succes('success',[
+                $this->success('success',[
                     'token' => $token
                 ]);
 
@@ -177,7 +177,7 @@ class Login extends MerchantsBase
         $user->password = md5($password);
         $user->save();
 
-        $this->succes('密码修改成功');
+        $this->success('密码修改成功');
     }
 
     /**
@@ -201,7 +201,7 @@ class Login extends MerchantsBase
 
         $user = ShopInfo::get(['account'=>$phone]);
         if ($user){
-            $this->succes('success',['shop_id'=>$user->id]);
+            $this->success('success',['shop_id'=>$user->id]);
         }else{
             $this->error('用户不存在');
         }
@@ -243,7 +243,7 @@ class Login extends MerchantsBase
         $back = model('Alisms', 'service')->sendCode($mobile,$type);
 
         if ($back) {
-            $this->succes('验证码已发送至 ' . $mobile . ', 5分钟内有效！');
+            $this->success('验证码已发送至 ' . $mobile . ', 5分钟内有效！');
         } else {
             $this->error('短信发送失败');
         }

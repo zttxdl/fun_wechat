@@ -29,7 +29,7 @@ class Auth extends Controller
         $jwtAuth = JwtAuth::getInstance();
         $token = $jwtAuth->setUid(1)->encode()->getToken();
 
-        $this->succes([
+        $this->success([
             'token' => $token
         ]);
     }

@@ -27,7 +27,7 @@ class TodaySpecial extends MerchantsBase
             ->where('today',$today)
             ->find();
 
-        $this->succes('success',$result);
+        $this->success('success',$result);
 
     }
 
@@ -55,7 +55,7 @@ class TodaySpecial extends MerchantsBase
 
         $result = TodayDeals::create($data);
 
-        $this->succes('success');
+        $this->success('success');
     }
 
 

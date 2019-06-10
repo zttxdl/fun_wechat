@@ -30,7 +30,7 @@ class MyCoupon extends Controller
         $list = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')->where($where)
                 ->field('m.phone,m.indate,m.status,p.face_value,p.threshold,p.type,p.name')->paginate(8);
 
-        $this->succes('获取红包列表成功',['list'=>$list]);
+        $this->success('获取红包列表成功',['list'=>$list]);
     }
 
      

@@ -34,7 +34,7 @@ class RiderInfo extends Controller
                     return $item;
                 });
 
-        $this->succes('ok',['list'=>$list]);
+        $this->success('ok',['list'=>$list]);
     }
 
 
@@ -49,7 +49,7 @@ class RiderInfo extends Controller
         if (!$result) {
             $this->error('设置失败');
         }
-        $this->succes('ok');
+        $this->success('ok');
     }
 
 
@@ -62,7 +62,7 @@ class RiderInfo extends Controller
         // 骑手的基本信息
         $info = Db::name('rider_info')->field('id,nickname,name,img,link_tel,identity_num,card_img,back_img,hand_card_img,status')->find($id);
 
-        $this->succes('ok',['info'=>$info]);
+        $this->success('ok',['info'=>$info]);
     }
 
 
@@ -90,7 +90,7 @@ class RiderInfo extends Controller
             $v['mb_status'] = config('order_status')[$v['status']];
         }
 
-        $this->succes('ok',['info'=>$info,'order_list'=>$order_list]);
+        $this->success('ok',['info'=>$info,'order_list'=>$order_list]);
     }
 
 
@@ -113,7 +113,7 @@ class RiderInfo extends Controller
                     return $item;
                 });
 
-        $this->succes('ok',['list'=>$list]);  
+        $this->success('ok',['list'=>$list]);  
     }
 
 
@@ -131,7 +131,7 @@ class RiderInfo extends Controller
             $this->error('设置失败');
         }
 
-        $this->succes('ok');
+        $this->success('ok');
     }
 
      

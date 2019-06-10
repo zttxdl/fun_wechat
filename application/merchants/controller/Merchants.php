@@ -51,7 +51,7 @@ class Merchants extends MerchantsBase
 
          }
 
-        $this->succes('success');
+        $this->success('success');
 
     }
 
@@ -75,7 +75,7 @@ class Merchants extends MerchantsBase
             }
         }
 
-        $this->succes('success',$school_district_list);
+        $this->success('success',$school_district_list);
     }
 
     /**
@@ -87,7 +87,7 @@ class Merchants extends MerchantsBase
     {
         $data = model('ManageCategory')->field('id,name,img')->select();
 
-        $this->succes('success',$data);
+        $this->success('success',$data);
     }
 
     /**
@@ -99,7 +99,7 @@ class Merchants extends MerchantsBase
     {
         $data = model('Back')->field('id,name')->select();
 
-        $this->succes('success',$data);
+        $this->success('success',$data);
     }
 
     /**
@@ -126,7 +126,7 @@ class Merchants extends MerchantsBase
 
         model('ShopInfo')->where('id',$this->shop_id)->update(['password'=>md5($new_password)]);
 
-        $this->succes('success');
+        $this->success('success');
     }
 
     /**
@@ -176,7 +176,7 @@ class Merchants extends MerchantsBase
 
         $data['list']  =$list;
 
-        $this->succes('success',$data);
+        $this->success('success',$data);
 
     }
 }

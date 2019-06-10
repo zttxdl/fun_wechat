@@ -22,7 +22,7 @@ class GoodsAttribute extends MerchantsBase
     {
         $data = ProductAttrClassify::all(['shop_id'=>$this->shop_id])->toArray();
         $data = $this->getSonCategory($data);
-        $this->succes('success',$data);
+        $this->success('success',$data);
 
     }
 
@@ -46,7 +46,7 @@ class GoodsAttribute extends MerchantsBase
 
         }
         $result = ProductAttrClassify::create($data);
-        $this->succes('success');
+        $this->success('success');
     }
 
 
@@ -68,7 +68,7 @@ class GoodsAttribute extends MerchantsBase
             $this->error('请先删除标签属性');
         }
         $result = ProductAttrClassify::destroy($id);
-        $this->succes('success');
+        $this->success('success');
     }
 
 

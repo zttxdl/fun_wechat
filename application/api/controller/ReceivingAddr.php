@@ -30,7 +30,7 @@ class ReceivingAddr extends Controller
         }
 
 
-        $this->succes('获取收货地址成功',['list'=>$list]);
+        $this->success('获取收货地址成功',['list'=>$list]);
     }
 
 
@@ -61,7 +61,7 @@ class ReceivingAddr extends Controller
             $this->error('添加失败',201);
         }
 
-        $this->succes('添加成功');
+        $this->success('添加成功');
     }
 
 
@@ -76,7 +76,7 @@ class ReceivingAddr extends Controller
         $school_model = new School();
         $info['school_name'] = $school_model->getNameById($info['school_id']);
         
-        $this->succes('获取地址信息成功',['info'=>$info]);
+        $this->success('获取地址信息成功',['info'=>$info]);
     }
 
 
@@ -108,7 +108,7 @@ class ReceivingAddr extends Controller
             $this->error('修改失败',201);
         }
         
-        $this->succes('修改成功');
+        $this->success('修改成功');
 
     }
 
@@ -125,7 +125,7 @@ class ReceivingAddr extends Controller
             $this->error('删除失败',201);
         }
         
-        $this->succes('删除成功');
+        $this->success('删除成功');
     }
      
      

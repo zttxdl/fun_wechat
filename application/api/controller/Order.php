@@ -69,7 +69,7 @@ class Order extends ApiBase
             ];
         }
 
-        $this->succes('获取成功',$result);
+        $this->success('获取成功',$result);
     }
 
     /**
@@ -128,7 +128,7 @@ class Order extends ApiBase
 
         $result['order_status'] = config('order_status')[$orders['status']];
 
-        $this->succes('获取成功',$result);
+        $this->success('获取成功',$result);
     }
 
 
@@ -296,7 +296,7 @@ class Order extends ApiBase
         //改变商品状态
         model('Orders')->where('id',$orders_id)->update(['status'=>9,'update_time'=>time()]);
 
-        $this->succes('success');
+        $this->success('success');
     }
 
     //获取评价标签
@@ -304,7 +304,7 @@ class Order extends ApiBase
     {
         $list = model('Tips')->select();
 
-        $this->succes('success',$list);
+        $this->success('success',$list);
     }
 
     /**
@@ -345,7 +345,7 @@ class Order extends ApiBase
         $res = Db::name('refund')->insert($data);
 
         if($res) {
-            $this->succes('售后申请已提交成功,等待商家处理');
+            $this->success('售后申请已提交成功,等待商家处理');
         }
     }
 

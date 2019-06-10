@@ -32,7 +32,7 @@ class MerchantEnter extends Controller
                     $item['mb_status'] = config('dispose_status')[$item['status']];
                     return $item;
                 });
-        $this->succes('ok',['list'=>$list]);
+        $this->success('ok',['list'=>$list]);
     }
 
     /**
@@ -47,7 +47,7 @@ class MerchantEnter extends Controller
             $this->error('设置失败');
         }
         
-        $this->succes('ok');
+        $this->success('ok');
 
     }
 

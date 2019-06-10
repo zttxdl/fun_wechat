@@ -43,7 +43,7 @@ class Shop
 //            }
 //        }
 
-        $this->succes('获取成功',$shop_list);
+        $this->success('获取成功',$shop_list);
     }
 
 
@@ -86,7 +86,7 @@ class Shop
 
         //结算信息
         $result['shop_settle'] = $this->shopModel->getSettle();
-        $this->succes('获取成功',$result);
+        $this->success('获取成功',$result);
 
     }
 
@@ -164,7 +164,7 @@ class Shop
         //结算信息
         $result['shop_settle'] = $this->shopModel->getSettle();
 //        dump($result);
-        $this->succes('获取成功',$result);
+        $this->success('获取成功',$result);
     }
 
 
@@ -246,7 +246,7 @@ class Shop
             ];
         }*/
 
-        $this->succes('查询成功',$shop_check_list);
+        $this->success('查询成功',$shop_check_list);
 
 
     }
@@ -304,7 +304,7 @@ class Shop
         $result['shop_qualification'] = $shop_qualification;
         $result['shop_account'] = $shop_account;
 
-        $this->succes('获取成功',$result);
+        $this->success('获取成功',$result);
 
     }
 
@@ -338,7 +338,7 @@ class Shop
 
 
         if($res) {
-            $this->succes('更新成功');
+            $this->success('更新成功');
         }
 
         $this->error('更新失败');
@@ -351,7 +351,7 @@ class Shop
     public function checkShow()
     {
         $data = config('check_status')['shop'];
-        $this->succes('获取成功',$data);
+        $this->success('获取成功',$data);
     }
 
     /**
@@ -375,7 +375,7 @@ class Shop
             $sort_info['sort'] = $row['sort'];
         }
 
-        $this->succes('获取成功',$sort_info);
+        $this->success('获取成功',$sort_info);
     }
 
     /**
@@ -398,6 +398,6 @@ class Shop
         if(empty($data)) {
             $this->error('更新失败');
         }
-        $this->succes('更新成功');
+        $this->success('更新成功');
     }
 }

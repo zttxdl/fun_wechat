@@ -27,7 +27,7 @@ class ReceivingAddr extends Controller
         }
 
 
-        $this->succes('获取收货地址成功',['list'=>$list]);
+        $this->success('获取收货地址成功',['list'=>$list]);
     }
 
      
