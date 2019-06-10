@@ -181,7 +181,7 @@ class Login extends Controller
         }
         $rider_info = RiderInfo::where('id','=',$rid)->find();
 
-        $this->success('快捷登录成功',['user_info'=>$user_info]);
+        $this->success('快捷登录成功',['rider_info'=>$rider_info]);
 
     }
      

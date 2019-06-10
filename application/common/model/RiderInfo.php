@@ -7,7 +7,7 @@ use think\Model;
 class RiderInfo extends Model
 {
     /**
-     * 获取一条用户记录
+     * 获取一条骑手记录
      * @param $uid
      */
     public function getRiderInfo($uid)
@@ -17,7 +17,7 @@ class RiderInfo extends Model
     }
 
     /**
-     * 获取用户列表
+     * 获取骑手列表
      * @param $page_no
      * @param $page_size
      * @return mixed
@@ -30,7 +30,7 @@ class RiderInfo extends Model
 
 
     /**
-     * 获取用户的主键值
+     * 获取骑手的主键值
      * @param $openid
      */
     public function getRidByOpenId($openid)
