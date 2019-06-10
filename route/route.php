@@ -154,7 +154,7 @@ Route::group('merchants',function (){
 
 });
 
-//店铺管理
+//店铺
 Route::group('merchants',function (){
     Route::get('shopIndex','merchants/Shop/index');
     Route::get('shopSetName','merchants/Shop/setName');//修改店铺名称
@@ -163,6 +163,16 @@ Route::group('merchants',function (){
     Route::get('shopSetInfo','merchants/Shop/setInfo');//设置商家信息
     Route::post('shopMoreInfo','merchants/Shop/moreInfo');//入驻信息
 });
+
+//订单
+Route::group('merchants',function (){
+    Route::get('orderIndex','merchants/Order/show');//订单查询
+    Route::get('orderDetail','merchants/Order/detail');//订单详情
+    Route::get('orderDel','merchants/Order/del');//订单删除
+    Route::get('orderReceipt','merchants/Order/receipt');//订单处理
+
+});
+
 
 
 
