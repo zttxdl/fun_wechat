@@ -20,8 +20,8 @@ class Login extends Controller
     public function getAuthInfo(Request $request)
     {
         $code = $request->param('code');
-        $app_id = config('wx_mike')['app_id'];
-        $app_secret = config('wx_mike')['secret'];
+        $app_id = config('wx_rider')['app_id'];
+        $app_secret = config('wx_rider')['secret'];
         
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
@@ -55,7 +55,7 @@ class Login extends Controller
         // 判断当前用户是否已授权
         $id = RiderInfo::where('openid','=',$data['openid'])->count('id');
         if ($id) {
-            return json_error('该用户已授权！不需要再次授权，直接跳转至登录页面');
+            return json_success('该用户已授权！');
         }
 
         // 存入数据
@@ -191,8 +191,8 @@ class Login extends Controller
      */
     public function getWechatPhone($encrypted_data,$code,$iv)
     {
-        $app_id = config('wx_mike')['app_id'];
-        $app_secret = config('wx_mike')['secret'];
+        $app_id = config('wx_rider')['app_id'];
+        $app_secret = config('wx_rider')['secret'];
 
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
