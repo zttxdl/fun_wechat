@@ -12,10 +12,11 @@ use app\common\controller\ApiBase;
 
 class Invitation extends ApiBase
 {
-
+    protected $noNeedLogin = [];
     //邀请有奖
-    public function index($id)
+    public function index()
     {
+        $id = $this->auth->id;
         $data['mum'] = model('Invitation')->getUserCount($id);
         $data['money'] = model('Invitation')->getLuckyMoney($id);
 
