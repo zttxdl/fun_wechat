@@ -86,7 +86,6 @@ class Search extends ApiBase
     public function delete($id)
     {
         $where[] = ['user_id','=',$this->auth->id];
-        $where[] = ['id','=',$id];
         $id = model('Search')->where($where)->delete();
         if ($id){
             $this->success('删除成功');
