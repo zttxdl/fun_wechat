@@ -46,11 +46,17 @@ class Login extends Controller
     {
         $data = $request->post();
         $list['nickname'] = $data['nickName'];
-        $list['img'] = $data['avatarUrl'];
+        $list['headimgurl'] = $data['avatarUrl'];
         $list['openid'] = $data['openid'];
         $list['sex'] = $data['gender'];
         $list['invitation_id'] = $data['invitation_id'];
         $list['add_time'] = time();
+
+        // 判断当前用户是否已授权
+        $id = RiderInfo::where('openid','=',$data['openid'])->count('id');
+        if ($id) {
+            return json_error('该用户已授权！不需要再次授权，直接跳转至登录页面');
+        }
 
         // 存入数据
         $result = RiderInfo::create($list);
@@ -202,7 +208,9 @@ class Login extends Controller
 
         // 解密
         $recod = json_decode($wxResult);
-        $wx = new WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
+
+        include_once './../extend/wx_auth_phone/wxBizDataCrypt.php';
+        $wx = new \WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
             $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
         if ($errCode == 0) {
             $data = json_decode($data, true);

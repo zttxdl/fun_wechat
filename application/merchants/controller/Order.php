@@ -8,20 +8,16 @@
 
 namespace app\merchants\controller;
 
-<<<<<<< HEAD
 
-class Order extends MerchantsBase
-=======
-class Order
->>>>>>> 9f40ed14774081fd2b30743b911569854ca7695c
-{
+class Order extends MerchantsBase{
+
 
     /**
      * 商家店铺订单展示
      */
     public function show()
     {
-
+        
     }
 
 

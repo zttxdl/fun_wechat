@@ -33,7 +33,7 @@ class Order extends ApiBase
         $page_no = $request->param('page_no');
         $user_id = $request->param('user_id');
 
-        if(empty($user_id)) {
+        if(!$user_id || !$page_no) {
             return json_error('非法传参');
         }
 
@@ -45,6 +45,10 @@ class Order extends ApiBase
                 ->where('user_id',$user_id)
                 ->page($page_no,$page_size)
                 ->select();
+
+        if(empty($data)){
+            return json_error('暂无数据');
+        }
 
         //dump($data);
         $result = [];
@@ -302,5 +306,49 @@ class Order extends ApiBase
 
         return json_success('success',$list);
     }
+
+    /**
+     * 退款申请
+     */
+    public function  orderRefund(Request $request)
+    {
+        $orders_id = $request->param('orders_id');
+
+        $orders_info_ids = $request->param('orders_info_ids');
+
+        $content = $request->param('content');
+
+        $imgs = $request->param('imgs');
+
+        $money = $request->param('money');
+
+        $num = $request->param('num');
+
+        $data = Db::name('refund')->where('orders_id',$orders_id)->find();
+
+        if(is_array($data)){
+            return json_error('退单已提交申请,请耐心等待');
+        }
+
+        $data = [
+            'orders_id' => $orders_id,
+            'orders_info_ids' => $orders_info_ids,
+            'content' => $content,
+            'imgs' => $imgs,
+            'money' => $money,
+            'num' => $num,
+            'status' => '1',
+            'add_time' => time(),
+
+        ];
+
+        $res = Db::name('refund')->insert($data);
+
+        if($res) {
+            return json_success('售后申请已提交成功,等待商家处理');
+        }
+    }
+
+
 
 }
