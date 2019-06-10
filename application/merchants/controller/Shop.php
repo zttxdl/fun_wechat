@@ -48,7 +48,7 @@ class Shop extends MerchantsBase
         }
 
 
-        $this->succes('获取成功',$shop_info);
+        $this->success('获取成功',$shop_info);
     }
 
     /**
@@ -67,7 +67,7 @@ class Shop extends MerchantsBase
         $res = Model('shopInfo')->where('id',$shop_id)->setField('shop_name',$shop_name);
 
         if($res) {
-            $this->succes('更新成功');
+            $this->success('更新成功');
         }
 
         $this->error('更新失败');
@@ -99,7 +99,7 @@ class Shop extends MerchantsBase
         $res = Model('shopInfo')->where('id',$shop_id)->setField('open_status',$open_status);
 
         if($res) {
-            $this->succes('更新成功');
+            $this->success('更新成功');
         }
 
         $this->error('更新失败');
@@ -183,7 +183,7 @@ class Shop extends MerchantsBase
         $result['shop_qualification'] = $shop_qualification;
         $result['shop_account'] = $shop_account;
 
-        $this->succes('获取成功',$result);
+        $this->success('获取成功',$result);
     }
 
 

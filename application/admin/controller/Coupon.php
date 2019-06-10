@@ -44,7 +44,7 @@ class Coupon extends Controller
                             return $item;
                         });
 
-        $this->succes('ok',['category_list'=>$category_list,'coupon_list'=>$coupon_list]);
+        $this->success('ok',['category_list'=>$category_list,'coupon_list'=>$coupon_list]);
 
     }
 
@@ -63,7 +63,7 @@ class Coupon extends Controller
         $mg_model = new ManageCategory();
         $manage_category_list = $mg_model->getManageCategoryList();
 
-        $this->succes('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list]);
+        $this->success('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list]);
 
     }
      
@@ -94,7 +94,7 @@ class Coupon extends Controller
             $this->error('添加失败',201);
         }
 
-        $this->succes('添加成功');
+        $this->success('添加成功');
 
     }
 
@@ -127,7 +127,7 @@ class Coupon extends Controller
         // 优惠券的覆盖范围 [店铺]
         $shop_list = Db::name('shop_info')->where('school_id',$coupon_info['school_id'])->find();
 
-        $this->succes('ok',['coupon_info'=>$coupon_info,'school_list'=>$school_list,'shop_list'=>$shop_list,'manage_category_list'=>$manage_category_list]);
+        $this->success('ok',['coupon_info'=>$coupon_info,'school_list'=>$school_list,'shop_list'=>$shop_list,'manage_category_list'=>$manage_category_list]);
 
     }
 
@@ -174,7 +174,7 @@ class Coupon extends Controller
             $this->error('修改失败',201);
         }
         
-        $this->succes('修改成功');
+        $this->success('修改成功');
 
     }
 
@@ -191,7 +191,7 @@ class Coupon extends Controller
         //获取店铺列表
         $shop_list = Db::name('shop_info')->where('school_id',$id)->field('id,shop_name')->select();
         
-        $this->succes('ok',['shop_list'=>$shop_list]);
+        $this->success('ok',['shop_list'=>$shop_list]);
     }
 
 
@@ -233,7 +233,7 @@ class Coupon extends Controller
                             ->field('pc.id,pc.name,pc.face_value,u.nickname,u.phone,mc.indate,mc.order_sn,mc.status')
                             ->select();
 
-        $this->succes('ok',['coupon_info'=>$coupon_info,'shop_info'=>$shop_info,'coupon_used_list'=>$coupon_used_list]);
+        $this->success('ok',['coupon_info'=>$coupon_info,'shop_info'=>$shop_info,'coupon_used_list'=>$coupon_used_list]);
 
     }
      
@@ -251,7 +251,7 @@ class Coupon extends Controller
             $this->error('设置失败');
         }
 
-        $this->succes('ok');
+        $this->success('ok');
      }
       
      

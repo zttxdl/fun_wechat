@@ -33,7 +33,7 @@ class Feedback extends Controller
                     return $item;
                 });
 
-        $this->succes('ok',['list'=>$list]);
+        $this->success('ok',['list'=>$list]);
     }
 
     /**
@@ -50,7 +50,7 @@ class Feedback extends Controller
         $info['mb_status'] = config('dispose_status')[$info['status']];
         $info['add_time'] = date('Y-m-d',$info['add_time']);
 
-        $this->succes('ok',['info'=>$info]);
+        $this->success('ok',['info'=>$info]);
     }
 
 
@@ -67,7 +67,7 @@ class Feedback extends Controller
             $this->error('设置失败');
         }
         
-        $this->succes('ok');
+        $this->success('ok');
     }
      
 

@@ -48,7 +48,7 @@ class Agreement extends Controller
 
         $info = Db::name('agreement')->where('id',$id)->field('id,title,content')->find();
 
-        $this->succes('ok',['info'=>$info]);
+        $this->success('ok',['info'=>$info]);
     }
 
 
@@ -88,7 +88,7 @@ class Agreement extends Controller
     {
         $info = Db::name('agreement')->where('id',$id)->field('title,content')->find();
 
-        $this->succes('ok',['info'=>$info]);
+        $this->success('ok',['info'=>$info]);
     }
      
 

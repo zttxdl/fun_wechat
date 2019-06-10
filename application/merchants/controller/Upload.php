@@ -29,7 +29,7 @@ class Upload extends MerchantsBase
         if ($info) {
 
             $data['images'] = '/uploads/merchant/'.$this->shop_id.'/'.$info->getSaveName();
-            $this->succes('文件上传成功',$data);
+            $this->success('文件上传成功',$data);
         } else {
             // 上传失败获取错误信息
             $this->error($file->getError());

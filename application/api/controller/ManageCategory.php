@@ -18,6 +18,6 @@ class ManageCategory extends Controller
 
         $manage_list = $model->getManageCategoryList();
 
-        $this->succes('获取经营品类二级列表成功',['manage_list'=>$manage_list]);
+        $this->success('获取经营品类二级列表成功',['manage_list'=>$manage_list]);
     }
 }

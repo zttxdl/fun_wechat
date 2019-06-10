@@ -69,7 +69,7 @@ class Order extends ApiBase
             ];
         }
 
-        $this->succes('获取成功',$result);
+        $this->success('获取成功',$result);
     }
 
     /**
@@ -128,7 +128,7 @@ class Order extends ApiBase
 
         $result['order_status'] = config('order_status')[$orders['status']];
 
-        $this->succes('获取成功',$result);
+        $this->success('获取成功',$result);
     }
 
 
@@ -186,7 +186,7 @@ class Order extends ApiBase
             $result['package']="prepay_id=".$result['prepay_id'];
             $result['paySign']=MD5("appId=".$app_id."&nonceStr=".$result['nonce_str']."&package=".$result['package']."&signType=MD5&timeStamp=".$result['timeStamp']."&key=10S9a3A3EdF2a60e04cb1b8G8b507AF4");
 
-            $this->success('success',$result);
+            $this->successs('success',$result);
         }else{
 
              $this->error('下单失败'.$result['err_code_des']);
@@ -296,7 +296,7 @@ class Order extends ApiBase
         //改变商品状态
         model('Orders')->where('id',$orders_id)->update(['status'=>9,'update_time'=>time()]);
 
-        $this->succes('success');
+        $this->success('success');
     }
 
     //获取评价标签
@@ -304,7 +304,7 @@ class Order extends ApiBase
     {
         $list = model('Tips')->select();
 
-        $this->succes('success',$list);
+        $this->success('success',$list);
     }
 
     /**
@@ -345,7 +345,7 @@ class Order extends ApiBase
         $res = Db::name('refund')->insert($data);
 
         if($res) {
-            $this->succes('售后申请已提交成功,等待商家处理');
+            $this->success('售后申请已提交成功,等待商家处理');
         }
     }
 

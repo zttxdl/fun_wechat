@@ -101,7 +101,7 @@ class Advers extends Controller
         if (!$result) {
             $this->error('删除失败',201);
         }
-        $this->succes('删除成功');
+        $this->success('删除成功');
     }
      
      

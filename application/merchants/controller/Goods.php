@@ -59,7 +59,7 @@ class Goods extends MerchantsBase
         $data['preferential'] = $preferential;
         $data['class'] = $class;
 
-        $this->succes('success',$data);
+        $this->success('success',$data);
 
     }
 
@@ -75,7 +75,7 @@ class Goods extends MerchantsBase
         $data['shop_id'] = $this->shop_id;
         $result = Product::create($data);
 
-        $this->succes('success');
+        $this->success('success');
     }
 
 
@@ -90,7 +90,7 @@ class Goods extends MerchantsBase
     {
         $data   = $request->param();
         $result = Product::update($data, ['id' => $request->param('id')]);
-        $this->succes('success');
+        $this->success('success');
     }
 
     /**
@@ -108,7 +108,7 @@ class Goods extends MerchantsBase
         }
 
         $result = Product::destroy($id);
-        $this->succes('success');
+        $this->success('success');
     }
 
     /**
@@ -126,7 +126,7 @@ class Goods extends MerchantsBase
             $result->price = $data->price;
         }
 
-        $this->succes('success',$result);
+        $this->success('success',$result);
     }
 
     /**
@@ -142,6 +142,6 @@ class Goods extends MerchantsBase
            ->where('shop_id',$this->shop_id)
             ->select();
 
-        $this->succes('success',$result);
+        $this->success('success',$result);
     }
 }

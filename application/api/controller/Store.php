@@ -75,7 +75,7 @@ class Store extends ApiBase
         $data['class'] = $class;
 
 
-        $this->succes('success',$data);
+        $this->success('success',$data);
     }
 
     //获取商户评价
@@ -134,7 +134,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
         $data['list']  =$list;
 
-        $this->succes('success',$data);
+        $this->success('success',$data);
 
 
     }
@@ -164,7 +164,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             ->where('delete',0)
             ->select();
 
-        $this->succes('success',$data);
+        $this->success('success',$data);
     }
 
     /**
@@ -220,7 +220,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         unset($product['attr_ids']);
         unset($product['shop_id']);
 
-        $this->succes('success',$product);
+        $this->success('success',$product);
 
     }
 
@@ -349,7 +349,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             Db::commit();
             $result['orders_id'] = $orders_id;
             $result['orders_sn'] = $orders_sn;
-            $this->succes('提交成功',$result);
+            $this->success('提交成功',$result);
 
         } catch (\Exception $e) {
             Db::rollback();

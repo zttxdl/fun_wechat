@@ -34,7 +34,7 @@ class Login extends Controller
         if (isset($wxResult['errcode'])) {
             $this->error($wxResult['errmsg'], $wxResult['errcode']);
         }
-        $this->succes('获取 openid 成功',['auth_result'=>$wxResult]);
+        $this->success('获取 openid 成功',['auth_result'=>$wxResult]);
     }
 
 
@@ -62,7 +62,7 @@ class Login extends Controller
         if(!$result) {
             $this->error('授权入表失败');
         }
-        $this->succes('授权入表成功');
+        $this->success('授权入表成功');
         
     }
      
@@ -82,7 +82,7 @@ class Login extends Controller
         if (!$result) {
             $this->error(model('Alisms', 'service')->getError());
         }
-        $this->succes('验证通过');
+        $this->success('验证通过');
 
     }
 
@@ -102,7 +102,7 @@ class Login extends Controller
         if (!$back) {
             $this->error('短信发送失败');
         }
-        $this->succes('验证码已发送至 ' . $phone . ', 5分钟内有效！');
+        $this->success('验证码已发送至 ' . $phone . ', 5分钟内有效！');
 
     }
 
@@ -140,7 +140,7 @@ class Login extends Controller
         }
         $user_info = User::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
 
-        $this->succes('登录或注册成功',['user_info'=>$user_info]);
+        $this->success('登录或注册成功',['user_info'=>$user_info]);
         
     }
 
@@ -178,7 +178,7 @@ class Login extends Controller
         }
         $user_info = User::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
 
-        $this->succes('快捷登录成功',['user_info'=>$user_info]);
+        $this->success('快捷登录成功',['user_info'=>$user_info]);
 
     }
      

@@ -43,7 +43,7 @@ class Feedback extends Controller
             $this->error('添加失败',201);
         }
 
-        $this->succes('添加成功');
+        $this->success('添加成功');
     }
      
 }
