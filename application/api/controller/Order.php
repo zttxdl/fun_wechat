@@ -186,7 +186,7 @@ class Order extends ApiBase
             $result['package']="prepay_id=".$result['prepay_id'];
             $result['paySign']=MD5("appId=".$app_id."&nonceStr=".$result['nonce_str']."&package=".$result['package']."&signType=MD5&timeStamp=".$result['timeStamp']."&key=10S9a3A3EdF2a60e04cb1b8G8b507AF4");
 
-            $this->successs('success',$result);
+            $this->success('success',$result);
         }else{
 
              $this->error('下单失败'.$result['err_code_des']);

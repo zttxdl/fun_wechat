@@ -22,7 +22,7 @@ class Index extends ApiBase
         $data['special'] = $this->getSpecial($lat,$lng);
         $data['recommend'] = $this->getRecommendList($lat,$lng);
 
-        $this->successs('success',$data);
+        $this->success('success',$data);
         $this->error('','','');
     }
 
@@ -150,7 +150,7 @@ class Index extends ApiBase
 
         $list = $this->getRecommendList($lat,$lng);
 
-        $this->successs('success',$list);
+        $this->success('success',$list);
     }
 
 
@@ -173,7 +173,7 @@ class Index extends ApiBase
             ->toArray();
 
         if (empty($list)){
-            $this->successs('success',$list);
+            $this->success('success',$list);
         }
 
         foreach ($list as &$value) {
@@ -189,7 +189,7 @@ class Index extends ApiBase
                 ->select();
         }
 
-        $this->successs('success',$list);
+        $this->success('success',$list);
     }
 
 }
