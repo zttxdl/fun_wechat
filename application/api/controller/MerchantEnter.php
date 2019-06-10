@@ -7,9 +7,13 @@ use think\Request;
 use app\common\model\ManageCategory;
 use app\common\model\School;
 use app\common\model\MerchantEnter as MerchantEnterModel;
+use app\common\controller\ApiBase;
 
-class MerchantEnter extends Controller
+class MerchantEnter extends ApiBase
 {
+    protected  $noNeedLogin = [];
+
+
     /**
      * 保存商家入驻申请 
      * 
@@ -17,6 +21,7 @@ class MerchantEnter extends Controller
     public function create(Request $request)
     {
         $data = $request->post();
+        $data['user_id'] = $this->auth->id;
         $data['add_time'] = time();
 
         // 验证表单数据

@@ -5,9 +5,13 @@ namespace app\api\controller;
 use think\Controller;
 use think\Request;
 use app\common\model\ManageCategory as ManageCategoryModel;
+use app\common\controller\ApiBase;
 
-class ManageCategory extends Controller
+class ManageCategory extends ApiBase
 {
+    protected  $noNeedLogin = ['*'];
+
+    
     /**
      * 获取经营品类二级列表
      *

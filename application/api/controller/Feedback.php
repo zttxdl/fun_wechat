@@ -6,9 +6,14 @@ use think\Controller;
 use think\Request;
 use think\facade\Cache;
 use app\common\model\Feedback as FeedbackModel;
+use app\common\controller\ApiBase;
 
-class Feedback extends Controller
+class Feedback extends ApiBase
 {
+
+    protected  $noNeedLogin = [];
+
+
     /**
      * 保存意见反馈表单 
      * 
@@ -25,7 +30,7 @@ class Feedback extends Controller
         }
 
         // 当用户在一天内提交多余三次，提示“您已提交多次，我们会竭力改进”
-        $key = 'feedback_'.$data['user_id'];
+        $key = 'feedback_'.$this->auth->id;
         $check = Cache::store('redis')->has($key);  
         if($check){  
             Cache::store('redis')->inc($key);  

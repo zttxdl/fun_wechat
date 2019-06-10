@@ -5,9 +5,13 @@ namespace app\api\controller;
 use think\Controller;
 use think\Request;
 use app\common\model\School as SchoolModel;
+use app\common\controller\ApiBase;
 
-class School extends Controller
+class School extends ApiBase
 {
+    protected  $noNeedLogin = [];
+
+
     /**
      * 学校地区
      *

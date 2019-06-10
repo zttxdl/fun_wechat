@@ -18,9 +18,9 @@ class Member extends Controller
      * 我的资料
      * 
      */
-    public function index($rid)
+    public function index()
     {
-        $info = model('RiderInfo')->getRiderInfo($rid);
+        $info = model('RiderInfo')->getRiderInfo($this->auth->id);
         return json_success('获取骑手信息成功',['info'=>$info]);
 
     }
@@ -32,7 +32,7 @@ class Member extends Controller
      */
     public function setRiderPhone(Request $request)
     {
-        $uid = $request->param('rid');
+        $rid = $this->auth->id;
         $phone = $request->param('phone');
         $code  = $request->param('code');
         $type  = $request->param('type');
@@ -44,13 +44,13 @@ class Member extends Controller
         }
 
         // 更新数据
-        $rider = RiderInfo::get($uid);
+        $rider = RiderInfo::get($rid);
         $rider->phone = $phone;
         $res = $rider->save();
         if (!$res) {
             return json_error('更换失败');
         }
-        $rider_info = RiderInfo::get($uid);
+        $rider_info = RiderInfo::get($rid);
         return json_success('更换成功',['rider_info'=>$rider_info]);
         
     }
@@ -63,6 +63,7 @@ class Member extends Controller
     public function applyRider(Request $request)
     {
         $data = $request->post();
+        $data['status'] = 1;
         $data['add_time'] = time();
 
         // 验证表单数据
@@ -84,9 +85,9 @@ class Member extends Controller
      * 重新编辑申请入驻【成为骑手】 
      * 
      */
-    public function edit($rid)
+    public function edit()
     {
-        $info = model('RiderInfo')->where('id',$rid)->field('id,headimgurl,name,identity_num,card_img,back_img,hand_card_img,school_id')->find();
+        $info = model('RiderInfo')->where('id',$this->auth->id)->field('id,headimgurl,name,identity_num,card_img,back_img,hand_card_img,school_id')->find();
 
         $this->success('获取成功',['info'=>$info]);        
     }

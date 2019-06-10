@@ -5,9 +5,13 @@ namespace app\api\controller;
 use think\Controller;
 use think\Request;
 use app\common\model\RiderRecruit as RiderRecruitModel;
+use app\common\controller\ApiBase;
 
-class RiderRecruit extends Controller
+class RiderRecruit extends ApiBase
 {
+    protected  $noNeedLogin = [];
+
+
     /**
      * 保存骑手招募申请 
      * 
@@ -15,6 +19,7 @@ class RiderRecruit extends Controller
     public function create(Request $request)
     {
         $data = $request->post();
+        $data['user_id'] = $this->auth->id;
         $data['add_time'] = time();
 
         // 验证表单数据
