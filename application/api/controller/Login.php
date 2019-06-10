@@ -210,7 +210,7 @@ class Login extends Controller
 
         include_once './../extend/wx_auth_phone/wxBizDataCrypt.php';
         $wx = new \WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
-            $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
+        $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
         if ($errCode == 0) {
             $data = json_decode($data, true);
             $res = ['code'=>200,'phone'=>$data['phoneNumber'],'openid'=>$recod->openid];
