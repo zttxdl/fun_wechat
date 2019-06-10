@@ -8,6 +8,8 @@ use think\Request;
 
 class IsLogin
 {
+    use \traits\controller\Jump;
+
     public function handle($request, \Closure $next)
     {
         try{
