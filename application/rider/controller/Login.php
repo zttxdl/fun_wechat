@@ -5,7 +5,6 @@ namespace app\rider\controller;
 use think\Controller;
 use think\Request;
 use app\common\model\RiderInfo;
-use wx_auth_phone\WXBizDataCrypt;
 
 
 /**
@@ -42,7 +41,7 @@ class Login extends Controller
      * 授权时，存储 openid 等用户相关信息 
      * 
      */
-    public function saveUserBaseInfo(Request $request)
+    public function saveRiderBaseInfo(Request $request)
     {
         $data = $request->post();
         $list['nickname'] = $data['nickName'];
@@ -73,7 +72,7 @@ class Login extends Controller
      * 校验当前的手机号的验证码 
      * 
      */
-    public function checkUserPhone(Request $request)
+    public function checkRiderPhone(Request $request)
     {
         $phone = $request->param('phone');
         $code  = $request->param('code');
@@ -126,8 +125,8 @@ class Login extends Controller
         }
 
         // 判断openid是否存在
-        $uid = RiderInfo::where('openid',$openid)->value('id');
-        if (!$uid) {
+        $rid = RiderInfo::where('openid',$openid)->value('id');
+        if (!$rid) {
             return json_error('非法参数');
         }
         // 更新数据
@@ -139,9 +138,9 @@ class Login extends Controller
         if (!$res) {
             return json_error('登录或注册失败');
         }
-        $user_info = RiderInfo::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
+        $rider_info = RiderInfo::where('id','=',$rid)->find();
 
-        return json_success('登录或注册成功',['user_info'=>$user_info]);
+        return json_success('登录或注册成功',['rider_info'=>$rider_info]);
         
     }
 
@@ -164,8 +163,8 @@ class Login extends Controller
 
         // 存表处理
         // 判断openid是否存在
-        $uid = RiderInfo::where('openid',$data['openid'])->value('id');
-        if (!$uid) {
+        $rid = RiderInfo::where('openid',$data['openid'])->value('id');
+        if (!$rid) {
             return json_error('非法参数');
         }
         // 更新数据
@@ -177,9 +176,9 @@ class Login extends Controller
         if (!$res) {
             return json_error('快捷登录失败');
         }
-        $user_info = RiderInfo::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
+        $rider_info = RiderInfo::where('id','=',$rid)->find();
 
-        return json_success('快捷登录成功',['user_info'=>$user_info]);
+        return json_success('快捷登录成功',['rider_info'=>$rider_info]);
 
     }
      
