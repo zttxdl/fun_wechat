@@ -4,11 +4,12 @@
 namespace app\admin\controller;
 
 
+use think\Controller;
 use think\Db;
 use think\facade\Request;
 //use think\facade\Validate;
 
-class User
+class User extends Controller
 {
     public function getList()
     {

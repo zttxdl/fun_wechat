@@ -156,20 +156,20 @@ Route::group('merchants',function (){
 
 //店铺
 Route::group('merchants',function (){
-    Route::get('shopIndex','merchants/Shop/index');
-    Route::get('shopSetName','merchants/Shop/setName');//修改店铺名称
-    Route::get('shopSetLogo','merchants/Shop/setLogo');//修改店铺Logo
-    Route::get('shopInfo','merchants/Shop/info');//商家信息
-    Route::get('shopSetInfo','merchants/Shop/setInfo');//设置商家信息
-    Route::post('shopMoreInfo','merchants/Shop/moreInfo');//入驻信息
+    Route::rule('shopIndex','merchants/Shop/index');
+    Route::rule('shopSetName','merchants/Shop/setName');//修改店铺名称
+    Route::rule('shopSetLogo','merchants/Shop/setLogo');//修改店铺Logo
+    Route::rule('shopInfo','merchants/Shop/info');//商家信息
+    Route::rule('shopSetInfo','merchants/Shop/setInfo');//设置商家信息
+    Route::rule('shopMoreInfo','merchants/Shop/moreInfo');//入驻信息
 });
 
 //订单
 Route::group('merchants',function (){
-    Route::get('orderIndex','merchants/Order/show');//订单查询
-    Route::get('orderDetail','merchants/Order/detail');//订单详情
-    Route::get('orderDel','merchants/Order/del');//订单删除
-    Route::get('orderReceipt','merchants/Order/receipt');//订单处理
+    Route::post('orderIndex','merchants/Order/show');//订单查询
+    Route::post('orderDetail','merchants/Order/detail');//订单详情
+    Route::post('orderDel','merchants/Order/del');//订单删除
+    Route::post('orderReceipt','merchants/Order/receipt');//订单处理
 
 });
 
