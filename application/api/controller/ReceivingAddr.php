@@ -30,7 +30,7 @@ class ReceivingAddr extends Controller
         }
 
 
-        return json_success('获取收货地址成功',['list'=>$list]);
+        $this->succes('获取收货地址成功',['list'=>$list]);
     }
 
 
@@ -45,7 +45,7 @@ class ReceivingAddr extends Controller
         // 验证表单数据
         $check = $this->validate($data, 'ReceivingAddr');
         if ($check !== true) {
-            return json_error($check,201);
+            $this->error($check,201);
         }
         // 将物理地址逆解析为经纬度
         $school_id = $request->param('school_id');
@@ -58,10 +58,10 @@ class ReceivingAddr extends Controller
         // 提交新增表单
         $result = ReceiveAddr::create($data,true);
         if (!$result) {
-            return json_error('添加失败',201);
+            $this->error('添加失败',201);
         }
 
-        return json_success('添加成功');
+        $this->succes('添加成功');
     }
 
 
@@ -76,7 +76,7 @@ class ReceivingAddr extends Controller
         $school_model = new School();
         $info['school_name'] = $school_model->getNameById($info['school_id']);
         
-        return json_success('获取地址信息成功',['info'=>$info]);
+        $this->succes('获取地址信息成功',['info'=>$info]);
     }
 
 
@@ -91,7 +91,7 @@ class ReceivingAddr extends Controller
         // 验证表单数据
         $check = $this->validate($data, 'ReceivingAddr');
         if ($check !== true) {
-            return json_error($check,201);
+            $this->error($check,201);
         }
 
         // 将物理地址逆解析为经纬度
@@ -105,10 +105,10 @@ class ReceivingAddr extends Controller
         // 提交表单
         $result = ReceiveAddr::update($data);
         if (!$result) {
-            return json_error('修改失败',201);
+            $this->error('修改失败',201);
         }
         
-        return json_success('修改成功');
+        $this->succes('修改成功');
 
     }
 
@@ -122,10 +122,10 @@ class ReceivingAddr extends Controller
         $result = ReceiveAddr::destroy($id);
 
         if (!$result) {
-            return json_error('删除失败',201);
+            $this->error('删除失败',201);
         }
         
-        return json_success('删除成功');
+        $this->succes('删除成功');
     }
      
      

@@ -16,10 +16,10 @@ class IsLogin
             if($phone) {
                 return $next($request);
             } else {
-                return json_error('用户未登录');
+                $this->error('用户未登录');
             }
         }catch (ErrorException $e){
-            return json_error($e->getMessage());
+            $this->error($e->getMessage());
         }
 
     }

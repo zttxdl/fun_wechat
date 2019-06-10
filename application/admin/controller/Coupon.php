@@ -44,7 +44,7 @@ class Coupon extends Controller
                             return $item;
                         });
 
-        return json_success('ok',['category_list'=>$category_list,'coupon_list'=>$coupon_list]);
+        $this->succes('ok',['category_list'=>$category_list,'coupon_list'=>$coupon_list]);
 
     }
 
@@ -63,7 +63,7 @@ class Coupon extends Controller
         $mg_model = new ManageCategory();
         $manage_category_list = $mg_model->getManageCategoryList();
 
-        return json_success('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list]);
+        $this->succes('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list]);
 
     }
      
@@ -85,16 +85,16 @@ class Coupon extends Controller
         // 验证表单数据
         $check = $this->validate($data, 'Coupon');
         if ($check !== true) {
-            return json_error($check,201);
+            $this->error($check,201);
         }
 
         // 提交新增表单
         $result = Db::name('platform_coupon')->insert($data);
         if (!$result) {
-            return json_error('添加失败',201);
+            $this->error('添加失败',201);
         }
 
-        return json_success('添加成功');
+        $this->succes('添加成功');
 
     }
 
@@ -107,7 +107,7 @@ class Coupon extends Controller
     public function edit($id)
     {
         if (empty((int)$id) ) {
-            return json_error('非法参数',201);
+            $this->error('非法参数',201);
         }
 
         // 当前优惠券信息
@@ -127,7 +127,7 @@ class Coupon extends Controller
         // 优惠券的覆盖范围 [店铺]
         $shop_list = Db::name('shop_info')->where('school_id',$coupon_info['school_id'])->find();
 
-        return json_success('ok',['coupon_info'=>$coupon_info,'school_list'=>$school_list,'shop_list'=>$shop_list,'manage_category_list'=>$manage_category_list]);
+        $this->succes('ok',['coupon_info'=>$coupon_info,'school_list'=>$school_list,'shop_list'=>$shop_list,'manage_category_list'=>$manage_category_list]);
 
     }
 
@@ -141,7 +141,7 @@ class Coupon extends Controller
         $data = $request->param();
 
         if (!isset($data['id']) || empty((int)$data['id'])) {
-            return json_error('非法参数',201);
+            $this->error('非法参数',201);
         }
         
         $info = Db::name('platform_coupon')->where('id',$data['id'])->field('num,surplus_num,status')->find();
@@ -154,7 +154,7 @@ class Coupon extends Controller
             // 验证表单数据
             $check = $this->validate($data, 'Coupon');
             if ($check !== true) {
-                return json_error($check,201);
+                $this->error($check,201);
             }
         }
         // 当优惠券已发放时，仅可修改发放量
@@ -164,17 +164,17 @@ class Coupon extends Controller
             if ($data['num'] >= $temp) {
                 $data['surplus_num'] = $data['num'] - $temp;
             } else {
-                return json_error('发行量不能小于已领取的优惠券数量');
+                $this->error('发行量不能小于已领取的优惠券数量');
             }
         }
         
         // 提交表单
         $result = Db::name('platform_coupon')->update($data);
         if (!$result) {
-            return json_error('修改失败',201);
+            $this->error('修改失败',201);
         }
         
-        return json_success('修改成功');
+        $this->succes('修改成功');
 
     }
 
@@ -186,12 +186,12 @@ class Coupon extends Controller
     public function getSchoolShop($id)
     {
         if (empty((int)$id)) {
-            return json_error('非法参数',201);
+            $this->error('非法参数',201);
         }
         //获取店铺列表
         $shop_list = Db::name('shop_info')->where('school_id',$id)->field('id,shop_name')->select();
         
-        return json_success('ok',['shop_list'=>$shop_list]);
+        $this->succes('ok',['shop_list'=>$shop_list]);
     }
 
 
@@ -202,14 +202,14 @@ class Coupon extends Controller
     public function show($id)
     {
         if (empty((int)$id)) {
-            return json_error('非法参数',201);
+            $this->error('非法参数',201);
         }
 
         // 优惠券详情信息
         $coupon_info = Db::name('platform_coupon pc')->join('school s','pc.school_id = s.id')->where('pc.id',$id)->field('pc.*,s.name as school_name')->find();
 
         if (empty($coupon_info)) {
-            return json_error('非法参数',202);
+            $this->error('非法参数',202);
         }
 
         // 优惠券状态
@@ -233,7 +233,7 @@ class Coupon extends Controller
                             ->field('pc.id,pc.name,pc.face_value,u.nickname,u.phone,mc.indate,mc.order_sn,mc.status')
                             ->select();
 
-        return json_success('ok',['coupon_info'=>$coupon_info,'shop_info'=>$shop_info,'coupon_used_list'=>$coupon_used_list]);
+        $this->succes('ok',['coupon_info'=>$coupon_info,'shop_info'=>$shop_info,'coupon_used_list'=>$coupon_used_list]);
 
     }
      
@@ -248,10 +248,10 @@ class Coupon extends Controller
         $result = Db::name('platform_coupon')->where('id',$id)->setField('status',$status);
 
         if (!$result) {
-            return json_error('设置失败');
+            $this->error('设置失败');
         }
 
-        return json_success('ok');
+        $this->succes('ok');
      }
       
      

@@ -11,12 +11,12 @@ class RiderAuth
     {
         $uid = $request->header('rider-auth');
         if (!$uid) {
-            return json_error('参数出错，暂无登录', 205);
+            $this->error('参数出错，暂无登录', 205);
         } 
         
         $result = RiderInfo::find($uid);
         if (!$result) {
-            return json_error('未查到该用户',201);
+            $this->error('未查到该用户',201);
         }
 
         return $next($request);

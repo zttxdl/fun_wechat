@@ -43,12 +43,12 @@ class Agreement extends Controller
     public function edit($id)
     {
         if (empty((int)$id) ) {
-            return json_error('非法参数',201);
+            $this->error('非法参数',201);
         }
 
         $info = Db::name('agreement')->where('id',$id)->field('id,title,content')->find();
 
-        return json_success('ok',['info'=>$info]);
+        $this->succes('ok',['info'=>$info]);
     }
 
 
@@ -61,19 +61,19 @@ class Agreement extends Controller
         $data = $request->param();
 
         if (!isset($data['id']) || empty((int)$data['id'])) {
-            return json_error('非法参数',201);
+            $this->error('非法参数',201);
         }
 
         // 验证表单数据
         $check = $this->validate($data, 'Agreement');
         if ($check !== true) {
-            return json_error($check,201);
+            $this->error($check,201);
         }
 
         // 提交表单
         $result = Db::name('agreement')->update($data);
         if (!$result) {
-            return json_error('修改失败',201);
+            $this->error('修改失败',201);
         }
         
         return  json_success('ok');
@@ -88,7 +88,7 @@ class Agreement extends Controller
     {
         $info = Db::name('agreement')->where('id',$id)->field('title,content')->find();
 
-        return json_success('ok',['info'=>$info]);
+        $this->succes('ok',['info'=>$info]);
     }
      
 

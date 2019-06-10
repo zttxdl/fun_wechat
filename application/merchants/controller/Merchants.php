@@ -51,7 +51,7 @@ class Merchants extends MerchantsBase
 
          }
 
-        return json_success('success');
+        $this->succes('success');
 
     }
 
@@ -75,7 +75,7 @@ class Merchants extends MerchantsBase
             }
         }
 
-        return json_success('success',$school_district_list);
+        $this->succes('success',$school_district_list);
     }
 
     /**
@@ -87,7 +87,7 @@ class Merchants extends MerchantsBase
     {
         $data = model('ManageCategory')->field('id,name,img')->select();
 
-        return json_success('success',$data);
+        $this->succes('success',$data);
     }
 
     /**
@@ -99,7 +99,7 @@ class Merchants extends MerchantsBase
     {
         $data = model('Back')->field('id,name')->select();
 
-        return json_success('success',$data);
+        $this->succes('success',$data);
     }
 
     /**
@@ -117,16 +117,16 @@ class Merchants extends MerchantsBase
         $data = model('ShopInfo')->where('id',$this->shop_id)->find();
 
         if (md5($old_password) != $data->password){
-            return json_error('输入的旧密码不正确');
+            $this->error('输入的旧密码不正确');
         }
 
         if ($new_password != $true_password){
-            return json_error('两次密码不一致');
+            $this->error('两次密码不一致');
         }
 
         model('ShopInfo')->where('id',$this->shop_id)->update(['password'=>md5($new_password)]);
 
-        return json_success('success');
+        $this->succes('success');
     }
 
     /**
@@ -176,7 +176,7 @@ class Merchants extends MerchantsBase
 
         $data['list']  =$list;
 
-        return json_success('success',$data);
+        $this->succes('success',$data);
 
     }
 }

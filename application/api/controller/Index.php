@@ -22,7 +22,8 @@ class Index extends ApiBase
         $data['special'] = $this->getSpecial($lat,$lng);
         $data['recommend'] = $this->getRecommendList($lat,$lng);
 
-        return json_success('success',$data);
+        $this->success('success',$data);
+        $this->error('','','');
     }
 
 
@@ -125,6 +126,12 @@ class Index extends ApiBase
         }
 
         foreach ($list as &$value) {
+            if (! empty($value['run_time'])){
+                $value['business'] = model('ShopInfo')->getBusiness($value['run_time']);
+            }else{
+                $value['business'] = 0;
+            }
+
             $value['disc'] = model('ShopDiscounts')
                 ->field('face_value,threshold')
                 ->where('shop_id',$value['id'])
@@ -143,7 +150,7 @@ class Index extends ApiBase
 
         $list = $this->getRecommendList($lat,$lng);
 
-        return json_success('success',$list);
+        $this->success('success',$list);
     }
 
 
@@ -157,7 +164,7 @@ class Index extends ApiBase
         $page = input('page',1);
 
         $list = model('ShopInfo')
-            ->field("id,shop_name,marks,sales,up_to_send_money,run_time,
+            ->field("id,shop_name,marks,sales,logo_img,up_to_send_money,run_time,
             address,manage_category_id,ping_fee,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),2 ) AS distance ")
             ->where('manage_category_id','=',$class_id)
             ->having('distance < 3')
@@ -166,10 +173,15 @@ class Index extends ApiBase
             ->toArray();
 
         if (empty($list)){
-            return json_success('success',$list);
+            $this->success('success',$list);
         }
 
         foreach ($list as &$value) {
+            if (! empty($value['run_time'])){
+                $value['business'] = model('ShopInfo')->getBusiness($value['run_time']);
+            }else{
+                $value['business'] = 0;
+            }
             $value['disc'] = model('ShopDiscounts')
                 ->field('face_value,threshold')
                 ->where('shop_id',$value['id'])
@@ -177,7 +189,7 @@ class Index extends ApiBase
                 ->select();
         }
 
-        return json_success('success',$list);
+        $this->success('success',$list);
     }
 
 }

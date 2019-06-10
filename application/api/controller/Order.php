@@ -34,7 +34,7 @@ class Order extends ApiBase
         $user_id = $request->param('user_id');
 
         if(!$user_id || !$page_no) {
-            return json_error('非法传参');
+            $this->error('非法传参');
         }
 
 
@@ -47,7 +47,7 @@ class Order extends ApiBase
                 ->select();
 
         if(empty($data)){
-            return json_error('暂无数据');
+            $this->error('暂无数据');
         }
 
         //dump($data);
@@ -69,7 +69,7 @@ class Order extends ApiBase
             ];
         }
 
-        return json_success('获取成功',$result);
+        $this->succes('获取成功',$result);
     }
 
     /**
@@ -81,7 +81,7 @@ class Order extends ApiBase
         $orders_id = $request->param('orders_id');
 
         if(!$orders_id) {
-            return json_error('非法传参');
+            $this->error('非法传参');
         }
 
         $result = [];
@@ -128,7 +128,7 @@ class Order extends ApiBase
 
         $result['order_status'] = config('order_status')[$orders['status']];
 
-        return json_success('获取成功',$result);
+        $this->succes('获取成功',$result);
     }
 
 
@@ -251,7 +251,7 @@ class Order extends ApiBase
         } catch (\Throwable $e) {
             Db::rollback();
             $this->error($e->getMessage());
-            //return json_error($e->getMessage());
+            //$this->error($e->getMessage());
         }
 
         return true;
@@ -279,7 +279,7 @@ class Order extends ApiBase
         $ret = model('ShopComments')->where('orders_id',$orders_id)->find();
 
         if ($ret){
-            return json_error('该商品已评价');
+            $this->error('该商品已评价');
         }
 
         $id = model('ShopComments')->insertGetId($data);
@@ -296,7 +296,7 @@ class Order extends ApiBase
         //改变商品状态
         model('Orders')->where('id',$orders_id)->update(['status'=>9,'update_time'=>time()]);
 
-        return json_success('success');
+        $this->succes('success');
     }
 
     //获取评价标签
@@ -304,7 +304,7 @@ class Order extends ApiBase
     {
         $list = model('Tips')->select();
 
-        return json_success('success',$list);
+        $this->succes('success',$list);
     }
 
     /**
@@ -327,7 +327,7 @@ class Order extends ApiBase
         $data = Db::name('refund')->where('orders_id',$orders_id)->find();
 
         if(is_array($data)){
-            return json_error('退单已提交申请,请耐心等待');
+            $this->error('退单已提交申请,请耐心等待');
         }
 
         $data = [
@@ -345,7 +345,7 @@ class Order extends ApiBase
         $res = Db::name('refund')->insert($data);
 
         if($res) {
-            return json_success('售后申请已提交成功,等待商家处理');
+            $this->succes('售后申请已提交成功,等待商家处理');
         }
     }
 

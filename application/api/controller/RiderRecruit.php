@@ -20,22 +20,22 @@ class RiderRecruit extends Controller
         // 验证表单数据
         $check = $this->validate($data, 'RiderRecruit');
         if ($check !== true) {
-            return json_error($check,201);
+            $this->error($check,201);
         }
 
         // 判断当前用户是否已有提交
         $res = RiderRecruitModel::where('user_id','=',$data['user_id'])->value('id');
         if ($res) {
-            return json_error('您已提交过申请');
+            $this->error('您已提交过申请');
         }
 
         // 提交新增表单
         $result = RiderRecruitModel::create($data,true);
         if (!$result) {
-            return json_error('添加失败',201);
+            $this->error('添加失败',201);
         }
 
-        return json_success('添加成功');
+        $this->succes('添加成功');
 
     }
      

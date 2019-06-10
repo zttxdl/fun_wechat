@@ -80,9 +80,9 @@ class Alisms extends Model
                 return false;
             }
         }catch (ClientException $e) {
-             return json_error($e->getErrorMessage());
+             $this->error($e->getErrorMessage());
         } catch (ServerException $e) {
-            return json_error($e->getErrorMessage());
+            $this->error($e->getErrorMessage());
         }
 
 

@@ -22,7 +22,7 @@ class GoodsAttribute extends MerchantsBase
     {
         $data = ProductAttrClassify::all(['shop_id'=>$this->shop_id])->toArray();
         $data = $this->getSonCategory($data);
-        return json_success('success',$data);
+        $this->succes('success',$data);
 
     }
 
@@ -41,12 +41,12 @@ class GoodsAttribute extends MerchantsBase
         if ($fid){
             $count = model('ProductAttrClassify')->where('pid',$fid)->count();
             if ($count >= 3){
-                return json_error('最多添加三个属性');
+                $this->error('最多添加三个属性');
             }
 
         }
         $result = ProductAttrClassify::create($data);
-        return json_success('success');
+        $this->succes('success');
     }
 
 
@@ -60,15 +60,15 @@ class GoodsAttribute extends MerchantsBase
     {
         $result = ProductAttrClassify::get($id);
         if ($result->shop_id != $this->shop_id) {
-            return json_error('没有权限删除');
+            $this->error('没有权限删除');
         }
 
         $result = ProductAttrClassify::get(['pid'=>$id]);
         if ($result){
-            return json_error('请先删除标签属性');
+            $this->error('请先删除标签属性');
         }
         $result = ProductAttrClassify::destroy($id);
-        return json_success('success');
+        $this->succes('success');
     }
 
 

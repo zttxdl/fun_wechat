@@ -17,7 +17,7 @@ class User
         $page_size = 5;
         $user_list = Db::name('user')->order('id','desc')->page($page_no,$page_size)->select();
 
-        return json_success('获取成功',$user_list);
+        $this->succes('获取成功',$user_list);
 
 
     }
@@ -28,14 +28,14 @@ class User
         //验证参数
         /*$validate = new \app\index\validate\User;
         if(!$validate->test($data)) {
-            return json_error($validate->getError());
+            $this->error($validate->getError());
         }*/
 
 
         $uid = Request::param('uid');
 
         if(!$uid) {
-            return json_error('Uid 不能为空');
+            $this->error('Uid 不能为空');
         }
 
         $result = [];
@@ -81,7 +81,7 @@ class User
                 $result['user_coupon'][] = Db::name('platform_coupon')->where('id',$v['platform_coupon_id'])->field('id,name as coupon_name,face_value,other_time,type,limit_use,threshold')->find();
             }
         }*/
-         return json_success('获取成功',$result);
+         $this->succes('获取成功',$result);
 
     }
 }

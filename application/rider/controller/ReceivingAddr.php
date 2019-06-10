@@ -27,7 +27,7 @@ class ReceivingAddr extends Controller
         }
 
 
-        return json_success('获取收货地址成功',['list'=>$list]);
+        $this->succes('获取收货地址成功',['list'=>$list]);
     }
 
      

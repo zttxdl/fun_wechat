@@ -18,7 +18,7 @@ class School extends Controller
 
         $school_list = $model->getShopList();
 
-        return json_success('获取学校地区列表成功',['school_list'=>$school_list]);
+        $this->succes('获取学校地区列表成功',['school_list'=>$school_list]);
     }
 
     

@@ -31,7 +31,7 @@ class RiderRecruit extends Controller
                     $item['mb_status'] = config('dispose_status')[$item['status']];
                     return $item;
                 });
-        return json_success('ok',['list'=>$list]);
+        $this->succes('ok',['list'=>$list]);
     }
 
     /**
@@ -44,10 +44,10 @@ class RiderRecruit extends Controller
         $result = Db::name('rider_recruit')->where('id',$id)->setField('status',$status);
         
         if (!$result) {
-            return json_error('设置失败');
+            $this->error('设置失败');
         }
         
-        return json_success('ok');
+        $this->succes('ok');
     }
 
 }
