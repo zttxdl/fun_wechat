@@ -11,6 +11,7 @@ namespace app\merchants\controller;
 
 class Promotion extends MerchantsBase
 {
+    protected $noNeedLogin = ["*"];
     /**
      * 活动管理
      */

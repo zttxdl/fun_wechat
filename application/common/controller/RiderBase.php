@@ -32,7 +32,9 @@ class RiderBase extends Controller
     {
         $token = $this->request->header('api-token');
         $jwtAuth = new JwtAuth();
-        $this->auth = $jwtAuth->checkToken($token);
+        $jwt = $jwtAuth->checkToken($token);
+        $this->auth =$jwt['data'];
+
     }
 
     /**

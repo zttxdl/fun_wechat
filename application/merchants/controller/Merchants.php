@@ -14,7 +14,7 @@ use think\Request;
 class Merchants extends MerchantsBase
 {
 
-    protected $noNeedLogin = ['getSchool','getCategory','getBack'];
+    protected $noNeedLogin = [];
 
     /**
      * 新建商家
