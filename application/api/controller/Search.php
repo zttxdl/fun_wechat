@@ -38,8 +38,8 @@ class Search extends ApiBase
         $keywords = $request->param('keywords');
         $lat = $request->param('latitude');
         $lng = $request->param('longitude');
-        $pagesize = input('pagesize',15);
-        $page = input('page',1);
+        $pagesize = $request->param('pagesize',15);
+        $page = $request->param('page',1);
 
         //记录历史搜索
         $data = ['user_id'=>$user_id,'keywords'=>$keywords,'add_time'=>time()];

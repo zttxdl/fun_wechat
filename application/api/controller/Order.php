@@ -28,33 +28,22 @@ class Order extends ApiBase
      */
     public function getList(Request $request)
     {
-        //dump($request->param());
-        //$this->param_empty($request->param());
-        $page_size = config('page_size');
-        $page_no = $request->param('page_no');
+        $pagesize = $request->param('pagesize',20);
+        $page = $request->param('page');
         $user_id = $this->auth->id;
-
-//        $user_id = $request->param('user_id');
-
-
-        if(!$user_id || !$page_no) {
-            $this->error('非法传参');
-        }
-
 
         $data = model('orders')->alias('a')
                 ->leftJoin('shopInfo b','a.shop_id = b.id')
                 ->leftJoin('ordersInfo c','a.id = c.id')
                 ->field(['a.id','a.orders_sn','a.num','FROM_UNIXTIME( a.add_time, "%Y-%m-%d %H:%i" )'=> 'add_time','a.status','a.money','b.link_tel','b.logo_img','b.shop_name','c.product_id'])
                 ->where('user_id',$user_id)
-                ->page($page_no,$page_size)
+                ->page($page,$pagesize)
                 ->select();
 
         if(empty($data)){
-            $this->error('暂无数据');
+            $this->error('你暂时还没有订单，快去挑选吧！');
         }
 
-        //dump($data);
         $result = [];
         foreach ($data as $row) {
             $product_name = model('Product')->getNameById($row['product_id']);
@@ -73,7 +62,7 @@ class Order extends ApiBase
             ];
         }
 
-        $this->success('获取成功',$result);
+        $this->success('success',$result);
     }
 
     /**
@@ -169,8 +158,7 @@ class Order extends ApiBase
         $config = config('wx_pay');
         $app_id = config('wx_pay')['app_id'];
         $app = Factory::payment($config);
-//        $openid = model('user')->where('id',$order['user_id'])->value('openid');
-        $openid= 'o2pfj5FQLRFUf3O-aLtXKsVekMfo';
+        $openid= $this->auth->openid;
 
 
         $ip   = request()->ip();
@@ -238,13 +226,6 @@ class Order extends ApiBase
                 ->where('orders_sn',$orders_sn)
                 ->update(['status'=>2,'pay_status'=>1,'pay_time'=>time(),'trade_no'=>$wx_id]);
 
-
-
-
-            //更新库存
-
-
-
             //更新红包信息
             if($orders['platform_coupon_id']) {
                 model('myCoupon')->where('platform_coupon_id',$orders['platform_coupon_id'])
@@ -255,7 +236,6 @@ class Order extends ApiBase
         } catch (\Throwable $e) {
             Db::rollback();
             $this->error($e->getMessage());
-            //$this->error($e->getMessage());
         }
 
         return true;
