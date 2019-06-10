@@ -4,11 +4,12 @@
 namespace app\admin\controller;
 
 //use think\Model;
+use think\Controller;
 use think\Model;
 use think\Request;
 use think\Db;
 
-class Shop
+class Shop extends Controller
 {
 
     public function __construct()
