@@ -72,7 +72,7 @@ class Search extends ApiBase
                 ->select();
         }
 
-        $this->success($list);
+        $this->success('success',$list);
 
     }
 
