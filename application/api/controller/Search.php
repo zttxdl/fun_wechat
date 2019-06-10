@@ -27,7 +27,7 @@ class Search extends ApiBase
             ->limit(8)
             ->select();
 
-        return json_success('success',$data);
+        $this->succes('success',$data);
     }
 
     //搜索
@@ -54,7 +54,7 @@ class Search extends ApiBase
             ->select();
 
         if (empty($list)){
-            return json_success('success',$list);
+            $this->succes('success',$list);
         }
 
         foreach ($list as &$value) {

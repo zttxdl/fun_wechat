@@ -43,7 +43,7 @@ class Shop
 //            }
 //        }
 
-        return json_success('获取成功',$shop_list);
+        $this->succes('获取成功',$shop_list);
     }
 
 
@@ -55,7 +55,7 @@ class Shop
         $shop_id = $request->param('id');
 
         if(empty((int)$shop_id)) {
-            return json_error('非法请求','404');
+            $this->error('非法请求','404');
         }
 
         $result = [];
@@ -86,7 +86,7 @@ class Shop
 
         //结算信息
         $result['shop_settle'] = $this->shopModel->getSettle();
-        return json_success('获取成功',$result);
+        $this->succes('获取成功',$result);
 
     }
 
@@ -100,7 +100,7 @@ class Shop
         $shop_id = $request->param('id');
 
         if(empty((int)$shop_id)) {
-            return json_error('非法请求','404');
+            $this->error('非法请求','404');
         }
         $shop_info = $this->shopModel->getShopInfo($shop_id);
         //dump($shop_list);
@@ -164,7 +164,7 @@ class Shop
         //结算信息
         $result['shop_settle'] = $this->shopModel->getSettle();
 //        dump($result);
-        return json_success('获取成功',$result);
+        $this->succes('获取成功',$result);
     }
 
 
@@ -201,7 +201,7 @@ class Shop
         $page_size = 5;
 
         if(!$page_no) {
-            return json_error('非法传参','404');
+            $this->error('非法传参','404');
         }
 
         $data = model('shopInfo')
@@ -246,7 +246,7 @@ class Shop
             ];
         }*/
 
-        return json_success('查询成功',$shop_check_list);
+        $this->succes('查询成功',$shop_check_list);
 
 
     }
@@ -259,7 +259,7 @@ class Shop
         $shop_id = $request->param('shop_id');
 
         if(!$shop_id) {
-            return json_error('非法传参','404');
+            $this->error('非法传参','404');
         }
 
         $result = [];
@@ -304,7 +304,7 @@ class Shop
         $result['shop_qualification'] = $shop_qualification;
         $result['shop_account'] = $shop_account;
 
-        return json_success('获取成功',$result);
+        $this->succes('获取成功',$result);
 
     }
 
@@ -318,14 +318,14 @@ class Shop
         $remark = $request->param('remark');
 
         if(empty($shop_id) || empty($status)){
-            return json_error('非法传参','404');
+            $this->error('非法传参','404');
         }
 
         $shopInfo = Model('ShopInfo');
 
         if($status == '4') {
             if(empty($remark)){
-                return json_error('请填写不通过理由哦');
+                $this->error('请填写不通过理由哦');
             }
             $res = $shopInfo->update([
                 'status' => $status,
@@ -338,10 +338,10 @@ class Shop
 
 
         if($res) {
-            return json_success('更新成功');
+            $this->succes('更新成功');
         }
 
-        return json_error('更新失败');
+        $this->error('更新失败');
 
     }
 
@@ -351,7 +351,7 @@ class Shop
     public function checkShow()
     {
         $data = config('check_status')['shop'];
-        return json_success('获取成功',$data);
+        $this->succes('获取成功',$data);
     }
 
     /**
@@ -362,7 +362,7 @@ class Shop
         $page_no = $request->param('page_no');
         $page_size = 5;
         if(empty($page_no)) {
-            return json_error('非法传参','404');
+            $this->error('非法传参','404');
         }
         $shop_list = Model('Shop')->getShopList($page_no,$page_size);
 
@@ -375,7 +375,7 @@ class Shop
             $sort_info['sort'] = $row['sort'];
         }
 
-        return json_success('获取成功',$sort_info);
+        $this->succes('获取成功',$sort_info);
     }
 
     /**
@@ -387,7 +387,7 @@ class Shop
         $sort = $request->param('sort');
 
         if(empty($shop_id) || empty($sort)) {
-            return json_error('非法传参','404');
+            $this->error('非法传参','404');
         }
 
         $map['shop_id'] = $shop_id;
@@ -396,8 +396,8 @@ class Shop
         $data = $this->shopModel->sortEdit($map);
 
         if(empty($data)) {
-            return json_error('更新失败');
+            $this->error('更新失败');
         }
-        return json_success('更新成功');
+        $this->succes('更新成功');
     }
 }

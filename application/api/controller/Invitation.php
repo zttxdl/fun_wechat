@@ -19,7 +19,7 @@ class Invitation extends ApiBase
         $data['mum'] = model('Invitation')->getUserCount($id);
         $data['money'] = model('Invitation')->getLuckyMoney($id);
 
-        return json_success('success',$data);
+        $this->succes('success',$data);
     }
 
     //邀请

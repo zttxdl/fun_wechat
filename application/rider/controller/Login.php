@@ -32,9 +32,9 @@ class Login extends Controller
 
         //判断返回的结果中是否有错误码
         if (isset($wxResult['errcode'])) {
-            return json_error($wxResult['errmsg'], $wxResult['errcode']);
+            $this->error($wxResult['errmsg'],$wxResult['errcode']);
         }
-        return json_success('获取 openid 成功',['auth_result'=>$wxResult]);
+        $this->succes('获取 openid 成功',['auth_result'=>$wxResult]);
     }
 
 
@@ -55,15 +55,15 @@ class Login extends Controller
         // 判断当前用户是否已授权
         $id = RiderInfo::where('openid','=',$data['openid'])->count('id');
         if ($id) {
-            return json_error('该用户已授权！不需要再次授权，直接跳转至登录页面');
+            $this->error('该用户已授权！不需要再次授权，直接跳转至登录页面');
         }
 
         // 存入数据
         $result = RiderInfo::create($list);
         if(!$result) {
-            return json_error('授权入表失败');
+            $this->error('授权入表失败');
         }
-        return json_success('授权入表成功');
+        $this->succes('授权入表成功');
         
     }
      
@@ -81,9 +81,9 @@ class Login extends Controller
 
         $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
         if (!$result) {
-            return json_error(model('Alisms', 'service')->getError());
+            $this->error(model('Alisms', 'service')->getError());
         }
-        return json_success('验证通过');
+        $this->succes('验证通过');
 
     }
 
@@ -101,9 +101,9 @@ class Login extends Controller
         $back = model('Alisms', 'service')->sendCode($phone,$type);
 
         if (!$back) {
-            return json_error('短信发送失败');
+            $this->error('短信发送失败');
         }
-        return json_success('验证码已发送至 ' . $phone . ', 5分钟内有效！');
+        $this->succes('验证码已发送至 ' . $phone . ', 5分钟内有效！');
 
     }
 
@@ -122,13 +122,13 @@ class Login extends Controller
         // 校验验证码
         $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
         if (!$result) {
-            return json_error(model('Alisms', 'service')->getError());
+            $this->error(model('Alisms', 'service')->getError());
         }
 
         // 判断openid是否存在
         $uid = RiderInfo::where('openid',$openid)->value('id');
         if (!$uid) {
-            return json_error('非法参数');
+            $this->error('非法参数');
         }
         // 更新数据
         $res = RiderInfo::where('openid',$openid)->save([
@@ -137,11 +137,11 @@ class Login extends Controller
         ]);
         
         if (!$res) {
-            return json_error('登录或注册失败');
+            $this->error('登录或注册失败');
         }
         $user_info = RiderInfo::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
 
-        return json_success('登录或注册成功',['user_info'=>$user_info]);
+        $this->succes('登录或注册成功',['user_info'=>$user_info]);
         
     }
 
@@ -159,14 +159,14 @@ class Login extends Controller
         // 解密手机号
         $data = $this->getWechatPhone($encrypted_data,$code,$iv);
         if ($data['code'] != 200) {
-            return json_error($data['msg'],$data['code']);
+            $this->error($data['msg'],$data['code']);
         }
 
         // 存表处理
         // 判断openid是否存在
         $uid = RiderInfo::where('openid',$data['openid'])->value('id');
         if (!$uid) {
-            return json_error('非法参数');
+            $this->error('非法参数');
         }
         // 更新数据
         $res = RiderInfo::where('openid',$data['openid'])->save([
@@ -175,11 +175,11 @@ class Login extends Controller
         ]);
         
         if (!$res) {
-            return json_error('快捷登录失败');
+            $this->error('快捷登录失败');
         }
         $user_info = RiderInfo::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
 
-        return json_success('快捷登录成功',['user_info'=>$user_info]);
+        $this->succes('快捷登录成功',['user_info'=>$user_info]);
 
     }
      

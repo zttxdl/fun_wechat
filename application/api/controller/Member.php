@@ -21,7 +21,7 @@ class Member extends Controller
     public function index($uid)
     {
         $info = model('User')->getUserInfo($uid);
-        return json_success('获取用户信息成功',['info'=>$info]);
+        $this->succes('获取用户信息成功',['info'=>$info]);
 
     }
 
@@ -40,7 +40,7 @@ class Member extends Controller
         // 校验验证码
         $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
         if (!$result) {
-            return json_error(model('Alisms', 'service')->getError());
+            $this->error(model('Alisms', 'service')->getError());
         }
 
         // 更新数据
@@ -48,10 +48,10 @@ class Member extends Controller
         $user->phone = $phone;
         $res = $user->save();
         if (!$res) {
-            return json_error('更换失败');
+            $this->error('更换失败');
         }
         $user_info = User::get($uid);
-        return json_success('更换成功',['user_info'=>$user_info]);
+        $this->succes('更换成功',['user_info'=>$user_info]);
         
     }
 }

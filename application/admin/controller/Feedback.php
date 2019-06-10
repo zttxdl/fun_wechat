@@ -33,7 +33,7 @@ class Feedback extends Controller
                     return $item;
                 });
 
-        return json_success('ok',['list'=>$list]);
+        $this->succes('ok',['list'=>$list]);
     }
 
     /**
@@ -45,12 +45,12 @@ class Feedback extends Controller
         $info = Db::name('feedback f')->join('user u','f.user_id = u.id')->where('f.id',$id)->field('f.*,u.nickname,u.phone')->find();
         
         if (!$info) {
-            return json_error('非法参数');
+            $this->error('非法参数');
         }
         $info['mb_status'] = config('dispose_status')[$info['status']];
         $info['add_time'] = date('Y-m-d',$info['add_time']);
 
-        return json_success('ok',['info'=>$info]);
+        $this->succes('ok',['info'=>$info]);
     }
 
 
@@ -64,10 +64,10 @@ class Feedback extends Controller
         $result = Db::name('feedback')->where('id',$id)->setField('status',$status);
         
         if (!$result) {
-            return json_error('设置失败');
+            $this->error('设置失败');
         }
         
-        return json_success('ok');
+        $this->succes('ok');
     }
      
 

@@ -21,7 +21,7 @@ class GoodsClassify extends MerchantsBase
     public function index()
     {
         $data = ProductsClassify::all(['shop_id'=>$this->shop_id]);
-        return json_success('success',$data);
+        $this->succes('success',$data);
 
     }
 
@@ -37,7 +37,7 @@ class GoodsClassify extends MerchantsBase
         $data['shop_id'] = $this->shop_id;
         $result = ProductsClassify::create($data);
 
-        return json_success('success');
+        $this->succes('success');
     }
 
 
@@ -52,7 +52,7 @@ class GoodsClassify extends MerchantsBase
     {
         $data   = $request->param();
         $result = ProductsClassify::update($data, ['id' => $request->param('id')]);
-        return json_success('success');
+        $this->succes('success');
     }
 
     /**
@@ -66,17 +66,17 @@ class GoodsClassify extends MerchantsBase
         $result = ProductsClassify::get($id);
         
         if ($result->shop_id != $this->shop_id) {
-            return json_error('没有权限删除');
+            $this->error('没有权限删除');
         }
 
         $result = ProductsClassify::get(['products_classify_id'=>$id,'delete'=>0]);
         
         if ($result) {
-            return json_error('该分类下有商品，请先删除商品');
+            $this->error('该分类下有商品，请先删除商品');
         }
 
         
         $result = ProductsClassify::destroy($id);
-        return json_success('success');
+        $this->succes('success');
     }
 }

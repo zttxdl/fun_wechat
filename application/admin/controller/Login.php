@@ -32,26 +32,26 @@ class Login extends Controller
 
         if(true !== $result)
         {
-           return json_error($result);//输出错误信息
+           $this->error($result);//输出错误信息
         }
 
         /*第二种方法
          $validate = new \app\admin\validate\Login;
         if(!$validate->check($data)){
             $result = $validate->getError();
-            return json_error($result);
+            $this->error($result);
         }*/
 
         /*if(!$phone || !$pwd || !$code) {
-            return json_error('参数不能为空');
+            $this->error('参数不能为空');
         }
         if(!Validate::regex($phone, "^1\d{10}$")) {
-            return json_error('手机格式不正确', '202');
+            $this->error('手机格式不正确', '202');
         }*/
         $data = captcha_check($code);
         /*if(!$data)
         {
-            return json_error('验证码错误');//输出错误信息
+            $this->error('验证码错误');//输出错误信息
         }*/
 
 
@@ -60,12 +60,12 @@ class Login extends Controller
 
         if(!$user)
         {
-            return json_error('用户不存在');
+            $this->error('用户不存在');
         }
 
         if(md5($pwd) != $user->password)
         {
-            return json_error('密码不正确');
+            $this->error('密码不正确');
         }
 
         session('admin_user.phone',$phone);
@@ -73,7 +73,7 @@ class Login extends Controller
         //记录登录时间
         model('admin')->where('phone',$phone)->setField('last_login_time',date("Y-m-d H:i:s",time()));
 
-        return json_success('登录成功');
+        $this->succes('登录成功');
 
     }
 
@@ -83,7 +83,7 @@ class Login extends Controller
     public function loginOut()
     {
         session('admin_user',null);
-        return json_success('退出成功');
+        $this->succes('退出成功');
     }
 
     /**

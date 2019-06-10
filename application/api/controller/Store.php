@@ -75,7 +75,7 @@ class Store extends ApiBase
         $data['class'] = $class;
 
 
-        return json_success('success',$data);
+        $this->succes('success',$data);
     }
 
     //获取商户评价
@@ -134,7 +134,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
         $data['list']  =$list;
 
-        return json_success('success',$data);
+        $this->succes('success',$data);
 
 
     }
@@ -164,7 +164,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             ->where('delete',0)
             ->select();
 
-        return json_success('success',$data);
+        $this->succes('success',$data);
     }
 
     /**
@@ -189,7 +189,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $data = model('TodayDeals')->where('product_id',$product_id)->find();
 
         if (! $product){
-            return json_error('商品已下架');
+            $this->error('商品已下架');
         }else{
             if ($data){
                 $product['old_price'] = $data->old_price;
@@ -220,7 +220,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         unset($product['attr_ids']);
         unset($product['shop_id']);
 
-        return json_success('success',$product);
+        $this->succes('success',$product);
 
     }
 
@@ -244,7 +244,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
 
         if(!$order || !$detail || !$platform_discount || !$shop_discount) {
-            return json_error('非法传参');
+            $this->error('非法传参');
         }
 
         $orders_sn = build_order_no();//生成唯一订单号
@@ -349,11 +349,11 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             Db::commit();
             $result['orders_id'] = $orders_id;
             $result['orders_sn'] = $orders_sn;
-            return json_success('提交成功',$result);
+            $this->succes('提交成功',$result);
 
         } catch (\Exception $e) {
             Db::rollback();
-            return json_error($e->getMessage());
+            $this->error($e->getMessage());
         }
 
     }

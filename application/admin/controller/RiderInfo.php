@@ -34,7 +34,7 @@ class RiderInfo extends Controller
                     return $item;
                 });
 
-        return json_success('ok',['list'=>$list]);
+        $this->succes('ok',['list'=>$list]);
     }
 
 
@@ -47,9 +47,9 @@ class RiderInfo extends Controller
     {
         $result = Db::name('rider_info')->where('id','=',$id)->setField('status',$status);
         if (!$result) {
-            return json_error('设置失败');
+            $this->error('设置失败');
         }
-        return json_success('ok');
+        $this->succes('ok');
     }
 
 
@@ -62,7 +62,7 @@ class RiderInfo extends Controller
         // 骑手的基本信息
         $info = Db::name('rider_info')->field('id,nickname,name,img,link_tel,identity_num,card_img,back_img,hand_card_img,status')->find($id);
 
-        return json_success('ok',['info'=>$info]);
+        $this->succes('ok',['info'=>$info]);
     }
 
 
@@ -90,7 +90,7 @@ class RiderInfo extends Controller
             $v['mb_status'] = config('order_status')[$v['status']];
         }
 
-        return json_success('ok',['info'=>$info,'order_list'=>$order_list]);
+        $this->succes('ok',['info'=>$info,'order_list'=>$order_list]);
     }
 
 
@@ -113,7 +113,7 @@ class RiderInfo extends Controller
                     return $item;
                 });
 
-        return json_success('ok',['list'=>$list]);  
+        $this->succes('ok',['list'=>$list]);  
     }
 
 
@@ -128,10 +128,10 @@ class RiderInfo extends Controller
 
         $result = Db::name('rider_info')->update($data);
         if (!$result) {
-            return json_error('设置失败');
+            $this->error('设置失败');
         }
 
-        return json_success('ok');
+        $this->succes('ok');
     }
 
      

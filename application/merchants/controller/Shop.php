@@ -28,7 +28,7 @@ class Shop extends MerchantsBase
 
 //        dump($result);
         if($result->isEmpty()) {
-            return json_error('暂无店铺信息');
+            $this->error('暂无店铺信息');
         }
 
 
@@ -48,7 +48,7 @@ class Shop extends MerchantsBase
         }
 
 
-        return json_success('获取成功',$shop_info);
+        $this->succes('获取成功',$shop_info);
     }
 
     /**
@@ -67,10 +67,10 @@ class Shop extends MerchantsBase
         $res = Model('shopInfo')->where('id',$shop_id)->setField('shop_name',$shop_name);
 
         if($res) {
-            return json_success('更新成功');
+            $this->succes('更新成功');
         }
 
-        return json_error('更新失败');
+        $this->error('更新失败');
     }
 
     /**
@@ -99,10 +99,10 @@ class Shop extends MerchantsBase
         $res = Model('shopInfo')->where('id',$shop_id)->setField('open_status',$open_status);
 
         if($res) {
-            return json_success('更新成功');
+            $this->succes('更新成功');
         }
 
-        return json_error('更新失败');
+        $this->error('更新失败');
 
     }
 
@@ -138,7 +138,7 @@ class Shop extends MerchantsBase
         $shop_id = $request->param('shop_id');
 
         if(!$shop_id) {
-            return json_error('非法传参','404');
+            $this->error('非法传参','404');
         }
 
         $result = [];
@@ -183,7 +183,7 @@ class Shop extends MerchantsBase
         $result['shop_qualification'] = $shop_qualification;
         $result['shop_account'] = $shop_account;
 
-        return json_success('获取成功',$result);
+        $this->succes('获取成功',$result);
     }
 
 

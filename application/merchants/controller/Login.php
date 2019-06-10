@@ -27,7 +27,7 @@ class Login extends MerchantsBase
 
         $check = $this->validate($request->param(), 'Login');
 		if ($check !== true) {
-			return json_error($check);
+			$this->error($check);
 		}
 
 		$user  = ShopInfo::field('id,password,status')
@@ -35,22 +35,22 @@ class Login extends MerchantsBase
                      ->where('account', $account)
                      ->find();
         if ( ! $user) {
-            return json_error('帐户不正确');
+            $this->error('帐户不正确');
         }
 
 
         if ($user->status == 2 ) {
 
-            return json_error('帐户锁定');
+            $this->error('帐户锁定');
         }
 
         if (md5($password) != $user->password) {
-            return json_error('密码不正确');
+            $this->error('密码不正确');
         }
 
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken('merchants'.$user->id,604800);
-        return json_success('success',[
+        $this->succes('success',[
             'token' => $token
         ]);
 	}
@@ -67,12 +67,12 @@ class Login extends MerchantsBase
         $vcode     	= $request->param('vcode','');
 
         if ($account == '' || $vcode == ''){
-            return json_error('用户名和密码不能为空！');
+            $this->error('用户名和密码不能为空！');
         }
 
         $result = model('Alisms', 'service')->checkCode($account, 'login', $vcode);
         if ( ! $result) {
-            return json_error(model('Alisms', 'service')->getError());
+            $this->error(model('Alisms', 'service')->getError());
         }
 
         $user  = ShopInfo::field('id,password,status')
@@ -80,18 +80,18 @@ class Login extends MerchantsBase
             ->where('account', $account)
             ->find();
         if ( ! $user) {
-            return json_error('帐户不正确');
+            $this->error('帐户不正确');
         }
 
 
         if ($user->status == 2 ) {
 
-            return json_error('帐户锁定');
+            $this->error('帐户锁定');
         }
 
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken('merchants'.$user->id,604800);
-        return json_success('success',[
+        $this->succes('success',[
             'token' => $token
         ]);
     }
@@ -111,13 +111,13 @@ class Login extends MerchantsBase
         // 表单后台验证
 		$check = $this->validate($request->param(), 'Login');
 		if ($check !== true) {
-			return json_error($check);
+			$this->error($check);
 		}
 
 //        if ($vcode != 1234) {
             $result = model('Alisms', 'service')->checkCode($account, 'register', $vcode);
             if ( ! $result) {
-                return json_error(model('Alisms', 'service')->getError());
+                $this->error(model('Alisms', 'service')->getError());
             }
 //        }
 
@@ -137,15 +137,15 @@ class Login extends MerchantsBase
 	        if ($result = ShopInfo::create($data)) {
                 $jwtAuth = new JwtAuth();
                 $token = $jwtAuth->createToken('merchants'.$result->id,604800);
-                return json_success('success',[
+                $this->succes('success',[
                     'token' => $token
                 ]);
 
 		    } else {
-		        return json_error('注册失败');
+		        $this->error('注册失败');
 		    }
         }else{
-        	return json_error('此手机号已注册过账号！');
+        	$this->error('此手机号已注册过账号！');
         }
 	}
 
@@ -163,21 +163,21 @@ class Login extends MerchantsBase
         $shop_id     	= $request->param('shop_id');
 
         if (! $shop_id){
-            return json_error('请输入商家id');
+            $this->error('请输入商家id');
         }
         $n = preg_match_all("/^\w{8,20}$/",$password);
         if (!$n){
-            return json_error('请输入合格的密码');
+            $this->error('请输入合格的密码');
         }
         if ($password != $true_password){
-            return json_error('密码不一致');
+            $this->error('密码不一致');
         }
 
         $user           = ShopInfo::get($shop_id);
         $user->password = md5($password);
         $user->save();
 
-        return json_success('密码修改成功');
+        $this->succes('密码修改成功');
     }
 
     /**
@@ -195,15 +195,15 @@ class Login extends MerchantsBase
         if ($vcode !== '1234'){
             $result = model('Alisms', 'service')->checkCode($phone, 'register', $vcode);
             if ( ! $result) {
-                return json_error(model('Alisms', 'service')->getError());
+                $this->error(model('Alisms', 'service')->getError());
             }
         }
 
         $user = ShopInfo::get(['account'=>$phone]);
         if ($user){
-            return json_success('success',['shop_id'=>$user->id]);
+            $this->succes('success',['shop_id'=>$user->id]);
         }else{
-            return json_error('用户不存在');
+            $this->error('用户不存在');
         }
 
     }
@@ -224,7 +224,7 @@ class Login extends MerchantsBase
         $mobile = trim($mobile);
         //判断手机号是否输入正确
         if ( ! validate_mobile($mobile)) {
-            return json_error("请输入正确的手机号码");
+            $this->error("请输入正确的手机号码");
         }
 
         //处理手机号是否已注册过会员
@@ -235,7 +235,7 @@ class Login extends MerchantsBase
                 ->where($map)
                 ->find();
             if ($result) {
-                return json_error('此手机号已注册过会员,请更换手机号！');
+                $this->error('此手机号已注册过会员,请更换手机号！');
             }
         }
 
@@ -243,9 +243,9 @@ class Login extends MerchantsBase
         $back = model('Alisms', 'service')->sendCode($mobile,$type);
 
         if ($back) {
-            return json_success('验证码已发送至 ' . $mobile . ', 5分钟内有效！');
+            $this->succes('验证码已发送至 ' . $mobile . ', 5分钟内有效！');
         } else {
-            return json_error('短信发送失败');
+            $this->error('短信发送失败');
         }
 
     }

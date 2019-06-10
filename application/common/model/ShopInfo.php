@@ -10,7 +10,7 @@ class ShopInfo extends Model
 	public function getDistance($lat,$lng,$page=1,$pagesize=15)
     {
 
-        $list = $this->field("id,shop_name,marks,sales,up_to_send_money,run_time,
+        $list = $this->field("id,shop_name,logo_img,marks,sales,up_to_send_money,run_time,
             address,manage_category_id,ping_fee,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
             ->having('distance < 3')
             ->page($page,$pagesize)
@@ -19,5 +19,52 @@ class ShopInfo extends Model
 
         return $list;
 
+    }
+
+    //获取商家营业状态
+    public function getBusiness($run_time)
+    {
+        $arr = explode(',',$run_time);
+        $count = count($arr);
+        $day = date('H:i');
+        $business = 0;
+        if ($count == 1){
+            $date = explode('-',$arr[0]);
+            if($date[0] < $day && $date[1] > $day){
+                $business = 1;
+            }
+
+        }elseif ($count == 2) {
+            $date = explode('-',$arr[0]);
+            if($date[0] < $day && $date[1] > $day){
+                $business = 1;
+            }
+
+            $date1 = explode('-',$arr[1]);
+
+            if($date1[0] < $day && $date1[1] > $day){
+                $business = 1;
+            }
+
+        }elseif ($count == 3){
+            $date = explode('-',$arr[0]);
+            if($date[0] < $day && $date[1] > $day){
+                $business = 1;
+            }
+
+            $date1 = explode('-',$arr[1]);
+
+            if($date1[0] < $day && $date1[1] > $day){
+                $business = 1;
+            }
+
+            $date2 = explode('-',$arr[2]);
+
+            if($date2[0] < $day && $date2[1] > $day){
+                $business = 1;
+            }
+        }
+
+        return $business;
     }
 }

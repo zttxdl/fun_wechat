@@ -48,7 +48,7 @@ class Advers extends Controller
     public function edit($id)
     {
         if (empty((int)$id)) {
-            return json_error('非法参数',201);
+            $this->error('非法参数',201);
         }
 
         $info = Db::name('advers')->find($id);  
@@ -71,19 +71,19 @@ class Advers extends Controller
         $data = $request->param();
 
         if (!isset($data['id']) || empty((int)$data['id'])) {
-            return json_error('非法参数',201);
+            $this->error('非法参数',201);
         }
 
         // 验证表单数据
         $check = $this->validate($data, 'Advers');
         if ($check !== true) {
-            return json_error($check,201);
+            $this->error($check,201);
         }
 
         // 提交表单
         $result = Db::name('advers')->update($data);
         if (!$result) {
-            return json_error('修改失败',201);
+            $this->error('修改失败',201);
         }
         
         return  json_success('ok');
@@ -99,9 +99,9 @@ class Advers extends Controller
     {
         $result = Db::name('advers')->delete($id);
         if (!$result) {
-            return json_error('删除失败',201);
+            $this->error('删除失败',201);
         }
-        return json_success('删除成功');
+        $this->succes('删除成功');
     }
      
      

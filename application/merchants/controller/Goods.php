@@ -59,7 +59,7 @@ class Goods extends MerchantsBase
         $data['preferential'] = $preferential;
         $data['class'] = $class;
 
-        return json_success('success',$data);
+        $this->succes('success',$data);
 
     }
 
@@ -75,7 +75,7 @@ class Goods extends MerchantsBase
         $data['shop_id'] = $this->shop_id;
         $result = Product::create($data);
 
-        return json_success('success');
+        $this->succes('success');
     }
 
 
@@ -90,7 +90,7 @@ class Goods extends MerchantsBase
     {
         $data   = $request->param();
         $result = Product::update($data, ['id' => $request->param('id')]);
-        return json_success('success');
+        $this->succes('success');
     }
 
     /**
@@ -104,11 +104,11 @@ class Goods extends MerchantsBase
         $result = Product::get($id);
         
         if ($result->shop_id != $this->shop_id) {
-            return json_error('没有权限删除');
+            $this->error('没有权限删除');
         }
 
         $result = Product::destroy($id);
-        return json_success('success');
+        $this->succes('success');
     }
 
     /**
@@ -126,7 +126,7 @@ class Goods extends MerchantsBase
             $result->price = $data->price;
         }
 
-        return json_success('success',$result);
+        $this->succes('success',$result);
     }
 
     /**
@@ -142,6 +142,6 @@ class Goods extends MerchantsBase
            ->where('shop_id',$this->shop_id)
             ->select();
 
-        return json_success('success',$result);
+        $this->succes('success',$result);
     }
 }
