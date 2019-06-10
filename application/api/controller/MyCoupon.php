@@ -14,11 +14,11 @@ use app\common\controller\ApiBase;
  */
 class MyCoupon extends ApiBase
 {
-    
+    protected  $noNeedLogin = [];
+
 
     /**
      * 我的红包列表
-     * @param $uid  用户表主键值
      * @param $type  $type = 1，可用红包列表 否则为历史红包 
      * 
      */
@@ -27,7 +27,7 @@ class MyCoupon extends ApiBase
         // 条件
         $type = $request->get('type');
         $type == 1 ? $where[] = ['m.status','=',1] : $where[] = ['m.status','in','2,3'];
-        $where[] = ['m.id','=',$uid];
+        $where[] = ['m.id','=',$this->auth->id];
         
         $list = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')->where($where)
                 ->field('m.phone,m.indate,m.status,p.face_value,p.threshold,p.type,p.name')->paginate(8);

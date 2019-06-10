@@ -6,20 +6,24 @@ use think\Controller;
 use think\Request;
 use app\common\model\ReceivingAddr as ReceiveAddr;
 use app\common\model\School;
+use app\common\controller\ApiBase;
 
-class ReceivingAddr extends Controller
+class ReceivingAddr extends ApiBase
 {
+    protected  $noNeedLogin = [];
+
+
     /**
      * 地址列表 
      * 
      */
-    public function index($uid,$lat='',$lng='')
+    public function index($lat='',$lng='')
     {
         if ($lat == '' & $lng == ''){
-            $list = model('ReceivingAddr')->getReceivingAddrList($uid);
+            $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
 
         }else{
-            $list = model('ReceivingAddr')->getReceivingAddrList($uid);
+            $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
             foreach ($list as &$value) {
                 $value['beyond'] = 0;
                 $distance = pc_sphere_distance($lat,$lng,$value['latitude'],$value['longitude']);
@@ -41,6 +45,7 @@ class ReceivingAddr extends Controller
     public function create(Request $request)
     {
         $data = $request->param();
+        $data['user_id'] = $this->auth->id;
         $data['add_time'] = time();
         // 验证表单数据
         $check = $this->validate($data, 'ReceivingAddr');
@@ -87,6 +92,7 @@ class ReceivingAddr extends Controller
     public function update(Request $request)
     {
         $data = $request->param();
+        $data['user_id'] = $this->auth->id;
 
         // 验证表单数据
         $check = $this->validate($data, 'ReceivingAddr');

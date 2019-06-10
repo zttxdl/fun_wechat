@@ -5,10 +5,14 @@ namespace app\api\controller;
 use think\Controller;
 use think\Request;
 use app\common\model\Agreement as AgreementModel;
+use app\common\controller\ApiBase;
 
-
-class Agreement extends Controller
+class Agreement extends ApiBase
 {
+
+    protected  $noNeedLogin = ['*'];
+
+
     /**
      * 图文协议详情 
      * 
