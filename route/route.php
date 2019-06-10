@@ -190,14 +190,14 @@ Route::group('u-login', function () {
 
 // 用户中心
 Route::group('u-member', function () {
-    Route::get('/index/:uid', 'index');
+    Route::get('/index', 'index');
     Route::post('/update-tel', 'setUserPhone');
-})->prefix('api/Member/')->middleware('UserAuth');
+})->prefix('api/Member/');
 
 // 红包组
 Route::group('u-coupon', function () {
     Route::get('/index/:uid', 'index');
-})->prefix('api/MyCoupon/')->middleware('UserAuth');
+})->prefix('api/MyCoupon/');
 
 
 // 收货地址组
@@ -207,7 +207,7 @@ Route::group('u-addr', function () {
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');
     Route::get('/del/:id', 'delete');
-})->prefix('api/ReceivingAddr/')->middleware('UserAuth');
+})->prefix('api/ReceivingAddr/');
 
 // 学校地区组
 Route::group('u-school', function () {
@@ -227,7 +227,7 @@ Route::group('u-agreement', function () {
 // 意见反馈组
 Route::group('u-feedback', function () {
     Route::post('/create', 'create');
-})->prefix('api/feedback/')->middleware('UserAuth');
+})->prefix('api/feedback/');
 
 // 入驻招募
 Route::group('u-intention', function () {
@@ -237,7 +237,7 @@ Route::group('u-intention', function () {
     // 骑手招募
     Route::post('/r-create', 'api/RiderRecruit/create');
 
-})->middleware('UserAuth');
+});
 
 
 //订单

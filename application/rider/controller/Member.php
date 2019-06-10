@@ -62,8 +62,21 @@ class Member extends Controller
      */
     public function applyRider(Request $request)
     {
+        $data = $request->post();
+        $data['add_time'] = time();
 
-        return json_success('ok');
+        // 验证表单数据
+        $check = $this->validate($data, 'RiderInfo');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+
+        // 添加数据
+        $result = RiderInfo::create($data);
+        if (!$result) {
+            $this->error('添加失败',201);
+        }
+        $this->success('添加成功');
     }
 
 
@@ -73,7 +86,9 @@ class Member extends Controller
      */
     public function edit($rid)
     {
-        return json_success('ok');        
+        $info = model('RiderInfo')->where('id',$rid)->field('id,headimgurl,name,identity_num,card_img,back_img,hand_card_img,school_id')->find();
+
+        $this->success('获取成功',['info'=>$info]);        
     }
 
 
@@ -83,7 +98,21 @@ class Member extends Controller
      */
     public function uodate(Request $request)
     {
-        return json_success('ok');        
+        $data = $request->post();
+
+        // 验证表单数据
+        $check = $this->validate($data, 'RiderInfo');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+        
+        // 更新数据
+        $result = model('RiderInfo')->update($data);
+
+        if (!$result) {
+            $this->error('更新失败',201);
+        }
+        $this->success('更新成功');
     }
      
      

@@ -2,7 +2,8 @@
 
 namespace app\api\controller;
 
-use think\Controller;
+use app\common\Auth\JwtAuth;
+use app\common\controller\ApiBase;
 use think\Request;
 use think\captcha\Captcha;
 use app\common\model\User;
@@ -11,8 +12,10 @@ use app\common\model\User;
 /**
  * 用户登录控制器
  */
-class Login extends Controller
+class Login extends ApiBase
 {
+    protected  $noNeedLogin = ['*'];
+
     /**
      * 授权获取openid、session_key信息
      * 
@@ -138,9 +141,13 @@ class Login extends Controller
         if (!$res) {
             $this->error('登录或注册失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
+        $user_info = User::where('id','=',$uid)->field('id,openid,headimgurl,nickname,phone')->find();
 
-        $this->success('登录或注册成功',['user_info'=>$user_info]);
+        $jwtAuth = new JwtAuth();
+        $token = $jwtAuth->createToken($user_info,604800);
+        $this->success('success',[
+            'token' => $token
+        ]);
         
     }
 
@@ -176,9 +183,13 @@ class Login extends Controller
         if (!$res) {
             $this->error('快捷登录失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,headimgurl,nickname,phone')->find();
+        $user_info = User::where('id','=',$uid)->field('id,openid,headimgurl,nickname,phone')->find();
 
-        $this->success('快捷登录成功',['user_info'=>$user_info]);
+        $jwtAuth = new JwtAuth();
+        $token = $jwtAuth->createToken($user_info,604800);
+        $this->success('success',[
+            'token' => $token
+        ]);
 
     }
      
@@ -210,7 +221,7 @@ class Login extends Controller
 
         include_once './../extend/wx_auth_phone/wxBizDataCrypt.php';
         $wx = new \WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
-            $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
+        $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
         if ($errCode == 0) {
             $data = json_decode($data, true);
             $res = ['code'=>200,'phone'=>$data['phoneNumber'],'openid'=>$recod->openid];

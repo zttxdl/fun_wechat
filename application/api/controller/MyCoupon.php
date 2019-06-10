@@ -5,22 +5,24 @@ namespace app\api\controller;
 use think\Controller;
 use think\Request;
 use think\Db;
-
+use app\common\controller\ApiBase;
 
 /**
  * 我的红包控制器
  * @autor  mike 
  * date 2019-5-31
  */
-class MyCoupon extends Controller
+class MyCoupon extends ApiBase
 {
+    
+
     /**
      * 我的红包列表
      * @param $uid  用户表主键值
      * @param $type  $type = 1，可用红包列表 否则为历史红包 
      * 
      */
-    public function index(Request $request,$uid)
+    public function index(Request $request)
     {
         // 条件
         $type = $request->get('type');

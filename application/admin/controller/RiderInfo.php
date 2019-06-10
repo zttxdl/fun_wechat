@@ -60,7 +60,7 @@ class RiderInfo extends Controller
     public function checkShow($id)
     {
         // 骑手的基本信息
-        $info = Db::name('rider_info')->field('id,nickname,name,img,link_tel,identity_num,card_img,back_img,hand_card_img,status')->find($id);
+        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status')->find($id);
 
         $this->success('ok',['info'=>$info]);
     }
@@ -73,7 +73,7 @@ class RiderInfo extends Controller
     public function show($id)
     {
         // 骑手的基本信息
-        $info = Db::name('rider_info')->field('id,nickname,name,img,link_tel,identity_num,card_img,back_img,hand_card_img,status')->find($id);
+        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status')->find($id);
 
         // 结算信息
         // $statistics_info = '';
@@ -105,7 +105,7 @@ class RiderInfo extends Controller
         !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : $where[] = ['status','=',1];
 
-        $list = Db::name('rider_info')->where($where)->field('id,nickname,name,img,link_tel,identity_num,hand_card_img,status')->order('id desc')->paginate(10)
+        $list = Db::name('rider_info')->where($where)->field('id,nickname,name,headimgurl,link_tel,identity_num,hand_card_img,status')->order('id desc')->paginate(10)
                 ->each(function ($item, $key) {
                     // 审核状态
                     $item['mb_status'] = config('rider_check_status')[$item['status']];

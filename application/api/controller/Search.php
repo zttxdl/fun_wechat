@@ -8,11 +8,12 @@ use think\Db;
 
 class Search extends ApiBase
 {
-    protected $noNeedLogin = ['*'];
+    protected $noNeedLogin = [];
 
     //搜索页面
     public function index()
     {
+        $user_id = $this->auth->id;
         $data['hot'] = model('HotSearch')
             ->distinct(true)
             ->field('keywords')
@@ -22,7 +23,7 @@ class Search extends ApiBase
         $data['history'] = model('Search')
             ->distinct(true)
             ->field('keywords')
-            ->where('user_id',1)
+            ->where('user_id',$user_id)
             ->order('add_time','desc')
             ->limit(8)
             ->select();
@@ -33,6 +34,7 @@ class Search extends ApiBase
     //搜索
     public function search(Request $request)
     {
+        $user_id = $this->auth->id;
         $keywords = $request->param('keywords');
         $lat = $request->param('latitude');
         $lng = $request->param('longitude');
@@ -40,13 +42,13 @@ class Search extends ApiBase
         $page = input('page',1);
 
         //记录历史搜索
-        $data = ['user_id'=>1,'keywords'=>$keywords,'add_time'=>time()];
+        $data = ['user_id'=>$user_id,'keywords'=>$keywords,'add_time'=>time()];
         model('Search')->insert($data);
 
         //搜索周边
         $list = Db::name('shop_info a')
             ->join('product b','a.id = b.shop_id')
-            ->field("a.id,a.shop_name,a.marks,a.sales,a.up_to_send_money,a.run_time,
+            ->field("a.id,a.shop_name,a.marks,a.sales,a.logo_img,a.up_to_send_money,a.run_time,
             a.address,a.manage_category_id,a.ping_fee,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( a.latitude ) ) * cos( radians( a.longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( a.latitude ) ) ),1 ) AS distance ")
             ->where('a.shop_name|b.name','like','%'.$keywords.'%')
             ->having('distance < 3')
@@ -58,6 +60,11 @@ class Search extends ApiBase
         }
 
         foreach ($list as &$value) {
+            if (! empty($value['run_time'])){
+                $value['business'] = model('ShopInfo')->getBusiness($value['run_time']);
+            }else{
+                $value['business'] = 0;
+            }
             $value['disc'] = model('ShopDiscounts')
                 ->field('face_value,threshold')
                 ->where('shop_id',$value['id'])
@@ -65,7 +72,7 @@ class Search extends ApiBase
                 ->select();
         }
 
-        return  json_success($list);
+        $this->success($list);
 
     }
 
