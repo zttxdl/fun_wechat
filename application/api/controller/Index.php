@@ -4,7 +4,6 @@ namespace app\api\controller;
 
 use app\common\controller\ApiBase;
 use think\Request;
-use think\Db;
 
 class Index extends ApiBase
 {
@@ -22,8 +21,7 @@ class Index extends ApiBase
         $data['special'] = $this->getSpecial($lat,$lng);
         $data['recommend'] = $this->getRecommendList($lat,$lng);
 
-        $this->successs('success',$data);
-        $this->error('','','');
+        $this->success('success',$data);
     }
 
 
@@ -150,7 +148,7 @@ class Index extends ApiBase
 
         $list = $this->getRecommendList($lat,$lng);
 
-        $this->successs('success',$list);
+        $this->success('success',$list);
     }
 
 
@@ -173,7 +171,7 @@ class Index extends ApiBase
             ->toArray();
 
         if (empty($list)){
-            $this->successs('success',$list);
+            $this->success('success',$list);
         }
 
         foreach ($list as &$value) {
@@ -189,7 +187,7 @@ class Index extends ApiBase
                 ->select();
         }
 
-        $this->successs('success',$list);
+        $this->success('success',$list);
     }
 
 }

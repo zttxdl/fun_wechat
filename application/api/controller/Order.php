@@ -16,6 +16,7 @@ use think\Request;
 
 class Order extends ApiBase
 {
+    protected $noNeedLogin = [];
 
     /**
      * 订单列表
@@ -31,7 +32,7 @@ class Order extends ApiBase
         //$this->param_empty($request->param());
         $page_size = config('page_size');
         $page_no = $request->param('page_no');
-        $user_id = $request->param('user_id');
+        $user_id = $this->auth->id;
 
         if(!$user_id || !$page_no) {
             $this->error('非法传参');
@@ -186,7 +187,7 @@ class Order extends ApiBase
             $result['package']="prepay_id=".$result['prepay_id'];
             $result['paySign']=MD5("appId=".$app_id."&nonceStr=".$result['nonce_str']."&package=".$result['package']."&signType=MD5&timeStamp=".$result['timeStamp']."&key=10S9a3A3EdF2a60e04cb1b8G8b507AF4");
 
-            $this->successs('success',$result);
+            $this->success('success',$result);
         }else{
 
              $this->error('下单失败'.$result['err_code_des']);
