@@ -167,7 +167,7 @@ Route::group('merchants',function (){
 //订单
 Route::group('merchants',function (){
     Route::post('orderIndex','merchants/Order/show');//订单查询
-    Route::post('orderDetail','merchants/Order/detail');//订单详情
+    Route::post('orderDetail','merchants/Order/orderDetail');//订单详情
     Route::post('orderDel','merchants/Order/del');//订单删除
     Route::post('orderReceipt','merchants/Order/receipt');//订单处理
 

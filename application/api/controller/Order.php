@@ -34,6 +34,9 @@ class Order extends ApiBase
         $page_no = $request->param('page_no');
         $user_id = $this->auth->id;
 
+//        $user_id = $request->param('user_id');
+
+
         if(!$user_id || !$page_no) {
             $this->error('非法传参');
         }
