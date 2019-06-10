@@ -157,6 +157,13 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             ->toArray();
         //获取品类
         $data['categoryName'] = model('ManageCategory')->where('id',$data['manage_category_id'])->value('name');
+        //判断店铺是否营业
+        if (! empty($data['run_time'])){
+            $data['business'] = model('ShopInfo')->getBusiness($data['run_time']);
+        }else{
+            $data['business'] = 0;
+        }
+
         //判断是否存在优惠
         $data['disc'] = model('ShopDiscounts')
             ->field('face_value,threshold')

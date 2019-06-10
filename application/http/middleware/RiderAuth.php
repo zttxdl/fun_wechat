@@ -7,6 +7,8 @@ use app\common\model\RiderInfo;
 
 class RiderAuth
 {
+    use \traits\controller\Jump;
+
     public function handle($request, \Closure $next)
     {
         $uid = $request->header('rider-auth');

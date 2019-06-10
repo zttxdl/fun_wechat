@@ -64,12 +64,20 @@ class Order extends Controller {
 
 
     /**
-     * 店铺订单详情
+     * 获取店铺订单详情
      */
     public function detail($id)
     {
         $detail = Db::name('Orders_info')->where('orders_id','=',$id)->select();
         return $detail;
+    }
+
+    /**
+     * 店铺订单详情
+     */
+    public function orderDetail(Request $request)
+    {
+
     }
 
     /**
@@ -82,7 +90,7 @@ class Order extends Controller {
 
 
 
-        $result = Db::name('Orders')->where('orders_sn',$orders_sn)->update(['status',$status]);
+        $result = Db::name('Orders')->where('orders_sn',$orders_sn)->update(['status'=>$status]);
 
         if($result) {
             return json_success('处理成功');

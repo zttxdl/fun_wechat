@@ -7,6 +7,8 @@ use app\common\model\User;
 
 class UserAuth
 {
+    use \traits\controller\Jump;
+
     public function handle($request, \Closure $next)
     {
         $uid = $request->header('user-auth');
