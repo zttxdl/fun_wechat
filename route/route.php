@@ -202,6 +202,7 @@ Route::group('u-login', function () {
 Route::group('u-member', function () {
     Route::get('/index', 'index');
     Route::post('/update-tel', 'setUserPhone');
+    Route::post('/bind-tel', 'BindUserPhone');
 })->prefix('api/Member/');
 
 // 红包组
@@ -287,4 +288,7 @@ Route::group('r-member', function () {
     Route::post('/apply', 'applyRider');
     Route::get('/edit', 'edit');
     Route::post('/uodate', 'uodate');
-})->prefix('rider/Member/')->middleware('RiderAuth');
+    Route::post('/bind-tel', 'BindRiderPhone');
+})->prefix('rider/Member/');
+
+

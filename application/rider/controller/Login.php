@@ -5,6 +5,7 @@ namespace app\rider\controller;
 use think\Controller;
 use think\Request;
 use app\common\model\RiderInfo;
+use app\common\Auth\JwtAuth;
 
 
 /**
@@ -133,7 +134,7 @@ class Login extends Controller
         }
         // 更新数据
         $res = RiderInfo::where('openid',$openid)->save([
-            'phone' =>  $phone,
+            'link_tel' =>  $phone,
             'last_login_time'   =>  time()
         ]);
         
@@ -142,7 +143,11 @@ class Login extends Controller
         }
         $rider_info = RiderInfo::where('id','=',$rid)->find();
 
-        $this->success('登录或注册成功',['rider_info'=>$rider_info]);
+        $jwtAuth = new JwtAuth();
+        $token = $jwtAuth->createToken($rider_info,604800);
+        $this->success('success',[
+            'token' => $token
+        ]);
 
         
     }
@@ -172,7 +177,7 @@ class Login extends Controller
         }
         // 更新数据
         $res = RiderInfo::where('openid',$data['openid'])->save([
-            'phone' =>  $data['phone'],
+            'link_tel' =>  $data['phone'],
             'last_login_time'   =>  time()
         ]);
         
@@ -181,7 +186,11 @@ class Login extends Controller
         }
         $rider_info = RiderInfo::where('id','=',$rid)->find();
 
-        $this->success('快捷登录成功',['rider_info'=>$rider_info]);
+        $jwtAuth = new JwtAuth();
+        $token = $jwtAuth->createToken($rider_info,604800);
+        $this->success('success',[
+            'token' => $token
+        ]);
 
     }
      

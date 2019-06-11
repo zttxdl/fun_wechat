@@ -9,7 +9,7 @@ use app\common\controller\ApiBase;
 
 class School extends ApiBase
 {
-    protected  $noNeedLogin = [];
+    protected  $noNeedLogin = ['*'];
 
 
     /**
