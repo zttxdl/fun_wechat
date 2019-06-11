@@ -286,13 +286,14 @@ class Shop extends Controller
 
         //收款信息
         $shop_account = [];
-
+        //exit;
         foreach ($shop_more_info as $row)
         {
             $shop_qualification['business_license'] = $row['business_license'];
             $shop_qualification['proprietor'] = $row['proprietor'];
             $shop_qualification['hand_card_front'] = $row['hand_card_front'];
-            $shop_qualification['user_name'] = $row['user_name'];
+            $shop_qualification['hand_card_back'] = $row['hand_card_back'];
+            $shop_qualification['user_name'] = !empty($row['user_name']) ? $row['user_name'] : $row['proprietor'];
             $shop_qualification['identity_num'] = $row['identity_num'];
             $shop_qualification['sex'] = config('sex')[$row['sex']];
             $shop_qualification['licence'] = $row['licence'];
@@ -301,6 +302,7 @@ class Shop extends Controller
             $shop_account['back_hand_name'] = $row['back_hand_name'];
             $shop_account['back_card_num'] = $row['back_card_num'];
         }
+
 
         $result['shop_qualification'] = $shop_qualification;
         $result['shop_account'] = $shop_account;

@@ -68,7 +68,7 @@ class Shop extends Model
 //        dump($start_time);
 //        dump($end_time);
 
-        $data = $this->name('orders')->where('status',1)
+        $data = $this->name('orders')->where('pay_status',1)
             ->where('shop_id',$shop_id)
             ->whereBetweenTime('add_time',$start_time,$end_time)
             ->sum('money');
@@ -82,7 +82,7 @@ class Shop extends Model
      */
     public function getCountSales($shop_id)
     {
-        $data = $this->name('orders')->where('status',1)
+        $data = $this->name('orders')->where('pay_status',1)
             ->where('shop_id',$shop_id)
             ->sum('money');
 
