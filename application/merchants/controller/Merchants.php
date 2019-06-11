@@ -151,7 +151,6 @@ class Merchants extends MerchantsBase
 
         $where[] = ['shop_id','=',$this->shop_id];
 
-
         $count = model('ShopComments')->where($where)->count();
         $sum = model('ShopComments')->where($where)->sum('star');
         if ($count != 0){
