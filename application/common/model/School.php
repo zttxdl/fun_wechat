@@ -13,7 +13,7 @@ class School extends Model
     public function getShopList()
     {
         // 学区列表
-        $school_district_list = $this->field('id,name')->where('level',1)->select()->toArray();
+        $school_district_list = $this->field('id,name as label,name as value')->where('level',1)->select()->toArray();
         // 学校列表
         $school_list = $this->field('id,fid,name as label,name as value')->where('level',2)->select()->toArray();
         // 组装三维数组
