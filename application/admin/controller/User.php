@@ -59,6 +59,8 @@ class User extends Controller
             ->field('a.name,a.phone,b.sex,c.name as school_name ,a.area_detail')
             ->select();
 
+
+
         foreach ($result['user_address'] as $row) {
             $result['user_address'] = [
                 'name' => $row['name'],

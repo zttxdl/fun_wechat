@@ -314,7 +314,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
                 $product_money = $row['total_money'];
 
-                $product_info = model('Product')->geProductById($row['product_id'])->toArray();
+                $product_info = model('Product')->getProductById($row['product_id'])->toArray();
                 //dump($product_info);
 
 
@@ -356,11 +356,11 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             Db::commit();
             $result['orders_id'] = $orders_id;
             $result['orders_sn'] = $orders_sn;
-            $this->success('提交成功',$result);
+            return json_success('提交成功',$result);
 
         } catch (\Exception $e) {
             Db::rollback();
-            $this->error($e->getMessage());
+            return json_error($e->getMessage());
         }
 
     }
