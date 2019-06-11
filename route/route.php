@@ -160,6 +160,7 @@ Route::group('merchants',function (){
     Route::rule('shopIndex','merchants/Shop/index');
     Route::rule('shopSetName','merchants/Shop/setName');//修改店铺名称
     Route::rule('shopSetLogo','merchants/Shop/setLogo');//修改店铺Logo
+    Route::rule('shopSetStatus','merchants/Shop/setOpenStatus');//修改店铺营业状态
     Route::rule('shopInfo','merchants/Shop/info');//商家信息
     Route::rule('shopSetInfo','merchants/Shop/setInfo');//设置商家信息
     Route::rule('shopMoreInfo','merchants/Shop/moreInfo');//入驻信息

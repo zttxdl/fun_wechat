@@ -71,7 +71,7 @@ class Login extends Controller
         session('admin_user.phone',$phone);
 
         //记录登录时间
-        model('admin')->where('phone',$phone)->setField('last_login_time',date("Y-m-d H:i:s",time()));
+        model('admin')->where('phone',$phone)->setField('last_login_time',time());
 
         $this->success('登录成功');
 
