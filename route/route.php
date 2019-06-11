@@ -112,6 +112,7 @@ Route::group('admin',function (){
     Route::rule('shopDetail','admin/Shop/getDetail2');//商家详情
     Route::rule('shopAddShop','admin/Shop/addShop');//添加店铺
     Route::rule('shopAddQualification','admin/Shop/addQualification');//添加商家资质
+    Route::rule('shopSetStatus','admin/Shop/setStatus');//启用禁用商家
     Route::rule('shopAddAccount','admin/Shop/addAccount');//添加收款信息
     Route::rule('shopCheckList','admin/Shop/checkList');//商家审核列表
     Route::rule('shopCheckDetail','admin/Shop/checkDetail');//商家审核详情
