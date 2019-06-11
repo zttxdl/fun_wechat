@@ -68,26 +68,6 @@ class Login extends Controller
         $this->success('授权入表成功');
         
     }
-     
-
-
-    /**
-     * 校验当前的手机号的验证码 
-     * 
-     */
-    public function checkRiderPhone(Request $request)
-    {
-        $phone = $request->param('phone');
-        $code  = $request->param('code');
-        $type  = $request->param('type');
-
-        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
-        if (!$result) {
-            $this->error(model('Alisms', 'service')->getError());
-        }
-        $this->success('验证通过');
-
-    }
 
 
     /**

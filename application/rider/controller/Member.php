@@ -28,13 +28,24 @@ class Member extends RiderBase
 
     }
 
+
     /**
-     * 校验当前的手机号的验证码 
+     * 校验绑定的手机号
      * 
      */
     public function BindRiderPhone(Request $request)
     {
         $phone = $request->param('phone');
+        $type = $request->param('type');
+        $code = $request->param('code');
+
+        // 校验验证码
+        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
+        if (!$result) {
+            $this->error(model('Alisms', 'service')->getError());
+        }
+
+        // 校验当前手机号真实性
         $sql_phone = model('RiderInfo')->where('id','=',$this->auth->id)->value('link_tel');
 
         if ($sql_phone != $phone) {
