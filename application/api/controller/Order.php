@@ -16,7 +16,7 @@ use think\Request;
 
 class Order extends ApiBase
 {
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['*'];
 
     /**
      * 订单列表
@@ -227,13 +227,6 @@ class Order extends ApiBase
                 ->update(['status'=>2,'pay_status'=>1,'pay_time'=>time(),'trade_no'=>$wx_id]);
 
 
-            $data = [
-                'shop_id' => $orders['shop_id'],
-                'current_money' => $orders['money'],
-                'type' => 1,
-                'balance_money' => ''
-            ];
-            model('IncomeExpenditure')->add($data);
 
 
 
