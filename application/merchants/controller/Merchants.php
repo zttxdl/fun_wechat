@@ -32,24 +32,32 @@ class Merchants extends MerchantsBase
             $this->error($check);
         }
 
-        model('ShopInfo')
-        ->where('id',$data['shop_id'])
-        ->update($data);
+        Db::startTrans();
+        try {
+            model('ShopInfo')
+                ->where('id',$data['shop_id'])
+                ->update($data);
 
-         $info = model('ShopMoreInfo')
-             ->field('id')
-             ->where('shop_id',$data['shop_id'])
-             ->find();
+            $info = model('ShopMoreInfo')
+                ->field('id')
+                ->where('shop_id',$data['shop_id'])
+                ->find();
 
-         if ($info){
-             model('ShopMoreInfo')
-                 ->where('shop_id',$data['shop_id'])
-                 ->update($data);
+            if ($info){
+                model('ShopMoreInfo')
+                    ->where('shop_id',$data['shop_id'])
+                    ->update($data);
 
-         }else{
-             model('ShopMoreInfo')->insert($data);
+            }else{
+                model('ShopMoreInfo')->insert($data);
 
-         }
+            }
+
+            Db::commit();
+        } catch (\Throwable $e) {
+            Db::rollback();
+            $this->error($e->getMessage());
+        }
 
         $this->success('success');
 

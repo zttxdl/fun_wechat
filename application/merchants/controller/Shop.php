@@ -8,7 +8,7 @@
 
 namespace app\merchants\controller;
 
-
+use app\common\controller\MerchantsBase;
 use think\Request;
 
 class Shop extends MerchantsBase

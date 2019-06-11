@@ -25,26 +25,11 @@ class Goods extends MerchantsBase
         $where = ['shop_id'=>$this->shop_id];
         //获取商品
         $list = model('Product')
-            ->field('id,name,price,old_price,thumb,sales,products_classify_id,type')
+            ->field('id,name,price,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
             ->where($where)
             ->where('status',1)
             ->select()
             ->toArray();
-        //获取分类
-        $class = model('ProductsClassify')
-            ->field('id as classId,name as className')
-            ->where($where)
-            ->select()
-            ->toArray();
-
-        foreach ($class as &$item) {
-            $item['goods'] = [];
-            foreach ($list as $value) {
-                if ($item['id'] == $value['products_classify_id']){
-                    $item['goods'][] = $value;
-                }
-            }
-        }
         $cakes = [];
         $preferential = [];
         //获取热销商品
@@ -57,7 +42,25 @@ class Goods extends MerchantsBase
         }
         $data['cakes'] = $cakes;
         $data['preferential'] = $preferential;
+
+        //获取分类
+        $class = model('ProductsClassify')
+            ->field('id as classId,name as className')
+            ->where($where)
+            ->select()
+            ->toArray();
+
+        foreach ($class as &$item) {
+            $item['goods'] = [];
+
+            foreach ($list as $value) {
+                if ($item['classId'] == $value['classId']){
+                    $item['goods'][] = $value;
+                }
+            }
+        }
         $data['class'] = $class;
+
 
         $this->success('success',$data);
 
@@ -75,7 +78,7 @@ class Goods extends MerchantsBase
         $data['shop_id'] = $this->shop_id;
         $result = Product::create($data);
 
-        $this->success('success');
+        $this->success('success',$result);
     }
 
 
@@ -90,7 +93,7 @@ class Goods extends MerchantsBase
     {
         $data   = $request->param();
         $result = Product::update($data, ['id' => $request->param('id')]);
-        $this->success('success');
+        $this->success('success',$result);
     }
 
     /**
@@ -108,7 +111,7 @@ class Goods extends MerchantsBase
         }
 
         $result = Product::destroy($id);
-        $this->success('success');
+        $this->success('success',$result);
     }
 
     /**

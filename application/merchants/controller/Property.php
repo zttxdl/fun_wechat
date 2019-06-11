@@ -9,8 +9,12 @@
 namespace app\merchants\controller;
 
 
+use app\common\controller\MerchantsBase;
+
 class Property extends MerchantsBase
 {
+
+    protected $noNeedLogin = [];
 
     /**
      * 我的资产
