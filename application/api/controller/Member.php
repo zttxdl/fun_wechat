@@ -36,6 +36,16 @@ class Member extends ApiBase
     public function BindUserPhone(Request $request)
     {
         $phone = $request->param('phone');
+        $type = $request->param('type');
+        $code = $request->param('code');
+
+        // 校验验证码
+        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
+        if (!$result) {
+            $this->error(model('Alisms', 'service')->getError());
+        }
+
+        // 校验当前手机号真实性
         $sql_phone = model('User')->where('id','=',$this->auth->id)->value('phone');
 
         if ($sql_phone != $phone) {
