@@ -23,57 +23,49 @@ class Store extends ApiBase
         $where = ['shop_id'=>$shop_id];
         //获取商品
         $list = model('Product')
-            ->field('id,name,price,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
+            ->field('id,name,price,info,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
             ->where($where)
             ->where('status',1)
             ->select()
             ->toArray();
         foreach ($list as &$item) {
-            $attr = '';
+
             if ($item['attr_ids']) {
                 $attr_list = model('ProductAttrClassify')
                     ->field('id,name,pid')
                     ->where('id','in',$item['attr_ids'])
                     ->select()
                     ->toArray();
+
                 $attr = $this->getSonCategory($attr_list);
-
+                $item['attr'] = $attr;
+            }else{
+                $item['attr'] = '';
             }
-            $item['attr'] = $attr;
+
         }
-
-
+//        dump($list);exit;
+        $data['goods'] = $list;
         $cakes = [];
         $preferential = [];
         //获取热销商品
-        foreach ($list as $item) {
-            if ($item['type'] == 1){
-                $cakes[] = $item;
-            }elseif($item['type'] == 2){
-                $preferential[] = $item;
+//        dump($list);exit;
+        foreach ($list as $value) {
+            if ($value['type'] === 1){
+                $cakes[] = $value;
+            }elseif($value['type'] == 2){
+                $preferential[] = $value;
             }
         }
+
         $data['cakes'] = $cakes;
         $data['preferential'] = $preferential;
 
         //获取分类
-        $class = model('ProductsClassify')
+        $data['class'] = model('ProductsClassify')
             ->field('id as classId,name as className')
             ->where($where)
-            ->select()
-            ->toArray();
-
-        foreach ($class as &$item) {
-            $item['goods'] = [];
-
-            foreach ($list as $value) {
-                if ($item['classId'] == $value['classId']){
-                    $item['goods'][] = $value;
-                }
-            }
-        }
-        $data['class'] = $class;
-
+            ->select();
 
         $this->success('success',$data);
     }
@@ -176,9 +168,10 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
     /**
      * 获取商品详情
-     *
-     * @param  int  $id
-     * @return \think\Response
+     * @param Request $request
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function getProduct(Request $request)
     {

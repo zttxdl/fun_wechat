@@ -275,6 +275,7 @@ class Shop extends Controller
             $result['shop_info']['link_name'] = $row['link_name'];
             $result['shop_info']['link_tel'] = $row['link_tel'];
             $result['shop_info']['address'] = $row['address'];
+            $result['shop_info']['status'] = config('shop_check_status')[$row['status']];
             $result['shop_info']['school'] = Model('School')->getNameById($row['school_id']);
             $result['shop_info']['manage_category_name'] = Model('ManageCategory')->getNameById($row['manage_category_id']);
         }

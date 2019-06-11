@@ -14,14 +14,19 @@ use think\Request;
 
 class Property extends MerchantsBase
 {
+
     protected $noNeedLogin = ["*"];
 
     protected $type = [1=>'收入',2=>'支出'];
+
+
+
     /**
      * 我的资产
      */
     public function myProperty(Request $request)
     {
+
         $shop_id = $this->shop_id;//从Token中获取
 
         isset($shop_id) ? $shop_id : $request->param('shop_id');
@@ -36,6 +41,7 @@ class Property extends MerchantsBase
         ];
 
         $this->success('获取成功',$data);
+
     }
 
     /**

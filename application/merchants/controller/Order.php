@@ -8,16 +8,14 @@
 
 namespace app\merchants\controller;
 
-
-
 use app\common\controller\MerchantsBase;
-use function GuzzleHttp\Psr7\str;
-use think\Controller;
 use think\Request;
 use think\Db;
 
-class Order extends Controller {
+class Order extends MerchantsBase
+{
 
+    protected $noNeedLogin = [];
 
     /**
      * 店铺订单查询
