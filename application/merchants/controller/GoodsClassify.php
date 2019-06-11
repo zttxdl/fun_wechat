@@ -37,7 +37,7 @@ class GoodsClassify extends MerchantsBase
         $data['shop_id'] = $this->shop_id;
         $result = ProductsClassify::create($data);
 
-        $this->success('success');
+        $this->success('success',$result);
     }
 
 
@@ -52,7 +52,7 @@ class GoodsClassify extends MerchantsBase
     {
         $data   = $request->param();
         $result = ProductsClassify::update($data, ['id' => $request->param('id')]);
-        $this->success('success');
+        $this->success('success',$result);
     }
 
     /**
@@ -77,6 +77,6 @@ class GoodsClassify extends MerchantsBase
 
         
         $result = ProductsClassify::destroy($id);
-        $this->success('success');
+        $this->success('success',$result);
     }
 }

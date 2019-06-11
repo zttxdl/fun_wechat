@@ -46,7 +46,7 @@ class GoodsAttribute extends MerchantsBase
 
         }
         $result = ProductAttrClassify::create($data);
-        $this->success('success');
+        $this->success('success',$result);
     }
 
 
@@ -68,7 +68,7 @@ class GoodsAttribute extends MerchantsBase
             $this->error('请先删除标签属性');
         }
         $result = ProductAttrClassify::destroy($id);
-        $this->success('success');
+        $this->success('success',$result);
     }
 
 
