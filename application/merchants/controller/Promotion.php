@@ -13,7 +13,8 @@ use app\common\controller\MerchantsBase;
 
 class Promotion extends MerchantsBase
 {
-    protected $noNeedLogin = [];
+
+    protected $noNeedLogin = ["*"];
 
     /**
      * 活动管理

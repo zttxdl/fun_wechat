@@ -5,15 +5,18 @@ namespace app\rider\controller;
 use think\Controller;
 use think\Request;
 use app\common\model\RiderInfo;
-
+use app\common\controller\RiderBase;
 
 /**
  * 骑手个人中心控制器
  * @author Mike
  * date 2019/6/10
  */
-class Member extends Controller
+class Member extends RiderBase
 {
+    protected  $noNeedLogin = [];
+
+    
     /**
      * 我的资料
      * 
@@ -25,7 +28,22 @@ class Member extends Controller
 
     }
 
-    
+    /**
+     * 校验当前的手机号的验证码 
+     * 
+     */
+    public function BindRiderPhone(Request $request)
+    {
+        $phone = $request->param('phone');
+        $sql_phone = model('RiderInfo')->where('id','=',$this->auth->id)->value('link_tel');
+
+        if ($sql_phone != $phone) {
+            $this->error('校验失败,当前手机号非绑定手机号');
+        }
+        $this->success('校验成功');
+    }
+
+
     /**
      * 更换手机号【保存】
      * 

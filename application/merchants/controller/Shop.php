@@ -13,6 +13,7 @@ use think\Request;
 
 class Shop extends MerchantsBase
 {
+    protected $noNeedLogin = ['*'];
     /**
      * 店铺管理
      * @param Request $request

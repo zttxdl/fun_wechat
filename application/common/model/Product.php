@@ -9,7 +9,7 @@ class Product extends Model
     /**
      * 获取商品类型
      */
-    public function geProductById($id)
+    public function getProductById($id)
     {
         return $this->field('*')->where('id',$id)->find();
     }

@@ -22,11 +22,11 @@ class Order extends MerchantsBase
      */
     public function show(Request $request)
     {
-        $status = $request->param('status');//订单状态 2:新订单 3：处理中 9:已完成
+        $status = $request->param('status','');//订单状态 2:新订单 3：处理中 4:商家拒绝接单 5:骑手已接单 6:骑手已配送 7:商家出单 8订单已送达 9:已完成
         $page_no = $request->param('page');
-        $page_size = config('page_size');
+        $page_size = $request->param('pageSize',20);
 
-        if(!$status || !$page_no) {
+        if(!$page_no ) {
             $this->error('非法传参');
         }
 
@@ -36,16 +36,16 @@ class Order extends MerchantsBase
             $map = ['status' => $status];
         }
 
-        $result = Db::name('orders')->where($map)->page($page_no,$page_size)->select();
+        $result = model('orders')->where($map)->page($page_no,$page_size)->select();
 
-        if(!$result) {
-            return json_error('暂无订单');
+        if(empty($result)) {
+            $this->error('暂无订单');
         }
 
         $orders = [];
         foreach ($result as $row)
         {
-            $orders = [
+            $orders[] = [
                 'orders_sn' => $row['orders_sn'],
                 'add_time' => date('Y-m-d H:i',$row['add_time']),
                 'address' => $row['address'],
@@ -55,7 +55,6 @@ class Order extends MerchantsBase
                 'detail' => $this->detail($row['id'])
             ];
         }
-
 
         $this->success('获取成功',$orders);
 
@@ -74,11 +73,29 @@ class Order extends MerchantsBase
     /**
      * 店铺订单详情
      */
-    public function orderDetail(Request $request)
+    public function OrderDetail(Request $request)
     {
+        $order_sn = $request->param('orders_sn');
+        $result = model('Orders')->getOrder($order_sn);
+        //dump($result);exit;
 
+        $orders = [];
+        foreach ($result as $row) {
+            $orders = [
+                'orders_sn' => $row['orders_sn'],
+                'add_time' => date('Y-m-d H:i',$row['add_time']),
+                'address' => $row['address'],
+                'remark' => $row['message'],
+                'box_money' => $row['box_money'],
+                'ping_fee' => $row['ping_fee'],
+                'money' => $row['money'],
+                'discount_money' => $row['shop_discounts_money'] + $row['platform_coupon_money'],
+                'detail' => model('Orders')->getOrderDetail($row['id'])
+            ];
+        }
+
+        $this->success('获取成功',$orders);
     }
-
     /**
      * 拒单 接单处理
      */
@@ -107,4 +124,6 @@ class Order extends MerchantsBase
     {
 
     }
+
+
 }

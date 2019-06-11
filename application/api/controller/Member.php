@@ -30,6 +30,23 @@ class Member extends ApiBase
 
     
     /**
+     * 校验绑定的手机号 
+     * 
+     */
+    public function BindUserPhone(Request $request)
+    {
+        $phone = $request->param('phone');
+        $sql_phone = model('User')->where('id','=',$this->auth->id)->value('phone');
+
+        if ($sql_phone != $phone) {
+            $this->error('校验失败,当前手机号非绑定手机号');
+        }
+        $this->success('校验成功');
+
+    }
+
+
+    /**
      * 更换手机号【保存】
      * 
      */

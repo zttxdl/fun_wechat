@@ -43,19 +43,19 @@ class Orders extends Model
     }
 
     /**
-     * 订单列表
+     * 订单详情
      */
-    public function orderList()
+    public function getOrderDetail($order_id)
     {
-
+        return $this->name('orders_info')->where('orders_id',$order_id)->select();
     }
 
     /**
-     * 订单详情
+     * 订单
      */
-    public function orderDetail()
+    public function getOrder($order_sn)
     {
-
+        return $this->name('orders')->where('orders_sn',$order_sn)->select();
     }
 
     /**

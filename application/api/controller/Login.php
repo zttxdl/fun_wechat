@@ -86,7 +86,7 @@ class Login extends ApiBase
             $this->error(model('Alisms', 'service')->getError());
         }
         $this->success('验证通过');
-
+        
     }
 
 

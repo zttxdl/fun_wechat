@@ -226,7 +226,18 @@ class Order extends ApiBase
                 ->where('orders_sn',$orders_sn)
                 ->update(['status'=>2,'pay_status'=>1,'pay_time'=>time(),'trade_no'=>$wx_id]);
 
-            //更新红包信息
+
+            $data = [
+                'shop_id' => $orders['shop_id'],
+                'current_money' => $orders['money'],
+                'type' => 1,
+                'balance_money' => ''
+            ];
+            model('IncomeExpenditure')->add($data);
+
+
+
+
             if($orders['platform_coupon_id']) {
                 model('myCoupon')->where('platform_coupon_id',$orders['platform_coupon_id'])
                     ->update(['status'=>'2','order_sn'=>$orders_sn]);
