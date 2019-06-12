@@ -17,7 +17,7 @@ class ReceivingAddr extends ApiBase
      * 地址列表 
      * 
      */
-    public function index($lat='',$lng='')
+    public function index($lat,$lng)
     {
         if ($lat == '' & $lng == ''){
             $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
@@ -27,7 +27,7 @@ class ReceivingAddr extends ApiBase
             foreach ($list as &$value) {
                 $value['beyond'] = 0;
                 $distance = pc_sphere_distance($lat,$lng,$value['latitude'],$value['longitude']);
-                if ($$distance > 3000){
+                if ($distance > 3000){
                     $value['beyond'] = 1;
                 }
             }
