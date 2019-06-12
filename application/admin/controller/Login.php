@@ -35,25 +35,11 @@ class Login extends Controller
            $this->error($result);//输出错误信息
         }
 
-        /*第二种方法
-         $validate = new \app\admin\validate\Login;
-        if(!$validate->check($data)){
-            $result = $validate->getError();
-            $this->error($result);
-        }*/
-
-        /*if(!$phone || !$pwd || !$code) {
-            $this->error('参数不能为空');
-        }
-        if(!Validate::regex($phone, "^1\d{10}$")) {
-            $this->error('手机格式不正确', '202');
-        }*/
         $data = captcha_check($code);
-        /*if(!$data)
+        if(!$data)
         {
             $this->error('验证码错误');//输出错误信息
-        }*/
-
+        }
 
         $user = model('admin')->where('phone',$phone)->find();
 
