@@ -194,9 +194,9 @@ class Coupon extends Controller
             $this->error('非法参数',201);
         }
         //获取店铺列表
-        $shop_list = Db::name('shop_info')->where('school_id',$id)->field('id,shop_name')->select();
+        $shop_list = Db::name('shop_info')->where('school_id',$id)->where('status','=',3)->field('id,shop_name')->select();
         
-        $this->success('ok',['shop_list'=>$shop_list]);
+        $this->success('获取当前学校的店铺列表成功',['shop_list'=>$shop_list]);
     }
 
 

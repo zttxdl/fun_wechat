@@ -113,7 +113,7 @@ class Login extends Controller
             $this->error('非法参数');
         }
         // 更新数据
-        $res = RiderInfo::where('openid',$openid)->save([
+        $res = RiderInfo::where('openid',$openid)->update([
             'link_tel' =>  $phone,
             'last_login_time'   =>  time()
         ]);
@@ -156,7 +156,7 @@ class Login extends Controller
             $this->error('非法参数');
         }
         // 更新数据
-        $res = RiderInfo::where('openid',$data['openid'])->save([
+        $res = RiderInfo::where('openid',$data['openid'])->update([
             'link_tel' =>  $data['phone'],
             'last_login_time'   =>  time()
         ]);
