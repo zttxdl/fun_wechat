@@ -33,7 +33,7 @@ class MerchantEnter extends ApiBase
         // 判断当前用户是否已有提交
         $res = MerchantEnterModel::where('user_id','=',$data['user_id'])->value('id');
         if ($res) {
-            $this->error('您已提交过申请');
+            $this->error('您已提交过申请，快跟客服联系吧');
         }
 
         // 提交新增表单

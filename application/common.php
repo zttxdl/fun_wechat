@@ -153,13 +153,18 @@ if (!function_exists('pc_sphere_distance')) {
 
 
 /**
- * 物理地址逆解析
+ * 物理地址解析经纬度
  */
 if (!function_exists('get_location')) {
     function get_location($address){
         $make_key = '5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T';
-        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$make_key;
+        // 仅学校地址信息，无法解析经纬度，目前需加上当前城市
+        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=南京市".$address."&key=".$make_key;
         $jsondata=json_decode(file_get_contents($url),true);
+        $data = [];
+        if ($jsondata['message'] == '查询无结果') {
+            return $data;
+        }
         $data['lat'] = $jsondata['result']['location']['lat'];
         $data['lng'] = $jsondata['result']['location']['lng'];
 
