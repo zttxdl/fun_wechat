@@ -164,6 +164,7 @@ class Shop extends Controller
                             ->alias('a')
                             ->join('ManageCategory b','a.manage_category_id = b.id')
                             ->join('school c','a.school_id = c.id')
+                            ->whereIn('status','1,2,3')
                             ->field(['a.id,a.logo_img','a.shop_name','a.link_name','a.link_tel','a.status','b.name'=>'manage_category_name','c.name'=>'school_name'])
                             ->select();
 
