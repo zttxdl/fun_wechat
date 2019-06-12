@@ -214,7 +214,7 @@ Route::group('u-coupon', function () {
 
 // 收货地址组
 Route::group('u-addr', function () {
-    Route::get('/index', 'index');
+    Route::rule('/index', 'index');
     Route::post('/create', 'create');
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');

@@ -147,9 +147,14 @@ class Coupon extends Controller
         $info = Db::name('platform_coupon')->where('id',$data['id'])->field('num,surplus_num,status')->find();
         // 当优惠券未发放时，可修改所以
         if ($info['status'] == 1) {
+            $data['surplus_num'] = $data['num'];
             if ($data['type'] == 2) {
                 $data['start_time'] = strtotime($data['start_time']);
                 $data['end_time'] = strtotime($data['end_time']);
+                $data['other_time'] = 0;
+            } else {
+                $data['start_time'] = 0;
+                $data['end_time'] = 0;
             }
             // 验证表单数据
             $check = $this->validate($data, 'Coupon');
@@ -189,9 +194,9 @@ class Coupon extends Controller
             $this->error('非法参数',201);
         }
         //获取店铺列表
-        $shop_list = Db::name('shop_info')->where('school_id',$id)->field('id,shop_name')->select();
+        $shop_list = Db::name('shop_info')->where('school_id',$id)->where('status','=',3)->field('id,shop_name')->select();
         
-        $this->success('ok',['shop_list'=>$shop_list]);
+        $this->success('获取当前学校的店铺列表成功',['shop_list'=>$shop_list]);
     }
 
 
@@ -239,7 +244,7 @@ class Coupon extends Controller
      
      
      /**
-      * 设置优惠券状态 
+      * 设置优惠券状态 【发放/暂停发放/设为作废】
       * @param $id 优惠券主键值
       * @param $status 状态值
       */

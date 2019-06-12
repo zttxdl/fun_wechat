@@ -74,13 +74,12 @@ class Member extends RiderBase
 
         // 更新数据
         $rider = RiderInfo::get($rid);
-        $rider->phone = $phone;
+        $rider->link_tel = $phone;
         $res = $rider->save();
         if (!$res) {
             return json_error('更换失败');
         }
-        $rider_info = RiderInfo::get($rid);
-        return json_success('更换成功',['rider_info'=>$rider_info]);
+        return json_success('更换成功');
         
     }
 

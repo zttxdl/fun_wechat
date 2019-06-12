@@ -17,8 +17,10 @@ class ReceivingAddr extends ApiBase
      * 地址列表 
      * 
      */
-    public function index($lat='',$lng='')
+    public function index(Request $request)
     {
+        $lat = $request->param('lat','');
+        $lng = $request->param('lng','');
         if ($lat == '' & $lng == ''){
             $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
 
@@ -27,7 +29,7 @@ class ReceivingAddr extends ApiBase
             foreach ($list as &$value) {
                 $value['beyond'] = 0;
                 $distance = pc_sphere_distance($lat,$lng,$value['latitude'],$value['longitude']);
-                if ($$distance > 3000){
+                if ($distance > 3000){
                     $value['beyond'] = 1;
                 }
             }
@@ -57,6 +59,9 @@ class ReceivingAddr extends ApiBase
         $school_name = model('School')->getNameById($school_id);
         $address = $school_name.$request->param('area_detail');
         $location = get_location($address);
+        if (empty($location)) {
+            $this->error('地址无法定位哦，请认真填写',201);            
+        }
         $data['latitude'] = $location['lat'];
         $data['longitude'] = $location['lng'];
 
@@ -105,6 +110,9 @@ class ReceivingAddr extends ApiBase
         $school_name = model('School')->getNameById($school_id);
         $address = $school_name.$request->param('area_detail');
         $location = get_location($address);
+        if (empty($location)) {
+            $this->error('地址无法定位哦，请认真填写',201);            
+        }
         $data['latitude'] = $location['lat'];
         $data['longitude'] = $location['lng'];
         

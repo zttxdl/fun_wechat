@@ -80,8 +80,7 @@ class Member extends ApiBase
         if (!$res) {
             $this->error('更换失败');
         }
-        $user_info = User::get($uid);
-        $this->success('更换成功',['user_info'=>$user_info]);
+        $this->success('更换成功');
         
     }
 }
