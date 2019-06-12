@@ -32,15 +32,15 @@ class MyCoupon extends ApiBase
         // 条件
         $type = $request->get('type');
         $type == 1 ? $where[] = ['m.status','=',1] : $where[] = ['m.status','in','2,3'];
-        $where[] = ['m.id','=',$uid];
+        $where[] = ['m.user_id','=',$uid];
 
         //是否可用
         $is_use = 1;
         //不可用原因
         $remark = '';
-
-        $list = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')->where($where)
+        $list = Db::name('my_coupon m')->leftJoin('platform_coupon p','m.platform_coupon_id = p.id')->where($where)
                 ->field('m.phone,m.indate,m.status,p.face_value,p.threshold,p.type,p.name,p.limit_use,p.school_id,p.shop_ids')->select();
+
 
         $userInfo = model('user')->where('id',$uid)->find();
 
