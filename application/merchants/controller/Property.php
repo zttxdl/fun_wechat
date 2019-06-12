@@ -36,7 +36,7 @@ class Property extends MerchantsBase
         $data = model('IncomeExpenditure')->index($shop_id);
 
         //商家信息
-        $shop_info = model('Shop')->getShopInfo();
+        $shop_info = model('Shop')->getShopInfo($shop_id);
 
         $data = [
             'balanceMoney' => $data['balance_money'],//可提现余额
