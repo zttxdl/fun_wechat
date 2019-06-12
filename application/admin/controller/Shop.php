@@ -26,19 +26,26 @@ class Shop extends Controller
         $page_no = $request->param('page_no');
         $page_size = config('page_size');
 
-        $shop_list = model('ShopInfo')
+        $list = model('ShopInfo')
             ->alias('a')
             ->page($page_no,$page_size)
             ->whereIn('status','3,4')
             ->select();
-        //$shop_list = $list;
-        foreach ($shop_list as &$row)
+
+        $shop_list = [];
+        foreach ($list as $row)
         {
             if($row['id']) {
-                $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
-                $row['school_name'] = Model('School')->getNameById($row['school_id']);
-                $row['shop_stock'] = Model('Shop')->getShopStock($row['id']);
-                $row['status'] = config('shop_check_status')[$row['status']];
+                $shop_list[] = [
+                    'shop_name' => $row['shop_name'],
+                    'logo_img' => $row['logo_img'],
+                    'link_name' => $row['link_name'],
+                    'link_tel' => $row['link_tel'],
+                    'add_time' => date('Y-m-d',$row['add_time']),
+                    'school_name' =>  Model('School')->getNameById($row['school_id']),
+                    'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
+                    'status' => config('shop_check_status')[$row['status']],
+                ];
             }
         }
 
@@ -157,7 +164,7 @@ class Shop extends Controller
         $page_size = 5;
 
         if(!$page_no) {
-            $this->error('非法传参','404');
+            $this->error('非法传参');
         }
 
         $data = model('shopInfo')
@@ -197,7 +204,7 @@ class Shop extends Controller
         $shop_id = $request->param('shop_id');
 
         if(!$shop_id) {
-            $this->error('非法传参','404');
+            $this->error('非法传参');
         }
 
         $result = [];

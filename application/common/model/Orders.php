@@ -76,4 +76,12 @@ class Orders extends Model
     {
         return $this->name('orders')->page($page_no,$page_size)->select();
     }
+
+
+    public function isFirstOrder($uid)
+    {
+        $data = $this->name('orders')->where('user_id',$uid)->find();
+
+        return isset($data) ? true : false;
+    }
 }
