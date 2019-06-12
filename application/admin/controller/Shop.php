@@ -29,24 +29,41 @@ class Shop extends Controller
         $shop_list = model('ShopInfo')
             ->alias('a')
             ->page($page_no,$page_size)
-            ->join('school b','a.school_id = b.id')
+/*            ->join('school b','a.school_id = b.id')
             ->join('product c','a.id = c.shop_id')
-            ->field(['a.id','a.shop_name','a.logo_img','a.link_name','a.link_tel','b.name'=>'school_name','from_unixtime(a.add_time)'=>'add_time','count(c.id)'=>'goods_num'])
+            ->field(['a.id','a.shop_name','a.logo_img','a.link_name','a.link_tel','a.status','b.name'=>'school_name','from_unixtime(a.add_time)'=>'add_time','count(c.id)'=>'goods_num'])*/
             ->select();
         //$shop_list = $list;
 
-//        foreach ($shop_list as &$row)
-//        {
-//            if($row['id']) {
-//                $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
-//                $row['school_name'] = Model('School')->getNameById($row['school_id']);
-//                $row['shop_stock'] = Model('Shop')->getShopStock($row['id']);
-//            }
-//        }
+        foreach ($shop_list as &$row)
+        {
+            if($row['id']) {
+                $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
+                $row['school_name'] = Model('School')->getNameById($row['school_id']);
+                $row['shop_stock'] = Model('Shop')->getShopStock($row['id']);
+                $row['status'] = config('shop_check_status')[$row['status']];
+            }
+        }
 
         $this->success('获取成功',$shop_list);
     }
 
+    /**
+     * 启用禁用店铺
+     */
+    public function setStatus(Request $request)
+    {
+        $shop_id = $request->param('shop_id');
+        $status = $request->param('status');//3 启用 4 禁用
+
+        $res = Model('ShopInfo')->where('id',$shop_id)->setField('status',$status);
+
+
+        if($res) {
+            $this->success('操作成功');
+        }
+        $this->error('操作失败');
+    }
 
     /**
      * 获取商家详情
@@ -113,6 +130,7 @@ class Shop extends Controller
             $result['shop_info']['logo_img'] = $row['logo_img'];
             $result['shop_info']['link_name'] = $row['link_name'];
             $result['shop_info']['link_tel'] = $row['link_tel'];
+            $result['shop_info']['status'] = config('shop_check_status')[$row['status']];
             $result['shop_info']['manage_category_name'] = Model('ManageCategory')->getNameById($row['manage_category_id']);
         }
 

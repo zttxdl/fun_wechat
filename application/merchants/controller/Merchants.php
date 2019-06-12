@@ -9,12 +9,13 @@ namespace  app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
 use think\Db;
+use think\Model;
 use think\Request;
 
 class Merchants extends MerchantsBase
 {
 
-    protected $noNeedLogin = ['*'];
+    protected $noNeedLogin = ['getSchool','getBack','getCategory'];
 
     /**
      * 新建商家
@@ -186,4 +187,5 @@ class Merchants extends MerchantsBase
         $this->success('success',$data);
 
     }
+
 }
