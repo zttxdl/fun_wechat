@@ -105,8 +105,10 @@ class Shop extends Model
     /**
      * 获取店铺补充信息
      */
-    public function getInformation()
+    public function getInformation($shop_id)
     {
+        $data = $this->name('shop_info')->field('sort,segmentation')->where('id',$shop_id)->find();
+        return $data;
 
     }
 
@@ -174,8 +176,10 @@ class Shop extends Model
      */
     public function getGoodsAttrName($attr_ids = '')
     {
-        $res = $this->name('product_attr_classify')->field('name')->whereIn('id',$attr_ids)->select();
-        return $res;
+        $res = $this->name('product_attr_classify')->field('name')->whereIn('id',$attr_ids)->select()->toArray();
+        $res = array_column($res,'name');
+        $attr_names = implode(",",$res);
+        return $attr_names;
     }
 
     /**
@@ -190,6 +194,16 @@ class Shop extends Model
         $settlement_wait_money = '';//待结算金额
         $month_money = '';//月销售额
         $total_money = '';//总销售额
+
+        return [
+            'total_num' => $total_num,
+            'month_order_num' => $month_order_num,
+            'day_order_num' => $day_order_num,
+            'settlement_money' => $settlement_money,
+            'settlement_wait_money' => $settlement_wait_money,
+            'month_money' => $month_money,
+            'total_money' => $total_money,
+        ];
 
 
     }

@@ -109,7 +109,7 @@ Route::group('admin',function (){
 // 商家模块
 Route::group('admin',function (){
     Route::rule('shopList','admin/Shop/getList');//商家列表
-    Route::rule('shopDetail','admin/Shop/getDetail2');//商家详情
+    Route::rule('shopDetail','admin/Shop/getDetail');//商家详情
     Route::rule('shopAddShop','admin/Shop/addShop');//添加店铺
     Route::rule('shopAddQualification','admin/Shop/addQualification');//添加商家资质
     Route::rule('shopSetStatus','admin/Shop/setStatus');//启用禁用商家
@@ -164,6 +164,7 @@ Route::group('merchants',function (){
     Route::rule('shopInfo','merchants/Shop/info');//商家信息
     Route::rule('shopSetInfo','merchants/Shop/setInfo');//设置商家信息
     Route::rule('shopMoreInfo','merchants/Shop/moreInfo');//入驻信息
+    Route::rule('checkStatus','merchants/Shop/checkStatus');//检查审核状态
 });
 
 //订单
@@ -178,8 +179,8 @@ Route::group('merchants',function (){
 
 //我的资产
 Route::group('merchants',function (){
-    Route::post('propertyIndex','merchants/Property/index');//订单查询
-    Route::post('propertyDetail','merchants/Property/detail');//订单查询
+    Route::post('propertyIndex','merchants/Property/myProperty');//列表
+    Route::post('propertyDetail','merchants/Property/receiptPay');//明细
     Route::post('propertyWithdraw','merchants/Property/withdraw');//提现
 
 });
