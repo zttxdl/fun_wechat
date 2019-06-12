@@ -17,7 +17,7 @@ class ReceivingAddr extends ApiBase
      * 地址列表 
      * 
      */
-    public function index($lat,$lng)
+    public function index($lat='',$lng='')
     {
         if ($lat == '' & $lng == ''){
             $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
