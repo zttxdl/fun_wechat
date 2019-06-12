@@ -36,6 +36,7 @@ class Login extends Controller
         }
 
         $data = captcha_check($code);
+        var_dump($code);die;
         if(!$data)
         {
             $this->error('验证码错误');//输出错误信息
