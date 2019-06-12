@@ -14,7 +14,7 @@ use think\Request;
 
 class Store extends ApiBase
 {
-    protected $noNeedLogin = ['*'];
+    protected $noNeedLogin = [];
     //获取商家详情-菜单
     public function index(Request $request)
     {
@@ -258,7 +258,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         try{
             $orderData = [
                 'orders_sn' => $orders_sn,//订单
-                'user_id' => isset($order['user_id']) ? $order['user_id'] : 0,
+                'user_id' => $this->auth->id,
                 'shop_id' => isset($order['shop_id']) ? $order['shop_id'] : 0,
                 'money' => isset($order['money']) ? (float)$order['money'] : 0.00,//实付金额
                 'total_money' => isset($order['total_money']) ? (float)$order['total_money'] : 0.00,//订单总价
@@ -323,11 +323,11 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
                 if($orderData['shop_discounts_id'] || $orderData['platform_coupon_id']){
                     $product_money = (float)(($product_money/$order['total_money']) * ($money - $order['box_money'] - $order['ping_fee']));
                 }
-
                 $detailData[] = [
                     'orders_id' => $orders_id,
                     'orders_sn' => $orders_sn,
                     'product_id' => $row['product_id'],
+                    'attr_ids' => $row['attr_ids'],
                     'num' => $row['num'],
                     'total_money' => $row['total_money'],
                     'money' => $product_money,//商品结算金额

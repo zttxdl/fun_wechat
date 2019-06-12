@@ -35,8 +35,8 @@ class Shop extends MerchantsBase
 
         foreach ($result as $row)
         {
-            if($row['open_status'] == '0') {
-                $this->error('暂停营业中');
+            if($row['status'] == '3') {
+                $this->error('店铺');
             }
             $shop_info = [
                 'shop_name' => $row['shop_name'],//店铺名称
@@ -201,6 +201,17 @@ class Shop extends MerchantsBase
         $result['shop_account'] = $shop_account;
 
         $this->success('获取成功',$result);
+    }
+
+    /**
+     * 商家审核反馈
+     */
+
+    public function checkStatus()
+    {
+        $shop_id = $this->shop_id;
+
+
     }
 
 
