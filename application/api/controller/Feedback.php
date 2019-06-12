@@ -22,6 +22,7 @@ class Feedback extends ApiBase
     {
         $data = $request->post();
         $data['add_time'] = time();
+        $data['user_id'] = $this->auth->id;
 
         // 验证表单数据
         $check = $this->validate($data, 'Feedback');

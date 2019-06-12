@@ -13,7 +13,7 @@ use think\Request;
 
 class Shop extends MerchantsBase
 {
-    protected $noNeedLogin = ['*'];
+    protected $noNeedLogin = [];
     /**
      * 店铺管理
      * @param Request $request
@@ -22,12 +22,12 @@ class Shop extends MerchantsBase
     public function index(Request $request)
     {
 
-        $shop_id = $request->param('id');
+        $shop_id = $this->shop_id;
         $shop_info = [];
 
         $result = Model('Shop')->getShopInfo($shop_id);
 
-//        dump($result);
+       //dump($result);
         if($result->isEmpty()) {
             $this->error('暂无店铺信息');
         }
@@ -35,11 +35,11 @@ class Shop extends MerchantsBase
 
         foreach ($result as $row)
         {
-            if($row['status']) {
-
+            if($row['open_status'] == '0') {
+                $this->error('暂停营业中');
             }
             $shop_info = [
-                'shop_name' => '123456',//店铺名称
+                'shop_name' => $row['shop_name'],//店铺名称
                 'status' => '1',//店铺营业状态
                 'day_order' => '55',//今日订单数
                 'day_sales' => 'wewe',//今日销售额
@@ -58,11 +58,12 @@ class Shop extends MerchantsBase
      */
     public function setName(Request $request)
     {
-        $shop_id = $request->param('shop_id');
+        $shop_id = $this->shop_id;
         $shop_name = $request->param('shop_name');
 
+
         if(empty($shop_id) || empty($shop_name)) {
-            json_error('非法传参','404');
+            json_error('非法传参');
         }
 
         $res = Model('shopInfo')->where('id',$shop_id)->setField('shop_name',$shop_name);
@@ -77,9 +78,23 @@ class Shop extends MerchantsBase
     /**
      * 店铺图标修改
      */
-    public function setLogo()
+    public function setLogo(Request $request)
     {
+        $shop_id = $this->shop_id;
+        $logo_img = $request->param('logo_img');
 
+
+        if(empty($shop_id) || empty($shop_name)) {
+            json_error('非法传参');
+        }
+
+        $res = Model('shopInfo')->where('id',$shop_id)->setField('logo_img',$logo_img);
+
+        if($res) {
+            $this->success('更新成功');
+        }
+
+        $this->error('更新失败');
     }
 
     /**
@@ -89,9 +104,10 @@ class Shop extends MerchantsBase
      */
     public function setOpenStatus(Request $request)
     {
-        $shop_id = $request->param('shop_id');
+        $shop_id = $this->shop_id;
         $shop_name = $request->param('shop_name');
         $open_status = $request->param('open_status');
+
 
         if(empty($shop_id) || empty($open_status)) {
             json_error('非法传参','404');
@@ -190,21 +206,7 @@ class Shop extends MerchantsBase
 
 
 
-    /**
-     * 添加商家资质
-     */
-    public function addQualification()
-    {
 
-    }
-
-    /**
-     * 添加收款信息
-     */
-    public function addAccount()
-    {
-
-    }
 
 
 }
