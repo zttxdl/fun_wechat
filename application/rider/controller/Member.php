@@ -143,6 +143,25 @@ class Member extends RiderBase
         }
         $this->success('更新成功');
     }
+
+
+    /**
+     * 设置骑手开工状态 
+     * 
+     */
+    public function openStatus(Request $request)
+    {
+        $status = $request->get('status');
+        $rid = $this->auth->id;
+        $result = RiderInfo::where('id','=',$rid)->setField('open_status',$status);
+
+        if (!$result) {
+            $this->error('设置失败');
+        }
+        $this->success('设置成功');
+        
+    }
+     
      
      
 }

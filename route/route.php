@@ -290,6 +290,7 @@ Route::group('r-member', function () {
     Route::get('/edit', 'edit');
     Route::post('/uodate', 'uodate');
     Route::post('/bind-tel', 'BindRiderPhone');
+    Route::get('/status', 'openStatus');
 })->prefix('rider/Member/');
 
 
