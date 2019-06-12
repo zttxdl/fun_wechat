@@ -34,9 +34,8 @@ class Login extends Controller
         {
            $this->error($result);//输出错误信息
         }
-
         $data = captcha_check($code);
-        var_dump($code);die;
+
         if(!$data)
         {
             $this->error('验证码错误');//输出错误信息
