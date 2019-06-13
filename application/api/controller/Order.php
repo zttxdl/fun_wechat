@@ -18,6 +18,19 @@ use think\Request;
 class Order extends ApiBase
 {
     protected $noNeedLogin = ['wxNotify'];
+    private $status_config = [
+        '1'     =>  '未支付',
+        '2'     =>  '已付款（商家待接单）',
+        '3'     =>  '商家已接单',
+        '4'     =>  '商家拒绝接单',
+        '5'     =>  '骑手取货中',
+        '6'     =>  '骑手配送站',
+        '7'     =>  '商家出单',
+        '8'     =>  '订单已送达（未评价） ',
+        '9'     =>  '订单已完成（已评价）',
+        '10'     =>  '交易关闭（15分钟未支付）',
+        '11'     =>  '订单已取消',
+    ];
 
     /**
      * 订单列表
@@ -46,6 +59,7 @@ class Order extends ApiBase
         }
 
         $result = [];
+
         foreach ($data as $row) {
             $product_name = model('Product')->getNameById($row['product_id']);
             $result[] = [
@@ -53,7 +67,7 @@ class Order extends ApiBase
                 'orders_sn' => $row['orders_sn'],
                 'num' => $row['num'],
                 'add_time' => $row['add_time'],
-                'status' => config('order_status')[$row['status']],
+                'status' => $this->status_config[$row['status']],
                 //'status' => $row['status'],
                 'money' => $row['money'],
                 'logo_img' => $row['logo_img'],
