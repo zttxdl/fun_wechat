@@ -39,4 +39,15 @@ class User extends Model
         return $id;
     }
 
+    /**
+     * 根据用户ID获取用户昵称
+     * @param $user_id
+     * @return mixed
+     */
+    public function getUserNameById($user_id)
+    {
+        $user_name = $this->where('id',$user_id)->value('nickname');
+        return $user_name;
+    }
+
 }
