@@ -39,7 +39,7 @@ class MyCoupon extends ApiBase
         //不可用原因
         $remark = '';
         $list = Db::name('my_coupon m')->leftJoin('platform_coupon p','m.platform_coupon_id = p.id')->where($where)
-                ->field('m.phone,m.indate,m.status,p.face_value,p.threshold,p.type,p.name,p.limit_use,p.school_id,p.shop_ids')->select();
+                ->field('m.id,m.phone,m.indate,m.status,p.face_value,p.threshold,p.type,p.name,p.limit_use,p.school_id,p.shop_ids')->select();
 
 
         $userInfo = model('user')->where('id',$uid)->find();

@@ -77,7 +77,11 @@ class Orders extends Model
         return $this->name('orders')->page($page_no,$page_size)->select();
     }
 
-
+    /**
+     * 用户是否首单
+     * @param $uid
+     * @return bool
+     */
     public function isFirstOrder($uid)
     {
         $data = $this->name('orders')->where('user_id',$uid)->find();
