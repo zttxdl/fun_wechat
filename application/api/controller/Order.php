@@ -179,7 +179,6 @@ class Order extends ApiBase
         ]);
         // print_r($result);
         if($result['return_code'] == "SUCCESS" && $result['result_code']=="SUCCESS"){
-            dump($result);exit;
             $result['openid']=$openid;
             $result['timeStamp']=strval(time());
             $result['package']="prepay_id=".$result['prepay_id'];
