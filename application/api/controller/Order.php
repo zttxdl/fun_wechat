@@ -182,7 +182,7 @@ class Order extends ApiBase
             $result['openid']=$openid;
             $result['timeStamp']=strval(time());
             $result['package']="prepay_id=".$result['prepay_id'];
-            $result['paySign']=MD5("appId=".$app_id."&nonceStr=".$result['nonce_str']."&package=".$result['package']."&signType=MD5&timeStamp=".$result['timeStamp']."&key=10S9a3A3EdF2a60e04cb1b8G8b507AF4");
+            $result['paySign']=MD5("appId=".$app_id."&nonceStr=".$result['nonce_str']."&package=".$result['package']."&signType=MD5&timeStamp=".$result['timeStamp']."&key=iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs");
 
             $this->success('success',$result);
         }else{
