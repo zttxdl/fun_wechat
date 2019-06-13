@@ -37,9 +37,9 @@ class Orders extends Model
     /**
      * 取消订单
      */
-    public function cancelOrder()
+    public function cancelOrder($order_sn,$status)
     {
-
+        return $this->name('orders')->where('orders_sn',$order_sn)->setField('status',$status);
     }
 
     /**
@@ -55,7 +55,7 @@ class Orders extends Model
      */
     public function getOrder($order_sn)
     {
-        return $this->name('orders')->where('orders_sn',$order_sn)->select();
+        return $this->name('orders')->where('orders_sn',$order_sn)->find();
     }
 
     /**
@@ -77,7 +77,11 @@ class Orders extends Model
         return $this->name('orders')->page($page_no,$page_size)->select();
     }
 
-
+    /**
+     * 用户是否首单
+     * @param $uid
+     * @return bool
+     */
     public function isFirstOrder($uid)
     {
         $data = $this->name('orders')->where('user_id',$uid)->find();

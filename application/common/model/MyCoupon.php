@@ -37,4 +37,21 @@ class MyCoupon extends Model
         return $this->insert($data);
     }
 
+    /**
+     * 获取红包记录
+     */
+    public function getHongbao($id)
+    {
+        return $this->where('id',$id)->find();
+    }
+
+    /**
+     * 红包状态变更
+     */
+    public function updateStatus($id,$status)
+    {
+        return $this->where('id',$id)->setField('status',$status);
+    }
+
+
 }

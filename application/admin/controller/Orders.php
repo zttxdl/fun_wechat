@@ -14,10 +14,10 @@ class Orders extends Controller
         $page = $request->param('page');
         $page_size = $request->param('pageSize',20);
 
-        /*$result = Model('orders')->alias('a')
+        $result = Model('orders')->alias('a')
             ->leftJoin('user b','a.user_id=b.id')
-            ->field('a.orders_sn,b.nickname')
-            ->select();*/
+            ->field('a.orders_sn,b.nickname,b.phone')
+            ->select();
 
         $orederList = Model('Orders')->getOrderList($page,$page_size);
 
@@ -28,6 +28,7 @@ class Orders extends Controller
             $result[] = [
                 'orders_sn' => $row['orders_sn'],
                 'user_name' => Model('user')->getUserNameById($row['user_id']),
+                'phone' => $row['phone'],
             ];
         }
 
