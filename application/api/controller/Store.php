@@ -9,7 +9,6 @@ namespace app\api\controller;
 
 use app\common\controller\ApiBase;
 use think\Db;
-use think\Exception;
 use think\Request;
 
 class Store extends ApiBase
@@ -23,7 +22,7 @@ class Store extends ApiBase
         $where = ['shop_id'=>$shop_id];
         //获取商品
         $list = model('Product')
-            ->field('id,name,price,info,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
+            ->field('id,name,box_money,price,info,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
             ->where($where)
             ->where('status',1)
             ->select()
@@ -184,7 +183,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 //        $where[] = ['status', '=', 1];
 
         $product = model('Product')
-            ->field('name,sales,price,old_price,thumb,info,type,attr_ids,status,shop_id')
+            ->field('name,box_money,sales,price,old_price,thumb,info,type,attr_ids,status,shop_id')
             ->where($where)
             ->find()
             ->toArray();
@@ -216,7 +215,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
         //判断是否存在优惠
         $product['disc'] = model('ShopDiscounts')
-            ->field('face_value,threshold')
+            ->field('id,face_value,threshold')
             ->where('shop_id',$product['shop_id'])
             ->where('delete',0)
             ->select();
