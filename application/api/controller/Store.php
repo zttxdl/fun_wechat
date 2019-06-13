@@ -264,7 +264,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
                 'total_money' => isset($order['total_money']) ? (float)$order['total_money'] : 0.00,//订单总价
                 'box_money' => isset($order['box_money']) ? (float)$order['box_money'] : 0.00,//订单参盒费
                 'ping_fee' => isset($order['ping_fee']) ? (float)$order['ping_fee'] : 0.00,//订单配送费
-                'pay_mode' => $order['pay_mode'],//支付方式
+                'pay_mode' => isset($order['pay_mode']) ? $order['pay_mode'] : 1,//支付方式
                 'address' => isset($order['address']) ? $order['address'] : '',//配送地址
                 'num' => isset($order['num']) ? $order['num'] : '',//商品总数
                 'message' => isset($order['remark']) ? $order['remark'] : '',//订单备注
@@ -326,12 +326,12 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
                 $detailData[] = [
                     'orders_id' => $orders_id,
                     'orders_sn' => $orders_sn,
-                    'product_id' => $row['product_id'],
-                    'attr_ids' => $row['attr_ids'],
-                    'num' => $row['num'],
-                    'total_money' => $row['total_money'],
+                    'product_id' => isset($row['product_id']) ? $row['product_id'] : 0,
+                    'attr_ids' => isset($row['attr_ids']) ? $row['attr_ids'] : '',
+                    'num' => isset($row['num']) ? $row['num'] : 0,
+                    'total_money' => isset($row['total_money']) ? $row['total_money'] : 0.00,
                     'money' => $product_money,//商品结算金额
-                    'box_money' => $row['box_money'],
+                    'box_money' => isset($row['box_money']) ? $row['box_money'] : 0.00,
                     'platform_coupon_id' => isset($platform_discount['id']) ? $platform_discount['id'] : 0,
                     'platform_coupon_money' => isset($platform_discount['face_value']) ? (float)$platform_discount['face_value'] : 0.00,
                     'shop_discounts_id' => isset($shop_discount['id']) ? $shop_discount['id'] : 0,
