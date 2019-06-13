@@ -326,9 +326,9 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
                 $detailData[] = [
                     'orders_id' => $orders_id,
                     'orders_sn' => $orders_sn,
-                    'product_id' => $row['product_id'],
-                    'attr_ids' => $row['attr_ids'],
-                    'num' => $row['num'],
+                    'product_id' => isset($row['product_id']) ? $row['product_id'] : 0,
+                    'attr_ids' => isset($row['attr_ids']) ? $row['attr_ids'] : '',
+                    'num' => isset($row['num']) ? $row['num'] : 0,
                     'total_money' => isset($row['total_money']) ? $row['total_money'] : 0.00,
                     'money' => $product_money,//商品结算金额
                     'box_money' => isset($row['box_money']) ? $row['box_money'] : 0.00,
