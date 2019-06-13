@@ -43,9 +43,6 @@ class Notify extends Collection
                 if ($message['result_code'] === 'SUCCESS') {
                     $this->returnResult($message['out_trade_no'], $message['transaction_id']);
 
-                } elseif ($message['result_code'] === 'FAIL') {
-                    model('orders')->where('orders_sn',$message['out_trade_no'])
-                        ->update(['pay_status'=>2]);
                 }
             }else {
                 return $fail('通信失败，请稍后再通知我');
