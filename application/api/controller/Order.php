@@ -378,9 +378,9 @@ class Order extends ApiBase
         dump($shop_discount);*/
 
 
-        if(!$order || !$detail || !$platform_discount || !$shop_discount) {
+        /*if(!$order || !$detail || !$platform_discount || !$shop_discount) {
             $this->error('非法传参');
-        }
+        }*/
 
         $orders_sn = build_order_no();//生成唯一订单号
 
