@@ -18,7 +18,7 @@ use think\Request;
 
 class Order extends ApiBase
 {
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['wxNotify'];
 
     /**
      * 订单列表
