@@ -11,7 +11,6 @@ use EasyWeChat\Factory;
 use EasyWeChat\Kernel\Support\XML;
 use think\Collection;
 use think\Db;
-use think\Log;
 use think\Request;
 
 
@@ -23,7 +22,8 @@ class Notify extends Collection
         $xml = XML::parse(strval($request->getContent()));
         //转成数组
 //        $result = json_decode($xml, true);
-        Log::info('wx_pay'.json_encode($xml));
+        trace('wx_pay'.json_encode($xml),'info');
+
         exit;
         $options = [
             'app_id' => '',
