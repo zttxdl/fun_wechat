@@ -267,6 +267,10 @@ Route::group('api',function () {
     Route::post('orderRefund','api/Order/orderRefund');
     //微信支付
     Route::post('orderPayment','api/Order/OrderPayment');
+    //小程序支付
+    Route::post('orderPay','api/Order/OrderPay');
+    //支付查询
+    Route::post('orderQuery','api/Order/orderQuery');
 });
 
 

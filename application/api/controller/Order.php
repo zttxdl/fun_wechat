@@ -18,6 +18,19 @@ use think\Request;
 class Order extends ApiBase
 {
     protected $noNeedLogin = ['wxNotify'];
+    private $status_config = [
+        '1'     =>  '未支付',
+        '2'     =>  '已付款（商家待接单）',
+        '3'     =>  '商家已接单',
+        '4'     =>  '商家拒绝接单',
+        '5'     =>  '骑手取货中',
+        '6'     =>  '骑手配送站',
+        '7'     =>  '商家出单',
+        '8'     =>  '订单已送达（未评价） ',
+        '9'     =>  '订单已完成（已评价）',
+        '10'     =>  '交易关闭（15分钟未支付）',
+        '11'     =>  '订单已取消',
+    ];
 
     /**
      * 订单列表
@@ -46,6 +59,7 @@ class Order extends ApiBase
         }
 
         $result = [];
+
         foreach ($data as $row) {
             $product_name = model('Product')->getNameById($row['product_id']);
             $result[] = [
@@ -53,7 +67,7 @@ class Order extends ApiBase
                 'orders_sn' => $row['orders_sn'],
                 'num' => $row['num'],
                 'add_time' => $row['add_time'],
-                'status' => config('order_status')[$row['status']],
+                'status' => $this->status_config[$row['status']],
                 //'status' => $row['status'],
                 'money' => $row['money'],
                 'logo_img' => $row['logo_img'],
@@ -126,8 +140,76 @@ class Order extends ApiBase
 
         $this->success('获取成功',$result);
     }
+    /**
+     * 支付查询
+     */
+    public function orderQuery(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+        $wx = new \app\api\controller\Weixin();
+        $result = $wx->query($orders_sn);
+
+        $this->success('获取成功',$result);
+    }
+
+    /**
+     * 小程序支付
+     * @param Request $request
+     */
+    public function orderPay(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+        $openid = $this->auth->openid;
+        $user_id = $this->auth->id;
 
 
+        if(!$orders_sn){
+
+            $this->error('订单号不能为空');
+        }
+
+        $order = model('Orders')->getOrder($orders_sn);
+
+        if(!$order){
+            $this->error('订单id错误');
+        }
+
+        if($order->user_id != $user_id){
+            $this->error('非法操作');
+        }
+        if($order->pay_status == 1){
+            $this->error('订单已支付');
+        }
+
+        if($order->status == 11){
+            $this->error('订单已取消');
+        }
+
+        if((time()-$order->add_time) > 15*60){//15分钟失效
+            $this->error('订单已失效');
+        }
+
+        $data['price'] = $order['money'];
+
+        $data = [
+            'openid' => $openid,
+            'body' => "11",
+            'detail' => "11",
+            'out_trade_no' => $orders_sn,
+            'total_fee' => $data['price'],
+        ];
+
+        error_log('request=='.print_r($data,1),3,ROOT_PATH."./logs/order.log");
+        $wx = new \app\api\controller\Weixin();
+        $result = $wx->pay($data);
+
+        error_log('result=='.print_r($result,1),3,ROOT_PATH."./logs/order.log");
+
+        if($result) {
+            $this->success('success',$result);
+        }
+
+    }
 
     //订单支付真实
     public function orderPayment(Request $request)
