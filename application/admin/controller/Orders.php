@@ -12,10 +12,26 @@ class Orders extends Controller
     public function getList(Request $request)
     {
         $page = $request->param('page');
-        $page_size = $request->param('pageSize');
+        $page_size = $request->param('pageSize',20);
+
+        /*$result = Model('orders')->alias('a')
+            ->leftJoin('user b','a.user_id=b.id')
+            ->field('a.orders_sn,b.nickname')
+            ->select();*/
+
         $orederList = Model('Orders')->getOrderList($page,$page_size);
 
-        $this->success('获取成功',$orederList);
+        $result = [];
+
+        foreach ($orederList as $row)
+        {
+            $result[] = [
+                'orders_sn' => $row['orders_sn'],
+                'user_name' => Model('user')->getUserNameById($row['user_id']),
+            ];
+        }
+
+        $this->success('获取成功',$result);
     }
 
     public function getDetail(Request $request)
