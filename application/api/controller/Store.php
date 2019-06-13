@@ -9,7 +9,6 @@ namespace app\api\controller;
 
 use app\common\controller\ApiBase;
 use think\Db;
-use think\Exception;
 use think\Request;
 
 class Store extends ApiBase
@@ -23,7 +22,7 @@ class Store extends ApiBase
         $where = ['shop_id'=>$shop_id];
         //获取商品
         $list = model('Product')
-            ->field('id,name,price,info,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
+            ->field('id,name,box_money,price,info,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
             ->where($where)
             ->where('status',1)
             ->select()
