@@ -74,7 +74,7 @@ class Orders extends Model
      */
     public function getOrderList($page_no, $page_size)
     {
-        return $this->name('orders')->page($page_no,$page_size)->select();
+        return $this->page($page_no,$page_size)->select()->toArray();
     }
 
     /**
