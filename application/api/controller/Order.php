@@ -126,7 +126,60 @@ class Order extends ApiBase
         $this->success('获取成功',$result);
     }
 
+    /**
+     * 小程序支付
+     * @param Request $request
+     */
+    public function orderPay(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+        $openid = $this->auth->openid;
+        $user_id = $this->auth->id;
 
+
+        if(!$orders_sn){
+
+            $this->error('订单号不能为空');
+        }
+
+        $order = model('Orders')->getOrder($orders_sn);
+
+        if(!$order){
+            $this->error('订单id错误');
+        }
+
+        if($order->user_id != $user_id){
+            $this->error('非法操作');
+        }
+        if($order->pay_status == 1){
+            $this->error('订单已支付');
+        }
+
+        if($order->status == 11){
+            $this->error('订单已取消');
+        }
+
+        if((time()-$order->add_time) > 15*60){//15分钟失效
+            $this->error('订单已失效');
+        }
+
+        $data['price'] = $order['money'];
+
+        $data = [
+            'openid' => $openid,
+            'body' => "11",
+            'detail' => "11",
+            'out_trade_no' => $orders_sn,
+            'total_fee' => $data['price'],
+        ];
+        $wx = new \app\api\controller\Weixin();
+        $result = $wx->pay($data);
+
+        if($result) {
+            $this->success('success',$result);
+        }
+
+    }
 
     //订单支付真实
     public function orderPayment(Request $request)
