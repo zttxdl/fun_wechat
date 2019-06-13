@@ -154,9 +154,10 @@ class Order extends ApiBase
             $this->error('订单已支付');
         }
 
-//        if((time()-$order->add_time) > 15*60){//15分钟失效
-//            $this->error('订单已失效');
-//        }
+        if((time()-$order->add_time) > 15*60){//15分钟失效
+            $this->error('订单已失效');
+        }
+
         $data['price'] = $order['money'];
 
         $config = config('wx_pay');
