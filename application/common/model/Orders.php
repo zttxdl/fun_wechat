@@ -37,9 +37,9 @@ class Orders extends Model
     /**
      * 取消订单
      */
-    public function cancelOrder()
+    public function cancelOrder($order_sn,$status)
     {
-
+        return $this->name('orders')->where('orders_sn',$order_sn)->setField('status',$status);
     }
 
     /**
@@ -55,7 +55,7 @@ class Orders extends Model
      */
     public function getOrder($order_sn)
     {
-        return $this->name('orders')->where('orders_sn',$order_sn)->select();
+        return $this->name('orders')->where('orders_sn',$order_sn)->find();
     }
 
     /**

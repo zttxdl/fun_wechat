@@ -256,7 +256,9 @@ Route::group('u-intention', function () {
 //订单
 Route::group('api',function () {
     //提交订单
-    Route::post('shopAddOrder','api/Store/sureOrder');
+    Route::post('shopAddOrder','api/Order/sureOrder');
+    //取消订单
+    Route::post('cancelOrder','api/Order/cancelOrder');
     //订单列表
     Route::post('getOrderList','api/Order/getList');
     //订单详情

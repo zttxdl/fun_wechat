@@ -28,7 +28,7 @@ class Orders extends Controller
             $result[] = [
                 'orders_sn' => $row['orders_sn'],
                 'user_name' => Model('user')->getUserNameById($row['user_id']),
-                'phone' => ,
+                'phone' => $row['phone'],
             ];
         }
 
