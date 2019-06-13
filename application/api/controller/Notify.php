@@ -22,14 +22,13 @@ class Notify extends Collection
         $xml = XML::parse(strval($request->getContent()));
         //转成数组
 //        $result = json_decode($xml, true);
-        trace('wx_pay'.json_encode($xml),'info');
+        trace($xml,'info');
 
-        exit;
         $options = [
-            'app_id' => '',
+            'app_id' => $xml['app_id'],
             'mch_id' => config('wx_pay')['mch_id'],
             'key' => config('wx_pay')['key'],
-            'notify_url' => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/order/wxNotify'
+            'notify_url' => 'http' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/index'
         ];
 
         $payment = Factory::payment($options);
@@ -43,7 +42,7 @@ class Notify extends Collection
                 $fail('Order not exist.');
             }
 
-            if ($order->pay_status  == '已支付') {
+            if ($order->pay_status  == 1) {
                 return true;
             }
 
@@ -51,13 +50,13 @@ class Notify extends Collection
             if($message['result_code'] === 'SUCCESS')
             {
                 $this->returnResult($message['out_trade_no'],$message['transaction_id']);
-                echo "success";
+
             }
 
             return true;
         });
 
-        return $response;
+        $response->send();;
     }
 
     //微信支付回调
