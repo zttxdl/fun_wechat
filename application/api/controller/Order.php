@@ -132,6 +132,8 @@ class Order extends ApiBase
     public function orderPayment(Request $request)
     {
         $orders_sn = $request->param('orders_sn');
+        $openid = $this->auth->openid;
+        $user_id = $this->auth->id;
 
 
         if(!$orders_sn){
@@ -145,10 +147,10 @@ class Order extends ApiBase
             $this->error('订单id错误');
         }
 
-        if($order->user_id != 1){
+        if($order->user_id != $user_id){
             $this->error('非法操作');
         }
-        if($order->pay_status==1){
+        if($order->pay_status == 1){
             $this->error('订单已支付');
         }
 
@@ -160,7 +162,7 @@ class Order extends ApiBase
         $config = config('wx_pay');
         $app_id = config('wx_pay')['app_id'];
         $app = Factory::payment($config);
-        $openid= $this->auth->openid;
+
 
 
 
