@@ -38,12 +38,17 @@ class Notify extends Collection
             if ($order->pay_status  == 1) {
                 return true;
             }
+            if ($message['return_code'] === 'SUCCESS') {
+                // 支付成功后的业务逻辑
+                if ($message['result_code'] === 'SUCCESS') {
+                    $this->returnResult($message['out_trade_no'], $message['transaction_id']);
 
-            // 支付成功后的业务逻辑
-            if($message['result_code'] === 'SUCCESS')
-            {
-                $this->returnResult($message['out_trade_no'],$message['transaction_id']);
-
+                } elseif ($message['result_code'] === 'FAIL') {
+                    model('orders')->where('orders_sn',$message['out_trade_no'])
+                        ->update(['pay_status'=>2]);
+                }
+            }else {
+                return $fail('通信失败，请稍后再通知我');
             }
 
             return true;
@@ -58,7 +63,6 @@ class Notify extends Collection
         Db::startTrans();
         try {
             $orders = model('orders')->where('orders_sn',$orders_sn)->find();
-
 
             //处理的业务逻辑，更新订单
             model('orders')
