@@ -173,3 +173,28 @@ if (!function_exists('get_location')) {
 }
 
 
+/**
+ *  写日志
+ * @param  $log  日志内容
+ * @param string $type   日志后缀文件类型
+ */
+if (!function_exists('write_log')) {
+    function write_log($log, $type = 'sql')
+    {
+        $request = Request::instance();
+        $path = './log/';
+        if (!is_dir($path) && !mkdir($path, 0755, true)) {
+                //无权创建文件忽略函数
+            return false;
+        }
+        if (is_array($log)) {
+            $log = json_encode($log);
+        }
+        $filename = $path . date("Ymd") . '_' . $type . ".log";
+        @$handle = fopen($filename, "a+");
+        @fwrite($handle, date('Y-m-d H:i:s') . " ".'[ip:'. $request->ip(). ']   ' . $log . "\r\n");
+        @fclose($handle);
+    }
+}
+
+
