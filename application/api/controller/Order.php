@@ -139,7 +139,7 @@ class Order extends ApiBase
             $this->error('订单号不能为空');
         }
 
-        $order = model('Orders')->where('orders_sn',$orders_sn)->find();
+        $order = model('Orders')->getOrder($orders_sn);
 
         if(!$order){
             $this->error('订单id错误');
@@ -155,12 +155,13 @@ class Order extends ApiBase
 //        if((time()-$order->add_time) > 15*60){//15分钟失效
 //            $this->error('订单已失效');
 //        }
-        $data['price'] = $order->money;
+        $data['price'] = $order['money'];
 
         $config = config('wx_pay');
         $app_id = config('wx_pay')['app_id'];
         $app = Factory::payment($config);
         $openid= $this->auth->openid;
+
 
 
         $ip   = request()->ip();
