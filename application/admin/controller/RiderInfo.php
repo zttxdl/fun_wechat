@@ -135,6 +135,16 @@ class RiderInfo extends Controller
         $this->success('ok');
     }
 
+
+    /**
+     * 商家审核展示
+     */
+    public function checkStatusList()
+    {
+        $data = config('check_status')['rider'];
+        $this->success('获取成功',$data);
+    }
+
      
      
      

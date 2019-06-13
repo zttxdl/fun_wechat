@@ -339,6 +339,24 @@ class Order extends ApiBase
         }
     }
 
+    /**
+     * 是否首单
+     */
+    public function is_first_order()
+    {
+        $uid = $this->auth->id;
+
+        $data  = model('orders')->isFirstOrder($uid);
+
+        if(!$data) {
+            return json_success('success',['is_first_order'=> 1]);
+        }
+
+        return json_success('success',['is_first_order'=> 0]);
+
+
+    }
+
 
 
 }

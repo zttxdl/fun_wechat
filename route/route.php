@@ -73,6 +73,7 @@ Route::group('a-rider', function () {
     // 骑手审核组
     Route::get('/c-index', 'admin/RiderInfo/checkRiderList');
     Route::get('/c-info/:id', 'admin/RiderInfo/checkShow');
+    Route::get('/c-show', 'admin/RiderInfo/checkStatusList');
     Route::post('/c-status', 'admin/RiderInfo/setCheckStatus');
 
 })->middleware('IsLogin');
@@ -290,6 +291,7 @@ Route::group('r-member', function () {
     Route::get('/edit', 'edit');
     Route::post('/uodate', 'uodate');
     Route::post('/bind-tel', 'BindRiderPhone');
+    Route::get('/status', 'openStatus');
 })->prefix('rider/Member/');
 
 
