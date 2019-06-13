@@ -296,19 +296,19 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
                 $product_total_money += $row['total_money'];
             }
 
-            if($total_money != $product_total_money) {
+            if($total_money != ($product_total_money + $orderData['box_money'] + $orderData['ping_fee'])) {
                 throw new \Exception('订单总价不正确');
             }
 
 
-            if($money != ($total_money - $order_discount) + $orderData['box_money'] + $orderData['ping_fee']) {
+            if($money != ($total_money - $order_discount)) {
                 throw new \Exception('订单结算金额不正确');
             }
 
 
             foreach ($detail as $row) {
 
-                $product_money = $row['total_money'];
+                $product_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
 
                 $product_info = model('Product')->getProductById($row['product_id'])->toArray();
                 //dump($product_info);
