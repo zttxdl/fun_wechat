@@ -161,7 +161,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
         //判断是否存在优惠
         $data['disc'] = model('ShopDiscounts')
-            ->field('face_value,threshold')
+            ->field('id,face_value,threshold')
             ->where('shop_id',$shop_id)
             ->where('delete',0)
             ->select();
