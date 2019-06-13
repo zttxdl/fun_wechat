@@ -264,7 +264,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
                 'total_money' => isset($order['total_money']) ? (float)$order['total_money'] : 0.00,//订单总价
                 'box_money' => isset($order['box_money']) ? (float)$order['box_money'] : 0.00,//订单参盒费
                 'ping_fee' => isset($order['ping_fee']) ? (float)$order['ping_fee'] : 0.00,//订单配送费
-                'pay_mode' => $order['pay_mode'],//支付方式
+                'pay_mode' => isset($order['pay_mode']) ? $order['pay_mode'] : 1,//支付方式
                 'address' => isset($order['address']) ? $order['address'] : '',//配送地址
                 'num' => isset($order['num']) ? $order['num'] : '',//商品总数
                 'message' => isset($order['remark']) ? $order['remark'] : '',//订单备注
