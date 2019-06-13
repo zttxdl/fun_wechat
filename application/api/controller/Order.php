@@ -126,6 +126,17 @@ class Order extends ApiBase
 
         $this->success('获取成功',$result);
     }
+    /**
+     * 支付查询
+     */
+    public function orderQuery(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+        $wx = new \app\api\controller\Weixin();
+        $result = $wx->query($orders_sn);
+
+        $this->success('获取成功',$result);
+    }
 
     /**
      * 小程序支付
@@ -173,8 +184,12 @@ class Order extends ApiBase
             'out_trade_no' => $orders_sn,
             'total_fee' => $data['price'],
         ];
+
+        error_log('request=='.print_r($data,1),3,ROOT_PATH."./logs/order.log");
         $wx = new \app\api\controller\Weixin();
         $result = $wx->pay($data);
+
+        error_log('result=='.print_r($result,1),3,ROOT_PATH."./logs/order.log");
 
         if($result) {
             $this->success('success',$result);

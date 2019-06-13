@@ -41,9 +41,11 @@ class Weixin extends ApiBase
     /**
      * 支付查询
      */
-    public function query()
+    public function query($order_sn)
     {
-
+        $result = $this->weixinquery($order_sn);
+        dump($result);
+        return $result;
     }
 
     /**
@@ -52,6 +54,29 @@ class Weixin extends ApiBase
     public function refund()
     {
 
+    }
+
+    /**
+     * 微信支付查询接口
+     */
+    private function weixinquery($order_sn)
+    {
+        $url = "https://api.mch.weixin.qq.com/pay/orderquery";
+        $key = $this->appkey;
+
+        $params = array(
+            'appid'=>$this->appid,//小程序ID
+            'mch_id'=>$this->mchid,//商户号
+            'sub_mch_id'=>$this->mchid,//商户号
+            'nonce_str'=>$this->createNoncestr(),//随机字符串
+            'out_trade_no'=>$order_sn,//商户订单号
+        );
+//        RpcLog::log("wx_pay_parameters:".$parameters['notify_url'], RpcLog::getMicroTime(), RpcLog::getMicroTime(), RpcLogEnvConfig::RPC_LOG_TYPE_MODULES);
+        //统一下单签名
+        $params['sign']=$this->getSign($params,$key);
+        dump($params);
+        $xmlData=$this->arrayToXml($params);
+        $return = $this->xmlToArray($this->postXmlCurl($xmlData, $url, 60));
     }
 
     /**
