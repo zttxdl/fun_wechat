@@ -25,7 +25,7 @@ class Notify extends Collection
         trace($xml,'info');
 
         $options = [
-            'app_id' => $xml['app_id'],
+            'app_id' => $xml['appid'],
             'mch_id' => config('wx_pay')['mch_id'],
             'key' => config('wx_pay')['key'],
             'notify_url' => 'http' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/index'
@@ -36,8 +36,7 @@ class Notify extends Collection
         $response = $payment->handlePaidNotify(function ($message, $fail)
         {
             // 根据返回的订单号查询订单数据
-            $order = $this->order->findBy('order_num', $message['out_trade_no']);
-
+            $order = model('Orders')->getOrder($message['out_trade_no']);
             if (!$order) {
                 $fail('Order not exist.');
             }
