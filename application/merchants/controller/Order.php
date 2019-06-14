@@ -117,20 +117,24 @@ class Order extends MerchantsBase
     {
 
         $number = $request->param('number');//商户订单号
-        $refundNumber = $request->param('refundNumber');//生成唯一商户退款单号
-        $totalFee = $request->param('totalFee');//订单金额
-        $refundFee = $request->param('refundFee');//退款金额
 
-        if (!$number || !$refundNumber){
+        if (!$number){
             $this->error('非法传参');
         }
 
-        if ($totalFee < $refundFee){
+        $find = model('Refund')->where('out_trade_no',$number)->find();
+
+        if (!$find){
+            $this->error('商户订单号错误');
+        }
+
+        if ($find->total_fee < $find->refund_fee){
             $this->error('退款金额不能大于订单总额');
         }
 
-        $totalFee = $totalFee*100;
-        $refundFee = $refundFee*100;
+        $totalFee = $find->total_fee * 100; //订单金额
+        $refundFee =  $find->refund_fee * 100;//退款金额
+        $refundNumber = $find->out_refund_no;//商户退款单号
 
         $pay_config = config('wx_pay');
         $app    = Factory::payment($pay_config);//pay_config 微信配置
@@ -139,7 +143,7 @@ class Order extends MerchantsBase
         $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
             // 可在此处传入其他参数，详细参数见微信支付文档
             'refund_desc' => '取消订单退款',
-            'notify_url'    => 'http' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+            'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
         ]);
 
 
