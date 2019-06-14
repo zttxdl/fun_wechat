@@ -19,17 +19,15 @@ class ReceivingAddr extends ApiBase
      */
     public function index(Request $request)
     {
-        $lat = $request->param('lat','');
-        $lng = $request->param('lng','');
-        if ($lat == '' & $lng == ''){
+        $school_id = $request->param('school_id','');
+        if ($school_id == ''){
             $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
 
         }else{
             $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
             foreach ($list as &$value) {
                 $value['beyond'] = 0;
-                $distance = pc_sphere_distance($lat,$lng,$value['latitude'],$value['longitude']);
-                if ($distance > 3000){
+                if ( $value['school_id'] == $school_id){
                     $value['beyond'] = 1;
                 }
             }

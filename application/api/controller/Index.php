@@ -161,14 +161,23 @@ class Index extends ApiBase
         $pagesize = input('pagesize',15);
         $page = input('page',1);
 
-        $list = model('ShopInfo')
-            ->field("id,shop_name,marks,sales,logo_img,up_to_send_money,run_time,
-            address,manage_category_id,ping_fee,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),2 ) AS distance ")
-            ->where('manage_category_id','=',$class_id)
-            ->having('distance < 3')
-            ->page($page,$pagesize)
-            ->select()
-            ->toArray();
+        $data = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
+            ->having('distance < 5')
+            ->where('level',2)
+            ->order('distance asc')
+            ->find();
+
+        $list = [];
+        if ($data){
+            $list = model('ShopInfo')->field("id,shop_name,logo_img,marks,sales,up_to_send_money,run_time,address,manage_category_id,ping_fee,school_id")
+                ->where('school_id',$data->id)
+                ->where('manage_category_id',$class_id)
+                ->page($page,$pagesize)
+                ->select()
+                ->toArray();
+
+        }
+
 
         if (empty($list)){
             $this->success('success',$list);
