@@ -9,9 +9,7 @@ namespace app\api\controller;
 
 use app\common\controller\ApiBase;
 use EasyWeChat\Factory;
-use EasyWeChat\Kernel\Support\XML;
 use think\Db;
-use think\Log;
 use think\Request;
 
 
