@@ -125,7 +125,7 @@ class Coupon extends Controller
         $sc_model = new School();
         $school_list = $sc_model->getShopList();
         // 优惠券的覆盖范围 [店铺]
-        $shop_list = Db::name('shop_info')->where('school_id',$coupon_info['school_id'])->find();
+        $shop_list = Db::name('shop_info')->where('school_id',$coupon_info['school_id'])->where('status','=',3)->field('id,shop_name')->select();
 
         $this->success('ok',['coupon_info'=>$coupon_info,'school_list'=>$school_list,'shop_list'=>$shop_list,'manage_category_list'=>$manage_category_list]);
 

@@ -18,6 +18,18 @@ use think\Request;
 class Order extends ApiBase
 {
     protected $noNeedLogin = ['wxNotify'];
+    private $status_config = [
+        '1'     =>  '订单待支付',
+        '2'     =>  '等待商家接单',
+        '3'     =>  '商家已接单',
+        '4'     =>  '商家拒绝接单',
+        '5'     =>  '骑手取货中',
+        '6'     =>  '骑手配送中',
+        '7'     =>  '订单已送达 ',
+        '8'     =>  '订单已完成',
+        '9'     =>  '订单已取消',
+        '10'     =>  '商家已取消',
+    ];
 
     /**
      * 订单列表
@@ -38,6 +50,7 @@ class Order extends ApiBase
                 ->leftJoin('ordersInfo c','a.id = c.id')
                 ->field(['a.id','a.orders_sn','a.num','FROM_UNIXTIME( a.add_time, "%Y-%m-%d %H:%i" )'=> 'add_time','a.status','a.money','b.link_tel','b.logo_img','b.shop_name','c.product_id'])
                 ->where('user_id',$user_id)
+                ->order('add_time','DESC')
                 ->page($page,$pagesize)
                 ->select();
 
@@ -46,6 +59,7 @@ class Order extends ApiBase
         }
 
         $result = [];
+
         foreach ($data as $row) {
             $product_name = model('Product')->getNameById($row['product_id']);
             $result[] = [
@@ -53,7 +67,7 @@ class Order extends ApiBase
                 'orders_sn' => $row['orders_sn'],
                 'num' => $row['num'],
                 'add_time' => $row['add_time'],
-                'status' => config('order_status')[$row['status']],
+                'status' => $this->status_config[$row['status']],
                 //'status' => $row['status'],
                 'money' => $row['money'],
                 'logo_img' => $row['logo_img'],
@@ -126,10 +140,82 @@ class Order extends ApiBase
 
         $this->success('获取成功',$result);
     }
+    /**
+     * 支付查询
+     */
+    public function orderQuery(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+        $wx = new \app\api\controller\Weixin();
+        $result = $wx->query($orders_sn);
+
+        $this->success('获取成功',$result);
+    }
+
+    /**
+     * 小程序支付
+     * @param Request $request
+     */
+    public function orderPay(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+        $openid = $this->auth->openid;
+        $user_id = $this->auth->id;
 
 
+        if(!$orders_sn){
 
-    //订单支付真实
+            $this->error('订单号不能为空');
+        }
+
+        $order = model('Orders')->getOrder($orders_sn);
+
+        if(!$order){
+            $this->error('订单id错误');
+        }
+
+        if($order->user_id != $user_id){
+            $this->error('非法操作');
+        }
+        if($order->pay_status == 1){
+            $this->error('订单已支付');
+        }
+
+        if($order->status == 11){
+            $this->error('订单已取消');
+        }
+
+        if((time()-$order->add_time) > 15*60){//15分钟失效
+            $this->error('订单已失效');
+        }
+
+        $data['price'] = $order['money'];
+
+        $data = [
+            'openid' => $openid,
+            'body' => "11",
+            'detail' => "11",
+            'out_trade_no' => $orders_sn,
+            'total_fee' => $data['price'],
+        ];
+
+        error_log('request=='.print_r($data,1),3,ROOT_PATH."./logs/order.log");
+        $wx = new \app\api\controller\Weixin();
+        $result = $wx->pay($data);
+
+        error_log('result=='.print_r($result,1),3,ROOT_PATH."./logs/order.log");
+
+        if($result) {
+            $this->success('success',$result);
+        }
+
+    }
+
+    /**
+     * 订单支付真实
+     * @param Request $request
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
+     */
     public function orderPayment(Request $request)
     {
         $orders_sn = $request->param('orders_sn');
@@ -156,6 +242,7 @@ class Order extends ApiBase
         }
 
         if((time()-$order->add_time) > 15*60){//15分钟失效
+            Model('Orders')->updateStatus($orders_sn,9);
             $this->error('订单已失效');
         }
 
@@ -451,7 +538,7 @@ class Order extends ApiBase
     public function cancelOrder(Request $request)
     {
         $order_sn = $request->param('order_sn');
-        $order_status = 11;//已取消
+        $order_status = 9;//已取消
         $hongbao_status = 1;//未使用
 
         if(isset($order_sn)) {

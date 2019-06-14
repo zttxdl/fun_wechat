@@ -74,7 +74,7 @@ class Orders extends Model
      */
     public function getOrderList($page_no, $page_size)
     {
-        return $this->name('orders')->page($page_no,$page_size)->select();
+        return $this->page($page_no,$page_size)->select()->toArray();
     }
 
     /**
@@ -87,5 +87,16 @@ class Orders extends Model
         $data = $this->name('orders')->where('user_id',$uid)->find();
 
         return isset($data) ? true : false;
+    }
+
+    /**
+     * 更新订单状态
+     * @param $order_sn
+     * @param $status
+     * @return int
+     */
+    public function updateStatus($order_sn,$status)
+    {
+        return $this->where('orders_sn',$order_sn)->setField('status',$status);
     }
 }
