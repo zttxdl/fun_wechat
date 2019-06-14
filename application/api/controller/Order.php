@@ -210,7 +210,11 @@ class Order extends ApiBase
 
     }
 
-    //订单支付真实
+    /**
+     * 订单支付真实
+     * @param Request $request
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
+     */
     public function orderPayment(Request $request)
     {
         $orders_sn = $request->param('orders_sn');
@@ -532,7 +536,7 @@ class Order extends ApiBase
     public function cancelOrder(Request $request)
     {
         $order_sn = $request->param('order_sn');
-        $order_status = 11;//已取消
+        $order_status = 9;//已取消
         $hongbao_status = 1;//未使用
 
         if(isset($order_sn)) {
