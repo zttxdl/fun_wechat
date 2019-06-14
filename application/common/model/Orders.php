@@ -88,4 +88,15 @@ class Orders extends Model
 
         return isset($data) ? true : false;
     }
+
+    /**
+     * 更新订单状态
+     * @param $order_sn
+     * @param $status
+     * @return int
+     */
+    public function updateStatus($order_sn,$status)
+    {
+        return $this->where('orders_sn',$order_sn)->setField('status',$status);
+    }
 }

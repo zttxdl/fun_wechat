@@ -50,6 +50,7 @@ class Order extends ApiBase
                 ->leftJoin('ordersInfo c','a.id = c.id')
                 ->field(['a.id','a.orders_sn','a.num','FROM_UNIXTIME( a.add_time, "%Y-%m-%d %H:%i" )'=> 'add_time','a.status','a.money','b.link_tel','b.logo_img','b.shop_name','c.product_id'])
                 ->where('user_id',$user_id)
+                ->order('add_time','DESC')
                 ->page($page,$pagesize)
                 ->select();
 
@@ -241,6 +242,7 @@ class Order extends ApiBase
         }
 
         if((time()-$order->add_time) > 15*60){//15分钟失效
+            Model('Orders')->updateStatus($orders_sn,9);
             $this->error('订单已失效');
         }
 
