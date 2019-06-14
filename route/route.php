@@ -176,6 +176,7 @@ Route::group('merchants',function (){
     Route::post('orderDel','merchants/Order/del');//订单删除
     Route::post('orderReceipt','merchants/Order/receipt');//订单处理
     Route::post('orderRefund','merchants/Order/refund');//退单
+    Route::post('refundQuery','merchants/Order/refundQuery');//查询退款
 
 });
 
