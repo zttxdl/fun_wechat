@@ -31,6 +31,7 @@ class Order extends ApiBase
         '10'     =>  '商家已取消',
     ];
 
+
     /**
      * 订单列表
      * @param Request $request
@@ -67,8 +68,8 @@ class Order extends ApiBase
                 'orders_sn' => $row['orders_sn'],
                 'num' => $row['num'],
                 'add_time' => $row['add_time'],
-                'status' => $this->status_config[$row['status']],
-                //'status' => $row['status'],
+                'status_name' => $this->status_config[$row['status']],
+                'status' => $row['status'],
                 'money' => $row['money'],
                 'logo_img' => $row['logo_img'],
                 'shop_name' => $row['shop_name'],
@@ -547,6 +548,14 @@ class Order extends ApiBase
 
         $order_info = Model('Orders')->getOrder($order_sn);
         try{
+            //订单支付
+            if($order_info['pay_staus'] == 1) {
+                //商家未接单 全额退款
+                if($order_info['status'] != 3) {
+                    //调用退款接口
+                }
+            }
+
             //如果使用红包 状态回滚
             if($order_info['platform_coupon_money'] > 0){
                 Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$hongbao_status);
