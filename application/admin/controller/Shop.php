@@ -303,28 +303,39 @@ class Shop extends Controller
     }
 
     /**
-     * 商家排序列表
+     * 商家排序列表【默认学校】
      */
     public function sortInfo(Request $request)
     {
-        $page_no = $request->param('page_no');
-        $page_size = 5;
-        if(empty($page_no)) {
-            $this->error('非法传参','404');
+        // 学校列表
+        $school_list = Model('school')->getSchoolList();
+        // 获取第一个学校
+        $current_school = $school_list[0]['children'][0];
+
+        // 搜索条件
+        !empty($request->get('name/s')) ? $where[] = ['shop_name','like',$request->get('name/s').'%'] : null;
+        if (!empty($request->get('school_id/d'))) {
+            $where[] = ['school_id','=',$request->get('school_id/d')];
+            $current_school = Model('school')->getSchoolInfoById($request->get('school_id/d'));
+        } else {
+            $where[] = ['school_id','=',$current_school['id']];
         }
-        $shop_list = Model('Shop')->getShopList($page_no,$page_size);
+
+        // 获取当前学校的已审核通过的商铺列表
+        $shop_list = Model('Shop')->getCurSchShopList($where);
 
         $sort_info = [];
-        foreach ($shop_list as $row) {
-            $sort_info['shop_id'] = $row['id'];
-            $sort_info['shop_name'] = $row['shop_name'];
-            $sort_info['logo_img'] = $row['logo_img'];
-            $sort_info['school_name'] = Model('School')->getNameById($row['school_id']);
-            $sort_info['sort'] = $row['sort'];
+        foreach ($shop_list as $k=>$row) {
+            $sort_info[$k]['shop_id'] = $row['id'];
+            $sort_info[$k]['shop_name'] = $row['shop_name'];
+            $sort_info[$k]['logo_img'] = $row['logo_img'];
+            $sort_info[$k]['school_name'] = Model('School')->getNameById($row['school_id']);
+            $sort_info[$k]['sort'] = $row['sort'];
         }
 
-        $this->success('获取成功',$sort_info);
+        $this->success('获取成功',['school_list'=>$school_list,'sort_info'=>$sort_info,'current_school'=>$current_school]);
     }
+
 
     /**
      * 商家排序

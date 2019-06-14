@@ -9,6 +9,7 @@
 namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
+use EasyWeChat\Factory;
 use think\Request;
 use think\Db;
 
@@ -104,25 +105,33 @@ class Order extends MerchantsBase
         $status = $request->param('status');//3:接单 4:拒单 7:确认送出
         $orders_sn = $request->param('orders_sn');
 
+        $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>$status]);
 
-
-        $result = Db::name('Orders')->where('orders_sn',$orders_sn)->update(['status'=>$status]);
-
-        if($result) {
-            return json_success('处理成功');
-        } else {
-            return json_error('处理失败');
-        }
-
-        $this->success('获取成功',$result);
+        $this->success('success',$result);
     }
 
     /**
      * 退款处理
      */
-    public function refund()
+    public function refund(Request $request)
     {
 
+        $number = $request->param('number');//商户订单号
+        $refundNumber = $request->param('refundNumber');//生成唯一商户退款单号
+        $totalFee = $request->param('totalFee');//订单金额
+        $refundFee = $request->param('refundFee');//退款金额
+        $pay_config = config('wx_pay');
+        $app    = Factory::payment($pay_config);//pay_config 微信配置
+
+        //根据商户订单号退款
+        $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
+            // 可在此处传入其他参数，详细参数见微信支付文档
+            'refund_desc' => '取消订单退款',
+            'notify_url'    => 'http' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+        ]);
+
+
+        dump($result);exit;
     }
 
 

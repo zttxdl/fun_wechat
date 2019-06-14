@@ -44,6 +44,7 @@ class Member extends ApiBase
         if (!$result) {
             $this->error(model('Alisms', 'service')->getError());
         }
+        // dump($this->auth->id);die;
 
         // 校验当前手机号真实性
         $sql_phone = model('User')->where('id','=',$this->auth->id)->value('phone');
