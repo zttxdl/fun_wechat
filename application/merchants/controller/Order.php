@@ -16,7 +16,7 @@ use think\Db;
 class Order extends MerchantsBase
 {
 
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['refund'];
 
     /**
      * 店铺订单查询
@@ -120,6 +120,18 @@ class Order extends MerchantsBase
         $refundNumber = $request->param('refundNumber');//生成唯一商户退款单号
         $totalFee = $request->param('totalFee');//订单金额
         $refundFee = $request->param('refundFee');//退款金额
+
+        if (!$number || !$refundNumber){
+            $this->error('非法传参');
+        }
+
+        if ($totalFee < $refundFee){
+            $this->error('退款金额不能大于订单总额');
+        }
+
+        $totalFee = $totalFee*100;
+        $refundFee = $refundFee*100;
+
         $pay_config = config('wx_pay');
         $app    = Factory::payment($pay_config);//pay_config 微信配置
 
@@ -131,8 +143,18 @@ class Order extends MerchantsBase
         ]);
 
 
-        dump($result);exit;
+        $this->success('success',$result);
     }
 
+    //退款查询
+    public function refundQuery(Request $request)
+    {
+        $outTradeNumber = $request->param('outTradeNumber');
+        $pay_config = config('wx_pay');
+        $app    = Factory::payment($pay_config);//pay_config 微信配置
+        $result = $app->refund->queryByOutTradeNumber($outTradeNumber);
+
+        $this->success('success',$result);
+    }
 
 }
