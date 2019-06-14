@@ -35,7 +35,11 @@ class Coupon extends Controller
         $coupon_list = Db::name('platform_coupon')->field('id,batch_id,name,user_type,face_value,threshold,start_time,end_time,other_time,limit_use,num,status,type')
                         ->where($where)->order('id desc')->paginate($pagesize)->each(function ($item, $key) {
                             // 优惠券状态
-                            $item['mb_status'] = config('coupon_status')[$item['status']];
+                            if ($item['type'] == 2 && (time() > $item['end_time'])) {
+                                $item['mb_status'] = '已过期';
+                            } else {
+                                $item['mb_status'] = config('coupon_status')[$item['status']];
+                            }
                             // 用户类型
                             $item['user_type'] = config('user_type')[$item['user_type']];
                             // 限品类
@@ -64,7 +68,10 @@ class Coupon extends Controller
         $mg_model = new ManageCategory();
         $manage_category_list = $mg_model->getManageCategoryList();
 
-        $this->success('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list]);
+        // 红包批次ID
+        $bacth_id = uniqid();
+
+        $this->success('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list,'bacth_id'=>$bacth_id]);
 
     }
      

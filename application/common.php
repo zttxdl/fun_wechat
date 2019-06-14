@@ -122,16 +122,18 @@ if (!function_exists('curl_post')) {
   }
 
 
-/**
- * 生成唯一订单号
- * @param string $head  订单头部前缀（用于区分订单）
- */
-if (!function_exists('build_order_no')) {  
-    function build_order_no()
+if (!function_exists('build_order_no')) {
+
+    /**
+     * $letter 可作为订单类型标识 也可以不用 假如你的项目有多种订单类型
+     */
+
+    function build_order_no($letter = '')
     {
-        return date('YmdHis') . substr(implode(null, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
+        return $letter . date('Ymd') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf('%02d', rand(0, 99));
     }
 }
+
 
 
 /**

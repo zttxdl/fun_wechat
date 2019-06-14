@@ -416,7 +416,7 @@ class Order extends ApiBase
             $this->error('非法传参');
         }*/
 
-        $orders_sn = build_order_no();//生成唯一订单号
+        $orders_sn = build_order_no('D');//生成唯一订单号
 
 
         //启动事务
