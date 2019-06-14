@@ -322,19 +322,53 @@ class Shop extends Controller
         }
 
         // 获取当前学校的已审核通过的商铺列表
+        // dump($where);die;
         $shop_list = Model('Shop')->getCurSchShopList($where);
 
-        $sort_info = [];
+        $shop_sort_list = [];
         foreach ($shop_list as $k=>$row) {
-            $sort_info[$k]['shop_id'] = $row['id'];
-            $sort_info[$k]['shop_name'] = $row['shop_name'];
-            $sort_info[$k]['logo_img'] = $row['logo_img'];
-            $sort_info[$k]['school_name'] = Model('School')->getNameById($row['school_id']);
-            $sort_info[$k]['sort'] = $row['sort'];
+            $shop_sort_list[$k]['shop_id'] = $row['id'];
+            $shop_sort_list[$k]['shop_name'] = $row['shop_name'];
+            $shop_sort_list[$k]['logo_img'] = $row['logo_img'];
+            $shop_sort_list[$k]['school_name'] = Model('School')->getNameById($row['school_id']);
+            $shop_sort_list[$k]['sort'] = $row['sort'];
         }
 
-        $this->success('获取成功',['school_list'=>$school_list,'sort_info'=>$sort_info,'current_school'=>$current_school]);
+        $this->success('获取成功',['school_list'=>$school_list,'shop_sort_list'=>$shop_sort_list,'current_school'=>$current_school]);
     }
+
+
+    /**
+     * 展示当前学校的编辑排序页面 
+     * 
+     */
+    public function editShopSort(Request $request)
+    {
+        $school_id = $request->param('school_id');
+        if (!$school_id) {
+            $this->error('非法参数');
+        }
+
+        // 获取当前学校名称
+        $school_name = model('school')->getNameById($school_id);
+
+        // 获取当前学校下的所有已审核通过的商家集合
+        $where[] = ['school_id','=',$school_id];
+        $shop_list = Model('Shop')->getCurSchShopList($where);
+
+        $shop_sort_list = [];
+        foreach ($shop_list as $k=>$row) {
+            $shop_sort_list[$k]['shop_id'] = $row['id'];
+            $shop_sort_list[$k]['shop_name'] = $row['shop_name'];
+            $shop_sort_list[$k]['logo_img'] = $row['logo_img'];
+            $shop_sort_list[$k]['school_name'] = Model('School')->getNameById($row['school_id']);
+            $shop_sort_list[$k]['sort'] = $row['sort'];
+        }
+
+        $this->success('获取成功',['current_school_name'=>$school_name,'shop_sort_list'=>$shop_sort_list]);
+
+    }
+     
 
 
     /**
@@ -342,21 +376,6 @@ class Shop extends Controller
      */
     public function sort(Request $request)
     {
-        $shop_id = $request->param('shop_id');
-        $sort = $request->param('sort');
-
-        if(empty($shop_id) || empty($sort)) {
-            $this->error('非法传参','404');
-        }
-
-        $map['shop_id'] = $shop_id;
-        $map['sort'] = $sort;
-
-        $data = $this->shopModel->sortEdit($map);
-
-        if(empty($data)) {
-            $this->error('更新失败');
-        }
-        $this->success('更新成功');
+        
     }
 }
