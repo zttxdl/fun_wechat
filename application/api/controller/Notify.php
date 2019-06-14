@@ -17,6 +17,11 @@ use think\Request;
 class Notify extends Collection
 {
 
+    /**
+     * 支付成功回调
+     * @param Request $request
+     * @throws \EasyWeChat\Kernel\Exceptions\Exception
+     */
     public function index(Request $request)
     {
         //转成数组
@@ -51,7 +56,7 @@ class Notify extends Collection
             return true;
         });
 
-        $response->send();;
+        $response->send();
     }
 
     //微信支付回调处理业务
@@ -79,6 +84,43 @@ class Notify extends Collection
         }
 
         return true;
+    }
+
+    /**
+     * 退款成功回调
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \EasyWeChat\Kernel\Exceptions\Exception
+     */
+    public function refundBack(){
+
+        $pay_config = config('wx_pay');
+        $app    = Factory::payment($pay_config);//pay_config 微信配置
+        $response = $app->handleRefundedNotify(function ($message, $reqInfo, $fail) {
+
+            $refund_info = model('Refund')->where('out_refund_no',$reqInfo['out_refund_no'])->find();
+            if (!$refund_info || $refund_info->status== 2) {// 如果订单不存在 或者 订单已经退过款了
+                $fail('Order not exist.');
+                return true;
+            }
+
+            if($message['return_code']=='SUCCESS'){
+
+                if($reqInfo['refund_status']=='SUCCESS'){
+                $data= [
+                    'refund_id'=> $reqInfo['refund_id'],
+                    'refund_time'=>time()
+                ];
+                model('Refund')
+                    ->where('out_refund_no',$reqInfo['out_refund_no'])
+                    ->update($data);
+
+                }
+
+            }
+            return true; // 返回 true 告诉微信“我已处理完成”
+        });
+
+        $response->send();
     }
 
 }
