@@ -23,10 +23,11 @@ class RiderRecruit extends Controller
         //搜索条件
         $where = [];
         !empty($request->get('status/d')) ? $where[] = ['r.status','=',$request->get('status/d')] : null;
+        !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
 
         $list = Db::name('rider_recruit r')->join('user u','r.user_id = u.id')->join('school s','r.school_id = s.id')
                 ->field('r.id,r.phone,r.add_time,r.status,u.nickname,s.name as school_name')->order('r.id desc')
-                ->where($where)->paginate(10)->each(function ($item, $key) {
+                ->where($where)->paginate($pagesize)->each(function ($item, $key) {
                     $item['add_time'] = date('Y-m-d H:i:s',$item['add_time']);
                     $item['mb_status'] = config('dispose_status')[$item['status']];
                     return $item;
