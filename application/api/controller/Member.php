@@ -40,10 +40,11 @@ class Member extends ApiBase
         $code = $request->param('code');
 
         // 校验验证码
-        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
-        if (!$result) {
-            $this->error(model('Alisms', 'service')->getError());
-        }
+        // $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
+        // if (!$result) {
+        //     $this->error(model('Alisms', 'service')->getError());
+        // }
+        dump($this->auth->id);die;
 
         // 校验当前手机号真实性
         $sql_phone = model('User')->where('id','=',$this->auth->id)->value('phone');

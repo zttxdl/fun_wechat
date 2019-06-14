@@ -41,5 +41,17 @@ class School extends Model
 
     }
 
+
+    /**
+     * 根据id 获取学校信息
+     * @param $school_id
+     * @return mixed
+     */
+    public function getSchoolInfoById($school_id)
+    {
+       return  $this->name('school')->where('id',$school_id)->field('id，name')->find();
+
+    }
+
     
 }
