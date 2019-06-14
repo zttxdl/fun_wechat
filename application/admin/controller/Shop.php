@@ -313,8 +313,13 @@ class Shop extends Controller
         $current_school = $school_list[0]['children'][0];
 
         // 搜索条件
-        !empty($request->get('school_id/d')) ? $where[] = ['school_id','=',$request->get('school_id/d')] : $where[] = ['school_id','=',$current_school['id']];
         !empty($request->get('name/s')) ? $where[] = ['shop_name','like',$request->get('name/s').'%'] : null;
+        if (!empty($request->get('school_id/d'))) {
+            $where[] = ['school_id','=',$request->get('school_id/d')];
+            $current_school = Model('school')->getSchoolInfoById($request->get('school_id/d'));
+        } else {
+            $where[] = ['school_id','=',$current_school['id']];
+        }
 
         // 获取当前学校的已审核通过的商铺列表
         $shop_list = Model('Shop')->getCurSchShopList($where);
