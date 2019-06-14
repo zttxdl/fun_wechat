@@ -20,7 +20,7 @@ class School extends ApiBase
     {
         $model = new SchoolModel();
 
-        $school_list = $model->getShopList();
+        $school_list = $model->getSchoolList();
 
         $this->success('获取学校地区列表成功',['school_list'=>$school_list]);
     }

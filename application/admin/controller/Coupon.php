@@ -29,10 +29,11 @@ class Coupon extends Controller
         !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
         !empty($request->get('category/d')) ? $where[] = ['limit_use','between',implode(',',array_column($category_list,'id'))]: null;
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : null;
+        !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
     
         // 优惠券列表
         $coupon_list = Db::name('platform_coupon')->field('id,batch_id,name,user_type,face_value,threshold,start_time,end_time,other_time,limit_use,num,status,type')
-                        ->where($where)->order('id desc')->paginate(10)->each(function ($item, $key) {
+                        ->where($where)->order('id desc')->paginate($pagesize)->each(function ($item, $key) {
                             // 优惠券状态
                             $item['mb_status'] = config('coupon_status')[$item['status']];
                             // 用户类型
@@ -57,7 +58,7 @@ class Coupon extends Controller
     {
         // 优惠券的覆盖范围 [学校]
         $sc_model = new School();
-        $school_list = $sc_model->getShopList();
+        $school_list = $sc_model->getSchoolList();
 
         // 经营品类列表
         $mg_model = new ManageCategory();
@@ -123,7 +124,7 @@ class Coupon extends Controller
 
         // 优惠券的覆盖范围 [学校]
         $sc_model = new School();
-        $school_list = $sc_model->getShopList();
+        $school_list = $sc_model->getSchoolList();
         // 优惠券的覆盖范围 [店铺]
         $shop_list = Db::name('shop_info')->where('school_id',$coupon_info['school_id'])->where('status','=',3)->field('id,shop_name')->select();
 

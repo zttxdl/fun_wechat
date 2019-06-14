@@ -25,9 +25,10 @@ class Advers extends Controller
         !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
         !empty($request->get('platfrom/d')) ? $where[] = ['platfrom','=',$request->get('platfrom/d')] : null;
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : null;
+        !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
 
         // 广告列表
-        $list = Db::name('advers')->where($where)->order('id desc')->paginate(10)->each(function ($item, $key) {
+        $list = Db::name('advers')->where($where)->order('id desc')->paginate($pagesize)->each(function ($item, $key) {
             // 是否启用
             $item['mb_status'] = config('advers_status')[$item['status']];
             // 展示平台

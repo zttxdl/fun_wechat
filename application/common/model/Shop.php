@@ -14,12 +14,14 @@ class Shop extends Model
      * 获取已经审核的商家店铺
      * @param $page_no
      * @param $page_size
+     * @param $school_id
      * @return mixed
      */
-    public function getShopList($page_no,$page_size)
+    public function getShopList($page_no,$page_size,$school_id)
     {
         $data = $this->name('shop_info')
-            ->where('status',1)
+            ->where('status',3)
+            ->where('school_id',$school_id)
             ->order('id','desc')
             ->page($page_no,$page_size)
             ->select();
@@ -219,6 +221,19 @@ class Shop extends Model
 
         return isset($res) ? $res :false ;
     }
+
+
+    /**
+     * 获取当前学校下的已审核通过的商家列表【不分页】 
+     * 
+     */
+    public function getCurSchShopList($where)
+    {
+        $data = $this->name('shop_info')->where('status',3)->where($where)->select()->toArray();
+
+        return $data;
+    }
+     
 
 
 

@@ -18,10 +18,11 @@ class RiderInfo extends Controller
         // 搜索条件
         $where= [];
         !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
+        !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
         $where[] = ['status','in','3,4'];
 
         $list = Db::name('rider_info')->where($where)->field('id,name,link_tel,status,add_time,last_login_time')->order('id desc')
-                ->paginate(10)->each(function ($item, $key) {
+                ->paginate($pagesize)->each(function ($item, $key) {
                     // 完成送餐单数
                     $item['order_nums'] = Db::name('orders')->where('rider_id',$item['id'])->count('id');
                     // 累计收益
@@ -104,9 +105,9 @@ class RiderInfo extends Controller
         $where= [];
         !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : $where[] = ['status','notin','0,4'];
+        !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
 
-
-        $list = Db::name('rider_info')->where($where)->field('id,nickname,name,headimgurl,link_tel,identity_num,hand_card_img,status')->order('id desc')->paginate(10)
+        $list = Db::name('rider_info')->where($where)->field('id,nickname,name,headimgurl,link_tel,identity_num,hand_card_img,status')->order('id desc')->paginate($pagesize)
                 ->each(function ($item, $key) {
                     // 审核状态
                     $item['mb_status'] = config('rider_check_status')[$item['status']];
