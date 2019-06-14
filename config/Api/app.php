@@ -83,7 +83,7 @@ return [
     ],
 
     // 用户端订单显示状态
-    'order_status_name'  =>  [
+    'order_status_msg'  =>  [
         '1'     =>  '订单待支付',
         '2'     =>  '等待商家接单',
         '3'     =>  '商家已接单',
@@ -97,7 +97,7 @@ return [
     ],
 
     //商家端订单显示状态
-    'bussiness_status_name' => [
+    'bussiness_status_msg' => [
         '2' => '等待处理',
         '3' => '已接单',
         '4' => '已接单',
@@ -110,7 +110,7 @@ return [
     ],
 
     //骑手端订单显示状态
-    'rider_status_name' => [
+    'rider_status_msg' => [
         '3' => '待接单',
         '4' => '已接单',
         '5' => '已接单',

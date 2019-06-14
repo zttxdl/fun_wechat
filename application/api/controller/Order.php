@@ -16,7 +16,8 @@ use think\Request;
 class Order extends ApiBase
 {
     protected $noNeedLogin = ['wxNotify'];
-    private $status_config = [
+
+    private $order_status = [
         '1'     =>  '订单待支付',
         '2'     =>  '等待商家接单',
         '3'     =>  '商家已接单',
@@ -66,7 +67,7 @@ class Order extends ApiBase
                 'orders_sn' => $row['orders_sn'],
                 'num' => $row['num'],
                 'add_time' => $row['add_time'],
-                'status_name' => $this->status_config[$row['status']],
+                'status_name' => $this->order_status[$row['status']],
                 'status' => $row['status'],
                 'money' => $row['money'],
                 'logo_img' => $row['logo_img'],
@@ -546,13 +547,6 @@ class Order extends ApiBase
 
         $order_info = Model('Orders')->getOrder($order_sn);
         try{
-            //订单支付
-            if($order_info['pay_staus'] == 1) {
-                //商家未接单 全额退款
-                if($order_info['status'] != 3) {
-                    //调用退款接口
-                }
-            }
 
             //如果使用红包 状态回滚
             if($order_info['platform_coupon_money'] > 0){
@@ -571,6 +565,18 @@ class Order extends ApiBase
             Db::rollback();
             return json_error($e->getMessage());
         }
+
+    }
+
+    /**
+     * 在来一单
+     */
+
+    /**
+     * 订单取消
+     */
+    public function cancelOrder($order_id)
+    {
 
     }
 
