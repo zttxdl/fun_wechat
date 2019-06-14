@@ -22,9 +22,10 @@ class Feedback extends Controller
         //搜索条件
         $where = [];
         !empty($request->get('status/d')) ? $where[] = ['f.status','=',$request->get('status/d')] : null;
+        !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
 
         $list = Db::name('feedback f')->join('user u','f.user_id = u.id')->where($where)->order('f.id desc')->field('f.content,f.add_time,f.status,f.id,u.nickname,u.phone')
-                ->paginate(10)->each(function ($item, $key) {
+                ->paginate($pagesize)->each(function ($item, $key) {
                     // 状态
                     $item['mb_status'] = config('dispose_status')[$item['status']];
                     // 日期

@@ -10,7 +10,7 @@ class School extends Model
      * 学区学校关联列表 
      * 
      */
-    public function getShopList()
+    public function getSchoolList()
     {
         // 学区列表
         $school_district_list = $this->field('id,name as label,name as value')->where('level',1)->select()->toArray();
@@ -38,6 +38,18 @@ class School extends Model
     public function getNameById($school_id)
     {
        return  $this->name('school')->where('id',$school_id)->value('name');
+
+    }
+
+
+    /**
+     * 根据id 获取学校信息
+     * @param $school_id
+     * @return mixed
+     */
+    public function getSchoolInfoById($school_id)
+    {
+       return  $this->name('school')->where('id',$school_id)->field('id，name')->find();
 
     }
 
