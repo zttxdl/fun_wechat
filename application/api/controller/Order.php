@@ -19,17 +19,16 @@ class Order extends ApiBase
 {
     protected $noNeedLogin = ['wxNotify'];
     private $status_config = [
-        '1'     =>  '未支付',
-        '2'     =>  '已付款（商家待接单）',
+        '1'     =>  '订单待支付',
+        '2'     =>  '等待商家接单',
         '3'     =>  '商家已接单',
         '4'     =>  '商家拒绝接单',
         '5'     =>  '骑手取货中',
-        '6'     =>  '骑手配送站',
-        '7'     =>  '商家出单',
-        '8'     =>  '订单已送达（未评价） ',
-        '9'     =>  '订单已完成（已评价）',
-        '10'     =>  '交易关闭（15分钟未支付）',
-        '11'     =>  '订单已取消',
+        '6'     =>  '骑手配送中',
+        '7'     =>  '订单已送达 ',
+        '8'     =>  '订单已完成',
+        '9'     =>  '订单已取消',
+        '10'     =>  '商家已取消',
     ];
 
     /**
@@ -51,6 +50,7 @@ class Order extends ApiBase
                 ->leftJoin('ordersInfo c','a.id = c.id')
                 ->field(['a.id','a.orders_sn','a.num','FROM_UNIXTIME( a.add_time, "%Y-%m-%d %H:%i" )'=> 'add_time','a.status','a.money','b.link_tel','b.logo_img','b.shop_name','c.product_id'])
                 ->where('user_id',$user_id)
+                ->order('add_time','DESC')
                 ->page($page,$pagesize)
                 ->select();
 
@@ -211,7 +211,11 @@ class Order extends ApiBase
 
     }
 
-    //订单支付真实
+    /**
+     * 订单支付真实
+     * @param Request $request
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
+     */
     public function orderPayment(Request $request)
     {
         $orders_sn = $request->param('orders_sn');
@@ -238,6 +242,7 @@ class Order extends ApiBase
         }
 
         if((time()-$order->add_time) > 15*60){//15分钟失效
+            Model('Orders')->updateStatus($orders_sn,9);
             $this->error('订单已失效');
         }
 
@@ -533,7 +538,7 @@ class Order extends ApiBase
     public function cancelOrder(Request $request)
     {
         $order_sn = $request->param('order_sn');
-        $order_status = 11;//已取消
+        $order_status = 9;//已取消
         $hongbao_status = 1;//未使用
 
         if(isset($order_sn)) {
