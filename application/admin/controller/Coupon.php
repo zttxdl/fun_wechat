@@ -68,7 +68,10 @@ class Coupon extends Controller
         $mg_model = new ManageCategory();
         $manage_category_list = $mg_model->getManageCategoryList();
 
-        $this->success('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list]);
+        // 红包批次ID
+        $bacth_id = uniqid();
+
+        $this->success('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list,'bacth_id'=>$bacth_id]);
 
     }
      
