@@ -381,7 +381,7 @@ class Shop extends Controller
         $data = json_decode($string,true);
         $shop = new ShopInfoModel;
         $result = $shop->saveAll($data);
-
+        
         if (!$result) {
             $this->error('设置失败');
         }

@@ -25,5 +25,21 @@ class School extends ApiBase
         $this->success('获取学校地区列表成功',['school_list'=>$school_list]);
     }
 
+
+
+    /**
+     * 学校地区
+     *
+     */
+    public function schoolLevel2()
+    {
+        $model = new SchoolModel();
+
+        $school_list = $model->getSchoolLevel2();
+
+        $this->success('获取学校列表成功',['school_list'=>$school_list]);
+    }
+    
+
     
 }
