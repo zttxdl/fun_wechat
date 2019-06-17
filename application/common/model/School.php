@@ -37,7 +37,7 @@ class School extends Model
      */
     public function getNameById($school_id)
     {
-       return  $this->name('school')->where('id',$school_id)->value('name');
+       return  $this->where('id',$school_id)->value('name');
 
     }
 
@@ -49,7 +49,21 @@ class School extends Model
      */
     public function getSchoolInfoById($school_id)
     {
-       return  $this->name('school')->where('id',$school_id)->field('id，name')->find();
+       return  $this->where('id',$school_id)->field('id,name')->find();
+
+    }
+
+
+    /**
+     * 学校列表 
+     * 
+     */
+    public function getSchoolLevel2()
+    {
+        // 学校列表
+        $school_list = $this->field('id,fid,name as label,name as value')->where('level',2)->select()->toArray();
+
+        return $school_list;
 
     }
 

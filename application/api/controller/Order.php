@@ -10,6 +10,7 @@ namespace app\api\controller;
 use app\common\controller\ApiBase;
 use EasyWeChat\Factory;
 use think\Db;
+use think\Model;
 use think\Request;
 use think\facade\Env;
 
@@ -94,7 +95,8 @@ class Order extends ApiBase
         }
 
         $result = [];
-        $data = Db::name('ordersInfo')->where('orders_id',$orders_id)->select();
+
+        $data = model('Orders')->getOrderDetail($orders_id);
 
         if(!$data) {
             $this->error('暂无数据');
@@ -400,7 +402,6 @@ class Order extends ApiBase
      */
     public function sureOrder(Request $request)
     {
-
         $order = $request->param('order');//主表
         $detail = $request->param('detail');//明细
         $platform_discount = $request->param('platform_discount');//平台活动
@@ -453,8 +454,12 @@ class Order extends ApiBase
 
             //更新红包状态
             if($orderData['platform_coupon_money'] > 0){
+                $data = [
+                    'status' => $hongbao_status,
+                    'order_sn' => $orders_sn,
+                ];
 
-                $res = Model('MyCoupon')->updateStatus($orderData['platform_coupon_id'],$hongbao_status);
+                $res = Model('MyCoupon')->updateStatus($orderData['platform_coupon_id'],$data);
                 if(!$res) {
                     throw new \Exception('红包使用失败');
                 }
@@ -489,6 +494,20 @@ class Order extends ApiBase
                 $product_info = model('Product')->getProductById($row['product_id'])->toArray();
                 //dump($product_info);
 
+
+                //今日特价商品逻辑 start
+                $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
+
+                $today = date('Y-m-d',time());
+
+                if($todaty_goods && $todaty_goods['today'] == $today) {
+                    //加库存
+                    Db::name('today_deals')
+                        ->where('product_id',$row['product_id'])
+                        ->where('today',$today)
+                        ->setDec('num',$row['num']);
+                }
+                //今日特价商品逻辑 end
 
 
                 if($product_info['type'] == 2 && $row['num'] > 1) {//优惠商品
@@ -552,40 +571,54 @@ class Order extends ApiBase
 
         $order_info = Model('Orders')->getOrder($order_sn);
 
-        try{
-            if(!$order_info) {
-                throw new \Exception('订单不存在');
+        $order_detail =  model('Orders')->getOrderDetail($order_info['id']);
+
+        foreach ($order_detail as $row)
+        {
+            //今日特价商品逻辑 start
+            $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
+
+            $today = date('Y-m-d',time());
+
+            if($todaty_goods && $todaty_goods['today'] == $today) {
+                //加库存
+                Db::name('today_deals')
+                    ->where('product_id',$row['product_id'])
+                    ->where('today',$today)
+                    ->setInc('num',$row['num']);
             }
-
-            if($order_info['status'] == 2) {//已经支付
-
-                if($order_info['status'] == 3) {
-                    $this->error('商家已接单,无法退款,请去申请退款');
-                }
-
-                $this->refund($order_info['orders_sn']);
-            }
-
-            //如果使用红包 状态回滚
-            if($order_info['platform_coupon_money'] > 0){
-                Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$hongbao_status);
-            }
-
-            $res = Model('Orders')->cancelOrder($order_sn,$order_status);
-
-            if($res) {
-                $msg = '订单取消成功';
-                $this->success($msg);
-            }
-            $msg = '订单取消失败';
-            $this->error($msg);
-
-
-
-        }catch (\Exception $e) {
-            Db::rollback();
-            return $this->error($e->getMessage());
+            //今日特价商品逻辑 end
         }
+
+        if(!$order_info) {
+            $this->error('订单不存在');
+        }
+
+        if($order_info['status'] == 9){
+            $this->error('订单已取消');
+        }
+
+        if($order_info['status'] == 2) {//已经支付
+
+            if($order_info['status'] == 3) {
+                $this->error('商家已接单,无法退款,请去申请退款');
+            }
+
+            $this->refund($order_info['orders_sn']);//退款
+        }
+
+        //如果使用红包 状态回滚
+        if($order_info['platform_coupon_money'] > 0){
+            $data['status'] = $hongbao_status;
+            Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
+        }
+
+        $res = Model('Orders')->cancelOrder($order_sn,$order_status);
+
+        if($res) {
+            $this->success('订单取消成功');
+        }
+        $this->error('订单取消失败');
 
     }
 
@@ -605,6 +638,7 @@ class Order extends ApiBase
 
         $order_detail = model('Orders')->getOrderDetail($order_id);
 
+        //dump($order_detail);
         $result = [];
 
         foreach ($order_detail  as $row)
@@ -617,8 +651,7 @@ class Order extends ApiBase
                 'total_money' => $row['total_money'],
                 'ping_fee' => $row['ping_fee'],
                 'box_money' => $row['box_money'],
-                'num' => $row['num'],
-                'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids'])
+                'attr_names' => isset($row['attr_ids']) ? model('Shop')->getGoodsAttrName($row['attr_ids']) : ''
             ];
         }
 

@@ -228,6 +228,7 @@ Route::group('u-addr', function () {
 // 学校地区组
 Route::group('u-school', function () {
     Route::get('/index', 'index');
+    Route::get('/school-level2', 'schoolLevel2');
 })->prefix('api/school/');
 
 // 经营品类组
