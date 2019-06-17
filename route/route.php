@@ -84,6 +84,7 @@ Route::group('admin',function (){
     Route::rule('loginOut','admin/Login/loginOut');//用户退出
     Route::rule('register','admin/Login/register');//用户注册
     Route::rule('verify','admin/Login/verify');//验证码
+    Route::rule('clearCache','admin/Login/clear_all');//缓存清理
 });
 
 //权限模块

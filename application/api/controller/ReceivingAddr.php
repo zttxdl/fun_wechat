@@ -20,11 +20,13 @@ class ReceivingAddr extends ApiBase
     public function index(Request $request)
     {
         $school_id = $request->param('school_id','');
-        if ($school_id == ''){
-            $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
-
-        }else{
-            $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
+        $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
+        // 获取学校名称
+        foreach ($list as $k => $v) {
+            $list[$k]['school_name'] = model('school')->getNameById($list[$k]['school_id']);
+        }
+        // 判断是否从下单处获取的地址列表
+        if (!$school_id){
             foreach ($list as &$value) {
                 $value['beyond'] = 0;
                 if ( $value['school_id'] == $school_id){
@@ -32,8 +34,6 @@ class ReceivingAddr extends ApiBase
                 }
             }
         }
-
-
         $this->success('获取收货地址成功',['list'=>$list]);
     }
 
