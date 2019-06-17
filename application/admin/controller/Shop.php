@@ -378,13 +378,10 @@ class Shop extends Controller
     public function sort(Request $request)
     {
         $string = $request->param('sort_list');
-        // print_r($string);
-        var_dump($string);
         $data = json_decode($string,true);
-        var_dump($data);die;
         $shop = new ShopInfoModel;
         $result = $shop->saveAll($data);
-
+        
         if (!$result) {
             $this->error('设置失败');
         }

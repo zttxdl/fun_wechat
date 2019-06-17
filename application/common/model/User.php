@@ -12,7 +12,7 @@ class User extends Model
      */
     public function getUserInfo($uid)
     {
-        $res = $this->name('user')->where('id',$uid)->find();
+        $res = $this->where('id',$uid)->find();
         return $res;
     }
 
@@ -24,7 +24,7 @@ class User extends Model
      */
     public function getUserList($page_no, $page_size)
     {
-        $res = $this->name('user')->page($page_no,$page_size)->select();
+        $res = $this->page($page_no,$page_size)->select();
         return $res;
     }
 

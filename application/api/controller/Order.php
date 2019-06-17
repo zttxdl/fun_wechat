@@ -698,7 +698,5 @@ class Order extends ApiBase
             return true;
         }
     }
-
-
-
 }
+
