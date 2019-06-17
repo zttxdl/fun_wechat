@@ -39,7 +39,7 @@ class Orders extends Model
      */
     public function cancelOrder($order_sn,$status)
     {
-        return $this->name('orders')->where('orders_sn',$order_sn)->setField('status',$status);
+        return $this->name('orders')->where('orders_sn',$order_sn)->setField(['status'=>$status,'cancle_time'=>time()]);
     }
 
     /**
@@ -47,7 +47,8 @@ class Orders extends Model
      */
     public function getOrderDetail($order_id)
     {
-        return $this->name('orders_info')->where('orders_id',$order_id)->select();
+        $data = $this->name('orders_info')->where('orders_id',$order_id)->select();
+        return $data;
     }
 
     /**

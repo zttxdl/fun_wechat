@@ -48,9 +48,9 @@ class MyCoupon extends Model
     /**
      * 红包状态变更
      */
-    public function updateStatus($id,$status)
+    public function updateStatus($id,$data)
     {
-        return $this->where('id',$id)->setField('status',$status);
+        return $this->where('id',$id)->setField($data);
     }
 
 
