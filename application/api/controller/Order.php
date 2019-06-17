@@ -106,6 +106,7 @@ class Order extends ApiBase
 
         foreach ($result['detail'] as &$row) {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
+            $row['name'] = Model('Product')->getNameById($row['product_id']);
             $result['platform_discount']['id'] = $row['platform_coupon_id'];
             $result['platform_discount']['face_value'] = $row['platform_coupon_money'];
             $result['shop_discount']['id'] = $row['shop_discounts_id'];
@@ -120,7 +121,7 @@ class Order extends ApiBase
             ->find();
 
         $result['ping_info'] = [
-            'address' => $orders['address'],
+            'address' => json_decode($orders['address']),
             'name' => $orders['name'],
             'link_tel' => $orders['link_tel'],
             'ping_time' => '尽快送达',
@@ -419,8 +420,11 @@ class Order extends ApiBase
         }*/
 
         $orders_sn = build_order_no('D');//生成唯一订单号
+        $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
+      /*  $orders = Model('Orders');
+        $orders->address = [
 
-
+        ];*/
         //启动事务
         Db::startTrans();
         try{
@@ -428,6 +432,7 @@ class Order extends ApiBase
                 'orders_sn' => $orders_sn,//订单
                 'user_id' => $this->auth->id,
                 'shop_id' => isset($order['shop_id']) ? $order['shop_id'] : 0,
+                'school_id' => $school_id,
                 'money' => isset($order['money']) ? (float)$order['money'] : 0.00,//实付金额
                 'total_money' => isset($order['total_money']) ? (float)$order['total_money'] : 0.00,//订单总价
                 'box_money' => isset($order['box_money']) ? (float)$order['box_money'] : 0.00,//订单参盒费
@@ -489,12 +494,6 @@ class Order extends ApiBase
 
             foreach ($detail as $row) {
 
-                $product_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
-
-                $product_info = model('Product')->getProductById($row['product_id'])->toArray();
-                //dump($product_info);
-
-
                 //今日特价商品逻辑 start
                 $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
 
@@ -509,15 +508,22 @@ class Order extends ApiBase
                 }
                 //今日特价商品逻辑 end
 
+                $product_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
+
+                $product_info = model('Product')->getProductById($row['product_id'])->toArray();
+                //dump($product_info);
+
 
                 if($product_info['type'] == 2 && $row['num'] > 1) {//优惠商品
                     $product_money = $product_info['price'] + ($product_info['old_price'] * ($row['num'] - 1));//优惠商品第二件按原价算
                 }
 
+
                 //如果订单包含 商家或者店铺优惠均摊到 商品结算金额
                 if($orderData['shop_discounts_id'] || $orderData['platform_coupon_id']){
                     $product_money = (float)(($product_money/$order['total_money']) * ($money - $order['box_money'] - $order['ping_fee']));
                 }
+
                 $detailData[] = [
                     'orders_id' => $orders_id,
                     'orders_sn' => $orders_sn,
@@ -573,22 +579,6 @@ class Order extends ApiBase
 
         $order_detail =  model('Orders')->getOrderDetail($order_info['id']);
 
-        foreach ($order_detail as $row)
-        {
-            //今日特价商品逻辑 start
-            $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
-
-            $today = date('Y-m-d',time());
-
-            if($todaty_goods && $todaty_goods['today'] == $today) {
-                //加库存
-                Db::name('today_deals')
-                    ->where('product_id',$row['product_id'])
-                    ->where('today',$today)
-                    ->setInc('num',$row['num']);
-            }
-            //今日特价商品逻辑 end
-        }
 
         if(!$order_info) {
             $this->error('订单不存在');
@@ -612,6 +602,24 @@ class Order extends ApiBase
             $data['status'] = $hongbao_status;
             Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
         }
+
+        //今日特价商品逻辑 start
+        foreach ($order_detail as $row)
+        {
+            $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
+
+            $today = date('Y-m-d',time());
+
+            if($todaty_goods && $todaty_goods['today'] == $today) {
+                //加库存
+                Db::name('today_deals')
+                    ->where('product_id',$row['product_id'])
+                    ->where('today',$today)
+                    ->setInc('num',$row['num']);
+            }
+
+        }
+        //今日特价商品逻辑 end
 
         $res = Model('Orders')->cancelOrder($order_sn,$order_status);
 
@@ -643,15 +651,32 @@ class Order extends ApiBase
 
         foreach ($order_detail  as $row)
         {
+            $attr_list  = model('ProductAttrClassify')
+                ->field('id,name,pid')
+                ->where('id','in',$row['attr_ids'])
+                ->select()
+                ->toArray();
+            $attr = $this->getSonCategory($attr_list);
+            /*ttrs = [];//二级规格集合*/
+            foreach ($attr as $k => &$v){
+                if(empty($v['son'])) {
+                    $v['son'] = '';
+                }
+            }
+
+
+
             $result[] = [
                 'orders_id' => $row['orders_id'],
                 'product_id' => $row['product_id'],
-                'product_name' => Model('Product')->getNameById($row['product_id']),
+                'name' => Model('Product')->getNameById($row['product_id']),
                 'num' => $row['num'],
                 'total_money' => $row['total_money'],
                 'ping_fee' => $row['ping_fee'],
                 'box_money' => $row['box_money'],
-                'attr_names' => isset($row['attr_ids']) ? model('Shop')->getGoodsAttrName($row['attr_ids']) : ''
+                'attrs' => isset($attr) ?  $attr : ''
+
+
             ];
         }
 
