@@ -63,7 +63,7 @@ class Orders extends Model
      */
     public function getOrderById($order_id)
     {
-        return $this->where('orders_sn',$order_id)->find();
+        return $this->where('id',$order_id)->find();
     }
 
     /**
