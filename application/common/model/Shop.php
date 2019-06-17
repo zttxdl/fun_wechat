@@ -8,7 +8,7 @@ use think\Model;
 
 class Shop extends Model
 {
-    private $table_name = 'shop_info';
+    protected $table = 'fun_shop_info';
     private $shop_id;
     /**
      * 获取已经审核的商家店铺
@@ -19,8 +19,7 @@ class Shop extends Model
      */
     public function getShopList($page_no,$page_size,$school_id)
     {
-        $data = $this->name('shop_info')
-            ->where('status',3)
+        $data = $this->where('status',3)
             ->where('school_id',$school_id)
             ->order('id','desc')
             ->page($page_no,$page_size)
@@ -40,8 +39,7 @@ class Shop extends Model
      */
     public function getShopInfo($shop_id)
     {
-        $data = $this->name('shop_info')
-            ->where('id',$shop_id)
+        $data = $this->where('id',$shop_id)
             ->select();
 
         return $data;
@@ -98,8 +96,7 @@ class Shop extends Model
      */
     public function getShopDetail($shop_id)
     {
-        $data = $this->name($this->table_name)
-            ->field('shop_name,logo_img,link_name,link_tel,manage_category_id,school_id,address')
+        $data = $this->field('shop_name,logo_img,link_name,link_tel,manage_category_id,school_id,address')
             ->where('id',$shop_id)->find();
         return $data;
     }
@@ -109,7 +106,7 @@ class Shop extends Model
      */
     public function getInformation($shop_id)
     {
-        $data = $this->name('shop_info')->field('sort,segmentation')->where('id',$shop_id)->find();
+        $data = $this->field('sort,segmentation')->where('id',$shop_id)->find();
         return $data;
 
     }
@@ -217,7 +214,7 @@ class Shop extends Model
      */
     public function sortEdit($map)
     {
-        $res = $this->name($this->table_name)->where('id',$map['shop_id'])->setField('sort',$map['sort']);
+        $res = $this->where('id',$map['shop_id'])->setField('sort',$map['sort']);
 
         return isset($res) ? $res :false ;
     }
@@ -229,7 +226,7 @@ class Shop extends Model
      */
     public function getCurSchShopList($where)
     {
-        $data = $this->name('shop_info')->where('status',3)->where($where)->select()->toArray();
+        $data = $this->where('status',3)->where($where)->select()->toArray();
 
         return $data;
     }
