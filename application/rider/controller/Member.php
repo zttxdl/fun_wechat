@@ -23,7 +23,7 @@ class Member extends RiderBase
      */
     public function index()
     {
-        $info = model('RiderInfo')->getRiderInfo($this->auth->id);
+        $info = Db::name('rider_info')->where('id',$this->auth->id)->field('id,headimgurl,link_tel,nickname,remark,status,open_status')->find();
         return json_success('获取骑手信息成功',['info'=>$info]);
 
     }
@@ -100,12 +100,12 @@ class Member extends RiderBase
             $this->error($check,201);
         }
 
-        // 添加数据
-        $result = RiderInfo::create($data);
+        // 更新数据
+        $result = RiderInfo::where('id','=',$this->auth->id)->update($data);
         if (!$result) {
-            $this->error('添加失败',201);
+            $this->error('更新失败',201);
         }
-        $this->success('添加成功');
+        $this->success('更新成功');
     }
 
 
@@ -115,8 +115,8 @@ class Member extends RiderBase
      */
     public function edit()
     {
-        $info = model('RiderInfo')->where('id',$this->auth->id)->field('id,headimgurl,name,identity_num,card_img,back_img,hand_card_img,school_id')->find();
-
+        $info = model('RiderInfo')->where('id',$this->auth->id)->field('id,name,link_tel,identity_num,card_img,back_img,hand_card_img,school_id')->find();
+        $info['school_name'] = model('school')->getNameById($info['school_id']);
         $this->success('获取成功',['info'=>$info]);        
     }
 
@@ -125,7 +125,7 @@ class Member extends RiderBase
      * 保存编辑后的申请入驻【成为骑手】 
      * 
      */
-    public function uodate(Request $request)
+    public function update(Request $request)
     {
         $data = $request->post();
 
@@ -136,7 +136,7 @@ class Member extends RiderBase
         }
         
         // 更新数据
-        $result = model('RiderInfo')->update($data);
+        $result = RiderInfo::where('id','=',$this->auth->id)->update($data);;
 
         if (!$result) {
             $this->error('更新失败',201);
