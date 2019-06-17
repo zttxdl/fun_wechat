@@ -11,6 +11,7 @@ use app\common\controller\ApiBase;
 use EasyWeChat\Factory;
 use think\Db;
 use think\Request;
+use think\facade\Env;
 
 
 class Order extends ApiBase
@@ -199,11 +200,11 @@ class Order extends ApiBase
             'total_fee' => $data['price'],
         ];
 
-        error_log('request=='.print_r($data,1),3,ROOT_PATH."./logs/order.log");
+        error_log('request=='.print_r($data,1),3,Env::get('root_path')."./logs/order.log");
         $wx = new \app\api\controller\Weixin();
         $result = $wx->pay($data);
 
-        error_log('result=='.print_r($result,1),3,ROOT_PATH."./logs/order.log");
+        error_log('result=='.print_r($result,1),3,Env::get('root_path')."./logs/order.log");
 
         if($result) {
             $this->success('success',$result);
@@ -550,18 +551,19 @@ class Order extends ApiBase
         }
 
         $order_info = Model('Orders')->getOrder($order_sn);
+
         try{
-            if($order_info['status'] == 1) {//未支付
+            if(!$order_info) {
+                throw new \Exception('订单不存在');
+            }
 
-
-
-            }else{ //已经支付
+            if($order_info['status'] == 2) {//已经支付
 
                 if($order_info['status'] == 3) {
                     $this->error('商家已接单,无法退款,请去申请退款');
                 }
 
-                $this->cancelOrder2($order_info);
+                $this->refund($order_info['orders_sn']);
             }
 
             //如果使用红包 状态回滚
@@ -582,7 +584,7 @@ class Order extends ApiBase
 
         }catch (\Exception $e) {
             Db::rollback();
-            return json_error($e->getMessage());
+            return $this->error($e->getMessage());
         }
 
     }
@@ -594,6 +596,11 @@ class Order extends ApiBase
     {
         $order_id = $request->param('order_id');
 
+        $order_info = model('Orders')->getOrderById($order_id);
+
+        if(!$order_info) {
+            $this->error('订单不存在');
+        }
 
         $order_detail = model('Orders')->getOrderDetail($order_id);
 
@@ -616,25 +623,15 @@ class Order extends ApiBase
 
         $this->success('获取成功',$result);
 
-
     }
 
-    /**
-     * 订单取消(已支付)
-     */
-    public function cancelOrder2($order_info)
-    {
-        if($order_info['status'] == 2) {
-            $this->refund($order_info['orders_sn']);//退款处理
-        }
-    }
 
     /**
      * 退款
      */
     public function refund($orders_sn)
     {
-        $number = $orders_sn['orders_sn'];//商户订单号
+        $number = $orders_sn;//商户订单号
         $refund_info = Model('refund')->getRefundInfo($number);
 
         $refundNumber = $refund_info('out_refund_no');//生成唯一商户退款单号
@@ -663,7 +660,9 @@ class Order extends ApiBase
         ]);
 
 
-        $this->success('success',$result);
+        if($result) {
+            return true;
+        }
     }
 
 

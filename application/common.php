@@ -199,4 +199,38 @@ if (!function_exists('write_log')) {
     }
 }
 
+/**
+ * 清理缓存函数
+ */
+if (!function_exists('delete_dir_file'))
+{
+    /**
+     * 循环删除目录和文件
+     * @param string $dir_name
+     * @return bool
+     */
+    function delete_dir_file($dir_name) {
+        $result = false;
+        if(is_dir($dir_name)){
+            if ($handle = opendir($dir_name)) {
+                while (false !== ($item = readdir($handle))) {
+                    if ($item != '.' && $item != '..') {
+                        if (is_dir($dir_name . DS . $item)) {
+                            delete_dir_file($dir_name . DS . $item);
+                        } else {
+                            unlink($dir_name . DS . $item);
+                        }
+                    }
+                }
+                closedir($handle);
+                if (rmdir($dir_name)) {
+                    $result = true;
+                }
+            }
+        }
+        return $result;
+    }
+}
+
+
 
