@@ -12,7 +12,7 @@
 //解决跨域问题
 header('Access-Control-Allow-Origin: *');
 header("Access-Control-Allow-Headers:Origin, X-Requested-With, Content-Type, Accept");
-header('Access-Control-Allow-Methods: POST,GET');
+header('Access-Control-Allow-Methods: POST,GET,PUT');
 if(request()->isOptions()){
     exit();
 }
@@ -273,6 +273,8 @@ Route::group('api',function () {
     Route::post('orderPay','api/Order/OrderPay');
     //支付查询
     Route::post('orderQuery','api/Order/orderQuery');
+    //再来一单
+    Route::post('againOrder','api/Order/againOrder');
 });
 
 
