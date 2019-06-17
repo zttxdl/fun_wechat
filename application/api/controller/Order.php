@@ -104,14 +104,16 @@ class Order extends ApiBase
 
         $result['detail'] = $data;
 
-        foreach ($result['detail'] as &$row) {
+        foreach ($result['detail'] as $row) {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
             $row['name'] = Model('Product')->getNameById($row['product_id']);
+            $row['id'] = $row['product_id'];
             $result['platform_discount']['id'] = $row['platform_coupon_id'];
             $result['platform_discount']['face_value'] = $row['platform_coupon_money'];
             $result['shop_discount']['id'] = $row['shop_discounts_id'];
             $result['shop_discount']['face_value'] = $row['shop_discounts_money'];
             unset($row['attr_ids']);
+            //unset($row['id']);
         }
 
         $orders = Db::name('orders')->alias('a')
