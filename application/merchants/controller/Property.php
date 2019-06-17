@@ -72,7 +72,7 @@ class Property extends MerchantsBase
     public function withdraw(Request $request)
     {
         $shop_id = $this->shop_id;
-        $withdraw_sn = 'TXBH'.build_order_no();
+        $withdraw_sn = build_order_no('TXBH');
         $moeny = $request->param('money');//提现金额
 
         //收支明细

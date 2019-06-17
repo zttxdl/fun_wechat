@@ -59,6 +59,14 @@ class Orders extends Model
     }
 
     /**
+     * 获取订单编号
+     */
+    public function getOrderSnById($order_id)
+    {
+        return $this->where('order_id',$order_id)->value('orders_sn');
+    }
+
+    /**
      * 添加订单详情
      */
     public function addOrderDetail($data)

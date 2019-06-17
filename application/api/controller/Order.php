@@ -16,7 +16,8 @@ use think\Request;
 class Order extends ApiBase
 {
     protected $noNeedLogin = ['wxNotify'];
-    private $status_config = [
+
+    private $order_status = [
         '1'     =>  '订单待支付',
         '2'     =>  '等待商家接单',
         '3'     =>  '商家已接单',
@@ -28,6 +29,7 @@ class Order extends ApiBase
         '9'     =>  '订单已取消',
         '10'     =>  '商家已取消',
     ];
+
 
     /**
      * 订单列表
@@ -65,8 +67,8 @@ class Order extends ApiBase
                 'orders_sn' => $row['orders_sn'],
                 'num' => $row['num'],
                 'add_time' => $row['add_time'],
-                'status' => $this->status_config[$row['status']],
-                //'status' => $row['status'],
+                'status_name' => $this->order_status[$row['status']],
+                'status' => $row['status'],
                 'money' => $row['money'],
                 'logo_img' => $row['logo_img'],
                 'shop_name' => $row['shop_name'],
@@ -349,16 +351,20 @@ class Order extends ApiBase
             $this->error('退单已提交申请,请耐心等待');
         }
 
+        $orders_sn = Model('Orders')->getOrderSnById($orders_id);
+
         $data = [
             'orders_id' => $orders_id,
             'orders_info_ids' => $orders_info_ids,
             'content' => $content,
             'imgs' => $imgs,
-            'money' => $money,
+            'refund_fee' => $money,
+            'total_fee' => $money,
             'num' => $num,
             'status' => '1',
             'add_time' => time(),
-
+            'out_refund_no' => build_order_no('T'),
+            'out_trade_no' => $orders_sn,
         ];
 
         $res = Db::name('refund')->insert($data);
@@ -545,6 +551,19 @@ class Order extends ApiBase
 
         $order_info = Model('Orders')->getOrder($order_sn);
         try{
+            if($order_info['status'] == 1) {//未支付
+
+
+
+            }else{ //已经支付
+
+                if($order_info['status'] == 3) {
+                    $this->error('商家已接单,无法退款,请去申请退款');
+                }
+
+                $this->cancelOrder2($order_info);
+            }
+
             //如果使用红包 状态回滚
             if($order_info['platform_coupon_money'] > 0){
                 Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$hongbao_status);
@@ -553,16 +572,98 @@ class Order extends ApiBase
             $res = Model('Orders')->cancelOrder($order_sn,$order_status);
 
             if($res) {
-                Db::commit();
-                return json_success('订单取消成功');
+                $msg = '订单取消成功';
+                $this->success($msg);
             }
-            return json_error('订单取消失败');
+            $msg = '订单取消失败';
+            $this->error($msg);
+
+
 
         }catch (\Exception $e) {
             Db::rollback();
             return json_error($e->getMessage());
         }
 
+    }
+
+    /**
+     * 在来一单
+     */
+    public function agianOrder(Request $request)
+    {
+        $order_id = $request->param('order_id');
+
+
+        $order_detail = model('Orders')->getOrderDetail($order_id);
+
+        $result = [];
+
+        foreach ($order_detail  as $row)
+        {
+            $result[] = [
+                'orders_id' => $row['orders_id'],
+                'product_id' => $row['product_id'],
+                'product_name' => Model('Product')->getNameById($row['product_id']),
+                'num' => $row['num'],
+                'total_money' => $row['total_money'],
+                'ping_fee' => $row['ping_fee'],
+                'box_money' => $row['box_money'],
+                'num' => $row['num'],
+                'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids'])
+            ];
+        }
+
+        $this->success('获取成功',$result);
+
+
+    }
+
+    /**
+     * 订单取消(已支付)
+     */
+    public function cancelOrder2($order_info)
+    {
+        if($order_info['status'] == 2) {
+            $this->refund($order_info['orders_sn']);//退款处理
+        }
+    }
+
+    /**
+     * 退款
+     */
+    public function refund($orders_sn)
+    {
+        $number = $orders_sn['orders_sn'];//商户订单号
+        $refund_info = Model('refund')->getRefundInfo($number);
+
+        $refundNumber = $refund_info('out_refund_no');//生成唯一商户退款单号
+        $totalFee = $refund_info('total_fee');//订单金额
+        $refundFee = $refund_info('refund_fee');//退款金额
+
+        if (!$number || !$refundNumber){
+            $this->error('非法传参');
+        }
+
+        if ($totalFee < $refundFee){
+            $this->error('退款金额不能大于订单总额');
+        }
+
+        $totalFee = $totalFee*100;
+        $refundFee = $refundFee*100;
+
+        $pay_config = config('wx_pay');
+        $app    = Factory::payment($pay_config);//pay_config 微信配置
+
+        //根据商户订单号退款
+        $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
+            // 可在此处传入其他参数，详细参数见微信支付文档
+            'refund_desc' => '取消订单退款',
+            'notify_url'    => 'http' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+        ]);
+
+
+        $this->success('success',$result);
     }
 
 
