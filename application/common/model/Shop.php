@@ -5,6 +5,7 @@ namespace app\common\model;
 
 
 use think\Model;
+use think\Db;
 
 class Shop extends Model
 {
@@ -175,7 +176,7 @@ class Shop extends Model
      */
     public function getGoodsAttrName($attr_ids = '')
     {
-        $res = $this->name('product_attr_classify')->field('name')->whereIn('id',$attr_ids)->select()->toArray();
+        $res = Db::name('product_attr_classify')->field('name')->whereIn('id',$attr_ids)->select();
         $res = array_column($res,'name');
         $attr_names = implode(",",$res);
         return $attr_names;
