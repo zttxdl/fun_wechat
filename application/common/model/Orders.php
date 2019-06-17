@@ -51,11 +51,19 @@ class Orders extends Model
     }
 
     /**
-     * 订单
+     * 获取订单
      */
     public function getOrder($order_sn)
     {
-        return $this->name('orders')->where('orders_sn',$order_sn)->find();
+        return $this->where('orders_sn',$order_sn)->find();
+    }
+
+    /**
+     * 获取订单
+     */
+    public function getOrderById($order_id)
+    {
+        return $this->where('id',$order_id)->find();
     }
 
     /**
