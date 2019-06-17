@@ -294,6 +294,7 @@ class Shop extends Controller
 
     }
 
+
     /**
      * 商家审核展示
      */
@@ -303,6 +304,7 @@ class Shop extends Controller
         $this->success('获取成功',$data);
     }
 
+
     /**
      * 商家排序列表【默认学校】
      */
@@ -310,8 +312,6 @@ class Shop extends Controller
     {
         // 学校列表
         $school_list = Model('school')->getSchoolList();
-        // 获取第一个学校
-        $current_school = $school_list[0]['children'][0];
 
         // 搜索条件
         !empty($request->get('name/s')) ? $where[] = ['shop_name','like',$request->get('name/s').'%'] : null;
@@ -319,6 +319,9 @@ class Shop extends Controller
             $where[] = ['school_id','=',$request->get('school_id/d')];
             $current_school = Model('school')->getSchoolInfoById($request->get('school_id/d'));
         } else {
+            // 获取第一个学校
+            $current_school = $school_list[0]['children'][0];
+
             $where[] = ['school_id','=',$current_school['id']];
         }
 
@@ -381,7 +384,7 @@ class Shop extends Controller
         $data = json_decode($string,true);
         $shop = new ShopInfoModel;
         $result = $shop->saveAll($data);
-        
+
         if (!$result) {
             $this->error('设置失败');
         }
