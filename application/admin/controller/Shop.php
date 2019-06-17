@@ -378,8 +378,8 @@ class Shop extends Controller
     public function sort(Request $request)
     {
         $string = $request->param('sort_list');
-        print_r($string);
-        var_dump($string);die;
+        // print_r($string);
+        // var_dump($string);die;
         $data = json_decode($string,true);
         $shop = new ShopInfoModel;
         $result = $shop->saveAll($data);
