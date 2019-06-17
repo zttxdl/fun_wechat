@@ -9,6 +9,7 @@ use think\Model;
 class Shop extends Model
 {
     private $table_name = 'shop_info';
+    protected $table = 'shop_info';
     private $shop_id;
     /**
      * 获取已经审核的商家店铺
