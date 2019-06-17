@@ -12,8 +12,6 @@ class Orders extends Command
     protected function configure()
     {
         $this->setName('orders')->setDescription('Here is the auto join  weal');
-        //设置参数
-        $this->addArgument('limit', null, '页码', null);//页码
     }
  
     /**
@@ -21,22 +19,33 @@ class Orders extends Command
      */
     protected function execute(Input $input, Output $output)
     {
+
         
-        $orderlist=Db::table('fun_orders')->where('add_time','<',time()-15*60)->where('pay_status',0)->where('status',1)->column('id');
+        $orderlist=Db::table('fun_orders')->where('add_time','<',time()-15*60)->where('pay_status',0)->where('status',1)->select();
        
         foreach ($orderlist as $k => $v) {
-           Db::table('fun_orders')->where('id',$v)->update(['trading_closed_time'=>time(),'order_status'=>9]);
+           Db::table('fun_orders')->where('id',$v['id'])->update(['trading_closed_time'=>time(),'status'=>9]);
            //付款减库存的商品
-           $goodslist=Db::table('fun_orders_info')->where('orders_id',$v)->field('product_id,num')->select();
-           foreach ($goodslist as $key => $value) {
+           $goodslist=Db::table('fun_orders_info')->where('orders_id',$v['id'])->field('product_id,num')->select();
+
+           //如果使用红包 状态回滚
+            if($v['platform_coupon_money'] > 0){
+                Db::table('fun_my_coupon')->where('id',$v['platform_coupon_id'])->setField('status',1);
+                
+            }
+
+            foreach ($goodslist as $key => $value) {
                 $today = date('Y-m-d',time());
                 //加库存
                 Db::table('fun_today_deals')
-                ->where('product_id',$value->product_id)
+                ->where('product_id',$value['product_id'])
                 ->where('today',$today)
-                ->setInc('num',$value->num);
-           }
+                ->setInc('num',$value['num']);
+            }
         }
+        $num = count($orderlist);
+
+        $output->writeln("OrdersCommand:$num");
     
     }
 }

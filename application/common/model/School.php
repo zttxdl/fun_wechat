@@ -49,7 +49,7 @@ class School extends Model
      */
     public function getSchoolInfoById($school_id)
     {
-       return  $this->where('id',$school_id)->field('id，name')->find();
+       return  $this->where('id',$school_id)->field('id,name')->find();
 
     }
 
