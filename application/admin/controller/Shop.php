@@ -379,6 +379,7 @@ class Shop extends Controller
     {
         $string = $request->param('sort_list');
     
+        dump($string);die;
         $data = json_decode($string,true);
         $shop = new ShopInfoModel;
         $result = $shop->saveAll($data);
