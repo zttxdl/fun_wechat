@@ -314,5 +314,7 @@ Route::group('r-member', function () {
 // 骑手订单组
 Route::group('r-orders', function () {
     Route::rule('/index', 'index');
-   
+    Route::rule('/details', 'details');
+    Route::rule('/statusUpdate', 'statusUpdate');
+
 })->prefix('rider/Orders/');
