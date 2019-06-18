@@ -315,4 +315,8 @@ Route::group('r-member', function () {
     Route::get('/status', 'openStatus');
 })->prefix('rider/Member/');
 
-
+// 骑手订单组
+Route::group('r-orders', function () {
+    Route::rule('/index', 'index');
+   
+})->prefix('rider/Orders/');

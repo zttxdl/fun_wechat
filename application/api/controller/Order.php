@@ -334,28 +334,38 @@ class Order extends ApiBase
     //评价
     public function addEvaluation(Request $request)
     {
-        $orders_id = $request->param('orders_id');
-        $shop_id = $request->param('shop_id');
-        $star = $request->param('star');
-        $content = $request->param('content','');
+        
+        $param = $request->param();
         $tips_ids = $request->param('tips_ids','');
-        $type = $request->param('type');
-
+        
         $data = [
-            'orders_id'=>$orders_id,
-            'shop_id'=>$shop_id,
-            'star'=>$star,
-            'content'=>$content,
-            'user_id'=>1,
-            'type'=>$type,
+            'orders_id'=>$param['orders_id'],
+            'shop_id'=>$param['shop_id'],
+            'star'=>$param['star'],
+            'content'=>$param['content'],
+            'user_id'=>$this->auth->id,
             'add_time'=>time(),
         ];
-        $ret = model('ShopComments')->where('orders_id',$orders_id)->find();
+
+        $data2 = [
+            'orders_id'=>$param['orders_id'],
+            'user_id'=>$this->auth->id,
+            'rider_id'=>$param['rider_id'],
+            'content'=>$param['rider_content'],
+            'star'=> $param['rider_star'],
+            'add_time'=>time(),
+        ];
+
+        $ret = model('ShopComments')->where('orders_id',$param['orders_id'])->find();
 
         if ($ret){
             $this->error('该商品已评价');
         }
 
+        //骑手评价
+        $rid = model('RiderComments')->insertGetId($data2);
+
+        //商家评价
         $id = model('ShopComments')->insertGetId($data);
 
         if ($tips_ids){
@@ -368,7 +378,7 @@ class Order extends ApiBase
             model('ShopCommentsTips')->insertAll($com);
         }
         //改变商品状态
-        model('Orders')->where('id',$orders_id)->update(['status'=>9,'update_time'=>time()]);
+        model('Orders')->where('id',$param['orders_id'])->update(['status'=>9,'update_time'=>time()]);
 
         $this->success('success');
     }
