@@ -26,6 +26,7 @@ class Order extends MerchantsBase
         $status = $request->param('status','');//1:订单待支付;2等待商家接单;3商家已接单;4商家拒绝接单;5骑手取货中;6骑手配送中;7订单已送达;8订单已完成;9订单已取消;10骑手待取餐
         $page_no = $request->param('page');
         $page_size = $request->param('pageSize',20);
+        $shop_id = $this->auth->shop_id;
 
         if(!$page_no ) {
             $this->error('非法传参');
