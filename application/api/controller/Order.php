@@ -17,7 +17,7 @@ use think\facade\Env;
 
 class Order extends ApiBase
 {
-    protected $noNeedLogin = ['wxNotify'];
+    protected $noNeedLogin = ['wxNotify','getriderinfo','getshopinfo'];
 
     private $order_status = [
         '1'     =>  '订单待支付',
@@ -74,12 +74,42 @@ class Order extends ApiBase
                 'money' => $row['money'],
                 'logo_img' => $row['logo_img'],
                 'shop_name' => $row['shop_name'],
-                'product_name' => $product_name,
+                'name' => $product_name,
                 'shop_tel' => $row['link_tel']
             ];
         }
 
         $this->success('success',$result);
+    }
+
+    //获取商家信息
+    public function getShopInfo(Request $request)
+    {
+        $orders_id = $request->param('orders_id');
+        $shop_id = Db::name('orders')->where('id',$orders_id)->value('shop_id');
+
+        $shop_info = Db::name('shop_info')->where('id',$shop_id)->field('id,shop_name,logo_img,link_name,link_tel')->find();
+
+        if(!$shop_info) {
+            $this->error('暂无商家信息');
+        }
+
+        $this->success('获取成功',$shop_info);
+
+    }
+
+    //获取骑手信息
+    public function getRiderInfo(Request $request) {
+        $orders_id = $request->param('orders_id');
+        $rider_id = Db::name('takeout')->where('order_id',$orders_id)->value('rider_id');
+
+        $rider_info = Db::name('rider_info')->where('id',$rider_id)->field('id,name,headimgurl,sex,link_tel')->find();
+
+        if(!$rider_info) {
+            $this->error('暂无骑手信息');
+        }
+
+        $this->success('获取成功',$rider_info);
     }
 
     /**
@@ -116,19 +146,7 @@ class Order extends ApiBase
             //unset($row['id']);
         }
 
-        $orders = Db::name('orders')->alias('a')
-            ->leftJoin('rider_info b','a.rider_id = b.id')
-            ->field('a.*,b.name,b.link_tel')
-            ->where('a.id',$orders_id)
-            ->find();
-
-        $result['ping_info'] = [
-            'address' => json_decode($orders['address']),
-            'name' => $orders['name'],
-            'link_tel' => $orders['link_tel'],
-            'ping_time' => '尽快送达',
-            'ping_type' => '平台配送',
-        ];
+        $orders = Model('Orders')->getOrderById($orders_id);
 
         $result['orders'] = [
             'orders_sn' => $orders['orders_sn'],
@@ -137,8 +155,36 @@ class Order extends ApiBase
             'pint_fee' => $orders['ping_fee'],
             'box_money' => $orders['box_money'],
             'money' => $orders['money'],
-            'shop_id' => $orders['shop_id']
         ];
+
+        $shop_info = Model('ShopInfo')->where('id',$orders['shop_id'])->field('id,shop_name,logo_img,run_type')->find();
+
+        $rider_info = Db::name('takeout')->alias('a')
+            ->leftJoin('rider_info b','a.rider_id = b.id')
+            ->where('a.order_id',$orders_id)
+            ->field('b.*')
+            ->find();
+
+        $result['shop_info'] = [
+            'id' => $shop_info['id'],
+            'shop_name' => $shop_info['shop_name'],
+            'logo_img' => $shop_info['logo_img'],
+        ];
+
+        if(in_array($orders['status'],[3,5,6])) {//骑手取货配货显示时间 送达时间
+
+        }
+        $result['ping_info']['ping_time'] = '尽快送达';
+        $result['ping_info']['ping_type'] = config('run_type')[$shop_info['run_type']];
+        $result['ping_info']['rider_info'] = isset($rider_info) ? $rider_info : '';//骑手信息
+
+        if(empty($rider_info)) {//骑手未接单 配送信息为空
+            $result['ping_info'] = '';
+        }
+        //$result['ping_info']['rider_info'] = !empty($rider_info) ? $rider_info : '';
+
+
+
         if(in_array($orders['status'],[3,5,6])) { //商家接单 和 骑手取货配货显示时间 送达时间
             $result['plan_arrive_time'] = $orders['plan_arrive_time'];
         }
