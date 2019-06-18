@@ -47,14 +47,16 @@ class Order extends ApiBase
         $page = $request->param('page');
         $user_id = $this->auth->id;
 
-        $data = model('orders')->alias('a')
-                ->leftJoin('shopInfo b','a.shop_id = b.id')
-                ->leftJoin('ordersInfo c','a.id = c.id')
-                ->field(['a.id','a.orders_sn','a.num','FROM_UNIXTIME( a.add_time, "%Y-%m-%d %H:%i" )'=> 'add_time','a.status','a.money','b.link_tel','b.logo_img','b.shop_name','c.product_id'])
+        $data = model('orders')
+                ->alias('a')
+                ->leftJoin('ordersInfo b','a.id = b.orders_id')
+                ->field(['a.user_id','a.id','a.orders_sn','a.num','FROM_UNIXTIME( a.add_time, "%Y-%m-%d %H:%i" )'=> 'add_time','a.status','a.money','a.shop_id','b.product_id'])
                 ->where('user_id',$user_id)
                 ->order('add_time','DESC')
                 ->page($page,$pagesize)
                 ->select();
+
+        //dump($data);
 
         if(empty($data)){
             $this->error('你暂时还没有订单，快去挑选吧！');
@@ -63,19 +65,28 @@ class Order extends ApiBase
         $result = [];
 
         foreach ($data as $row) {
-            $product_name = model('Product')->getNameById($row['product_id']);
+
+            $shop_info = Model('ShopInfo')
+                ->where('id',$row['shop_id'])
+                ->field('link_tel,logo_img,shop_name')
+                ->find();
+
+
             $result[] = [
                 'id' => $row['id'],
+                'shop_id' => $row['shop_id'],
+                'user_id' => $row['user_id'],
                 'orders_sn' => $row['orders_sn'],
                 'num' => $row['num'],
                 'add_time' => $row['add_time'],
                 'status_name' => $this->order_status[$row['status']],
                 'status' => $row['status'],
                 'money' => $row['money'],
-                'logo_img' => $row['logo_img'],
-                'shop_name' => $row['shop_name'],
-                'name' => $product_name,
-                'shop_tel' => $row['link_tel']
+                'logo_img' => $shop_info['logo_img'],
+                'shop_name' => $shop_info['shop_name'],
+                'name' => model('Product')->getNameById($row['product_id']),
+                'product_id' => $row['product_id'],
+                'shop_tel' => $shop_info['link_tel']
             ];
         }
 
@@ -464,6 +475,8 @@ class Order extends ApiBase
         $platform_discount = $request->param('platform_discount');//平台活动
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
+
+//        set_log("request请求",$request->param(),'order');
 
         /*dump($order);
         dump($detail);
