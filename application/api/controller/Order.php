@@ -136,13 +136,14 @@ class Order extends ApiBase
             'pay_type' => '在现支付',
             'pint_fee' => $orders['ping_fee'],
             'box_money' => $orders['box_money'],
-            'money' => $orders['money']
+            'money' => $orders['money'],
+            'shop_id' => $orders['shop_id']
         ];
-        if(in_array($orders['status'],[2,5,6])) { //商家接单 和 骑手取货配货显示时间 送达时间
-            $result['time'] = $orders['plan_arrive_time'];
+        if(in_array($orders['status'],[3,5,6])) { //商家接单 和 骑手取货配货显示时间 送达时间
+            $result['plan_arrive_time'] = $orders['plan_arrive_time'];
         }
 
-        $result['order_status'] = config('order_status')[$orders['status']];
+        $result['order_status'] = $this->order_status[$orders['status']];
 
         $this->success('获取成功',$result);
     }
