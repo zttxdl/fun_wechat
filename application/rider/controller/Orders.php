@@ -2,9 +2,8 @@
 
 namespace app\rider\controller;
 
-use think\Controller;
+use think\Db;
 use think\Request;
-use app\common\model\RiderInfo;
 use app\common\controller\RiderBase;
 
 /**
@@ -33,11 +32,13 @@ class Orders extends RiderBase
 
 		$where = [];
 		$where[] = ['school_id','=',$this->auth->school_id];
-		if ($type == 0) {
+		if ($type == 1) {
 			//获取待接单
+            Db::table('fun_takeout');
 			
-		}else{
+		}elseif($type == 2){
 			//获取已接单
+            dd;
 		}
 
 	}

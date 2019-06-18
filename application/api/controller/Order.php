@@ -332,7 +332,7 @@ class Order extends ApiBase
             model('ShopCommentsTips')->insertAll($com);
         }
         //改变商品状态
-        model('Orders')->where('id',$orders_id)->update(['status'=>9,'update_time'=>time()]);
+        model('Orders')->where('id',$param['orders_id'])->update(['status'=>9,'update_time'=>time()]);
 
         $this->success('success');
     }
