@@ -69,11 +69,11 @@ class Orders extends RiderBase
 	
 	public function grabSingle(Request $request)
 	{
-        $orderId = $request->param('orderId');
+        $orderId = $request->param('order_id');
 
         $status = model('Orders')->where('id',$orderId)->value('status');
 
-        if ($status == 10){
+        if ($status !== 3){
             $this->error('手慢了，被人抢走了');
         }
         $data = [
@@ -129,7 +129,7 @@ class Orders extends RiderBase
 
         $data = Db::table('fun_takeout')
             ->alias('a')
-            ->field('a.order_id,a.ping_fee,a.meal_sn,a.single_time,shop_address,a.accomplish_time,a.expected_time,b.address,b.status,b.trading_closed_time,b.send_time')
+            ->field('a.order_id,a.ping_fee,a.meal_sn,a.single_time,shop_address,a.accomplish_time,a.expected_time,b.address,b.status,b.trading_closed_time,b.send_time,b.cancel_desc')
             ->join('fun_orders b','a.order_id = b.id')
             ->where('a.order_id','=',$orderId)
             ->find();

@@ -319,6 +319,7 @@ Route::group('r-member', function () {
 Route::group('r-orders', function () {
     Route::rule('/index', 'index');
     Route::rule('/details', 'details');
+    Route::rule('/grabSingle', 'grabSingle');
     Route::rule('/statusUpdate', 'statusUpdate');
 
 })->prefix('rider/Orders/');
