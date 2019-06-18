@@ -256,6 +256,11 @@ Route::group('u-intention', function () {
 
 });
 
+// 公共接口
+Route::group('u-upload', function () {
+    Route::post('/upload', 'upload');
+})->prefix('api/upload/');
+
 
 //订单
 Route::group('api',function () {
@@ -301,7 +306,7 @@ Route::group('r-member', function () {
     Route::post('/update-tel', 'setRiderPhone');
     Route::post('/apply', 'applyRider');
     Route::get('/edit', 'edit');
-    Route::post('/uodate', 'uodate');
+    Route::post('/update', 'update');
     Route::post('/bind-tel', 'BindRiderPhone');
     Route::get('/status', 'openStatus');
 })->prefix('rider/Member/');

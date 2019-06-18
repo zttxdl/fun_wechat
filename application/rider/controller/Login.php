@@ -49,15 +49,12 @@ class Login extends Controller
         $list['headimgurl'] = $data['avatarUrl'];
         $list['openid'] = $data['openid'];
         $list['sex'] = $data['gender'];
-        $list['invitation_id'] = $data['invitation_id'];
         $list['add_time'] = time();
 
         // 判断当前用户是否已授权
         $id = RiderInfo::where('openid','=',$data['openid'])->count('id');
         if ($id) {
-
             $this->error('该用户已授权');
-
         }
 
         // 存入数据

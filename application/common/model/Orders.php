@@ -6,6 +6,8 @@ use think\Model;
 
 class Orders extends Model
 {
+    // 设置json类型字段
+    protected $json = ['address'];
     //
     /**
      * 获取会员消费记录
