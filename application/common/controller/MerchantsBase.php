@@ -32,8 +32,7 @@ class MerchantsBase extends Controller
         $jwtAuth = new JwtAuth();
 
         $jwt = $jwtAuth->checkToken($token);
-
-        $this->shop_id = substr($jwt['data'],9);
+        $this->auth = $jwt['data'];
 
     }
 

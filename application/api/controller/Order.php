@@ -29,7 +29,7 @@ class Order extends ApiBase
         '7'     =>  '订单已送达 ',
         '8'     =>  '订单已完成',
         '9'     =>  '订单已取消',
-        '10'     =>  '商家已取消',
+        '10'     =>  '骑手待取餐',
     ];
 
 
@@ -50,14 +50,28 @@ class Order extends ApiBase
         $data = model('orders')
                 ->alias('a')
                 ->leftJoin('ordersInfo b','a.id = b.orders_id')
-                ->field(['a.user_id','a.id','a.orders_sn','a.num','FROM_UNIXTIME( a.add_time, "%Y-%m-%d %H:%i" )'=> 'add_time','a.status','a.money','a.shop_id','b.product_id'])
+                ->leftJoin('ShopInfo c', 'a.shop_id = c.id')
+                ->field([
+                    'a.user_id',
+                    'a.id',
+                    'a.orders_sn',
+                    'a.num',
+                    'FROM_UNIXTIME( a.add_time, "%Y-%m-%d %H:%i" )'=> 'add_time',
+                    'a.status',
+                    'a.money',
+                    'a.shop_id',
+                    'b.product_id',
+                    'c.link_tel',
+                    'c.logo_img',
+                    'c.shop_name'])
                 ->where('user_id',$user_id)
                 ->order('add_time','DESC')
                 ->page($page,$pagesize)
+                ->group('a.id')
                 ->select();
 
         //dump($data);
-
+        //exit;
         if(empty($data)){
             $this->error('你暂时还没有订单，快去挑选吧！');
         }
@@ -65,12 +79,6 @@ class Order extends ApiBase
         $result = [];
 
         foreach ($data as $row) {
-
-            $shop_info = Model('ShopInfo')
-                ->where('id',$row['shop_id'])
-                ->field('link_tel,logo_img,shop_name')
-                ->find();
-
 
             $result[] = [
                 'id' => $row['id'],
@@ -82,11 +90,11 @@ class Order extends ApiBase
                 'status_name' => $this->order_status[$row['status']],
                 'status' => $row['status'],
                 'money' => $row['money'],
-                'logo_img' => $shop_info['logo_img'],
-                'shop_name' => $shop_info['shop_name'],
+                'logo_img' => $row['logo_img'],
+                'shop_name' => $row['shop_name'],
                 'name' => model('Product')->getNameById($row['product_id']),
                 'product_id' => $row['product_id'],
-                'shop_tel' => $shop_info['link_tel']
+                'shop_tel' => $row['link_tel']
             ];
         }
 
@@ -150,9 +158,9 @@ class Order extends ApiBase
             $row['name'] = Model('Product')->getNameById($row['product_id']);
             $row['id'] = $row['product_id'];
             $result['platform_discount']['id'] = $row['platform_coupon_id'];
-            $result['platform_discount']['face_value'] = $row['platform_coupon_money'];
+            $result['platform_discount']['face_value'] = (int)$row['platform_coupon_money'];
             $result['shop_discount']['id'] = $row['shop_discounts_id'];
-            $result['shop_discount']['face_value'] = $row['shop_discounts_money'];
+            $result['shop_discount']['face_value'] = (int)$row['shop_discounts_money'];
 //            unset($row['attr_ids']);
             //unset($row['id']);
         }
@@ -166,6 +174,7 @@ class Order extends ApiBase
             'pint_fee' => $orders['ping_fee'],
             'box_money' => $orders['box_money'],
             'money' => $orders['money'],
+            'num' => $orders['num'],
             'status' => $orders['status'],
             'status_name' => $this->order_status[$orders['status']]
         ];
@@ -546,6 +555,7 @@ class Order extends ApiBase
             $order_discount = $orderData['shop_discounts_money'] + $orderData['platform_coupon_money'];//订单优惠金额
             $product_total_money = '0.00';//商品总价和
             $product_money = '0.00';//商品结算金额(如果有优惠会把运费和包装费去除计算)
+            $old_money = '0.00';//商品原价 如果有优惠商品记录商品原价
 
             foreach ($detail as $row) {
                 $product_total_money += $row['total_money'];
@@ -577,18 +587,21 @@ class Order extends ApiBase
                 }
                 //今日特价商品逻辑 end
 
+                //商品均摊金额和商品原价初始化
                 $product_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
+                $old_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
 
                 $product_info = model('Product')->getProductById($row['product_id'])->toArray();
                 //dump($product_info);
 
-
-                if($product_info['type'] == 2 && $row['num'] > 1) {//优惠商品
-                    $product_money = $product_info['price'] + ($product_info['old_price'] * ($row['num'] - 1));//优惠商品第二件按原价算
+                //优惠商品计算逻辑
+                if($product_info['type'] == 2 && $row['num'] > 1) {
+                    $product_money = $product_info['total_money'] + ($product_info['old_price'] * ($row['num'] - 1));//优惠商品第二件按原价算
+                    $old_money = $product_info['old_price'] * $row['num'];//商品原价
                 }
 
 
-                //如果订单包含 商家或者店铺优惠均摊到 商品结算金额
+                //如果订单包含 商家或者店铺优惠均摊到 商品结算金额计算逻辑
                 if($orderData['shop_discounts_id'] || $orderData['platform_coupon_id']){
                     $product_money = (float)(($product_money/$order['total_money']) * ($money - $order['box_money'] - $order['ping_fee']));
                 }
@@ -599,8 +612,9 @@ class Order extends ApiBase
                     'product_id' => isset($row['product_id']) ? $row['product_id'] : 0,
                     'attr_ids' => isset($row['attr_ids']) ? $row['attr_ids'] : '',
                     'num' => isset($row['num']) ? $row['num'] : 0,
-                    'total_money' => isset($row['total_money']) ? $row['total_money'] : 0.00,
+                    'total_money' => $row['total_money'],
                     'money' => $product_money,//商品结算金额
+                    'old_money' => $old_money,//商品原价
                     'box_money' => isset($row['box_money']) ? $row['box_money'] : 0.00,
                     'platform_coupon_id' => isset($platform_discount['id']) ? $platform_discount['id'] : 0,
                     'platform_coupon_money' => isset($platform_discount['face_value']) ? (float)$platform_discount['face_value'] : 0.00,
@@ -715,6 +729,7 @@ class Order extends ApiBase
 
         $order_detail = model('Orders')->getOrderDetail($order_id);
 
+
         //dump($order_detail);
         $result = [];
 
@@ -732,17 +747,19 @@ class Order extends ApiBase
                     $v['son'] = '';
                 }
             }*/
-
+            $product_info = Model('Product')->where('id',$row['product_id'])->find();
 
 
             $result[] = [
                 'orders_id' => $row['orders_id'],
-                'product_id' => $row['product_id'],
-                'name' => Model('Product')->getNameById($row['product_id']),
+                'product_id' => $product_info['id'],
+                'products_classify_id' => $product_info['products_classify_id'],
+                'thumb' => $product_info['thumb'],
+                'name' => $product_info['name'],
                 'num' => $row['num'],
-                'total_money' => $row['total_money'],
-                'ping_fee' => $row['ping_fee'],
-                'box_money' => $row['box_money'],
+                'price' => $product_info['price'],
+                'old_price' => $product_info['old_price'],
+                'box_money' => $product_info['box_money'],
                 'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
                 'attr_ids' => $row['attr_ids']
 
