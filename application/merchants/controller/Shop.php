@@ -35,8 +35,8 @@ class Shop extends MerchantsBase
 
         foreach ($result as $row)
         {
-            if($row['status'] == '3') {
-                $this->error('店铺');
+            if($row['status'] == '1') {
+                $this->error('店铺待审核中!');
             }
             $shop_info = [
                 'shop_name' => $row['shop_name'],//店铺名称
@@ -46,6 +46,7 @@ class Shop extends MerchantsBase
                 'day_uv' => '20',//今日访客数
                 'order_cancel_num' => '2',//订单取消数量
             ];
+
         }
 
 
@@ -126,8 +127,38 @@ class Shop extends MerchantsBase
     /**
      * 商家信息
      */
-    public function info()
+    public function info(Request $request)
     {
+        $shop_id = $request->param('shop_id');
+
+        if(!$shop_id) {
+            $this->error('非法传参');
+        }
+
+        $shop_info = Model('Shop')->getShopInfo($shop_id);
+
+
+        if(empty($shop_info) && !isset($shop_info)) {
+            $this->error('店铺不存在');
+        }
+
+        $result = [];
+
+        foreach ($shop_info as $row)
+        {
+            $result = [
+                'shop_name' => $row['shop_name'],
+                'link_tel' => $row['link_tel'],
+                'open_time' => $row['open_time'],
+                'run_type' => config('run_type')[$row['run_type']],
+                'ping_fee' => $row['ping_fee'],
+                'up_to_send_money' => $row['up_to_send_money'],
+                'notice' => $row['notice'],
+                'info' => $row['info'],
+            ];
+        }
+
+        $this->success('获取成功',$result);
 
     }
 

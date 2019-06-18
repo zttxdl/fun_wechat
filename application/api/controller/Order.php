@@ -17,7 +17,7 @@ use think\facade\Env;
 
 class Order extends ApiBase
 {
-    protected $noNeedLogin = ['wxNotify'];
+    protected $noNeedLogin = ['wxNotify','getriderinfo','getshopinfo'];
 
     private $order_status = [
         '1'     =>  '订单待支付',
@@ -47,14 +47,16 @@ class Order extends ApiBase
         $page = $request->param('page');
         $user_id = $this->auth->id;
 
-        $data = model('orders')->alias('a')
-                ->leftJoin('shopInfo b','a.shop_id = b.id')
-                ->leftJoin('ordersInfo c','a.id = c.id')
-                ->field(['a.id','a.orders_sn','a.num','FROM_UNIXTIME( a.add_time, "%Y-%m-%d %H:%i" )'=> 'add_time','a.status','a.money','b.link_tel','b.logo_img','b.shop_name','c.product_id'])
+        $data = model('orders')
+                ->alias('a')
+                ->leftJoin('ordersInfo b','a.id = b.orders_id')
+                ->field(['a.user_id','a.id','a.orders_sn','a.num','FROM_UNIXTIME( a.add_time, "%Y-%m-%d %H:%i" )'=> 'add_time','a.status','a.money','a.shop_id','b.product_id'])
                 ->where('user_id',$user_id)
                 ->order('add_time','DESC')
                 ->page($page,$pagesize)
                 ->select();
+
+        //dump($data);
 
         if(empty($data)){
             $this->error('你暂时还没有订单，快去挑选吧！');
@@ -63,23 +65,62 @@ class Order extends ApiBase
         $result = [];
 
         foreach ($data as $row) {
-            $product_name = model('Product')->getNameById($row['product_id']);
+
+            $shop_info = Model('ShopInfo')
+                ->where('id',$row['shop_id'])
+                ->field('link_tel,logo_img,shop_name')
+                ->find();
+
+
             $result[] = [
                 'id' => $row['id'],
+                'shop_id' => $row['shop_id'],
+                'user_id' => $row['user_id'],
                 'orders_sn' => $row['orders_sn'],
                 'num' => $row['num'],
                 'add_time' => $row['add_time'],
                 'status_name' => $this->order_status[$row['status']],
                 'status' => $row['status'],
                 'money' => $row['money'],
-                'logo_img' => $row['logo_img'],
-                'shop_name' => $row['shop_name'],
-                'product_name' => $product_name,
-                'shop_tel' => $row['link_tel']
+                'logo_img' => $shop_info['logo_img'],
+                'shop_name' => $shop_info['shop_name'],
+                'name' => model('Product')->getNameById($row['product_id']),
+                'product_id' => $row['product_id'],
+                'shop_tel' => $shop_info['link_tel']
             ];
         }
 
         $this->success('success',$result);
+    }
+
+    //获取商家信息
+    public function getShopInfo(Request $request)
+    {
+        $orders_id = $request->param('orders_id');
+        $shop_id = Db::name('orders')->where('id',$orders_id)->value('shop_id');
+
+        $shop_info = Db::name('shop_info')->where('id',$shop_id)->field('id,shop_name,logo_img,link_name,link_tel')->find();
+
+        if(!$shop_info) {
+            $this->error('暂无商家信息');
+        }
+
+        $this->success('获取成功',$shop_info);
+
+    }
+
+    //获取骑手信息
+    public function getRiderInfo(Request $request) {
+        $orders_id = $request->param('orders_id');
+        $rider_id = Db::name('takeout')->where('order_id',$orders_id)->value('rider_id');
+
+        $rider_info = Db::name('rider_info')->where('id',$rider_id)->field('id,name,headimgurl,sex,link_tel')->find();
+
+        if(!$rider_info) {
+            $this->error('暂无骑手信息');
+        }
+
+        $this->success('获取成功',$rider_info);
     }
 
     /**
@@ -104,28 +145,19 @@ class Order extends ApiBase
 
         $result['detail'] = $data;
 
-        foreach ($result['detail'] as &$row) {
+        foreach ($result['detail'] as $row) {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
+            $row['name'] = Model('Product')->getNameById($row['product_id']);
+            $row['id'] = $row['product_id'];
             $result['platform_discount']['id'] = $row['platform_coupon_id'];
             $result['platform_discount']['face_value'] = $row['platform_coupon_money'];
             $result['shop_discount']['id'] = $row['shop_discounts_id'];
             $result['shop_discount']['face_value'] = $row['shop_discounts_money'];
-            unset($row['attr_ids']);
+//            unset($row['attr_ids']);
+            //unset($row['id']);
         }
 
-        $orders = Db::name('orders')->alias('a')
-            ->leftJoin('rider_info b','a.rider_id = b.id')
-            ->field('a.*,b.name,b.link_tel')
-            ->where('a.id',$orders_id)
-            ->find();
-
-        $result['ping_info'] = [
-            'address' => $orders['address'],
-            'name' => $orders['name'],
-            'link_tel' => $orders['link_tel'],
-            'ping_time' => '尽快送达',
-            'ping_type' => '平台配送',
-        ];
+        $orders = Model('Orders')->getOrderById($orders_id);
 
         $result['orders'] = [
             'orders_sn' => $orders['orders_sn'],
@@ -133,13 +165,39 @@ class Order extends ApiBase
             'pay_type' => '在现支付',
             'pint_fee' => $orders['ping_fee'],
             'box_money' => $orders['box_money'],
-            'money' => $orders['money']
+            'money' => $orders['money'],
+            'status' => $orders['status'],
+            'status_name' => $this->order_status[$orders['status']]
         ];
-        if(in_array($orders['status'],[2,5,6])) { //商家接单 和 骑手取货配货显示时间 送达时间
-            $result['time'] = $orders['plan_arrive_time'];
+
+        $shop_info = Model('ShopInfo')->where('id',$orders['shop_id'])->field('id,shop_name,logo_img,run_type')->find();
+
+        $result['shop_info'] = [
+            'id' => $shop_info['id'],
+            'shop_name' => $shop_info['shop_name'],
+            'logo_img' => $shop_info['logo_img'],
+        ];
+
+        $result['ping_info']['ping_time'] = '尽快送达';
+        $result['ping_info']['ping_type'] = '平台配送';
+        $result['ping_info']['address'] = $orders['address'];
+        $result['ping_info']['rider_info'] = '';
+        if(in_array($orders['status'],[5,6,7,8])) {//骑手取货、配货、已送达、已完成显示配送信息
+
+            $rider_info = Db::name('takeout')->alias('a')
+                ->leftJoin('rider_info b','a.rider_id = b.id')
+                ->where('a.order_id',$orders_id)
+                ->field('b.*')
+                ->find();
+            $result['ping_info']['rider_info'] = isset($rider_info) ? $rider_info : '';//骑手信息
+
         }
 
-        $result['order_status'] = config('order_status')[$orders['status']];
+        if(in_array($orders['status'],[3,5,6,7,8])) { //商家接单 和 骑手取货配货显示时间 送达时间
+            $result['plan_arrive_time'] = $orders['plan_arrive_time'];
+        }
+
+
 
         $this->success('获取成功',$result);
     }
@@ -284,28 +342,38 @@ class Order extends ApiBase
     //评价
     public function addEvaluation(Request $request)
     {
-        $orders_id = $request->param('orders_id');
-        $shop_id = $request->param('shop_id');
-        $star = $request->param('star');
-        $content = $request->param('content','');
+        
+        $param = $request->param();
         $tips_ids = $request->param('tips_ids','');
-        $type = $request->param('type');
-
+        
         $data = [
-            'orders_id'=>$orders_id,
-            'shop_id'=>$shop_id,
-            'star'=>$star,
-            'content'=>$content,
-            'user_id'=>1,
-            'type'=>$type,
+            'orders_id'=>$param['orders_id'],
+            'shop_id'=>$param['shop_id'],
+            'star'=>$param['star'],
+            'content'=>$param['content'],
+            'user_id'=>$this->auth->id,
             'add_time'=>time(),
         ];
-        $ret = model('ShopComments')->where('orders_id',$orders_id)->find();
+
+        $data2 = [
+            'orders_id'=>$param['orders_id'],
+            'user_id'=>$this->auth->id,
+            'rider_id'=>$param['rider_id'],
+            'content'=>$param['rider_content'],
+            'star'=> $param['rider_star'],
+            'add_time'=>time(),
+        ];
+
+        $ret = model('ShopComments')->where('orders_id',$param['orders_id'])->find();
 
         if ($ret){
             $this->error('该商品已评价');
         }
 
+        //骑手评价
+        $rid = model('RiderComments')->insertGetId($data2);
+
+        //商家评价
         $id = model('ShopComments')->insertGetId($data);
 
         if ($tips_ids){
@@ -318,7 +386,7 @@ class Order extends ApiBase
             model('ShopCommentsTips')->insertAll($com);
         }
         //改变商品状态
-        model('Orders')->where('id',$orders_id)->update(['status'=>9,'update_time'=>time()]);
+        model('Orders')->where('id',$param['orders_id'])->update(['status'=>9,'update_time'=>time()]);
 
         $this->success('success');
     }
@@ -408,6 +476,8 @@ class Order extends ApiBase
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
 
+//        set_log("request请求",$request->param(),'order');
+
         /*dump($order);
         dump($detail);
         dump($platform_discount);
@@ -419,8 +489,11 @@ class Order extends ApiBase
         }*/
 
         $orders_sn = build_order_no('D');//生成唯一订单号
+        $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
+      /*  $orders = Model('Orders');
+        $orders->address = [
 
-
+        ];*/
         //启动事务
         Db::startTrans();
         try{
@@ -428,6 +501,7 @@ class Order extends ApiBase
                 'orders_sn' => $orders_sn,//订单
                 'user_id' => $this->auth->id,
                 'shop_id' => isset($order['shop_id']) ? $order['shop_id'] : 0,
+                'school_id' => $school_id,
                 'money' => isset($order['money']) ? (float)$order['money'] : 0.00,//实付金额
                 'total_money' => isset($order['total_money']) ? (float)$order['total_money'] : 0.00,//订单总价
                 'box_money' => isset($order['box_money']) ? (float)$order['box_money'] : 0.00,//订单参盒费
@@ -489,12 +563,6 @@ class Order extends ApiBase
 
             foreach ($detail as $row) {
 
-                $product_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
-
-                $product_info = model('Product')->getProductById($row['product_id'])->toArray();
-                //dump($product_info);
-
-
                 //今日特价商品逻辑 start
                 $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
 
@@ -509,15 +577,22 @@ class Order extends ApiBase
                 }
                 //今日特价商品逻辑 end
 
+                $product_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
+
+                $product_info = model('Product')->getProductById($row['product_id'])->toArray();
+                //dump($product_info);
+
 
                 if($product_info['type'] == 2 && $row['num'] > 1) {//优惠商品
                     $product_money = $product_info['price'] + ($product_info['old_price'] * ($row['num'] - 1));//优惠商品第二件按原价算
                 }
 
+
                 //如果订单包含 商家或者店铺优惠均摊到 商品结算金额
                 if($orderData['shop_discounts_id'] || $orderData['platform_coupon_id']){
                     $product_money = (float)(($product_money/$order['total_money']) * ($money - $order['box_money'] - $order['ping_fee']));
                 }
+
                 $detailData[] = [
                     'orders_id' => $orders_id,
                     'orders_sn' => $orders_sn,
@@ -573,22 +648,6 @@ class Order extends ApiBase
 
         $order_detail =  model('Orders')->getOrderDetail($order_info['id']);
 
-        foreach ($order_detail as $row)
-        {
-            //今日特价商品逻辑 start
-            $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
-
-            $today = date('Y-m-d',time());
-
-            if($todaty_goods && $todaty_goods['today'] == $today) {
-                //加库存
-                Db::name('today_deals')
-                    ->where('product_id',$row['product_id'])
-                    ->where('today',$today)
-                    ->setInc('num',$row['num']);
-            }
-            //今日特价商品逻辑 end
-        }
 
         if(!$order_info) {
             $this->error('订单不存在');
@@ -612,6 +671,24 @@ class Order extends ApiBase
             $data['status'] = $hongbao_status;
             Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
         }
+
+        //今日特价商品逻辑 start
+        foreach ($order_detail as $row)
+        {
+            $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
+
+            $today = date('Y-m-d',time());
+
+            if($todaty_goods && $todaty_goods['today'] == $today) {
+                //加库存
+                Db::name('today_deals')
+                    ->where('product_id',$row['product_id'])
+                    ->where('today',$today)
+                    ->setInc('num',$row['num']);
+            }
+
+        }
+        //今日特价商品逻辑 end
 
         $res = Model('Orders')->cancelOrder($order_sn,$order_status);
 
@@ -643,15 +720,33 @@ class Order extends ApiBase
 
         foreach ($order_detail  as $row)
         {
+            /*$attr_list  = model('ProductAttrClassify')
+                ->field('id,name,pid')
+                ->where('id','in',$row['attr_ids'])
+                ->select()
+                ->toArray();
+            $attr = $this->getSonCategory($attr_list);
+            ttrs = [];//二级规格集合
+            foreach ($attr as $k => &$v){
+                if(empty($v['son'])) {
+                    $v['son'] = '';
+                }
+            }*/
+
+
+
             $result[] = [
                 'orders_id' => $row['orders_id'],
                 'product_id' => $row['product_id'],
-                'product_name' => Model('Product')->getNameById($row['product_id']),
+                'name' => Model('Product')->getNameById($row['product_id']),
                 'num' => $row['num'],
                 'total_money' => $row['total_money'],
                 'ping_fee' => $row['ping_fee'],
                 'box_money' => $row['box_money'],
-                'attr_names' => isset($row['attr_ids']) ? model('Shop')->getGoodsAttrName($row['attr_ids']) : ''
+                'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
+                'attr_ids' => $row['attr_ids']
+
+
             ];
         }
 

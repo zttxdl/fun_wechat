@@ -282,6 +282,10 @@ Route::group('api',function () {
     Route::post('orderQuery','api/Order/orderQuery');
     //再来一单
     Route::post('againOrder','api/Order/againOrder');
+    //获取订单骑手信息
+    Route::post('getRiderInfo','api/Order/getRiderInfo');
+    //获取订单商家信息
+    Route::post('getShopInfo','api/Order/getShopInfo');
 });
 
 
@@ -311,4 +315,8 @@ Route::group('r-member', function () {
     Route::get('/status', 'openStatus');
 })->prefix('rider/Member/');
 
-
+// 骑手订单组
+Route::group('r-orders', function () {
+    Route::rule('/index', 'index');
+   
+})->prefix('rider/Orders/');

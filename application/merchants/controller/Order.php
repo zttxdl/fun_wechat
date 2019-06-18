@@ -23,7 +23,7 @@ class Order extends MerchantsBase
      */
     public function show(Request $request)
     {
-        $status = $request->param('status','');//订单状态 2:新订单 3：处理中 4:商家拒绝接单 5:骑手已接单 6:骑手已配送 7:商家出单 8订单已送达 9:已完成
+        $status = $request->param('status','');//订单状态 2:新订单 3：商家已经接单 4:商家拒绝接单 5:骑手已接单 6:骑手已配送 7:商家出单 8订单已送达 9:已完成
         $page_no = $request->param('page');
         $page_size = $request->param('pageSize',20);
 

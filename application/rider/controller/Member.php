@@ -2,7 +2,6 @@
 
 namespace app\rider\controller;
 
-use think\Controller;
 use think\Request;
 use app\common\model\RiderInfo;
 use app\common\controller\RiderBase;

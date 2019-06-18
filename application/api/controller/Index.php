@@ -77,7 +77,6 @@ class Index extends ApiBase
     public function getSpecial($lat,$lng)
     {
         $list = model('ShopInfo')->getDistance($lat,$lng);
-
         if (! $list) {
             return [];
         }
@@ -199,4 +198,53 @@ class Index extends ApiBase
         $this->success('success',$list);
     }
 
+    //今日特价
+    public function getSpecialList(Request $request)
+    {
+        $lat = $request->param('latitude');
+        $lng = $request->param('longitude');
+        $page = $request->param('page');
+        $pagesize = $request->param('pagesize');
+
+        $list = model('ShopInfo')->getDistance($lat,$lng);
+        if (! $list) {
+            return [];
+        }
+
+        $data = array_column($list,'id');
+        $shop_ids=  implode(",",$data);
+        $where[] = [
+            'status',
+            '=',
+            1,
+        ];
+
+        $where[] = [
+            'shop_id',
+            'in',
+            $shop_ids,
+        ];
+        $day = date('Y-m-d',time());
+        $where[] = [
+            'today',
+            '=',
+            $day,
+        ];
+
+        $data = model('TodayDeals')
+            ->field('name,shop_id,product_id,old_price,price,num,limit_buy_num,thumb')
+            ->where($where)
+            ->whereTime('end_time', '>=', time())
+            ->page($page,$pagesize)
+            ->select()
+            ->toArray();
+        foreach ($data as &$val) {
+            $fin = model('ShopInfo')->field('shop_name,up_to_send_money,ping_fee')->where('id',$val['shop_id'])->find();
+            $val['shop_name'] = $fin->shop_name;
+            $val['up_to_send_money'] = $fin->up_to_send_money;
+            $val['ping_fee'] = $fin->ping_fee;
+        }
+
+        $this->success('success',$data);
+    }
 }
