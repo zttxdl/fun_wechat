@@ -98,7 +98,7 @@ class Orders extends RiderBase
         $type = $request->param('type');
         $orderId = $request->param('order_id');
         $Order = \app\common\model\Orders::get($orderId);
-        $Takeout = \app\common\model\Takeout::get($orderId);
+        $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
         if ($type == 1){//我已到店
             $Order->status = 5;
             $Order->send_time = time();
@@ -111,11 +111,11 @@ class Orders extends RiderBase
             $Takeout->accomplish_time = time();
             $Takeout->update_time = time();
             $Takeout->type = 3;
-
+            $Takeout->save();
         }
 
         $Order->save();
-        $Takeout->save();
+
         $this->success('success');
     }
 
