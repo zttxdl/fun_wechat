@@ -13,19 +13,14 @@ use app\common\controller\ApiBase;
 class Invitation extends ApiBase
 {
     protected $noNeedLogin = [];
-    //邀请有奖
+    // 邀请有奖
     public function index()
     {
         $id = $this->auth->id;
-        $data['mum'] = model('Invitation')->getUserCount($id);
-        $data['money'] = model('Invitation')->getLuckyMoney($id);
+        $info['num'] = model('Invitation')->getUserCount($id);
+        $info['money'] = model('Invitation')->getLuckyMoney($id);
 
-        $this->success('success',$data);
+        $this->success('success',['info'=>$info]);
     }
 
-    //邀请
-    public function share_wx()
-    {
-
-    }
 }
