@@ -183,6 +183,21 @@ class Shop extends Model
     }
 
     /**
+     * 获取二级商品属性名称集合
+     * @param string $attr
+     * @return array|mixed
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\exception\PDOException
+     */
+    public function getGoodsAttrSonName($attr_ids = '')
+    {
+        $res = Db::name('product_attr_classify')->field('name')->whereIn('pid',$attr_ids)->select();
+        $res = array_column($res,'name');
+        $attr_names = implode(",",$res);
+        return $attr_names;
+    }
+
+    /**
      * 获取结算
      */
     public function getSettle()

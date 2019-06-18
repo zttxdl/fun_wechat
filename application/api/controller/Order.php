@@ -142,7 +142,7 @@ class Order extends ApiBase
             $result['platform_discount']['face_value'] = $row['platform_coupon_money'];
             $result['shop_discount']['id'] = $row['shop_discounts_id'];
             $result['shop_discount']['face_value'] = $row['shop_discounts_money'];
-            unset($row['attr_ids']);
+//            unset($row['attr_ids']);
             //unset($row['id']);
         }
 
@@ -155,15 +155,11 @@ class Order extends ApiBase
             'pint_fee' => $orders['ping_fee'],
             'box_money' => $orders['box_money'],
             'money' => $orders['money'],
+            'status' => $orders['status'],
+            'status_name' => $this->order_status[$orders['status']]
         ];
 
         $shop_info = Model('ShopInfo')->where('id',$orders['shop_id'])->field('id,shop_name,logo_img,run_type')->find();
-
-        $rider_info = Db::name('takeout')->alias('a')
-            ->leftJoin('rider_info b','a.rider_id = b.id')
-            ->where('a.order_id',$orders_id)
-            ->field('b.*')
-            ->find();
 
         $result['shop_info'] = [
             'id' => $shop_info['id'],
@@ -171,25 +167,26 @@ class Order extends ApiBase
             'logo_img' => $shop_info['logo_img'],
         ];
 
-        if(in_array($orders['status'],[3,5,6])) {//骑手取货配货显示时间 送达时间
-
-        }
         $result['ping_info']['ping_time'] = '尽快送达';
-        $result['ping_info']['ping_type'] = config('run_type')[$shop_info['run_type']];
-        $result['ping_info']['rider_info'] = isset($rider_info) ? $rider_info : '';//骑手信息
+        $result['ping_info']['ping_type'] = '平台配送';
+        $result['ping_info']['address'] = $orders['address'];
+        $result['ping_info']['rider_info'] = '';
+        if(in_array($orders['status'],[5,6,7,8])) {//骑手取货、配货、已送达、已完成显示配送信息
 
-        if(empty($rider_info)) {//骑手未接单 配送信息为空
-            $result['ping_info'] = '';
+            $rider_info = Db::name('takeout')->alias('a')
+                ->leftJoin('rider_info b','a.rider_id = b.id')
+                ->where('a.order_id',$orders_id)
+                ->field('b.*')
+                ->find();
+            $result['ping_info']['rider_info'] = isset($rider_info) ? $rider_info : '';//骑手信息
+
         }
-        //$result['ping_info']['rider_info'] = !empty($rider_info) ? $rider_info : '';
 
-
-
-        if(in_array($orders['status'],[3,5,6])) { //商家接单 和 骑手取货配货显示时间 送达时间
+        if(in_array($orders['status'],[3,5,6,7,8])) { //商家接单 和 骑手取货配货显示时间 送达时间
             $result['plan_arrive_time'] = $orders['plan_arrive_time'];
         }
 
-        $result['order_status'] = $this->order_status[$orders['status']];
+
 
         $this->success('获取成功',$result);
     }
@@ -710,18 +707,18 @@ class Order extends ApiBase
 
         foreach ($order_detail  as $row)
         {
-            $attr_list  = model('ProductAttrClassify')
+            /*$attr_list  = model('ProductAttrClassify')
                 ->field('id,name,pid')
                 ->where('id','in',$row['attr_ids'])
                 ->select()
                 ->toArray();
             $attr = $this->getSonCategory($attr_list);
-            /*ttrs = [];//二级规格集合*/
+            ttrs = [];//二级规格集合
             foreach ($attr as $k => &$v){
                 if(empty($v['son'])) {
                     $v['son'] = '';
                 }
-            }
+            }*/
 
 
 
@@ -733,7 +730,8 @@ class Order extends ApiBase
                 'total_money' => $row['total_money'],
                 'ping_fee' => $row['ping_fee'],
                 'box_money' => $row['box_money'],
-                'attrs' => isset($attr) ?  $attr : ''
+                'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
+                'attr_ids' => $row['attr_ids']
 
 
             ];
