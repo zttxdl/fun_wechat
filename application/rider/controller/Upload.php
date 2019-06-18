@@ -9,10 +9,10 @@
 namespace app\api\controller;
 
 
-use app\common\controller\ApiBase;
+use app\common\controller\RiderBase;
 use think\Request;
 
-class Upload extends ApiBase
+class Upload extends RiderBase
 {
     protected $noNeedLogin = [];
 
@@ -32,9 +32,9 @@ class Upload extends ApiBase
             $this->error($result);
         }
         // 移动到框架应用根目录 目录下
-        $info = $file->move('./uploads/api/'.$path);
+        $info = $file->move('./uploads/rider/'.$path);
         if ($info) {
-            $data['images'] = '/uploads/api/'.$path.'/'.$info->getSaveName();
+            $data['images'] = '/uploads/rider/'.$path.'/'.$info->getSaveName();
             $this->success('文件上传成功',$data);
         } else {
             // 上传失败获取错误信息
