@@ -752,12 +752,14 @@ class Order extends ApiBase
 
             $result[] = [
                 'orders_id' => $row['orders_id'],
-                'product_id' => $row['product_id'],
-                'name' => Model('Product')->getNameById($row['product_id']),
+                'product_id' => $product_info['id'],
+                'products_classify_id' => $product_info['products_classify_id'],
+                'thumb' => $product_info['thumb'],
+                'name' => $product_info['name'],
                 'num' => $row['num'],
                 'price' => $product_info['price'],
                 'old_price' => $product_info['old_price'],
-                'box_money' => $row['box_money'],
+                'box_money' => $product_info['box_money'],
                 'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
                 'attr_ids' => $row['attr_ids']
 
