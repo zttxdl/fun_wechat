@@ -236,7 +236,14 @@ class Index extends ApiBase
             ->where($where)
             ->whereTime('end_time', '>=', time())
             ->page($page,$pagesize)
-            ->select();
+            ->select()
+            ->toArray();
+        foreach ($data as &$val) {
+            $fin = model('ShopInfo')->field('shop_name,up_to_send_money,ping_fee')->where('id',$val['shop_id'])->find();
+            $val['shop_name'] = $fin->shop_name;
+            $val['up_to_send_money'] = $fin->up_to_send_money;
+            $val['ping_fee'] = $fin->ping_fee;
+        }
 
         $this->success('success',$data);
     }
