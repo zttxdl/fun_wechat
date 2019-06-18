@@ -241,7 +241,7 @@ class Shop extends MerchantsBase
     public function checkStatus()
     {
         $shop_id = $this->shop_id;
-
+        
 
     }
 
