@@ -729,6 +729,7 @@ class Order extends ApiBase
 
         $order_detail = model('Orders')->getOrderDetail($order_id);
 
+
         //dump($order_detail);
         $result = [];
 
@@ -746,7 +747,7 @@ class Order extends ApiBase
                     $v['son'] = '';
                 }
             }*/
-
+            $product_info = Model('Product')->where('id',$row['product_id'])->find();
 
 
             $result[] = [
@@ -754,8 +755,8 @@ class Order extends ApiBase
                 'product_id' => $row['product_id'],
                 'name' => Model('Product')->getNameById($row['product_id']),
                 'num' => $row['num'],
-                'total_money' => $row['total_money'],
-                'ping_fee' => $row['ping_fee'],
+                'price' => $product_info['price'],
+                'old_price' => $product_info['old_price'],
                 'box_money' => $row['box_money'],
                 'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
                 'attr_ids' => $row['attr_ids']
