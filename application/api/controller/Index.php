@@ -77,7 +77,6 @@ class Index extends ApiBase
     public function getSpecial($lat,$lng)
     {
         $list = model('ShopInfo')->getDistance($lat,$lng);
-
         if (! $list) {
             return [];
         }
@@ -199,4 +198,46 @@ class Index extends ApiBase
         $this->success('success',$list);
     }
 
+    //今日特价
+    public function getSpecialList(Request $request)
+    {
+        $lat = $request->param('latitude');
+        $lng = $request->param('longitude');
+        $page = $request->param('page');
+        $pagesize = $request->param('pagesize');
+
+        $list = model('ShopInfo')->getDistance($lat,$lng);
+        if (! $list) {
+            return [];
+        }
+
+        $data = array_column($list,'id');
+        $shop_ids=  implode(",",$data);
+        $where[] = [
+            'status',
+            '=',
+            1,
+        ];
+
+        $where[] = [
+            'shop_id',
+            'in',
+            $shop_ids,
+        ];
+        $day = date('Y-m-d',time());
+        $where[] = [
+            'today',
+            '=',
+            $day,
+        ];
+
+        $data = model('TodayDeals')
+            ->field('name,shop_id,product_id,old_price,price,num,limit_buy_num,thumb')
+            ->where($where)
+            ->whereTime('end_time', '>=', time())
+            ->page($page,$pagesize)
+            ->select();
+
+        $this->success('success',$data);
+    }
 }
