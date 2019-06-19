@@ -33,30 +33,34 @@ class Orders extends RiderBase
         $where = [];
 		if ($type == 1) {
 
-            $where[] = ['a.school_id','=',$this->auth->school_id];
-		    $where[] = ['a.type','=',1];
-            //获取待接单
-            $list = Db::table('fun_takeout')
-                    ->alias('a')
-                    ->field('a.order_id,a.ping_fee,a.meal_sn,a.shop_address,a.expected_time,b.address,b.status')
-                    ->join('fun_orders b','a.order_id = b.id')
-                    ->where($where)
-                    ->select();
+            $where[] = ['school_id','=',$this->auth->school_id];
+		    $where[] = ['type','=',1];
+
+            $list = model('Takeout')
+                ->field('order_id,ping_fee,meal_sn,shop_address,expected_time')
+                ->where($where)->select();
+
+            foreach ($list as $key => $item) {
+                $order = model('Orders')->field('address,status')->where('id',$item->order_id)->find();
+                $item->address = $order->address;
+                $item->status = $order->status;
+            }
 
 		}else{
 			//获取已接单
-            $where[] = ['a.school_id','=',$this->auth->school_id];
-            $where[] = ['a.type','=',2];
-            $where[] = ['a.rider_id','=',$this->auth->id];
+            $where[] = ['school_id','=',$this->auth->school_id];
+            $where[] = ['type','=',2];
+            $where[] = ['rider_id','=',$this->auth->id];
 
-            $list = Db::table('fun_takeout')
-                ->alias('a')
-                ->field('a.order_id,a.ping_fee,a.meal_sn,a.shop_address,a.expected_time,b.address,b.status')
-                ->join('fun_orders b','a.order_id = b.id')
-                ->where($where)
-                ->select();
-            foreach ($list as &$value) {
-                $value['rest_time'] = round(($value['expected_time'] - time()) / 60) ;
+            $list = model('Takeout')
+                ->field('order_id,ping_fee,meal_sn,shop_address,expected_time')
+                ->where($where)->select();
+
+            foreach ($list as $key => $item) {
+                $order = model('Orders')->field('address,status')->where('id',$item->order_id)->find();
+                $item->address = $order->address;
+                $item->status = $order->status;
+                $item->rest_time = round(($item->expected_time - time()) / 60);
             }
 		}
 
