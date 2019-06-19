@@ -9,7 +9,7 @@ use think\Request;
 class Refund extends MerchantsBase
 {
     /*
-     * 订单查询
+     * 退款查询
      */
     public function index(Request $request) {
         $shop_id = $this->shop_id;
@@ -27,6 +27,29 @@ class Refund extends MerchantsBase
 
 
         return $this->success('获取成功',$refund_info);
+    }
+
+    /**
+     * 商家退单 拒单操作
+     */
+    public function refundAction(Request $request) {
+        $orders_sn = $request->param('orders_sn');
+        $type = $request->param('type');
+
+        //退单
+        if($type == 'td') {
+
+            model('Refund')->where('out_trade_no',$orders_sn)->setField('status',2);
+            model('Orders')->where('orders_sn',$orders_sn)->setField('status',12);
+            $msg = '退款成功';
+        }elseif ($type == 'jd'){
+            model('Refund')->where('out_trade_no',$orders_sn)->setField('status',3);
+            model('Orders')->where('orders_sn',$orders_sn)->setField('status',13);
+            $msg = '拒绝成功';
+        }
+
+        $this->success($msg);
+
     }
 
     /**
@@ -69,6 +92,13 @@ class Refund extends MerchantsBase
 
 
         $this->success('success',$result);
+    }
+
+    /**
+     * 微信退款
+     */
+    public function wx_refund(Request $request) {
+
     }
 
     //退款查询

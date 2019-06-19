@@ -120,9 +120,15 @@ class Order extends ApiBase
     //获取骑手信息
     public function getRiderInfo(Request $request) {
         $orders_id = $request->param('orders_id');
-        $rider_id = Db::name('takeout')->where('order_id',$orders_id)->value('rider_id');
+        //$rider_id = Db::name('takeout')->where('order_id',$orders_id)->value('rider_id');
 
-        $rider_info = Db::name('rider_info')->where('id',$rider_id)->field('id,name,headimgurl,sex,link_tel')->find();
+        //$rider_info = Db::name('rider_info')->where('id',$rider_id)->field('id,name,headimgurl,sex,link_tel,single_time,accomplish_time')->find();
+
+        $rider_info = Db::name('takeout')->alias('a')
+            ->join('rider_info b','a.rider_id = b.id')
+            ->field('a.single_time,a.accomplish_time,b.id,b.name,b.headimgurl,b.sex,b.link_tel')
+            ->where('a.order_id',$orders_id)
+            ->find();
 
         if(!$rider_info) {
             $this->error('暂无骑手信息');
@@ -455,6 +461,8 @@ class Order extends ApiBase
         $res = Db::name('refund')->insert($data);
 
         if($res) {
+            //更新一下主表订单状态为退款中
+            Model('Orders')->updateStatus($orders['orders_sn'],11);
             $this->success('售后申请已提交成功,等待商家处理');
         }
     }

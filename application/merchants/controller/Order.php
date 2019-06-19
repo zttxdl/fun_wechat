@@ -127,12 +127,12 @@ class Order extends MerchantsBase
      */
     public function receipt(Request $request)
     {
-        $status = $request->param('status');//3:接单 4:拒单 7:确认送出
+        $type = $request->param('status');//3:接单 4:拒单 7:确认送出
         $orders_sn = $request->param('orders_sn');
 
-        if($status == 4) {
+        if($type == 'jd') {
 
-        }
+        }elseif ($type == 'jd')
 
         $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>$status]);
 
