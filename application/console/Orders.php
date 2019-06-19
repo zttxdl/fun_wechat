@@ -11,7 +11,7 @@ class Orders extends Command
 {
     protected function configure()
     {
-        $this->setName('orders')->setDescription('Here is the auto join  weal');
+        $this->setName('orders')->setDescription('超时订单自动取消');
     }
  
     /**

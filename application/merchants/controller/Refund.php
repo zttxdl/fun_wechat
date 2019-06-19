@@ -12,8 +12,7 @@ class Refund extends MerchantsBase
      * 订单查询
      */
     public function index(Request $request) {
-        $shop_id = 1;
-        echo  $shop_id;
+        $shop_id = $this->shop_id;
         $status = $request->param('status');//1申请退款， 2退款成功， 3退款失败
 
         $refund_info = Model('Refund')
@@ -57,6 +56,8 @@ class Refund extends MerchantsBase
         $refundNumber = $find->out_refund_no;//商户退款单号
 
         $pay_config = config('wx_pay');
+
+        dump($pay_config);
         $app    = Factory::payment($pay_config);//pay_config 微信配置
 
         //根据商户订单号退款
