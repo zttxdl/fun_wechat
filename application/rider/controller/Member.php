@@ -2,6 +2,7 @@
 
 namespace app\rider\controller;
 
+use think\Db;
 use think\Request;
 use app\common\model\RiderInfo;
 use app\common\controller\RiderBase;
@@ -160,7 +161,45 @@ class Member extends RiderBase
         $this->success('设置成功');
         
     }
-     
+
+    /**
+     * 我的评价
+     */
+    public function getEvaluation(Request $request)
+    {
+        $page = $request->param('page',1);
+        $pagesize = $request->param('pagesize',20);
+        $type = $request->param('type','');
+
+        $where[] = ['rider_id','=',$this->auth->id];
+        if ($type == 1){
+            $where[] = ['star','=',$this->auth->id];
+        }
+
+        $count = Db::name('rider_comments')->where('rider_id',$this->auth->id)->count();
+        $count1 = Db::name('rider_comments')->where('star',1)->where('rider_id',$this->auth->id)->count();
+        $count2 = Db::name('rider_comments')->where('star',2)->where('rider_id',$this->auth->id)->count();
+        $count3 = Db::name('rider_comments')->where('star',3)->where('rider_id',$this->auth->id)->count();
+        $list = Db::name('rider_comments')
+                ->field('a.star,a.content,a.add_time,b.headimgurl,b.nickname')
+                ->alias('a')
+                ->join('user b','a.user_id = b.id')
+                ->where($where)
+                ->page($page,$pagesize)
+                ->select();
+        foreach ($list as &$item) {
+            $item['add_time'] = date('Y-m-d',$item['add_time']);
+        }
+
+        $data['count']['all'] = $count;
+        $data['count']['cz'] = $count3;
+        $data['count']['yb'] = $count2;
+        $data['count']['cp'] = $count1;
+        $data['list'] = $list;
+
+        $this->success('success',$data);
+
+    }
      
      
 }
