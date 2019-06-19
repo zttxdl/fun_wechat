@@ -10,6 +10,7 @@ namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
 use EasyWeChat\Factory;
+use think\facade\Cache;
 use think\Request;
 use think\Db;
 
@@ -26,16 +27,28 @@ class Order extends MerchantsBase
         $status = $request->param('status','');//1:订单待支付;2等待商家接单;3商家已接单;4商家拒绝接单;5骑手取货中;6骑手配送中;7订单已送达;8订单已完成;9订单已取消;10骑手待取餐
         $page_no = $request->param('page');
         $page_size = $request->param('pageSize',20);
-        $shop_id = $this->auth->shop_id;
+        $shop_id = $this->shop_id;
 
-        if(!$page_no ) {
+        if(!$status ) {
             $this->error('非法传参');
         }
 
-        $map = '';
+        //从缓存中获取
+        /*$key = "shop_info:shop_id:$shop_id:status:$status";
+        $orders = Cache::store('redis')->get($key);
 
+        if($orders) {
+            $this->success('获取成功',$orders);
+        }*/
+
+        //构建查询表达式
+        $map = [];
+
+        if($shop_id) {
+            $map[] = ['shop_id','=',$shop_id];
+        }
         if($status) {
-            $map = ['status' => $status];
+            $map[] = ['status','=',$status];
         }
 
         $result = model('orders')->where($map)->page($page_no,$page_size)->select();
@@ -58,6 +71,9 @@ class Order extends MerchantsBase
             ];
         }
 
+        //写入缓存
+        //Cache::store('redis')->set($key,$orders);
+
         $this->success('获取成功',$orders);
 
     }
@@ -68,7 +84,15 @@ class Order extends MerchantsBase
      */
     public function detail($id)
     {
-        $detail = Db::name('Orders_info')->where('orders_id','=',$id)->select();
+        $detail = Db::name('Orders_info')
+            ->field('id,orders_id,product_id,num,ping_fee,box_money,attr_ids,total_money,old_money')
+            ->where('orders_id','=',$id)
+            ->select();
+
+        foreach ($detail as &$row)
+        {
+            $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
+        }
         return $detail;
     }
 
@@ -106,60 +130,15 @@ class Order extends MerchantsBase
         $status = $request->param('status');//3:接单 4:拒单 7:确认送出
         $orders_sn = $request->param('orders_sn');
 
+        if($status == 4) {
+
+        }
+
         $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>$status]);
 
         $this->success('success',$result);
     }
 
-    /**
-     * 退款处理
-     */
-    public function refund(Request $request)
-    {
 
-        $number = $request->param('number');//商户订单号
-
-        if (!$number){
-            $this->error('非法传参');
-        }
-
-        $find = model('Refund')->where('out_trade_no',$number)->find();
-
-        if (!$find){
-            $this->error('商户订单号错误');
-        }
-
-        if ($find->total_fee < $find->refund_fee){
-            $this->error('退款金额不能大于订单总额');
-        }
-
-        $totalFee = $find->total_fee * 100; //订单金额
-        $refundFee =  $find->refund_fee * 100;//退款金额
-        $refundNumber = $find->out_refund_no;//商户退款单号
-
-        $pay_config = config('wx_pay');
-        $app    = Factory::payment($pay_config);//pay_config 微信配置
-
-        //根据商户订单号退款
-        $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
-            // 可在此处传入其他参数，详细参数见微信支付文档
-            'refund_desc' => '取消订单退款',
-            'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
-        ]);
-
-
-        $this->success('success',$result);
-    }
-
-    //退款查询
-    public function refundQuery(Request $request)
-    {
-        $outTradeNumber = $request->param('outTradeNumber');
-        $pay_config = config('wx_pay');
-        $app    = Factory::payment($pay_config);//pay_config 微信配置
-        $result = $app->refund->queryByOutTradeNumber($outTradeNumber);
-
-        $this->success('success',$result);
-    }
 
 }
