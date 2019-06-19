@@ -415,6 +415,8 @@ class Order extends ApiBase
     {
         $orders_id = $request->param('orders_id');
 
+        $shop_id = $request->param('shop_id');
+
         $orders_info_ids = $request->param('orders_info_ids');
 
         $content = $request->param('content');
@@ -427,6 +429,7 @@ class Order extends ApiBase
 
         $data = Db::name('refund')->where('orders_id',$orders_id)->find();
 
+
         if(is_array($data)){
             $this->error('退单已提交申请,请耐心等待');
         }
@@ -435,6 +438,7 @@ class Order extends ApiBase
 
         $data = [
             'orders_id' => $orders_id,
+            'shop_id' => $shop_id,
             'orders_info_ids' => $orders_info_ids,
             'content' => $content,
             'imgs' => $imgs,
@@ -762,8 +766,6 @@ class Order extends ApiBase
                 'box_money' => $product_info['box_money'],
                 'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
                 'attr_ids' => $row['attr_ids']
-
-
             ];
         }
 

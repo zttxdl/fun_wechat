@@ -22,7 +22,7 @@ class Shop extends MerchantsBase
     public function index(Request $request)
     {
 
-        $shop_id = $this->auth->shop_id;
+        $shop_id = $this->shop_id;
         $shop_info = [];
 
         $result = Model('Shop')->getShopInfo($shop_id);
@@ -42,7 +42,7 @@ class Shop extends MerchantsBase
                 'shop_name' => $row['shop_name'],//店铺名称
                 'status' => '1',//店铺营业状态
                 'day_order' => '55',//今日订单数
-                'day_sales' => 'wewe',//今日销售额
+                'day_sales' => '500',//今日销售额
                 'day_uv' => '20',//今日访客数
                 'order_cancel_num' => '2',//订单取消数量
             ];
@@ -59,7 +59,7 @@ class Shop extends MerchantsBase
      */
     public function setName(Request $request)
     {
-        $shop_id = $this->auth->shop_id;
+        $shop_id = $this->shop_id;
         $shop_name = $request->param('shop_name');
 
 
@@ -81,7 +81,7 @@ class Shop extends MerchantsBase
      */
     public function setLogo(Request $request)
     {
-        $shop_id = $this->auth->shop_id;
+        $shop_id = $this->shop_id;
         $logo_img = $request->param('logo_img');
 
 
@@ -105,7 +105,7 @@ class Shop extends MerchantsBase
      */
     public function setOpenStatus(Request $request)
     {
-        $shop_id = $this->auth->shop_id;
+        $shop_id = $this->shop_id;
         $shop_name = $request->param('shop_name');
         $open_status = $request->param('open_status');
 
@@ -129,7 +129,7 @@ class Shop extends MerchantsBase
      */
     public function info(Request $request)
     {
-        $shop_id = $request->param('shop_id');
+        $shop_id = $this->shop_id;
 
         if(!$shop_id) {
             $this->error('非法传参');
@@ -183,7 +183,7 @@ class Shop extends MerchantsBase
      */
     public function moreInfo(Request $request)
     {
-        $shop_id = $request->param('shop_id');
+        $shop_id = $this->shop_id;
 
         if(!$shop_id) {
             $this->error('非法传参','404');
