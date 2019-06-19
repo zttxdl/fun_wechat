@@ -318,6 +318,7 @@ Route::group('r-member', function () {
     Route::post('/update', 'update');
     Route::post('/bind-tel', 'BindRiderPhone');
     Route::get('/status', 'openStatus');
+    Route::rule('/getEvaluation', 'getEvaluation');
 })->prefix('rider/Member/');
 
 // 骑手订单组
