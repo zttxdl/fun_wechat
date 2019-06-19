@@ -22,7 +22,7 @@ class Shop extends MerchantsBase
     public function index(Request $request)
     {
 
-        $shop_id = $this->shop_id;
+        $shop_id = $this->auth->shop_id;
         $shop_info = [];
 
         $result = Model('Shop')->getShopInfo($shop_id);
@@ -59,7 +59,7 @@ class Shop extends MerchantsBase
      */
     public function setName(Request $request)
     {
-        $shop_id = $this->shop_id;
+        $shop_id = $this->auth->shop_id;
         $shop_name = $request->param('shop_name');
 
 
@@ -81,7 +81,7 @@ class Shop extends MerchantsBase
      */
     public function setLogo(Request $request)
     {
-        $shop_id = $this->shop_id;
+        $shop_id = $this->auth->shop_id;
         $logo_img = $request->param('logo_img');
 
 
@@ -105,7 +105,7 @@ class Shop extends MerchantsBase
      */
     public function setOpenStatus(Request $request)
     {
-        $shop_id = $this->shop_id;
+        $shop_id = $this->auth->shop_id;
         $shop_name = $request->param('shop_name');
         $open_status = $request->param('open_status');
 
@@ -241,7 +241,7 @@ class Shop extends MerchantsBase
     public function checkStatus()
     {
         $shop_id = $this->shop_id;
-        
+
 
     }
 

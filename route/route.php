@@ -256,6 +256,11 @@ Route::group('u-intention', function () {
 
 });
 
+// 邀请有奖
+Route::group('u-invitation', function () {
+    Route::get('/invitation', 'index');
+})->prefix('api/invitation/');
+
 // 公共接口
 Route::group('u-upload', function () {
     Route::post('/upload', 'upload');
@@ -323,3 +328,13 @@ Route::group('r-orders', function () {
     Route::rule('/statusUpdate', 'statusUpdate');
 
 })->prefix('rider/Orders/');
+
+
+
+
+/*************** 定时脚本接口 *********************************************************************************************/
+
+// 用户端
+Route::group('u-auto', function () {
+    Route::rule('/set-mycoupon-overtime', 'setMyCouponOvertime');
+})->prefix('api/AutoShell/');
