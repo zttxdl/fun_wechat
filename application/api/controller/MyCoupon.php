@@ -69,6 +69,79 @@ class MyCoupon extends ApiBase
         $this->success('获取红包列表成功',['list'=>$list]);
     }
 
+
+    /**
+     * 我的红包-个人中心 
+     * 
+     * @param $type  $type = 1，可用红包列表 否则为历史红包 
+     */
+    public function myCoupon(Request $request)
+    {
+        // 条件
+        $type = $request->get('type');
+        $type == 1 ? $where[] = ['m.status','=',1] : $where[] = ['m.status','in','2,3'];
+        $where[] = ['m.id','=',$this->auth->id];
+
+        !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
+        
+        $list = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')->where($where)
+                ->field('m.phone,m.indate,m.status,p.face_value,p.threshold,p.type,p.name')->paginate($pagesize);
+
+        $this->success('获取红包列表成功',['list'=>$list]);
+    }
+
+
+    /**
+     * 我的可用红包-下单 
+     * 
+     */
+    public function myOrderCoupon(Request $request)
+    {
+        $shop_id = $request->param('shop_id');//店铺ID
+        $category_id = $request->param('category_id');//品类ID
+
+        $where = [['m.user_id','=',$this->auth->id],['m.status','=',1]];
+
+        $list = Db::name('my_coupon m')->leftJoin('platform_coupon p','m.platform_coupon_id = p.id')->where($where)
+                ->field('m.id,m.phone,m.indate,m.status,p.face_value,p.threshold,p.type,p.name,p.limit_use,p.school_id,p.shop_ids')->select();
+
+        // 当前用户的手机号
+        $phone = $this->auth->phone;
+
+        // 需进一步思考。。。。。。。
+        foreach ($list as &$row) {
+            $row['is_use'] = 1;
+            $row['limit_use'] =  explode(',',$row['limit_use']);  // limit_use = 0 ，表示全部【不限品类】，当limit = 1,2,...n,表示限部分品类
+            $row['shop_ids'] = explode(',',$row['shop_ids']); // 
+            // 手机使用条件判断
+            if($row['phone'] != $phone) {
+                $row['is_use'] = 0;
+                $row['remark'] = '仅限手机号'.$row['phone'].'使用';
+                continue;
+            }
+            // 店铺使用条件判断
+            if (!in_array($shop_id,$row['shop_ids'])) {
+                $row['is_use'] = 0;
+                $row['remark'] = '仅限部分商家使用';
+                continue;
+            }
+            // 品类使用条件判断
+            if (($row['limit_use'] != 0) && !in_array($category_id,$row['limit_use'])) {
+                $row['is_use'] = 0;
+                $row['remark'] = '仅限部分品类使用';
+                continue;
+            }
+        }
+
+        $this->success('获取红包列表成功',['list'=>$list]);
+
+
+
+    }
+
+     
+     
+
      
      
 }
