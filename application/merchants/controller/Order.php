@@ -37,7 +37,6 @@ class Order extends MerchantsBase
             $this->error('非法传参');
         }*/
 
-        $map = '1=1';
 
         //从缓存中获取
         /*$key = "shop_info:shop_id:$shop_id:status:$status";
@@ -58,12 +57,14 @@ class Order extends MerchantsBase
         }
 
         if($date) {
-            //$map[] = ['add_time','>',$date];
+            $start = strtotime($date.'00:00:00');
+            $end = strtotime($date.'23:59:59');
+            $map[] = ['add_time','between time',[$start,$end]];
         }
+
 
         $result = model('orders')
             ->where($map)
-            //->whereBetweenTime('','','')
             ->page($page_no,$page_size)->select();
 
         if(empty($result)) {
