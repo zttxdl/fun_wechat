@@ -13,11 +13,18 @@ class Refund extends MerchantsBase
      */
     public function index(Request $request) {
         $shop_id = $this->shop_id;
-        $status = $request->param('status');//1申请退款， 2退款成功， 3退款失败
+        $status = $request->param('status','');//1申请退款， 2退款成功， 3退款失败
+        $map = ' 1=1';
+
+        if($status) {
+            $map = [
+                'status'=>$status
+            ];
+        }
 
         $refund_info = Model('Refund')
             ->where('shop_id',$shop_id)
-            ->where('status',$status)
+            ->where($map)
             ->select();
 
         foreach ($refund_info as &$row) {
@@ -30,35 +37,74 @@ class Refund extends MerchantsBase
     }
 
     /**
-     * 商家退单 拒单操作
+     * 商家退款
      */
-    public function refundAction(Request $request) {
+    public function refund(Request $request) {
         $orders_sn = $request->param('orders_sn');
-        $type = $request->param('type');
 
-        //退单
-        if($type == 'td') {
+        if(!$orders_sn) {
+            $this->error('订单号不能为空');
+        }
+        $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
 
-            model('Refund')->where('out_trade_no',$orders_sn)->setField('status',2);
-            model('Orders')->where('orders_sn',$orders_sn)->setField('status',12);
-            $msg = '退款成功';
-        }elseif ($type == 'jd'){
-            model('Refund')->where('out_trade_no',$orders_sn)->setField('status',3);
-            model('Orders')->where('orders_sn',$orders_sn)->setField('status',13);
-            $msg = '拒绝成功';
+        if($find['status'] == 2) {
+            $this->error('商家已退款!');
         }
 
-        $this->success($msg);
+        try{
+            $res = $this->wxRefund($orders_sn);
+
+            if('SUCCESS' == $res['data']['return_code'] && 'SUCCESS' == $res['data']['result_code']) {
+
+                model('Refund')->where('out_trade_no',$orders_sn)->setField('status',2);
+                model('Orders')->where('orders_sn',$orders_sn)->setField('status',13);
+
+                $this->success('退款成功');
+            }
+
+
+
+        }catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+    }
+
+    /**
+     *  拒绝退款操作
+     */
+    public function refuse(Request $request) {
+        $orders_sn = $request->param('orders_sn');
+
+        if(!$orders_sn) {
+            $this->error('订单号不能为空');
+        }
+
+        $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
+
+        if($find['status'] == 2) {
+            $this->error('商家已退款!');
+        }
+
+        if($find['status'] == 3) {
+            $this->error('商家已拒绝退款!');
+        }
+
+        //外卖表添取消原因,取消时间
+
+        model('Refund')->where('out_trade_no',$orders_sn)->setField('status',3);
+        model('Orders')->where('orders_sn',$orders_sn)->setField('status',12);
+
+        $this->success('拒绝退款成功');
 
     }
 
     /**
-     * 退款处理
+     * 微信退款处理
      */
-    public function refund(Request $request)
+    public function wxRefund($orders_sn)
     {
 
-        $number = $request->param('orders_sn');//商户订单号
+        $number = trim($orders_sn);//商户订单号
 
         if (!$number){
             $this->error('非法传参');
@@ -80,7 +126,7 @@ class Refund extends MerchantsBase
 
         $pay_config = config('wx_pay');
 
-        dump($pay_config);
+        //dump($pay_config);
         $app    = Factory::payment($pay_config);//pay_config 微信配置
 
         //根据商户订单号退款
@@ -91,15 +137,9 @@ class Refund extends MerchantsBase
         ]);
 
 
-        $this->success('success',$result);
+        return $result;
     }
 
-    /**
-     * 微信退款
-     */
-    public function wx_refund(Request $request) {
-
-    }
 
     //退款查询
     public function refundQuery(Request $request)

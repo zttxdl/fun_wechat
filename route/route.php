@@ -175,9 +175,11 @@ Route::group('merchants',function (){
     Route::post('orderIndex','merchants/Order/show');//订单查询
     Route::post('orderDetail','merchants/Order/orderDetail');//订单详情
     Route::post('orderDel','merchants/Order/del');//订单删除
-    Route::post('orderReceipt','merchants/Order/receipt');//订单接单 拒单处理
-    Route::post('orderRefund','merchants/refund/refund');//退单
-    Route::post('refundAction','merchants/refund/refundAction');//退款 拒绝操作
+    Route::post('orderAccept','merchants/Order/accept');//商家接单
+    Route::post('orderRefuse','merchants/Order/refuse');//商家拒单
+    Route::post('refund','merchants/refund/refund');//退款
+    Route::post('refuse','merchants/refund/refuse');//拒绝退款
+    Route::post('wxRefund','merchants/refund/wxRefund');//微信退款
     Route::post('refundQuery','merchants/refund/refundQuery');//查询退款
 
 });

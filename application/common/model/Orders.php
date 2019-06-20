@@ -45,6 +45,14 @@ class Orders extends Model
     }
 
     /**
+     * 获取订单
+     */
+    public function getOrderById($order_id)
+    {
+        return $this->where('id',$order_id)->find();
+    }
+
+    /**
      * 订单详情
      */
     public function getOrderDetail($order_id)
@@ -61,13 +69,7 @@ class Orders extends Model
         return $this->where('orders_sn',$order_sn)->find();
     }
 
-    /**
-     * 获取订单
-     */
-    public function getOrderById($order_id)
-    {
-        return $this->where('id',$order_id)->find();
-    }
+
 
     /**
      * 获取订单编号
