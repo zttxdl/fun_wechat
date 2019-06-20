@@ -101,6 +101,12 @@ Route::group('admin',function (){
     Route::rule('indexInfo','admin/Index/getUserList');
 });
 
+
+// 企业打款给用户
+Route::group('transfer',function (){
+    Route::rule('send-money','admin/Transfer/sendMoney');
+})->middleware('IsLogin');
+
 // 会员模块
 Route::group('admin',function (){
     Route::rule('userList','admin/User/getList');//会员列表
@@ -131,7 +137,10 @@ Route::group('admin',function (){
     Route::rule('orderDetail','admin/Orders/getDetail');//订单详情
 });
 
-
+// 图片上传接口
+Route::group('a-upload', function () {
+    Route::post('/upload', 'upload');
+})->prefix('admin/upload/');
 
 
 
@@ -264,7 +273,7 @@ Route::group('u-invitation', function () {
     Route::get('/invitation', 'index');
 })->prefix('api/invitation/');
 
-// 公共接口
+// 图片上传接口
 Route::group('u-upload', function () {
     Route::post('/upload', 'upload');
 })->prefix('api/upload/');
@@ -340,6 +349,11 @@ Route::group('r-inc-exp', function () {
     Route::post('/withdraw', 'withdraw');
 })->prefix('rider/IncomeExpend/');
 
+
+// 图片上传接口
+Route::group('r-upload', function () {
+    Route::post('/upload', 'upload');
+})->prefix('rider/upload/');
 
 
 

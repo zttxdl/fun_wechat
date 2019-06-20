@@ -14,7 +14,7 @@ use think\Request;
 
 class Upload extends RiderBase
 {
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['*'];
 
     /**
      * 文件上传提交

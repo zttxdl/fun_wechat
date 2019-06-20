@@ -6,6 +6,7 @@ use think\Controller;
 use think\Request;
 use app\common\model\RiderInfo;
 use app\common\Auth\JwtAuth;
+use EasyWeChat\Factory;
 
 
 /**
@@ -19,22 +20,28 @@ class Login extends Controller
      */
     public function getAuthInfo(Request $request)
     {
+        $config = config('wx_rider');
+        $app = Factory::miniProgram($config);
         $code = $request->param('code');
-        $app_id = config('wx_rider')['app_id'];
-        $app_secret = config('wx_rider')['secret'];
+        $result = $app->auth->session($code);
+
+        dump($result);die;
+
+        // $app_id = config('wx_rider')['app_id'];
+        // $app_secret = config('wx_rider')['secret'];
         
-        $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
+        // $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
-        // curl 请求
-        $result = curl_post($url,'POST');
+        // // curl 请求
+        // $result = curl_post($url,'POST');
   
-        $wxResult = json_decode($result, true);
+        // $wxResult = json_decode($result, true);
 
-        //判断返回的结果中是否有错误码
-        if (isset($wxResult['errcode'])) {
-            $this->error($wxResult['errmsg'],$wxResult['errcode']);
-        }
-        $this->success('获取 openid 成功',['auth_result'=>$wxResult]);
+        // //判断返回的结果中是否有错误码
+        // if (isset($wxResult['errcode'])) {
+        //     $this->error($wxResult['errmsg'],$wxResult['errcode']);
+        // }
+        // $this->success('获取 openid 成功',['auth_result'=>$wxResult]);
     }
 
 
