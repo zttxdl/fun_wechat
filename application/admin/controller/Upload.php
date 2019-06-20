@@ -8,14 +8,12 @@
 
 namespace app\api\controller;
 
-
-use app\common\controller\ApiBase;
 use think\Request;
+use think\Controller;
 
-class Upload extends ApiBase
+
+class Upload extends Controller
 {
-    protected $noNeedLogin = ['*'];
-
     /**
      * 文件上传提交
      *
@@ -32,9 +30,9 @@ class Upload extends ApiBase
             $this->error($result);
         }
         // 移动到框架应用根目录 目录下
-        $info = $file->move('./uploads/api/'.$path);
+        $info = $file->move('./uploads/admin/'.$path);
         if ($info) {
-            $data['images'] = '/uploads/api/'.$path.'/'.$info->getSaveName();
+            $data['images'] = '/uploads/admin/'.$path.'/'.$info->getSaveName();
             $this->success('文件上传成功',$data);
         } else {
             // 上传失败获取错误信息

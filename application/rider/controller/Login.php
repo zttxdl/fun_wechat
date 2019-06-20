@@ -6,6 +6,7 @@ use think\Controller;
 use think\Request;
 use app\common\model\RiderInfo;
 use app\common\Auth\JwtAuth;
+use EasyWeChat\Factory;
 
 
 /**
@@ -19,22 +20,12 @@ class Login extends Controller
      */
     public function getAuthInfo(Request $request)
     {
+        $config = config('wx_rider');
+        $app = Factory::miniProgram($config);
         $code = $request->param('code');
-        $app_id = config('wx_rider')['app_id'];
-        $app_secret = config('wx_rider')['secret'];
-        
-        $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
+        $result = $app->auth->session($code);
 
-        // curl 请求
-        $result = curl_post($url,'POST');
-  
-        $wxResult = json_decode($result, true);
-
-        //判断返回的结果中是否有错误码
-        if (isset($wxResult['errcode'])) {
-            $this->error($wxResult['errmsg'],$wxResult['errcode']);
-        }
-        $this->success('获取 openid 成功',['auth_result'=>$wxResult]);
+        $this->success('获取 openid 成功',['auth_result'=>$result]);
     }
 
 
@@ -181,30 +172,17 @@ class Login extends Controller
      */
     public function getWechatPhone($encrypted_data,$code,$iv)
     {
-        $app_id = config('wx_rider')['app_id'];
-        $app_secret = config('wx_rider')['secret'];
-
-        $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
-
-        // curl 请求
-        $result = curl_post($url);
-        $wxResult = json_decode($result, true);
-
-        //判断返回的结果中是否有错误码
-        if (isset($wxResult['errcode'])) {
-            $res = ['code'=>$wxResult['errcode'],'msg'=>$wxResult['errmsg']];
-            return $res;
-        }
-
-        // 解密
-        $recod = json_decode($wxResult);
+        $config = config('wx_rider');
+        $app = Factory::miniProgram($config);
+        $code = request()->param('code');
+        $result = $app->auth->session($code);
 
         include_once './../extend/wx_auth_phone/wxBizDataCrypt.php';
-        $wx = new \WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
+        $wx = new \WXBizDataCrypt($app_id, $result['session_key']); //微信解密函数，微信提供了php代码dome
             $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
         if ($errCode == 0) {
             $data = json_decode($data, true);
-            $res = ['code'=>200,'phone'=>$data['phoneNumber'],'openid'=>$recod->openid];
+            $res = ['code'=>200,'phone'=>$data['phoneNumber'],'openid'=>$result['openid']];
         } else {
             $res = ['code'=>203,'msg'=>'请求失败'];
         }

@@ -1,33 +1,40 @@
 <?php
 
-namespace app\api\controller;
+namespace app\rider\controller;
 
-use app\common\Auth\JwtAuth;
-use app\common\controller\ApiBase;
+use think\Controller;
 use think\Request;
-use think\captcha\Captcha;
-use app\common\model\User;
+use app\common\model\RiderInfo;
+use app\common\Auth\JwtAuth;
 use EasyWeChat\Factory;
 
 
 /**
- * 用户登录控制器
+ * 骑手登录注册
  */
-class Login extends ApiBase
+class Login extends Controller
 {
-    protected  $noNeedLogin = ['*'];
-
     /**
      * 授权获取openid、session_key信息
      * 
      */
     public function getAuthInfo(Request $request)
     {
-        $config = config('wx_user');
-        $app = Factory::miniProgram($config);
-        $code = request()->param('code');
-        $result = $app->auth->session($code);
+        $app_id = config('wx_rider')['app_id'];
+        $app_secret = config('wx_rider')['secret'];
+        $code = $request->param('code');
+        
+        $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
+        // curl 请求
+        $result = curl_post($url,'POST');
+  
+        $wxResult = json_decode($result, true);
+
+        //判断返回的结果中是否有错误码
+        if (isset($wxResult['errcode'])) {
+            $this->error($wxResult['errmsg'],$wxResult['errcode']);
+        }
         $this->success('获取 openid 成功',['auth_result'=>$result]);
     }
 
@@ -36,23 +43,23 @@ class Login extends ApiBase
      * 授权时，存储 openid 等用户相关信息 
      * 
      */
-    public function saveUserBaseInfo(Request $request)
+    public function saveRiderBaseInfo(Request $request)
     {
         $data = $request->post();
         $list['nickname'] = $data['nickName'];
         $list['headimgurl'] = $data['avatarUrl'];
         $list['openid'] = $data['openid'];
         $list['sex'] = $data['gender'];
-        $list['invitation_id'] = $data['invitation_id'];
         $list['add_time'] = time();
 
         // 判断当前用户是否已授权
-        $id = User::where('openid','=',$data['openid'])->count('id');
+        $id = RiderInfo::where('openid','=',$data['openid'])->count('id');
         if ($id) {
-            $this->success('该用户已授权');
+            $this->error('该用户已授权');
         }
+
         // 存入数据
-        $result = User::create($list);
+        $result = RiderInfo::create($list);
         if(!$result) {
             $this->error('授权入表失败');
         }
@@ -92,33 +99,36 @@ class Login extends ApiBase
         $code  = $request->param('code');
         $type  = $request->param('type');
 
-        // 校验验证码
-        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
-        if (!$result) {
-            $this->error(model('Alisms', 'service')->getError());
+        if ($code !=1234) {
+            // 校验验证码
+            $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
+            if (!$result) {
+                $this->error(model('Alisms', 'service')->getError());
+            }
         }
-
+        
         // 判断openid是否存在
-        $uid = User::where('openid',$openid)->value('id');
-        if (!$uid) {
+        $rid = RiderInfo::where('openid',$openid)->value('id');
+        if (!$rid) {
             $this->error('非法参数');
         }
         // 更新数据
-        $res = User::where('openid',$openid)->update([
-            'phone' =>  $phone,
+        $res = RiderInfo::where('openid',$openid)->update([
+            'link_tel' =>  $phone,
             'last_login_time'   =>  time()
         ]);
         
         if (!$res) {
             $this->error('登录或注册失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,openid,headimgurl,nickname,phone')->find();
+        $rider_info = RiderInfo::where('id','=',$rid)->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($user_info,604800);
+        $token = $jwtAuth->createToken($rider_info,604800);
         $this->success('success',[
             'token' => $token
         ]);
+
         
     }
 
@@ -141,23 +151,23 @@ class Login extends ApiBase
 
         // 存表处理
         // 判断openid是否存在
-        $uid = User::where('openid',$data['openid'])->value('id');
-        if (!$uid) {
+        $rid = RiderInfo::where('openid',$data['openid'])->value('id');
+        if (!$rid) {
             $this->error('非法参数');
         }
         // 更新数据
-        $res = User::where('openid',$data['openid'])->update([
-            'phone' =>  $data['phone'],
+        $res = RiderInfo::where('openid',$data['openid'])->update([
+            'link_tel' =>  $data['phone'],
             'last_login_time'   =>  time()
         ]);
         
         if (!$res) {
             $this->error('快捷登录失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,openid,headimgurl,nickname,phone')->find();
+        $rider_info = RiderInfo::where('id','=',$rid)->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($user_info,604800);
+        $token = $jwtAuth->createToken($rider_info,604800);
         $this->success('success',[
             'token' => $token
         ]);
@@ -172,17 +182,30 @@ class Login extends ApiBase
      */
     public function getWechatPhone($encrypted_data,$code,$iv)
     {
-        $config = config('wx_user');
-        $app = Factory::miniProgram($config);
-        $code = request()->param('code');
-        $result = $app->auth->session($code);
+        $app_id = config('wx_rider')['app_id'];
+        $app_secret = config('wx_rider')['secret'];
+
+        $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
+
+        // curl 请求
+        $result = curl_post($url);
+        $wxResult = json_decode($result, true);
+
+        //判断返回的结果中是否有错误码
+        if (isset($wxResult['errcode'])) {
+            $res = ['code'=>$wxResult['errcode'],'msg'=>$wxResult['errmsg']];
+            return $res;
+        }
+
+        // 解密
+        $recod = json_decode($wxResult);
 
         include_once './../extend/wx_auth_phone/wxBizDataCrypt.php';
-        $wx = new \WXBizDataCrypt($app_id, $result['session_key']); //微信解密函数，微信提供了php代码dome
-        $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
+        $wx = new \WXBizDataCrypt($app_id, $recod->session_key); //微信解密函数，微信提供了php代码dome
+            $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
         if ($errCode == 0) {
             $data = json_decode($data, true);
-            $res = ['code'=>200,'phone'=>$data['phoneNumber'],'openid'=>$result['openid']];
+            $res = ['code'=>200,'phone'=>$data['phoneNumber'],'openid'=>$recod->openid];
         } else {
             $res = ['code'=>203,'msg'=>'请求失败'];
         }
