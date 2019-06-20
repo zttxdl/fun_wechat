@@ -120,9 +120,15 @@ class Order extends ApiBase
     //获取骑手信息
     public function getRiderInfo(Request $request) {
         $orders_id = $request->param('orders_id');
-        $rider_id = Db::name('takeout')->where('order_id',$orders_id)->value('rider_id');
+        //$rider_id = Db::name('takeout')->where('order_id',$orders_id)->value('rider_id');
 
-        $rider_info = Db::name('rider_info')->where('id',$rider_id)->field('id,name,headimgurl,sex,link_tel')->find();
+        //$rider_info = Db::name('rider_info')->where('id',$rider_id)->field('id,name,headimgurl,sex,link_tel,single_time,accomplish_time')->find();
+
+        $rider_info = Db::name('takeout')->alias('a')
+            ->join('rider_info b','a.rider_id = b.id')
+            ->field('a.single_time,a.accomplish_time,b.id,b.name,b.headimgurl,b.sex,b.link_tel')
+            ->where('a.order_id',$orders_id)
+            ->find();
 
         if(!$rider_info) {
             $this->error('暂无骑手信息');
@@ -415,6 +421,8 @@ class Order extends ApiBase
     {
         $orders_id = $request->param('orders_id');
 
+        $shop_id = $request->param('shop_id');
+
         $orders_info_ids = $request->param('orders_info_ids');
 
         $content = $request->param('content');
@@ -427,29 +435,34 @@ class Order extends ApiBase
 
         $data = Db::name('refund')->where('orders_id',$orders_id)->find();
 
+
         if(is_array($data)){
             $this->error('退单已提交申请,请耐心等待');
         }
 
-        $orders_sn = Model('Orders')->getOrderSnById($orders_id);
+        $orders = Model('Orders')->getOrderById($orders_id);
 
         $data = [
             'orders_id' => $orders_id,
+            'shop_id' => $orders['shop_id'],
             'orders_info_ids' => $orders_info_ids,
             'content' => $content,
             'imgs' => $imgs,
-            'refund_fee' => $money,
-            'total_fee' => $money,
-            'num' => $num,
+            'refund_fee' => $orders['money'] - $orders['ping_fee'],//退单
+            'total_fee' => $orders['money'],
+            'num' => $orders['num'],
             'status' => '1',
             'add_time' => time(),
             'out_refund_no' => build_order_no('T'),
-            'out_trade_no' => $orders_sn,
+            'out_trade_no' => $orders['orders_sn'],
         ];
+
 
         $res = Db::name('refund')->insert($data);
 
         if($res) {
+            //更新一下主表订单状态为退款中
+            Model('Orders')->updateStatus($orders['orders_sn'],11);
             $this->success('售后申请已提交成功,等待商家处理');
         }
     }
@@ -762,8 +775,6 @@ class Order extends ApiBase
                 'box_money' => $product_info['box_money'],
                 'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
                 'attr_ids' => $row['attr_ids']
-
-
             ];
         }
 

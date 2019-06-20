@@ -175,9 +175,10 @@ Route::group('merchants',function (){
     Route::post('orderIndex','merchants/Order/show');//订单查询
     Route::post('orderDetail','merchants/Order/orderDetail');//订单详情
     Route::post('orderDel','merchants/Order/del');//订单删除
-    Route::post('orderReceipt','merchants/Order/receipt');//订单处理
-    Route::post('orderRefund','merchants/Order/refund');//退单
-    Route::post('refundQuery','merchants/Order/refundQuery');//查询退款
+    Route::post('orderReceipt','merchants/Order/receipt');//订单接单 拒单处理
+    Route::post('orderRefund','merchants/refund/refund');//退单
+    Route::post('refundAction','merchants/refund/refundAction');//退款 拒绝操作
+    Route::post('refundQuery','merchants/refund/refundQuery');//查询退款
 
 });
 
@@ -320,6 +321,7 @@ Route::group('r-member', function () {
     Route::post('/update', 'update');
     Route::post('/bind-tel', 'BindRiderPhone');
     Route::get('/status', 'openStatus');
+    Route::rule('/getEvaluation', 'getEvaluation');
 })->prefix('rider/Member/');
 
 // 骑手订单组

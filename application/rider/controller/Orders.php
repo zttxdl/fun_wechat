@@ -33,30 +33,24 @@ class Orders extends RiderBase
         $where = [];
 		if ($type == 1) {
 
-            $where[] = ['a.school_id','=',$this->auth->school_id];
-		    $where[] = ['a.type','=',1];
-            //获取待接单
-            $list = Db::table('fun_takeout')
-                    ->alias('a')
-                    ->field('a.order_id,a.ping_fee,a.meal_sn,a.shop_address,a.expected_time,b.address,b.status')
-                    ->join('fun_orders b','a.order_id = b.id')
-                    ->where($where)
-                    ->select();
+            $where[] = ['school_id','=',$this->auth->school_id];
+		    $where[] = ['status','=',1];
 
+            $list = model('Takeout')
+                ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
+                ->where($where)->select();
 		}else{
 			//获取已接单
-            $where[] = ['a.school_id','=',$this->auth->school_id];
-            $where[] = ['a.type','=',2];
-            $where[] = ['a.rider_id','=',$this->auth->id];
+            $where[] = ['school_id','=',$this->auth->school_id];
+            $where[] = ['status','in','2,3,4,5'];
+            $where[] = ['rider_id','=',$this->auth->id];
 
-            $list = Db::table('fun_takeout')
-                ->alias('a')
-                ->field('a.order_id,a.ping_fee,a.meal_sn,a.shop_address,a.expected_time,b.address,b.status')
-                ->join('fun_orders b','a.order_id = b.id')
-                ->where($where)
-                ->select();
-            foreach ($list as &$value) {
-                $value['rest_time'] = round(($value['expected_time'] - time()) / 60) ;
+            $list = model('Takeout')
+                ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
+                ->where($where)->select();
+
+            foreach ($list as $key => $item) {
+                $item->rest_time = round(($item->expected_time - time()) / 60);
             }
 		}
 
@@ -71,14 +65,18 @@ class Orders extends RiderBase
 	{
         $orderId = $request->param('order_id');
 
-        $status = model('Orders')->where('id',$orderId)->value('status');
+        $status = model('Takeout')->where('order_id',$orderId)->value('status');
 
-        if ($status !== 3){
+        if ($status == 2){
+            $this->error('该订单已取消');
+        }
+
+        if ($status !== 1){
             $this->error('手慢了，被人抢走了');
         }
         $data = [
             'rider_id'=>$this->auth->id,
-            'type'=>2,
+            'status'=>3,
             'single_time'=>time(),
             'update_time'=>time(),
         ];
@@ -101,19 +99,34 @@ class Orders extends RiderBase
         $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
         if ($type == 1){//我已到店
             $Order->status = 5;
-            $Order->send_time = time();
-        }elseif ($type == 2){
-            $Order->status = 6;
+            $Takeout->status = 4;
+            $Takeout->toda_time = time();
 
-        }elseif ($type ==3){
+        }elseif ($type == 2){//取餐离店
+            $Order->status = 6;
+            $Takeout->status = 5;
+            $Order->send_time = time();
+        }elseif ($type ==3){//确认送达
             $Order->arrive_time = time();
             $Order->status = 7;
+            $Takeout->status = 6;
             $Takeout->accomplish_time = time();
             $Takeout->update_time = time();
-            $Takeout->type = 3;
-            $Takeout->save();
+
+            //订单完成插入明细
+            $data = [
+                'rider_id' => $this->auth->id,
+                'name' => $Takeout->shop_address->shop_name,
+                'current_money' => $Takeout->ping_fee,
+                'type' => 1,
+                'serial_number' => $Order->orders_sn,
+                'add_time' => time(),
+            ];
+
+            Db::name('rider_income_expend')->insert($data);
         }
 
+        $Takeout->save();
         $Order->save();
 
         $this->success('success');
@@ -127,23 +140,19 @@ class Orders extends RiderBase
         $orderId = $request->param('order_id');
 
 
-        $data = Db::table('fun_takeout')
-            ->alias('a')
-            ->field('a.order_id,a.ping_fee,a.meal_sn,a.single_time,shop_address,a.accomplish_time,a.expected_time,b.address,b.status,b.trading_closed_time,b.send_time,b.cancel_desc')
-            ->join('fun_orders b','a.order_id = b.id')
-            ->where('a.order_id','=',$orderId)
-            ->find();
+        $data = model('Takeout')
+            ->field('order_id,ping_fee,meal_sn,single_time,shop_address,accomplish_time,expected_time,user_address,status,toda_time,cancel_desc,cancel_time')
+            ->where('order_id',$orderId)->find();
 
-
-        if ($data['status'] == 5 || $data['status'] == 6 || $data['status'] == 10  ){
+        if ($data['status'] == 3 || $data['status'] == 4 || $data['status'] == 5  ){
             $data['rest_time'] = round(($data['expected_time'] - time()) / 60) ;
         }
 
         $data['single_time'] = $data['single_time'] ? date('H:i',$data['single_time'])  : '';
         $data['accomplish_time'] =  $data['accomplish_time'] ? date('H:i',$data['accomplish_time']) : '';
-        $data['trading_closed_time'] = $data['trading_closed_time'] ? date('H:i',$data['trading_closed_time']) : '';
+        $data['cancel_time'] = $data['cancel_time'] ? date('H:i',$data['cancel_time']) : '';
         $data['expected_time'] = $data['expected_time'] ? date('H:i',$data['expected_time']) : '';
-        $data['send_time'] = $data['send_time'] ? date('H:i',$data['send_time']) : '';
+        $data['toda_time'] = $data['toda_time'] ? date('H:i',$data['toda_time']) : '';
 
         $this->success('success',$data);
     }
