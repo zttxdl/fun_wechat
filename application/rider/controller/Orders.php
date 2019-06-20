@@ -39,7 +39,6 @@ class Orders extends RiderBase
             $list = model('Takeout')
                 ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
                 ->where($where)->select();
-
 		}else{
 			//获取已接单
             $where[] = ['school_id','=',$this->auth->school_id];
@@ -113,7 +112,6 @@ class Orders extends RiderBase
             $Takeout->status = 6;
             $Takeout->accomplish_time = time();
             $Takeout->update_time = time();
-            $Takeout->save();
 
             //订单完成插入明细
             $data = [
@@ -128,6 +126,7 @@ class Orders extends RiderBase
             Db::name('rider_income_expend')->insert($data);
         }
 
+        $Takeout->save();
         $Order->save();
 
         $this->success('success');
