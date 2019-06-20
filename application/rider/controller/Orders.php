@@ -144,7 +144,7 @@ class Orders extends RiderBase
 
 
         $data = model('Takeout')
-            ->field('order_id,ping_fee,meal_sn,single_time,shop_address,accomplish_time,expected_time,user_address,status,toda_time,cancel_desc,closed_time')
+            ->field('order_id,ping_fee,meal_sn,single_time,shop_address,accomplish_time,expected_time,user_address,status,toda_time,cancel_desc,cancel_time')
             ->where('order_id',$orderId)->find();
 
         if ($data['status'] == 3 || $data['status'] == 4 || $data['status'] == 5  ){
@@ -153,7 +153,7 @@ class Orders extends RiderBase
 
         $data['single_time'] = $data['single_time'] ? date('H:i',$data['single_time'])  : '';
         $data['accomplish_time'] =  $data['accomplish_time'] ? date('H:i',$data['accomplish_time']) : '';
-        $data['closed_time'] = $data['closed_time'] ? date('H:i',$data['closed_time']) : '';
+        $data['cancel_time'] = $data['cancel_time'] ? date('H:i',$data['cancel_time']) : '';
         $data['expected_time'] = $data['expected_time'] ? date('H:i',$data['expected_time']) : '';
         $data['toda_time'] = $data['toda_time'] ? date('H:i',$data['toda_time']) : '';
 
