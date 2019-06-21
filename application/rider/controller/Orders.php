@@ -127,8 +127,10 @@ class Orders extends RiderBase
                 'serial_number' => $Order->orders_sn,
                 'add_time' => time(),
             ];
-
             Db::name('rider_income_expend')->insert($data);
+            $phone = model('User')->where('id',$Order->user_id)->value('phone');
+            $this->consumptionGiving($Order->user_id,$Takeout->school_id,$Order->money,$phone);
+
         }
 
         $Takeout->save();
@@ -162,6 +164,55 @@ class Orders extends RiderBase
         $this->success('success',$data);
     }
 
+    /**
+     * 消费赠送红包
+     */
+    protected function consumptionGiving($user_id,$school_id,$fee,$phone)
+    {
+
+        $where[] = [
+            'type','=',3
+        ];
+        $where[] = [
+            'school_id','=',$school_id
+        ];
+        $where[] = [
+            'status','=',2
+        ];
+
+       $list =  model('PlatformCoupon')
+           ->where($where)
+           ->order('threshold','desc')
+           ->select();
+
+       foreach ($list as $item) {
+            if ($fee > $item->threshold && $item->surplus_num > 0){
+                $num = $item->indate;
+                //执行逻辑
+                $indate = date('Y-m-d',time()).'-'.date('Y-m-d',strtotime("$num + day"));
+                $data = [
+                    'user_id'=>$user_id,
+                    'phone'=>$phone,
+                    'platform_coupon_id'=>$item->id,
+                    'indate'=>$indate,
+                    'add_time'=>time(),
+                ];
+                model('MyCoupon')->insert($data);
+
+                //处理红包减法
+                model('PlatformCoupon')->where('id',$item->id)->setDec('surplus_num');
+                break;
+            }
+       }
+    }
+
+    /**
+     * 邀请赠送红包
+     */
+    protected function inviteGiving($user_id)
+    {
+        model();
+    }
 }
 
 
