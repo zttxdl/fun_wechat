@@ -254,7 +254,7 @@ class Shop extends Model
         $school_id = $this->where('id',$shop_id)->value('school_id');
         return $school_id;
     }
-     
+
 
 
 
