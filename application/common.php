@@ -11,7 +11,8 @@
 
 // 应用公共文件
 
-use \Firebase\JWT\JWT; //导入JWT
+use \Firebase\JWT\JWT;
+use think\facade\Cache; //导入JWT
 
  /**
  * 返回封装后的API成功方法
@@ -243,6 +244,51 @@ if (!function_exists('write_log')) {
         error_log($param.print_r($data),1,3,ROOT_PATH."./logs/".date('Y-m-d').$type.".log");
     }
 }
+
+
+if (!function_exists('createOrderSn')) {
+    /**
+     * 生成订单号
+     *  -当天从1开始自增
+     *  -订单号模样：20190604000001
+     * @param Client $redis
+     * @param $key
+     * @param $back：序号回退，如果订单创建失败，事务回滚可用
+     * @return string
+     */
+    function createOrderSn($key,$back=0) {
+        $sn = Cache::store('redis')->get($key);//redis读取，替换一下
+        $snDate = substr($sn,0,8);
+        $snNo = intval(substr($sn,8));
+        $curDate = date('Ymd');
+        if($back==1){//序号回退
+            if($curDate==$snDate){
+                $snNo = ($snNo>1) ? ($snNo-1) : 1;
+                $sn = $curDate.sprintf("%06d",$snNo);
+            }
+        }else{//序号增加
+            if(empty($sn)){
+                $sn = $curDate.'001';
+            }else{
+                $snNo = ($curDate==$snDate) ? ($snNo+1) : 1;
+                $sn = $curDate.sprintf("%06d",$snNo);
+            }
+        }
+        Cache::store('redis')->set($key,$sn);//redis写入，替换一下
+        return $snNo;
+    }
+}
+
+if (!function_exists('visitor')) {
+    /**
+     * 访客统计
+     */
+    function visitor() {
+
+    }
+}
+
+
 
 
 

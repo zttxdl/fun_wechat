@@ -9,7 +9,10 @@
 namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
+use app\common\model\Orders;
+use app\common\model\ShopInfo;
 use think\Request;
+use think\Db;
 
 class Shop extends MerchantsBase
 {
@@ -25,29 +28,31 @@ class Shop extends MerchantsBase
         $shop_id = $this->shop_id;
         $shop_info = [];
 
-        $result = Model('Shop')->getShopInfo($shop_id);
+        $result = ShopInfo::where('id',$shop_id)->find();
+
+        if($result['status'] == '1') {
+            $this->error('店铺待审核中!');
+        }
+
 
        //dump($result);
         if($result->isEmpty()) {
             $this->error('暂无店铺信息');
         }
 
+        $day_order = Orders::where('shop_id',$shop_id)->count('id');
+        $day_sales = Orders::where(['shop_id'=>$shop_id,'status'=>8])->sum('money');
+        $day_cancel_order = Orders::where(['shop_id'=>$shop_id,'status'=>9])->count('id');
 
-        foreach ($result as $row)
-        {
-            if($row['status'] == '1') {
-                $this->error('店铺待审核中!');
-            }
-            $shop_info = [
-                'shop_name' => $row['shop_name'],//店铺名称
-                'status' => '1',//店铺营业状态
-                'day_order' => '55',//今日订单数
-                'day_sales' => '500',//今日销售额
-                'day_uv' => '20',//今日访客数
-                'order_cancel_num' => '2',//订单取消数量
-            ];
+        $shop_info = [
+            'shop_name' => $result['shop_name'],//店铺名称
+            'status' => $result['open_status'],//店铺营业状态
+            'day_order' => $day_order,//今日订单数
+            'day_sales' => $day_sales,//今日销售额
+            'day_uv' => '20',//今日访客数
+            'order_cancel_num' => $day_cancel_order,//订单取消数量
+        ];
 
-        }
 
 
         $this->success('获取成功',$shop_info);
@@ -106,7 +111,7 @@ class Shop extends MerchantsBase
     public function setOpenStatus(Request $request)
     {
         $shop_id = $this->shop_id;
-        $shop_name = $request->param('shop_name');
+
         $open_status = $request->param('open_status');
 
 
@@ -165,21 +170,27 @@ class Shop extends MerchantsBase
     /**
      * 商家信息设置
      */
-    public function setInfo()
+    public function setInfo(Request $request)
     {
+        $data = $request->post();
 
+        // 验证表单数据
+        $check = $this->validate($data, 'ShopInfo');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+
+        // 更新数据
+        $result = ShopInfo::where('id','=',$this->shop_id)->update($data);;
+
+        if (!$result) {
+            $this->error('更新失败',201);
+        }
+        $this->success('更新成功');
     }
-
+    
     /**
-     *营业时间修改
-     */
-    public function setOpenTime()
-    {
-
-    }
-
-    /**
-     * 商家更多信息
+     * 商家入驻信息
      */
     public function moreInfo(Request $request)
     {
@@ -192,19 +203,6 @@ class Shop extends MerchantsBase
         $result = [];
 
         $shop_info = $this->shopModel->getShopInfo($shop_id);
-
-        foreach ($shop_info as $row)
-        {
-            //店铺信息
-            $result['shop_info']['shop_name'] = $row['shop_name'];
-            $result['shop_info']['logo_img'] = $row['logo_img'];
-            $result['shop_info']['link_name'] = $row['link_name'];
-            $result['shop_info']['link_tel'] = $row['link_tel'];
-            $result['shop_info']['address'] = $row['address'];
-            $result['shop_info']['school'] = Model('School')->getNameById($row['school_id']);
-            $result['shop_info']['manage_category_name'] = Model('ManageCategory')->getNameById($row['manage_category_id']);
-        }
-
         $shop_more_info = $this->shopModel->getShopMoreInfo($shop_id);
         //dump($shop_more_info);
         //商家资质
@@ -213,20 +211,38 @@ class Shop extends MerchantsBase
         //收款信息
         $shop_account = [];
 
-        foreach ($shop_more_info as $row)
-        {
-            $shop_qualification['business_license'] = $row['business_license'];
-            $shop_qualification['proprietor'] = $row['proprietor'];
-            $shop_qualification['hand_card_front'] = $row['hand_card_front'];
-            $shop_qualification['user_name'] = $row['user_name'];
-            $shop_qualification['identity_num'] = $row['identity_num'];
-            $shop_qualification['sex'] = $row['sex'];
-            $shop_qualification['licence'] = $row['licence'];
 
-            $shop_account['branch_back'] = $row['branch_back'];
-            $shop_account['back_hand_name'] = $row['back_hand_name'];
-            $shop_account['back_card_num'] = $row['back_card_num'];
+        if($shop_info) {
+            foreach ($shop_info as $row)
+            {
+                //店铺信息
+                $result['shop_info']['shop_name'] = $row['shop_name'];
+                $result['shop_info']['logo_img'] = $row['logo_img'];
+                $result['shop_info']['link_name'] = $row['link_name'];
+                $result['shop_info']['link_tel'] = $row['link_tel'];
+                $result['shop_info']['address'] = $row['address'];
+                $result['shop_info']['school'] = Model('School')->getNameById($row['school_id']);
+                $result['shop_info']['manage_category_name'] = Model('ManageCategory')->getNameById($row['manage_category_id']);
+            }
         }
+
+        if($shop_more_info) {
+            foreach ($shop_more_info as $row)
+            {
+                $shop_qualification['business_license'] = $row['business_license'];
+                $shop_qualification['proprietor'] = $row['proprietor'];
+                $shop_qualification['hand_card_front'] = $row['hand_card_front'];
+                $shop_qualification['user_name'] = $row['user_name'];
+                $shop_qualification['identity_num'] = $row['identity_num'];
+                $shop_qualification['sex'] = $row['sex'];
+                $shop_qualification['licence'] = $row['licence'];
+
+                $shop_account['branch_back'] = $row['branch_back'];
+                $shop_account['back_hand_name'] = $row['back_hand_name'];
+                $shop_account['back_card_num'] = $row['back_card_num'];
+            }
+        }
+
 
         $result['shop_qualification'] = $shop_qualification;
         $result['shop_account'] = $shop_account;

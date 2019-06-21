@@ -194,7 +194,7 @@ class Order extends ApiBase
         ];
 
         $result['ping_info']['ping_time'] = '尽快送达';
-        $result['ping_info']['ping_type'] = '平台配送';
+        $result['ping_info']['ping_type'] = $shop_info['run_type'];
         $result['ping_info']['address'] = $orders['address'];
         $result['ping_info']['rider_info'] = '';
         if(in_array($orders['status'],[5,6,7,8])) {//骑手取货、配货、已送达、已完成显示配送信息

@@ -10,7 +10,10 @@ namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
 use EasyWeChat\Factory;
+use think\Exception;
 use think\facade\Cache;
+use think\facade\Env;
+use think\Model;
 use think\Request;
 use think\Db;
 
@@ -28,10 +31,12 @@ class Order extends MerchantsBase
         $page_no = $request->param('page');
         $page_size = $request->param('pageSize',20);
         $shop_id = $this->shop_id;
+        $date = $request->param('date');
 
-        if(!$status ) {
+        /*if(!$status ) {
             $this->error('非法传参');
-        }
+        }*/
+
 
         //从缓存中获取
         /*$key = "shop_info:shop_id:$shop_id:status:$status";
@@ -51,7 +56,16 @@ class Order extends MerchantsBase
             $map[] = ['status','=',$status];
         }
 
-        $result = model('orders')->where($map)->page($page_no,$page_size)->select();
+        if($date) {
+            $start = strtotime($date.'00:00:00');
+            $end = strtotime($date.'23:59:59');
+            $map[] = ['add_time','between time',[$start,$end]];
+        }
+
+
+        $result = model('orders')
+            ->where($map)
+            ->page($page_no,$page_size)->select();
 
         if(empty($result)) {
             $this->error('暂无订单');
@@ -62,12 +76,11 @@ class Order extends MerchantsBase
         {
             $orders[] = [
                 'orders_sn' => $row['orders_sn'],
-                'add_time' => date('Y-m-d H:i',$row['add_time']),
+                'orders_id' => $row['id'],
                 'address' => $row['address'],
-                'remark' => $row['message'],
-                'ping_fee' => $row['ping_fee'],
+                'add_time' => date('Y-m-d H:i',$row['add_time']),
                 'money' => $row['money'],
-                'detail' => $this->detail($row['id'])
+                'status' => $row['status'],
             ];
         }
 
@@ -103,38 +116,166 @@ class Order extends MerchantsBase
     {
         $order_sn = $request->param('orders_sn');
         $result = model('Orders')->getOrder($order_sn);
-        //dump($result);exit;
 
-        $orders = [];
-        foreach ($result as $row) {
-            $orders = [
-                'orders_sn' => $row['orders_sn'],
-                'add_time' => date('Y-m-d H:i',$row['add_time']),
-                'address' => $row['address'],
-                'remark' => $row['message'],
-                'box_money' => $row['box_money'],
-                'ping_fee' => $row['ping_fee'],
-                'money' => $row['money'],
-                'discount_money' => $row['shop_discounts_money'] + $row['platform_coupon_money'],
-                'detail' => model('Orders')->getOrderDetail($row['id'])
-            ];
+        //dump($result);
+
+
+        if(!$result) {
+            $this->error('订单明细不存在!');
         }
 
-        $this->success('获取成功',$orders);
+
+        $order_info = [
+            'orders_sn' => $result['orders_sn'],
+            'orders_id' => $result['id'],
+            'add_time' => date('Y-m-d H:i',$result['add_time']),
+            'address' => $result['address'],
+            'remark' => $result['message'],
+            'total_money' => $result['total_money'],
+            'box_money' => $result['box_money'],
+            'ping_fee' => $result['ping_fee'],
+            'discount_money' => $result['shop_discounts_money'] + $result['platform_coupon_money'],
+            'money' => $result['money'],
+            'detail' => $this->detail($result['id'])
+        ];
+
+        $this->success('获取成功',$order_info);
     }
+
     /**
-     * 拒单 接单处理
+     * 商家接单
      */
-    public function receipt(Request $request)
+    public function accept(Request $request)
     {
-        $status = $request->param('status');//3:接单 4:拒单 7:确认送出
         $orders_sn = $request->param('orders_sn');
 
+        $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
 
-        $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>$status]);
+        if($order_info['status'] == 3) {
+            $this->error('商家已接单');
+        }
 
-        $this->success('success',$result);
+        $shop_info = Model('Shop')->getShopDetail($order_info['shop_id']);
+
+
+        $shop_address = [
+            'shop_name' => $shop_info['shop_name'],
+            'address_detail' => $shop_info['address'],
+            'phone' => $shop_info['link_tel'],
+            'name' => $shop_info['link_name'],
+        ];
+
+        try{
+            //封装外卖数据
+            $takeout_info = [
+                'order_id' => $order_info['id'],
+                'shop_id' => $order_info['shop_id'],
+                'ping_fee' => $order_info['ping_fee'],//配送费
+                'meal_sn' => createOrderSn('shop_id:'.$order_info['shop_id']),//取餐号
+                'school_id' => Model('Shop')->getSchoolIdByID($order_info['shop_id']),
+                'create_time' => time(),//商家接单时间
+                'user_address' => $order_info['address'],//收货地址
+                'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
+            ];
+
+
+
+            $takeout = Db::name('takeout')->where('order_id',$orders_sn)->value('order_id');
+
+            if($takeout) {
+                throw new Exception('订单ID重复');
+            }
+            //外卖数据入库
+            Db::name('takeout')->insert($takeout_info);
+
+
+
+            $result = model('Orders')->where('orders_sn',$orders_sn)->setField('status',3);
+
+            return json_success('success');
+
+        }catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+
     }
+
+    /**
+     * 商家拒单
+     */
+    public function refuse(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+        $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
+
+        if($order_info['status'] == 2) {
+            $this->error('商家已退款');
+        }
+
+        try{
+            $res = $this->wxRefund($orders_sn);
+
+            if('SUCCESS' == $res['data']['return_code'] && 'SUCCESS' == $res['data']['result_code']) {
+
+                $result = model('Orders')->where('orders_sn',$orders_sn)->setField('status',4);
+
+                if($result) {
+                    $this->success('拒单成功');
+                }
+            }
+
+
+        }catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+
+
+
+    }
+
+    /**
+     * 微信退款处理
+     */
+    public function wxRefund($orders_sn)
+    {
+
+        $number = trim($orders_sn);//商户订单号
+
+        if (!$number){
+            $this->error('非法传参');
+        }
+
+        $find = model('Refund')->where('out_trade_no',$number)->find();
+
+        if (!$find){
+            $this->error('商户订单号错误');
+        }
+
+        if ($find->total_fee < $find->refund_fee){
+            $this->error('退款金额不能大于订单总额');
+        }
+
+        $totalFee = $find->total_fee * 100; //订单金额
+        $refundFee =  $find->refund_fee * 100;//退款金额
+        $refundNumber = $find->out_refund_no;//商户退款单号
+
+        $pay_config = config('wx_pay');
+
+        //dump($pay_config);
+        $app    = Factory::payment($pay_config);//pay_config 微信配置
+
+        //根据商户订单号退款
+        $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
+            // 可在此处传入其他参数，详细参数见微信支付文档
+            'refund_desc' => '取消订单退款',
+            'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+        ]);
+
+
+        return $result;
+    }
+
+
 
 
 
