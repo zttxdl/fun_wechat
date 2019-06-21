@@ -204,6 +204,8 @@ class Orders extends RiderBase
                 break;
             }
        }
+
+       return true;
     }
 
     /**
