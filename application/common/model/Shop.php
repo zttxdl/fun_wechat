@@ -246,6 +246,14 @@ class Shop extends Model
 
         return $data;
     }
+
+    /**
+     * 获取学校ID
+     */
+    public function getSchoolIdByID($shop_id){
+        $school_id = $this->where('id',$shop_id)->value('school_id');
+        return $school_id;
+    }
      
 
 

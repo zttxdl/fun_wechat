@@ -106,7 +106,7 @@ class Shop extends MerchantsBase
     public function setOpenStatus(Request $request)
     {
         $shop_id = $this->shop_id;
-        $shop_name = $request->param('shop_name');
+
         $open_status = $request->param('open_status');
 
 
