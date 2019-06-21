@@ -225,6 +225,9 @@ Route::group('u-coupon', function () {
     Route::get('/index', 'index');
     Route::get('/mycoupon', 'myCoupon');
     Route::get('/myorder_coupon', 'myOrderCoupon');
+    Route::get('/get_coupon', 'getCoupon');
+    Route::get('/show_coupon', 'showCoupon');
+
 })->prefix('api/MyCoupon/');
 
 

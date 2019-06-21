@@ -6,6 +6,7 @@ use think\Controller;
 use think\Request;
 use think\Db;
 use app\common\controller\ApiBase;
+use app\common\model\PlatformCoupon;
 
 /**
  * 我的红包控制器
@@ -41,7 +42,7 @@ class MyCoupon extends ApiBase
         $list = Db::name('my_coupon m')->leftJoin('platform_coupon p','m.platform_coupon_id = p.id')->where($where)
                 ->field('m.id,m.phone,m.indate,m.status,p.face_value,p.threshold,p.type,p.name,p.limit_use,p.school_id,p.shop_ids')->select();
 
-
+                
         $userInfo = model('user')->where('id',$uid)->find();
 
 
@@ -80,7 +81,7 @@ class MyCoupon extends ApiBase
         // 条件
         $type = $request->get('type');
         $type == 1 ? $where[] = ['m.status','=',1] : $where[] = ['m.status','in','2,3'];
-        $where[] = ['m.id','=',$this->auth->id];
+        $where[] = ['m.user_id','=',$this->auth->id];
 
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
         
@@ -120,7 +121,7 @@ class MyCoupon extends ApiBase
                 continue;
             }
             // 店铺使用条件判断
-            if (!in_array($shop_id,$row['shop_ids'])) {
+            if (!in_array($shop_id,$row['shop_ids']) && $row['type'] != 4) {
                 $row['is_use'] = 0;
                 $row['remark'] = '仅限部分商家使用';
                 continue;
@@ -134,11 +135,60 @@ class MyCoupon extends ApiBase
         }
 
         $this->success('获取红包列表成功',['list'=>$list]);
-
-
-
     }
 
+
+    /**
+     * 领取优惠券 
+     * 
+     */
+    public function getCoupon(Request $request)
+    {
+        $coupon_id = $request->get('coupon_id');
+        $info = PlatformCoupon::get($coupon_id);
+
+        $data['user_id'] = $this->auth->id;
+        $data['platform_coupon_id'] = $info->id;
+        $data['indate'] = date('Y.m.d',time()).'-'.date('Y.m.d',time()+3600*24*$info->other_time);
+        $data['add_time'] = time();
+        $data['phone'] = $this->auth->phone;
+
+        $result = Db::name('my_coupon')->insert($data);
+
+        if (!$result) {
+            $this->error('网络繁忙，领取失败');
+        }
+        $this->success('领取成功');
+    }
+
+
+    /**
+     * 展示弹框的优惠券列表信息 
+     * 
+     */
+    public function showCoupon(Request $request)
+    {
+        $school_id = $request->param('school_id');
+        $user_id = $this->auth->id;
+
+        // 查询当前学校下，已发放的平台发放或自主领取的红包列表
+        $list = model('PlatformCoupon')->getSchoolCouponList($school_id);
+
+        // 这里需注意：针对首单减红包， 仅限新注册用户，如若是老用户，则不展示
+        $new_buy = model('user')->getNewBuy($user_id);
+        if ($new_buy == 1) { // 新用户
+            $this->success('获取成功',['list'=>$list]);
+        }
+        // 老用户
+        foreach ($list as $k => &$v) {
+            if ($v['coupon_type'] == 2) {
+                unset($v);
+            }
+        }
+        $this->success('获取成功',['list'=>$list]);
+    }
+     
+     
      
      
 
