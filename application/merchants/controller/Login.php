@@ -193,7 +193,7 @@ class Login extends MerchantsBase
 
         //是否为验证码登录
         if ($vcode !== '1234'){
-            $result = model('Alisms', 'service')->checkCode($phone, 'register', $vcode);
+            $result = model('Alisms', 'service')->checkCode($phone, 'auth', $vcode);
             if ( ! $result) {
                 $this->error(model('Alisms', 'service')->getError());
             }
