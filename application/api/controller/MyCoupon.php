@@ -42,7 +42,7 @@ class MyCoupon extends ApiBase
         $list = Db::name('my_coupon m')->leftJoin('platform_coupon p','m.platform_coupon_id = p.id')->where($where)
                 ->field('m.id,m.phone,m.indate,m.status,p.face_value,p.threshold,p.type,p.name,p.limit_use,p.school_id,p.shop_ids')->select();
 
-                
+
         $userInfo = model('user')->where('id',$uid)->find();
 
 
@@ -112,8 +112,10 @@ class MyCoupon extends ApiBase
         // 需进一步思考。。。。。。。
         foreach ($list as &$row) {
             $row['is_use'] = 1;
-            $row['limit_use'] =  explode(',',$row['limit_use']);  // limit_use = 0 ，表示全部【不限品类】，当limit = 1,2,...n,表示限部分品类
-            $row['shop_ids'] = explode(',',$row['shop_ids']); // 
+            $limit_use =  explode(',',$row['limit_use']);  // limit_use = 0 ，表示全部【不限品类】，当limit = 1,2,...n,表示限部分品类
+            $shop_ids = explode(',',$row['shop_ids']); // 
+            unset($row['limit_use']);
+            unset($row['shop_ids']);
             // 手机使用条件判断
             if($row['phone'] != $phone) {
                 $row['is_use'] = 0;
@@ -121,13 +123,13 @@ class MyCoupon extends ApiBase
                 continue;
             }
             // 店铺使用条件判断
-            if (!in_array($shop_id,$row['shop_ids']) && $row['type'] != 4) {
+            if (!in_array($shop_id,$shop_ids) && $row['type'] != 4) {
                 $row['is_use'] = 0;
                 $row['remark'] = '仅限部分商家使用';
                 continue;
             }
             // 品类使用条件判断
-            if (($row['limit_use'] != 0) && !in_array($category_id,$row['limit_use'])) {
+            if (($limit_use != 0) && !in_array($category_id,$limit_use)) {
                 $row['is_use'] = 0;
                 $row['remark'] = '仅限部分品类使用';
                 continue;
@@ -153,12 +155,25 @@ class MyCoupon extends ApiBase
         $data['add_time'] = time();
         $data['phone'] = $this->auth->phone;
 
-        $result = Db::name('my_coupon')->insert($data);
+        $count = Db::name('platform_coupon')->where('id',$info->id)->value('surplus_num');
+        if ($count < 1) {
+            $this->error('该优惠券已被领取完了');            
+        }
 
-        if (!$result) {
+        // 启动事务
+        Db::startTrans();
+        try {
+            Db::name('my_coupon')->insert($data);
+            Db::name('platform_coupon')->where('id',$info->id)->setDec('surplus_num');
+            // 提交事务
+            Db::commit();
+            $this->success('领取成功');
+        } catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
             $this->error('网络繁忙，领取失败');
         }
-        $this->success('领取成功');
+        
     }
 
 
@@ -176,16 +191,33 @@ class MyCoupon extends ApiBase
 
         // 这里需注意：针对首单减红包， 仅限新注册用户，如若是老用户，则不展示
         $new_buy = model('user')->getNewBuy($user_id);
-        if ($new_buy == 1) { // 新用户
-            $this->success('获取成功',['list'=>$list]);
-        }
-        // 老用户
+        
         foreach ($list as $k => &$v) {
-            if ($v['coupon_type'] == 2) {
-                unset($v);
+            // 老用户 去掉首单立减
+            if ($new_buy == 2 && $v['coupon_type'] == 2) { 
+                // unset($v);  // 删除数组元素后，新数组不会重新建立索引
+                array_splice($list,$k,1); // 删除数组元素后，新数组会自动重新建立索引
+                continue;
+            }
+            
+            // 当红包类型为平台发放时， type =2 时， 自动领取到我的红包表中
+            if ($v['type'] == 2) {
+                $data['user_id'] = $user_id;
+                $data['platform_coupon_id'] = $v['id'];
+                $data['indate'] = date('Y.m.d',$v['start_time']).'-'.date('Y.m.d',$v['end_time']);
+                $data['add_time'] = time();
+                $data['phone'] = $this->auth->phone;
+                Db::name('my_coupon')->insert($data);
+                $v['indate'] = '有效期限至'.date('Y.m.d',$v['end_time']);
+                $v['tips'] = '立即使用';
+            } else {
+                $v['indate'] = '领取日起'.$v['other_time'].'日有效';
+                $v['tips'] = '立即领取';
             }
         }
+
         $this->success('获取成功',['list'=>$list]);
+
     }
      
      

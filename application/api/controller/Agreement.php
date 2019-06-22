@@ -19,8 +19,12 @@ class Agreement extends ApiBase
      */
     public function index($id)
     {
-        $model = new AgreementModel();
-        $info = $model->getAgreementContent($id);
+        $info = Cache::get('agreement_'.$id,'');
+        if (!$info) {
+            $model = new AgreementModel();
+            $info = $model->getAgreementContent($id);
+            Cache::store('redis')->set('agreement_'.$id,$info,3600*24*7*30);
+        }
         
         $this->success('获取图文协议成功',['info'=>$info]);
     }

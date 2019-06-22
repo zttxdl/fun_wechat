@@ -12,7 +12,7 @@ class PlatformCoupon extends Model
      */
     public function getSchoolCouponList($school_id)
     {
-        $list = $this->where('school_id','=',$school_id)->where('status','=',2)->where('type','in','1,2')
+        $list = $this->where('school_id','=',$school_id)->where('status','=',2)->where('type','in','1,2')->where('surplus_num','>',0)
                 ->field('id,face_value,threshold,start_time,end_time,other_time,type,name,coupon_type')
                 ->select()->toArray();
 
