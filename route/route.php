@@ -169,7 +169,7 @@ Route::group('merchants',function (){
 
 //店铺
 Route::group('merchants',function (){
-    Route::rule('shopIndex','merchants/Shop/index');
+    Route::rule('shopIndex','merchants/Shop/index');//订单管理
     Route::rule('shopSetName','merchants/Shop/setName');//修改店铺名称
     Route::rule('shopSetLogo','merchants/Shop/setLogo');//修改店铺Logo
     Route::rule('shopSetStatus','merchants/Shop/setOpenStatus');//修改店铺营业状态
@@ -181,7 +181,7 @@ Route::group('merchants',function (){
 
 //订单
 Route::group('merchants',function (){
-    Route::post('orderIndex','merchants/Order/show');//订单查询
+    Route::post('orderQuery','merchants/Order/query');//订单管理
     Route::post('orderDetail','merchants/Order/orderDetail');//订单详情
     Route::post('orderDel','merchants/Order/del');//订单删除
     Route::post('orderAccept','merchants/Order/accept');//商家接单
@@ -190,12 +190,13 @@ Route::group('merchants',function (){
     Route::post('refuse','merchants/refund/refuse');//拒绝退款
     Route::post('wxRefund','merchants/refund/wxRefund');//微信退款
     Route::post('refundQuery','merchants/refund/refundQuery');//查询退款
+    Route::post('orderIndex','merchants/Order/index');//订单管理
 
 });
 
 //我的资产
 Route::group('merchants',function (){
-    Route::post('propertyIndex','merchants/Property/myProperty');//列表
+    Route::post('propertyIndex','merchants/Property/myIndex');//列表
     Route::post('propertyDetail','merchants/Property/receiptPay');//明细
     Route::post('propertyWithdraw','merchants/Property/withdraw');//提现
 

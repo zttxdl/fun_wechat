@@ -51,7 +51,7 @@ class Shop extends Model
      */
     public function getShopStock($shop_id)
     {
-        $data = $this->name('product')->where('shop_id',$shop_id)->count('id');
+        $data = DB::name('product')->where('shop_id',$shop_id)->count('id');
         return $data;
     }
 
@@ -69,7 +69,7 @@ class Shop extends Model
 //        dump($start_time);
 //        dump($end_time);
 
-        $data = $this->name('orders')->where('pay_status',1)
+        $data = Db::name('orders')->where('status',8)
             ->where('shop_id',$shop_id)
             ->whereBetweenTime('add_time',$start_time,$end_time)
             ->sum('money');
@@ -83,7 +83,7 @@ class Shop extends Model
      */
     public function getCountSales($shop_id)
     {
-        $data = $this->name('orders')->where('pay_status',1)
+        $data = Db::name('orders')->where('status',8)
             ->where('shop_id',$shop_id)
             ->sum('money');
 
@@ -121,7 +121,7 @@ class Shop extends Model
      */
     public function getShopMoreInfo($shop_id)
     {
-        $data = $this->name('shop_more_info')->where('shop_id',$shop_id)->select();
+        $data = Db::name('shop_more_info')->where('shop_id',$shop_id)->select();
         return $data;
     }
 
@@ -130,7 +130,7 @@ class Shop extends Model
      */
     public function getShopQualification($shop_id)
     {
-        $data = $this->name('shop_more_info')
+        $data = Db::name('shop_more_info')
             ->where('shop_id',$shop_id)
             ->field('business_license,proprietor,hand_card_front,user_name,identity_num,sex,licence')
             ->find();
@@ -144,7 +144,7 @@ class Shop extends Model
      */
     public function getAccount($shop_id)
     {
-        $data = $this->name('shop_more_info')
+        $data = Db::name('shop_more_info')
             ->where('shop_id',$shop_id)
             ->field('branch_back,back_hand_name,back_card_num')
             ->find();
@@ -157,7 +157,7 @@ class Shop extends Model
      */
     public function getIsOnlineGoods($shop_id)
     {
-        $data = $this->name('product')
+        $data = DB::name('product')
             ->alias('a')
             ->join('products_classify b','a.products_classify_id = b.id')
             ->where('a.shop_id',$shop_id)

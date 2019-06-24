@@ -11,6 +11,7 @@ namespace app\merchants\controller;
 use app\common\controller\MerchantsBase;
 use app\common\model\Orders;
 use app\common\model\ShopInfo;
+use app\common\model\ShopMoreInfo;
 use think\Request;
 use think\Db;
 
@@ -194,7 +195,8 @@ class Shop extends MerchantsBase
      */
     public function moreInfo(Request $request)
     {
-        $shop_id = $this->shop_id;
+        //$shop_id = $this->shop_id;
+        $shop_id = 2;
 
         if(!$shop_id) {
             $this->error('非法传参','404');
@@ -202,8 +204,8 @@ class Shop extends MerchantsBase
 
         $result = [];
 
-        $shop_info = $this->shopModel->getShopInfo($shop_id);
-        $shop_more_info = $this->shopModel->getShopMoreInfo($shop_id);
+        $shop_info = ShopInfo::where('id',$shop_id)->find();
+        $shop_more_info = ShopMoreInfo::where('shop_id',$shop_id)->find();
         //dump($shop_more_info);
         //商家资质
         $shop_qualification = [];
@@ -213,34 +215,34 @@ class Shop extends MerchantsBase
 
 
         if($shop_info) {
-            foreach ($shop_info as $row)
-            {
-                //店铺信息
-                $result['shop_info']['shop_name'] = $row['shop_name'];
-                $result['shop_info']['logo_img'] = $row['logo_img'];
-                $result['shop_info']['link_name'] = $row['link_name'];
-                $result['shop_info']['link_tel'] = $row['link_tel'];
-                $result['shop_info']['address'] = $row['address'];
-                $result['shop_info']['school'] = Model('School')->getNameById($row['school_id']);
-                $result['shop_info']['manage_category_name'] = Model('ManageCategory')->getNameById($row['manage_category_id']);
-            }
+
+            //店铺信息
+            $result['shop_info']['shop_name'] = $shop_info['shop_name'];
+            $result['shop_info']['address'] = $shop_info['address'];
+            $result['shop_info']['longitude'] = $shop_info['longitude'];
+            $result['shop_info']['latitude'] = $shop_info['latitude'];
+            $result['shop_info']['school'] = Model('School')->getNameById($shop_info['school_id']);
+            $result['shop_info']['manage_category_name'] = Model('ManageCategory')->getNameById($shop_info['manage_category_id']);
+            $result['shop_info']['logo_img'] = $shop_info['logo_img'];
+            $result['shop_info']['link_name'] = $shop_info['link_name'];
+            $result['shop_info']['link_tel'] = $shop_info['link_tel'];
+
         }
 
         if($shop_more_info) {
-            foreach ($shop_more_info as $row)
-            {
-                $shop_qualification['business_license'] = $row['business_license'];
-                $shop_qualification['proprietor'] = $row['proprietor'];
-                $shop_qualification['hand_card_front'] = $row['hand_card_front'];
-                $shop_qualification['user_name'] = $row['user_name'];
-                $shop_qualification['identity_num'] = $row['identity_num'];
-                $shop_qualification['sex'] = $row['sex'];
-                $shop_qualification['licence'] = $row['licence'];
+            $shop_qualification['business_license'] = $shop_more_info['business_license'];
+            $shop_qualification['proprietor'] = $shop_more_info['proprietor'];
+            $shop_qualification['hand_card_front'] = $shop_more_info['hand_card_front'];
+            $shop_qualification['hand_card_back'] = $shop_more_info['hand_card_back'];
+            $shop_qualification['user_name'] = $shop_more_info['user_name'];
+            $shop_qualification['identity_num'] = $shop_more_info['identity_num'];
+            $shop_qualification['sex'] = $shop_more_info['sex'] == '1' ? '男' : '女';
+            $shop_qualification['licence'] = $shop_more_info['licence'];
 
-                $shop_account['branch_back'] = $row['branch_back'];
-                $shop_account['back_hand_name'] = $row['back_hand_name'];
-                $shop_account['back_card_num'] = $row['back_card_num'];
-            }
+            $shop_account['branch_back'] = $shop_more_info['branch_back'];
+            $shop_account['back_hand_name'] = $shop_more_info['back_hand_name'];
+            $shop_account['back_card_num'] = $shop_more_info['back_card_num'];
+            $shop_account['account_type'] = $shop_more_info['account_type'] == '1' ? '对公' : '对私';
         }
 
 
