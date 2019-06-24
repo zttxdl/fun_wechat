@@ -31,15 +31,15 @@ class Shop extends MerchantsBase
 
         $result = ShopInfo::where('id',$shop_id)->find();
 
+       //dump($result);
+        if($result->isEmpty()) {
+            $this->error('暂无店铺信息');
+        }
         if($result['status'] == '1') {
             $this->error('店铺待审核中!');
         }
 
 
-       //dump($result);
-        if($result->isEmpty()) {
-            $this->error('暂无店铺信息');
-        }
 
         $day_order = Orders::where('shop_id',$shop_id)->count('id');
         $day_sales = Orders::where(['shop_id'=>$shop_id,'status'=>8])->sum('money');

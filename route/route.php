@@ -169,7 +169,7 @@ Route::group('merchants',function (){
 
 //店铺
 Route::group('merchants',function (){
-    Route::rule('shopIndex','merchants/Shop/index');//订单管理
+    //Route::rule('shopIndex','merchants/Shop/index');//店铺管理
     Route::rule('shopSetName','merchants/Shop/setName');//修改店铺名称
     Route::rule('shopSetLogo','merchants/Shop/setLogo');//修改店铺Logo
     Route::rule('shopSetStatus','merchants/Shop/setOpenStatus');//修改店铺营业状态
