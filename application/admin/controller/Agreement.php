@@ -47,7 +47,8 @@ class Agreement extends Controller
         }
 
         $info = Db::name('agreement')->where('id',$id)->field('id,title,content')->find();
-
+        // 设置缓存
+        Cache::store('redis')->set('agreement_'.$id,$info,3600*24*7*30);
         $this->success('ok',['info'=>$info]);
     }
 

@@ -50,4 +50,14 @@ class User extends Model
         return $user_name;
     }
 
+    /**
+     * 获取当前用户的购买用户类别 
+     * 
+     */
+    public function getNewBuy($user_id)
+    {
+        return $this->where('id',$user_id)->value('new_buy');
+    }
+     
+
 }
