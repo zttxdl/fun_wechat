@@ -3,6 +3,7 @@
 namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
+use app\common\model\Product;
 use think\Request;
 use app\common\model\ProductsClassify;
 
@@ -63,8 +64,8 @@ class GoodsClassify extends MerchantsBase
      */
     public function delete($id)
     {
-        $result = ProductsClassify::get(['products_classify_id'=>$id,'delete'=>0]);
-        
+        $result = Product::get(['products_classify_id'=>$id,'delete'=>0]);
+
         if ($result) {
             $this->error('该分类下有商品，请先删除商品');
         }
