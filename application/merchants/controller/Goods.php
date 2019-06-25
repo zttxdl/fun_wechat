@@ -15,9 +15,7 @@ class Goods extends MerchantsBase
     protected $noNeedLogin = [];
 
     /**
-     * 显示资源列表
-     *
-     * @return \think\Response
+     * 获取商家列表
      */
     public function index()
     {

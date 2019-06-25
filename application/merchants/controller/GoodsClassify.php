@@ -63,20 +63,14 @@ class GoodsClassify extends MerchantsBase
      */
     public function delete($id)
     {
-        $result = ProductsClassify::get($id);
-        
-        if ($result->shop_id != $this->shop_id) {
-            $this->error('没有权限删除');
-        }
-
         $result = ProductsClassify::get(['products_classify_id'=>$id,'delete'=>0]);
         
         if ($result) {
             $this->error('该分类下有商品，请先删除商品');
         }
 
-        
         $result = ProductsClassify::destroy($id);
+
         $this->success('success',$result);
     }
 }
