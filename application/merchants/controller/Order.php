@@ -360,6 +360,4 @@ class Order extends MerchantsBase
         return $result;
     }
 
-
-
 }
