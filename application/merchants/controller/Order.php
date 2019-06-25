@@ -44,12 +44,12 @@ class Order extends MerchantsBase
             $map[] = ['shop_id','=',$shop_id];
         }
 
-        $orders = Orders::where($map)->page($page_no,$page_size)->select();
+        $orders = Orders::where($map)->paginate($page_size)->toArray();
         //dump($orders);exit;
-        $result = [];
-        foreach ($orders as $key => $row)
+        //$result = [];
+        foreach ($orders['data'] as $key => &$row)
         {
-            $result[] = [
+            $data[] = [
                 'orders_sn' => $row['orders_sn'],
                 'add_time' => date('Y',$row['add_time']),//下单时间
                 'address' => $row['address'],
@@ -67,8 +67,10 @@ class Order extends MerchantsBase
 
         //$detail = OrdersInfo::where('orders_id','in',$order_ids)->select();
 
-        //$data['detail'] = $detail;
-
+        $result['list'] = $data;
+        $result['count'] = $orders['total'];
+        $result['page'] = $orders['current_page'];
+        $result['current_page'] = $orders['per_page'];
         $this->success('获取成功',$result);
 
     }
@@ -115,19 +117,20 @@ class Order extends MerchantsBase
             $map[] = ['add_time','between time',[$start,$end]];
         }
 
-        $result = model('orders')
+        $orders = model('orders')
             ->where($map)
-            ->page($page_no,$page_size)
-            ->select();
+            ->paginate($page_size)->toArray();
 
-        if(empty($result)) {
+        //var_dump($result);exit;
+        if(empty($orders)) {
             $this->error('暂无订单');
         }
 
-        $orders = [];
-        foreach ($result as $row)
+        //$result = [];
+
+        foreach ($orders['data'] as $row)
         {
-            $orders[] = [
+            $data[] = [
                 'orders_sn' => $row['orders_sn'],
                 'orders_id' => $row['id'],
                 'address' => $row['address'],
@@ -136,11 +139,17 @@ class Order extends MerchantsBase
                 'status' => $row['status'],
             ];
         }
-
         //写入缓存
         //Cache::store('redis')->set($key,$orders);
 
-        $this->success('获取成功',$orders);
+
+        //var_dump($result);
+        //var_dump($orders);
+        $result['list'] = $data;
+        $result['count'] = $orders['total'];
+        $result['page'] = $orders['current_page'];
+        $result['pageSize'] = $orders['per_page'];
+        $this->success('获取成功',$result);
 
     }
 

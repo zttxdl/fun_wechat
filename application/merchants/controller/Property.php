@@ -71,10 +71,11 @@ class Property extends MerchantsBase
         $withdraw_sn = build_order_no('TXBH');
         $moeny = $request->param('money');//提现金额
 
-        //收支明细
-        $szmx = model('incomeExpenditure')->get($shop_id);
+        //账户余额
+        $balance_money = model('IncomeExpenditure')->getBalanceMoney($shop_id);
 
-        if($szmx['balance_money'] < $moeny) {
+
+        if($balance_money < $moeny) {
             $this->error('提现金额不正确');
         }
 
