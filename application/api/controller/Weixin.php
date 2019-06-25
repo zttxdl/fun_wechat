@@ -10,6 +10,7 @@ namespace app\api\controller;
 
 
 use app\common\controller\ApiBase;
+use Predis\Client;
 use think\App;
 
 
@@ -259,5 +260,20 @@ class Weixin extends ApiBase
             curl_close($ch);
             throw new WxPayException("curl出错，错误码:$error");
         }
+    }
+
+    public function index() {
+        phpinfo();
+        $redis = new Client(
+            ['scheme' => 'tcp',
+                'host'   => '127.0.0.1',
+                'port'   => 6379,]
+        );
+
+        $redis->set('name','hello');
+        $v = $redis->get('name');
+        echo $v;
+
+
     }
 }
