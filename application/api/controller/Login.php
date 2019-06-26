@@ -39,7 +39,6 @@ class Login extends ApiBase
     public function saveUserBaseInfo(Request $request)
     {
         $data = $request->post();
-        dump($data);die;
         $list['nickname'] = $data['nickName'];
         $list['headimgurl'] = $data['avatarUrl'];
         $list['openid'] = $data['openid'];
