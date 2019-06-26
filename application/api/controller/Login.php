@@ -178,7 +178,7 @@ class Login extends ApiBase
         $result = $app->auth->session($code);
 
         include_once './../extend/wx_auth_phone/wxBizDataCrypt.php';
-        $wx = new \WXBizDataCrypt($app_id, $result['session_key']); //微信解密函数，微信提供了php代码dome
+        $wx = new \WXBizDataCrypt($config['app_id'], $result['session_key']); //微信解密函数，微信提供了php代码dome
         $errCode = $wx->decryptData($encrypted_data, $iv, $data); //微信解密函数
         if ($errCode == 0) {
             $data = json_decode($data, true);
