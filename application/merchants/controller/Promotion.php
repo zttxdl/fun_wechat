@@ -28,6 +28,7 @@ class Promotion extends MerchantsBase
         $id = model('ShopDiscounts')
             ->field('id,face_value,threshold')
             ->where('shop_id',$shop_id)
+            ->where('delete',1)
             ->select();
 
         $this->success('success',$id);
