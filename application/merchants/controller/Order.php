@@ -41,7 +41,7 @@ class Order extends MerchantsBase
         }
 
         if($shop_id) {
-            $map[] = ['shop_id','=',15];
+            $map[] = ['shop_id','=',$this->shop_id];
         }
 
         $orders = Orders::where($map)->paginate($page_size)->toArray();
