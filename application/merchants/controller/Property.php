@@ -16,7 +16,7 @@ use think\Db;
 class Property extends MerchantsBase
 {
 
-    protected $noNeedLogin = [""];
+    protected $noNeedLogin = [];
 
     protected $type = [1=>'收入',2=>'支出'];
 
