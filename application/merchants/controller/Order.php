@@ -41,36 +41,30 @@ class Order extends MerchantsBase
         }
 
         if($shop_id) {
-            $map[] = ['shop_id','=',$shop_id];
+            $map[] = ['shop_id','=',15];
         }
 
         $orders = Orders::where($map)->paginate($page_size)->toArray();
-        //dump($orders);exit;
-        //$result = [];
         foreach ($orders['data'] as $key => &$row)
         {
             $data[] = [
                 'orders_sn' => $row['orders_sn'],
-                'add_time' => date('Y',$row['add_time']),//下单时间
+                'add_time' => date('m-d H:i',$row['add_time']),//下单时间
                 'address' => $row['address'],
                 'message' => $row['message'],
-                'detail' => OrdersInfo::where('orders_id',$row['id'])->find()
+                'detail' => $this->detail($row['id'])
             ];
         }
-
-        //$order_ids = implode(',',array_column($orders,'id'));
-
 
         if(!$orders) {
             $this->error('暂无订单');
         }
 
-        //$detail = OrdersInfo::where('orders_id','in',$order_ids)->select();
 
         $result['list'] = $data;
         $result['count'] = $orders['total'];
         $result['page'] = $orders['current_page'];
-        $result['current_page'] = $orders['per_page'];
+        $result['pageSize'] = $orders['per_page'];
         $this->success('获取成功',$result);
 
     }
@@ -167,6 +161,7 @@ class Order extends MerchantsBase
         foreach ($detail as &$row)
         {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
+            $row['name'] = model('Product')->getNameById($row['product_id']);
         }
         return $detail;
     }
@@ -359,5 +354,6 @@ class Order extends MerchantsBase
         //$this->success('success',$result);
         return $result;
     }
+
 
 }
