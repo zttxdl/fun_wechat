@@ -34,8 +34,8 @@ class Upload extends ApiBase
         // 移动到框架应用根目录 目录下
         $info = $file->move('./uploads/api/'.$path);
         if ($info) {
-            $data['images'] = '/uploads/api/'.$path.'/'.$info->getSaveName();
-            $this->success('文件上传成功',$data);
+            $img_url = '/uploads/api/'.$path.'/'.$info->getSaveName();
+            $this->success('文件上传成功',['img_url'=>$img_url]);
         } else {
             // 上传失败获取错误信息
             $this->error($file->getError());
