@@ -4,6 +4,7 @@ namespace app\api\controller;
 
 use think\Controller;
 use think\Request;
+use think\facade\Cache;
 use app\common\model\Agreement as AgreementModel;
 use app\common\controller\ApiBase;
 
