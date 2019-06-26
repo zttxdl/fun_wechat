@@ -330,6 +330,7 @@ Route::group('r-login', function () {
 // 骑手中心组
 Route::group('r-member', function () {
     Route::get('/index', 'index');
+    Route::get('/check_status', 'checkStatus');
     Route::post('/update-tel', 'setRiderPhone');
     Route::post('/apply', 'applyRider');
     Route::get('/edit', 'edit');

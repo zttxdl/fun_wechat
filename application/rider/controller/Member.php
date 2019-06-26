@@ -18,12 +18,27 @@ class Member extends RiderBase
 
     
     /**
+     * 骑手审核状态
+     */
+    public function checkStatus()
+    {
+        $check_info = Db::name('rider_info')->where('id',$this->auth->id)->field('remark,status')->find();
+
+        if ($check_info['status'] == 2) { // 审核未通过
+            $check_info['mb_remark'] = Db::name('check_status')->where('type','=',2)->where('id','in',$check_info['remark'])->column('name');
+        }
+        unset($check_info['remark']);
+        return json_success('获取审核状态成功',['check_info'=>$check_info]);
+    }
+
+
+    /**
      * 我的资料
      * 
      */
     public function index()
     {
-        $info = Db::name('rider_info')->where('id',$this->auth->id)->field('id,headimgurl,link_tel,nickname,remark,status,open_status')->find();
+        $info = Db::name('rider_info')->where('id',$this->auth->id)->field('id,headimgurl,link_tel,nickname,status,open_status')->find();
         return json_success('获取骑手信息成功',['info'=>$info]);
 
     }
