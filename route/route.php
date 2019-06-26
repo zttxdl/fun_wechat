@@ -360,7 +360,7 @@ Route::group('r-inc-exp', function () {
 // 图片上传接口
 Route::group('r-upload', function () {
     Route::post('/upload', 'upload');
-})->prefix('rider/upload/');
+})->prefix('rider/Upload/');
 
 
 
