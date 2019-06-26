@@ -14,7 +14,7 @@ class IncomeExpenditure extends Model
      */
     public function index($shop_id)
     {
-        return $this->where('shop_id',$shop_id)->find();
+        return $this->where('shop_id',$shop_id)->order('id','DESC')->value('balance_money');
     }
 
     /**

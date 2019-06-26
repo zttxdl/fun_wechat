@@ -25,21 +25,17 @@ class Property extends MerchantsBase
     /**
      * 我的资产
      */
-    public function myProperty(Request $request)
+    public function myIndex(Request $request)
     {
 
         $shop_id = $this->shop_id;//从Token中获取
 
+
         isset($shop_id) ? $shop_id : $request->param('shop_id');
 
-
-        $data = model('IncomeExpenditure')->index($shop_id);
-
-        //商家信息
-        $shop_info = model('Shop')->getShopInfo($shop_id);
-
+        $balance_money = model('IncomeExpenditure')->getBalanceMoney($shop_id);
         $data = [
-            'balanceMoney' => $data['balance_money'],//可提现余额
+            'balanceMoney' => $balance_money,//可提现余额
             'totalMoney' => model('Shop')->getCountSales($shop_id),//总收入
             'monthMoney' => model("Shop")->getMonthSales($shop_id)//本月收入
         ];
@@ -75,10 +71,11 @@ class Property extends MerchantsBase
         $withdraw_sn = build_order_no('TXBH');
         $moeny = $request->param('money');//提现金额
 
-        //收支明细
-        $szmx = model('incomeExpenditure')->get($shop_id);
+        //账户余额
+        $balance_money = model('IncomeExpenditure')->getBalanceMoney($shop_id);
 
-        if($szmx['balance_money'] < $moeny) {
+
+        if($balance_money < $moeny) {
             $this->error('提现金额不正确');
         }
 

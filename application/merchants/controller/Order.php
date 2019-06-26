@@ -9,6 +9,8 @@
 namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
+use app\common\model\Orders;
+use app\common\model\OrdersInfo;
 use EasyWeChat\Factory;
 use think\Exception;
 use think\facade\Cache;
@@ -23,15 +25,68 @@ class Order extends MerchantsBase
     protected $noNeedLogin = ['refund'];
 
     /**
-     * 店铺订单查询
+     * 订单管理
      */
-    public function show(Request $request)
+    public function index(Request $request)
     {
         $status = $request->param('status','');//1:订单待支付;2等待商家接单;3商家已接单;4商家拒绝接单;5骑手取货中;6骑手配送中;7订单已送达;8订单已完成;9订单已取消;10骑手待取餐
         $page_no = $request->param('page');
         $page_size = $request->param('pageSize',20);
         $shop_id = $this->shop_id;
-        $date = $request->param('date');
+
+        $map = [];
+
+        if($status) {
+            $map[] = ['status','=',$status];
+        }
+
+        if($shop_id) {
+            $map[] = ['shop_id','=',$shop_id];
+        }
+
+        $orders = Orders::where($map)->paginate($page_size)->toArray();
+        //dump($orders);exit;
+        //$result = [];
+        foreach ($orders['data'] as $key => &$row)
+        {
+            $data[] = [
+                'orders_sn' => $row['orders_sn'],
+                'add_time' => date('Y',$row['add_time']),//下单时间
+                'address' => $row['address'],
+                'message' => $row['message'],
+                'detail' => OrdersInfo::where('orders_id',$row['id'])->find()
+            ];
+        }
+
+        //$order_ids = implode(',',array_column($orders,'id'));
+
+
+        if(!$orders) {
+            $this->error('暂无订单');
+        }
+
+        //$detail = OrdersInfo::where('orders_id','in',$order_ids)->select();
+
+        $result['list'] = $data;
+        $result['count'] = $orders['total'];
+        $result['page'] = $orders['current_page'];
+        $result['current_page'] = $orders['per_page'];
+        $this->success('获取成功',$result);
+
+    }
+
+    /**
+     * 店铺订单查询
+     */
+    public function query(Request $request)
+    {
+        $status = $request->param('status','');//1:订单待支付;2等待商家接单;3商家已接单;4商家拒绝接单;5骑手取货中;6骑手配送中;7订单已送达;8订单已完成;9订单已取消;10骑手待取餐
+        $page_no = $request->param('page');
+        $page_size = $request->param('pageSize',20);
+        $shop_id = $this->shop_id;
+        $date = $request->param('date',date('Ymd'));//默认时间是当天
+
+
 
         /*if(!$status ) {
             $this->error('非法传参');
@@ -62,19 +117,20 @@ class Order extends MerchantsBase
             $map[] = ['add_time','between time',[$start,$end]];
         }
 
-
-        $result = model('orders')
+        $orders = model('orders')
             ->where($map)
-            ->page($page_no,$page_size)->select();
+            ->paginate($page_size)->toArray();
 
-        if(empty($result)) {
+        //var_dump($result);exit;
+        if(empty($orders)) {
             $this->error('暂无订单');
         }
 
-        $orders = [];
-        foreach ($result as $row)
+        //$result = [];
+
+        foreach ($orders['data'] as $row)
         {
-            $orders[] = [
+            $data[] = [
                 'orders_sn' => $row['orders_sn'],
                 'orders_id' => $row['id'],
                 'address' => $row['address'],
@@ -83,11 +139,17 @@ class Order extends MerchantsBase
                 'status' => $row['status'],
             ];
         }
-
         //写入缓存
         //Cache::store('redis')->set($key,$orders);
 
-        $this->success('获取成功',$orders);
+
+        //var_dump($result);
+        //var_dump($orders);
+        $result['list'] = $data;
+        $result['count'] = $orders['total'];
+        $result['page'] = $orders['current_page'];
+        $result['pageSize'] = $orders['per_page'];
+        $this->success('获取成功',$result);
 
     }
 
@@ -115,31 +177,32 @@ class Order extends MerchantsBase
     public function OrderDetail(Request $request)
     {
         $order_sn = $request->param('orders_sn');
-        $result = model('Orders')->getOrder($order_sn);
+        $orders = model('Orders')->getOrder($order_sn);
 
         //dump($result);
 
 
-        if(!$result) {
+        if(!$orders) {
             $this->error('订单明细不存在!');
         }
+        $result = [];
 
-
-        $order_info = [
-            'orders_sn' => $result['orders_sn'],
-            'orders_id' => $result['id'],
-            'add_time' => date('Y-m-d H:i',$result['add_time']),
-            'address' => $result['address'],
-            'remark' => $result['message'],
-            'total_money' => $result['total_money'],
-            'box_money' => $result['box_money'],
-            'ping_fee' => $result['ping_fee'],
-            'discount_money' => $result['shop_discounts_money'] + $result['platform_coupon_money'],
-            'money' => $result['money'],
-            'detail' => $this->detail($result['id'])
+        $result['orders'] = [
+            'orders_sn' => $orders['orders_sn'],
+            'orders_id' => $orders['id'],
+            'add_time' => date('Y-m-d H:i',$orders['add_time']),
+            'address' => $orders['address'],
+            'remark' => $orders['message'],
+            'total_money' => $orders['total_money'],
+            'box_money' => $orders['box_money'],
+            'ping_fee' => $orders['ping_fee'],
+            'discount_money' => $orders['shop_discounts_money'] + $orders['platform_coupon_money'],
+            'money' => $orders['money'],
         ];
+        $result['detail'] = $this->detail($orders['id']);
 
-        $this->success('获取成功',$order_info);
+
+        $this->success('获取成功',$result);
     }
 
     /**
@@ -208,22 +271,33 @@ class Order extends MerchantsBase
         $orders_sn = $request->param('orders_sn');
         $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
 
-        if($order_info['status'] == 2) {
-            $this->error('商家已退款');
+        if(!$order_info) {
+            $this->error('订单不存在!');
+        }
+
+        if($order_info['status'] == '4') {
+            $this->error('订单已拒单,请勿重复提交!');
+        }
+
+        //去微信查一下订单是否退款,没有退款在走下面的退款接口
+        $res = $this->refundQuery($orders_sn);
+
+        if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
+            $this->error('订单已拒单,请勿重复提交!');
         }
 
         try{
-            $res = $this->wxRefund($orders_sn);
+            $res = $this->wxRefund($orders_sn);//商家拒绝接单把钱退给用户
 
-            if('SUCCESS' == $res['data']['return_code'] && 'SUCCESS' == $res['data']['result_code']) {
-
+            if($res['data']['result_code'] == 'SUCCESS' && $res['data']['return_code'] == 'SUCCESS') {
                 $result = model('Orders')->where('orders_sn',$orders_sn)->setField('status',4);
 
                 if($result) {
                     $this->success('拒单成功');
                 }
+            }else{
+                $this->success('拒单失败');
             }
-
 
         }catch (\Exception $e) {
             $this->error($e->getMessage());
@@ -245,19 +319,15 @@ class Order extends MerchantsBase
             $this->error('非法传参');
         }
 
-        $find = model('Refund')->where('out_trade_no',$number)->find();
+        $find = model('Orders')->where('orders_sn',$number)->find();
 
         if (!$find){
             $this->error('商户订单号错误');
         }
 
-        if ($find->total_fee < $find->refund_fee){
-            $this->error('退款金额不能大于订单总额');
-        }
-
-        $totalFee = $find->total_fee * 100; //订单金额
-        $refundFee =  $find->refund_fee * 100;//退款金额
-        $refundNumber = $find->out_refund_no;//商户退款单号
+        $totalFee = $find->money * 100; //订单金额
+        $refundFee =  $find->money * 100;//退款金额
+        $refundNumber = build_order_no('T');//商户退款单号
 
         $pay_config = config('wx_pay');
 
@@ -268,15 +338,26 @@ class Order extends MerchantsBase
         $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
             // 可在此处传入其他参数，详细参数见微信支付文档
             'refund_desc' => '取消订单退款',
-            'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+            //'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
         ]);
 
 
         return $result;
     }
 
+    /**
+     * 微信退款查询
+     * @param Request $request
+     */
+    public function refundQuery($orders_sn)
+    {
+        $outTradeNumber = $orders_sn;
+        $pay_config = config('wx_pay');
+        $app    = Factory::payment($pay_config);//pay_config 微信配置
+        $result = $app->refund->queryByOutTradeNumber($outTradeNumber);
 
-
-
+        //$this->success('success',$result);
+        return $result;
+    }
 
 }

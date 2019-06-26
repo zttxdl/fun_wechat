@@ -9,7 +9,7 @@ use think\Request;
 class Refund extends MerchantsBase
 {
     /*
-     * 退款查询
+     * 退款申请查询
      */
     public function index(Request $request) {
         $shop_id = $this->shop_id;
@@ -37,7 +37,7 @@ class Refund extends MerchantsBase
     }
 
     /**
-     * 商家退款
+     * 商家同意用户的申请退款
      */
     public function refund(Request $request) {
         $orders_sn = $request->param('orders_sn');
@@ -70,7 +70,7 @@ class Refund extends MerchantsBase
     }
 
     /**
-     *  拒绝退款操作
+     *  商家拒绝用户的申请退款
      */
     public function refuse(Request $request) {
         $orders_sn = $request->param('orders_sn');
