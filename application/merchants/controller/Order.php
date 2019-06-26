@@ -22,7 +22,7 @@ use think\Db;
 class Order extends MerchantsBase
 {
 
-    protected $noNeedLogin = ['refund'];
+    protected $noNeedLogin = [];
 
     /**
      * 订单管理

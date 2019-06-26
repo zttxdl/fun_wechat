@@ -15,7 +15,7 @@ use think\Request;
 class Promotion extends MerchantsBase
 {
 
-    protected $noNeedLogin = ['del','set','index'];
+    protected $noNeedLogin = [];
 
     /**
      * 活动管理
