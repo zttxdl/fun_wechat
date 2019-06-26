@@ -27,7 +27,7 @@ class Login extends Controller
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$app_id.'&secret='.$app_secret.'&js_code='.$code.'&grant_type=authorization_code';
 
         // curl 请求
-        $result = curl_post($url,'POST');
+        $result = curl_post($url);
   
         $wxResult = json_decode($result, true);
 
