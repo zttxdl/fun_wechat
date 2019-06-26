@@ -34,10 +34,13 @@ class Property extends MerchantsBase
         isset($shop_id) ? $shop_id : $request->param('shop_id');
 
         $balance_money = model('IncomeExpenditure')->getBalanceMoney($shop_id);
+        $totalMoney = model('Shop')->getCountSales($shop_id);
+        $monthMoney = model("Shop")->getMonthSales($shop_id);
+
         $data = [
-            'balanceMoney' => $balance_money,//可提现余额
-            'totalMoney' => model('Shop')->getCountSales($shop_id),//总收入
-            'monthMoney' => model("Shop")->getMonthSales($shop_id)//本月收入
+            'balanceMoney' => isset($balance_money) ? $balance_money : 0,//可提现余额
+            'totalMoney' => isset($totalMoney) ? $totalMoney: 0,//总收入
+            'monthMoney' => isset($monthMoney) ? $totalMoney: 0//本月收入
         ];
 
         $this->success('获取成功',$data);
