@@ -28,6 +28,7 @@ class Promotion extends MerchantsBase
         $id = model('ShopDiscounts')
             ->field('id,face_value,threshold')
             ->where('shop_id',$shop_id)
+            ->where('delete',0)
             ->select();
 
         $this->success('success',$id);
@@ -45,25 +46,31 @@ class Promotion extends MerchantsBase
         $data = [
             'face_value'=>$face_value,
             'threshold'=>$threshold,
-            'shop_id'=>$this->shop_id,
+            'shop_id'=>isset($this->shop_id) ? $this->shop_id : '1',
             'create_time'=>time(),
         ];
 
         $id = model('ShopDiscounts')->insertGetId($data);
 
-        $this->success('success',$id);
+        $this->success('success',['id'=>$id]);
     }
 
     /**
      * 删除活动
      */
-    public function del($id)
+    public function del(Request $request)
     {
+        $id = $request->param('id');
+        if(!$id) {
+            $this->error('参数不能空');
+        }
         $id = model('ShopDiscounts')
             ->where('id',$id)
             ->update(['delete'=>1]);
-
-        $this->success('success',$id);
+        if($id) {
+            $this->success('success');
+        }
+        $this->error('fail');
     }
 
 }

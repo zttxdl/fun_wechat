@@ -84,7 +84,7 @@ class Shop extends Model
     public function getCountSales($shop_id)
     {
         $data = Db::name('orders')->where('status',8)
-            ->where('shop_id',$shop_id)
+            ->where('shop_id',$shop_id)->fetchSql()
             ->sum('money');
 
         return $data;

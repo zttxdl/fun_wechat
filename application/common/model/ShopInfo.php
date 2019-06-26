@@ -77,4 +77,17 @@ class ShopInfo extends Model
 
         return $business;
     }
+
+    /**
+     * 获取店铺销售总额
+     */
+    public function getCountSales($shop_id)
+    {
+        $data = $this->name('orders')->where('status',8)
+            ->where('shop_id',$shop_id)->fetchSql()
+            ->sum('money');
+
+        return $data;
+
+    }
 }
