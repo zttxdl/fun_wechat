@@ -25,14 +25,10 @@ class MerchantEnter extends Controller
         !empty($request->get('status/d')) ? $where[] = ['m.status','=',$request->get('status/d')] :  null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
 
-        $list = Db::name('merchant_enter m')->join('manage_category mc','m.manage_category_id = mc.id')
+        $list = model('MerchantEnter')->alias('m')->join('manage_category mc','m.manage_category_id = mc.id')
                 ->join('user u','m.user_id = u.id')->join('school s','m.school_id = s.id')
-                ->field('m.id,mc.name as mc_name,m.name,m.phone,m.add_time,m.status,u.nickname,s.name as school_name')->order('m.id desc')
-                ->where($where)->paginate($pagesize)->each(function ($item, $key) {
-                    $item['add_time'] = date('Y-m-d H:i:s',$item['add_time']);
-                    $item['mb_status'] = config('dispose_status')[$item['status']];
-                    return $item;
-                });
+                ->field('m.id,mc.name as mc_name,m.name,m.phone,m.add_time,m.status,u.nickname,s.name as school_name')->append(['mb_status'])->order('m.id desc')
+                ->where($where)->paginate($pagesize);
         $this->success('ok',['list'=>$list]);
     }
 

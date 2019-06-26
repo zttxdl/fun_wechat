@@ -6,6 +6,17 @@ use think\Model;
 
 class RiderInfo extends Model
 {
+
+    /**
+     * 获取处理状态【方法很好用，但是前段需要status的原始数值，所以需要另写一个字段来标注】
+     * 
+     */
+    public function getMbStatusAttr($value,$data)
+    {
+        $status = ['0' => '未注册','1' => '待审核','2' => '未通过','3' => '通过','4' => '禁用'];
+        return $status[$data['status']];
+    }
+
     /**
      * 获取一条骑手记录
      * @param $uid
