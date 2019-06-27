@@ -291,6 +291,7 @@ class Shop extends MerchantsBase
         $old_password = $request->param('old_password');
         $new_password = $request->param('new_password');
         $true_password = $request->param('true_password');
+        $code = $request->param('code');
 
 
         $data = model('ShopInfo')->where('id',$this->shop_id)->find();
