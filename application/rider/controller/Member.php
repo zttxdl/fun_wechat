@@ -176,7 +176,7 @@ class Member extends RiderBase
 
         $where[] = ['rider_id','=',$this->auth->id];
         if ($type == 1){
-            $where[] = ['star','=',$this->auth->id];
+            $where[] = ['star','=',$type];
         }
 
         $count = Db::name('rider_comments')->where('rider_id',$this->auth->id)->count();

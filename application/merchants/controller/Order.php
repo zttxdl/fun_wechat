@@ -103,6 +103,8 @@ class Order extends MerchantsBase
         }
         if($status) {
             $map[] = ['status','=',$status];
+        }else{
+            $map[] = ['status','notin',[1,9,10,11,12]];
         }
 
         if($date) {
@@ -121,9 +123,10 @@ class Order extends MerchantsBase
         }
 
         //$result = [];
-
+        $type = '';
         foreach ($orders['data'] as $row)
         {
+            $type = $this->getShopType($row['status']);
             $data[] = [
                 'orders_sn' => $row['orders_sn'],
                 'orders_id' => $row['id'],
@@ -131,7 +134,12 @@ class Order extends MerchantsBase
                 'add_time' => date('Y-m-d H:i',$row['add_time']),
                 'money' => $row['money'],
                 'status' => $row['status'],
+                'type'=>$type
             ];
+
+
+
+
         }
         //写入缓存
         //Cache::store('redis')->set($key,$orders);
@@ -145,6 +153,36 @@ class Order extends MerchantsBase
         $result['pageSize'] = $orders['per_page'];
         $this->success('获取成功',$result);
 
+    }
+
+    /**
+     * 商家端状态展示
+     */
+
+    public function getShopType($status)
+    {
+        //商家端状态
+        if(in_array($status,[2])) {//等待处理
+            $type = '等待处理';
+        }
+
+        if(in_array($status,[4])) {//等待处理
+            $type = '商家已拒单';
+        }
+
+        if(in_array($status,[3,5])) {//已接单
+            $type = '已接单';
+        }
+
+        if(in_array($status,[6])) {//配送中
+            $type = '配送中';
+        }
+
+        if(in_array($status,[7,8])) {//已完成
+            $type = '已完成';
+        }
+
+        return $type;
     }
 
 
@@ -193,6 +231,7 @@ class Order extends MerchantsBase
             'ping_fee' => $orders['ping_fee'],
             'discount_money' => $orders['shop_discounts_money'] + $orders['platform_coupon_money'],
             'money' => $orders['money'],
+            'type' => $this->getShopType($orders['status'])
         ];
         $result['detail'] = $this->detail($orders['id']);
 
@@ -232,6 +271,7 @@ class Order extends MerchantsBase
                 'meal_sn' => createOrderSn('shop_id:'.$order_info['shop_id']),//取餐号
                 'school_id' => Model('Shop')->getSchoolIdByID($order_info['shop_id']),
                 'create_time' => time(),//商家接单时间
+                'expected_time' => time()+30*60,//预计送达时间
                 'user_address' => $order_info['address'],//收货地址
                 'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
             ];
@@ -270,12 +310,18 @@ class Order extends MerchantsBase
             $this->error('订单不存在!');
         }
 
+        if($order_info['status'] == '3') {
+            $this->error('订单已接单,无法拒单');
+        }
+
         if($order_info['status'] == '4') {
             $this->error('订单已拒单,请勿重复提交!');
         }
 
         //去微信查一下订单是否退款,没有退款在走下面的退款接口
         $res = $this->refundQuery($orders_sn);
+
+//        dump($res);
 
         if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
             $this->error('订单已拒单,请勿重复提交!');
@@ -284,14 +330,15 @@ class Order extends MerchantsBase
         try{
             $res = $this->wxRefund($orders_sn);//商家拒绝接单把钱退给用户
 
-            if($res['data']['result_code'] == 'SUCCESS' && $res['data']['return_code'] == 'SUCCESS') {
+//            dump($res);
+            if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
                 $result = model('Orders')->where('orders_sn',$orders_sn)->setField('status',4);
 
                 if($result) {
-                    $this->success('拒单成功');
+                    return json_success('据单成功');
                 }
             }else{
-                $this->success('拒单失败');
+                throw new Exception('拒单失败');
             }
 
         }catch (\Exception $e) {

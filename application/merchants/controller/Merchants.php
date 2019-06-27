@@ -16,6 +16,7 @@ class Merchants extends MerchantsBase
 {
 
     protected $noNeedLogin = ['getSchool','getBack','getCategory'];
+    //protected $noNeedLogin = ['*'];
 
     /**
      * 新建商家
@@ -159,10 +160,18 @@ class Merchants extends MerchantsBase
         }else{
             $data['star'] = 0;
         }
+        //好评总数
+        $hp_count  = model('ShopComments')->where($where)->where('star','>=',3)->count();
+        //差评总数
+        $cp_count  = model('ShopComments')->where($where)->where('star','<',3)->count();
+        $data['all_count']  =$count;
+        $data['hp_count']  =$hp_count;
+        $data['cp_count']  =$cp_count;
 
-
-        if ($type){
-            $where[] = ['type','=',$type];
+        if ($type == 1){
+            $where[] = ['star','>=',3];
+        }elseif($type == 2){
+            $where[] = ['star','<',3];
         }
 
         $list = Db::table('fun_shop_comments a ')
@@ -181,11 +190,12 @@ class Merchants extends MerchantsBase
                 ->where('a.comments_id',$value['id'])
                 ->select();
         }
-
         $data['list']  =$list;
 
         $this->success('success',$data);
 
     }
+
+
 
 }

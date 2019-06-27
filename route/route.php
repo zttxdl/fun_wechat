@@ -162,21 +162,32 @@ Route::group('merchants',function (){
 	//文件上传
 	Route::rule('upload','merchants/Upload/up');
 	Route::rule('updatePwd','merchants/Merchants/updatePwd');
-	Route::rule('getEvaluation','merchants/Merchants/getEvaluation');
+
 
 
 });
 
-//店铺
+//店铺管理
 Route::group('merchants',function (){
-    //Route::rule('shopIndex','merchants/Shop/index');//店铺管理
+    Route::rule('shopIndex','merchants/Shop/index');//店铺管理
     Route::rule('shopSetName','merchants/Shop/setName');//修改店铺名称
     Route::rule('shopSetLogo','merchants/Shop/setLogo');//修改店铺Logo
     Route::rule('shopSetStatus','merchants/Shop/setOpenStatus');//修改店铺营业状态
+    //商家信息
     Route::rule('shopInfo','merchants/Shop/info');//商家信息
     Route::rule('shopSetInfo','merchants/Shop/setInfo');//设置商家信息
     Route::rule('shopMoreInfo','merchants/Shop/moreInfo');//入驻信息
     Route::rule('checkStatus','merchants/Shop/checkStatus');//检查审核状态
+    //我的资产
+    Route::post('propertyIndex','merchants/Property/myIndex');//列表
+    Route::post('propertyDetail','merchants/Property/receiptPay');//明细
+    Route::post('propertyWithdraw','merchants/Property/withdraw');//提现
+    //设置
+    Route::rule('updatePwd','merchants/Shop/updatePwd');//忘记密码
+    Route::rule('loginOut','merchants/Shop/loginOut');//退出
+    Route::rule('ShopInfo','merchants/Shop/ShopInfo');//关于我们
+    //评价
+    Route::rule('getEvaluation','merchants/Merchants/getEvaluation');
 });
 
 //订单
@@ -194,13 +205,6 @@ Route::group('merchants',function (){
 
 });
 
-//我的资产
-Route::group('merchants',function (){
-    Route::post('propertyIndex','merchants/Property/myIndex');//列表
-    Route::post('propertyDetail','merchants/Property/receiptPay');//明细
-    Route::post('propertyWithdraw','merchants/Property/withdraw');//提现
-
-});
 
 
 
