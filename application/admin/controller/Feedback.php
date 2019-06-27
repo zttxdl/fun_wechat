@@ -24,13 +24,8 @@ class Feedback extends Controller
         !empty($request->get('status/d')) ? $where[] = ['f.status','=',$request->get('status/d')] : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
         
-        $list = model('feedback')->alias('f')->join('user u','f.user_id = u.id')->where($where)->order('f.id desc')->field('f.content,f.add_time,f.status,f.id,u.nickname,u.phone')
-                ->paginate($pagesize)->each(function ($item, $key) {
-                    // 状态
-                    $item['mb_status'] = config('dispose_status')[$item['status']];
-
-                    return $item;
-                });
+        $list = model('feedback')->alias('f')->join('user u','f.user_id = u.id')->where($where)->order('f.id desc')->append(['mb_status'])->field('f.content,f.add_time,f.status,f.id,u.nickname,u.phone')
+                ->paginate($pagesize);
 
         $this->success('ok',['list'=>$list]);
     }
@@ -42,12 +37,11 @@ class Feedback extends Controller
      */
     public function show($id)
     {
-        $info = model('feedback')->alias('f')->join('user u','f.user_id = u.id')->where('f.id',$id)->field('f.*,u.nickname,u.phone')->find();
+        $info = model('feedback')->alias('f')->join('user u','f.user_id = u.id')->where('f.id',$id)->append(['mb_status'])->field('f.*,u.nickname,u.phone')->find();
         
         if (!$info) {
             $this->error('非法参数');
         }
-        $info['mb_status'] = config('dispose_status')[$info['status']];
 
         $this->success('ok',['info'=>$info]);
     }

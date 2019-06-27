@@ -22,13 +22,25 @@ class Member extends RiderBase
      */
     public function checkStatus()
     {
-        $check_info = Db::name('rider_info')->where('id',$this->auth->id)->field('remark,status')->find();
-
+        $check_info = model('RiderInfo')->where('id',$this->auth->id)->field('remark,status,check_status')->find();
         if ($check_info['status'] == 2) { // 审核未通过
             $check_info['mb_remark'] = Db::name('check_status')->where('type','=',2)->where('id','in',$check_info['remark'])->column('name');
         }
         unset($check_info['remark']);
         return json_success('获取审核状态成功',['check_info'=>$check_info]);
+    }
+
+
+    /**
+     * 设置骑手已审核通过状态【前端单独用】
+     */
+    public function setCheckStatus()
+    {
+        $res = Db::name('rider_info')->where('id',$this->auth->id)->setField('check_status',1);
+        if (!$res) {
+            $this->error('设置失败');
+        }
+        $this->success('设置成功');
     }
 
 
@@ -133,30 +145,6 @@ class Member extends RiderBase
         $info = model('RiderInfo')->where('id',$this->auth->id)->field('id,name,link_tel,identity_num,card_img,back_img,hand_card_img,school_id')->find();
         $info['school_name'] = model('school')->getNameById($info['school_id']);
         $this->success('获取成功',['info'=>$info]);        
-    }
-
-
-    /**
-     * 保存编辑后的申请入驻【成为骑手】 
-     * 
-     */
-    public function update(Request $request)
-    {
-        $data = $request->post();
-
-        // 验证表单数据
-        $check = $this->validate($data, 'RiderInfo');
-        if ($check !== true) {
-            $this->error($check,201);
-        }
-        
-        // 更新数据
-        $result = RiderInfo::where('id','=',$this->auth->id)->update($data);;
-
-        if (!$result) {
-            $this->error('更新失败',201);
-        }
-        $this->success('更新成功');
     }
 
 
