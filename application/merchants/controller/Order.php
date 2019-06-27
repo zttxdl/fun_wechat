@@ -335,7 +335,7 @@ class Order extends MerchantsBase
                 $result = model('Orders')->where('orders_sn',$orders_sn)->setField('status',4);
 
                 if($result) {
-                    return json_success('据单成功');
+                    return json_success('拒单成功');
                 }
             }else{
                 throw new Exception('拒单失败');

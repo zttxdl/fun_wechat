@@ -26,7 +26,7 @@ class Login extends MerchantsBase
         $password     	= $request->param('password','');
 
         $check = $this->validate($request->param(), 'Login');
-		if ($check !== true) {
+        if ($check !== true) {
 			$this->error($check);
 		}
 
