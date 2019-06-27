@@ -6,7 +6,7 @@
  * Time: 7:55 PM
  */
 
-namespace app\api\controller;
+namespace app\rider\controller;
 
 
 use app\common\controller\RiderBase;
@@ -42,8 +42,8 @@ class Upload extends RiderBase
         write_log($info->getSaveName(),'txt');
         
         if ($info) {
-            $data['images'] = '/uploads/rider/'.$path.'/'.$info->getSaveName();
-            $this->success('文件上传成功',$data);
+            $img_url = '/uploads/rider/'.$path.'/'.$info->getSaveName();
+            $this->success('文件上传成功',['img_url'=>$img_url]);
         } else {
             // 上传失败获取错误信息
             $this->error($file->getError());

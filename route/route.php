@@ -335,6 +335,7 @@ Route::group('r-login', function () {
 Route::group('r-member', function () {
     Route::get('/index', 'index');
     Route::get('/check_status', 'checkStatus');
+    Route::get('/set_status', 'setCheckStatus');
     Route::post('/update-tel', 'setRiderPhone');
     Route::post('/apply', 'applyRider');
     Route::get('/edit', 'edit');
@@ -364,7 +365,7 @@ Route::group('r-inc-exp', function () {
 // 图片上传接口
 Route::group('r-upload', function () {
     Route::post('/upload', 'upload');
-})->prefix('rider/upload/');
+})->prefix('rider/Upload/');
 
 
 

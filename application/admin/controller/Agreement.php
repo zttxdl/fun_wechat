@@ -5,6 +5,7 @@ namespace app\admin\controller;
 use think\Controller;
 use think\Request;
 use think\Db;
+use think\facade\Cache;
 
 /**
  * 图文协议控制器

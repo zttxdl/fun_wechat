@@ -6,7 +6,7 @@
  * Time: 7:55 PM
  */
 
-namespace app\api\controller;
+namespace app\admin\controller;
 
 use think\Request;
 use think\Controller;
@@ -32,8 +32,8 @@ class Upload extends Controller
         // 移动到框架应用根目录 目录下
         $info = $file->move('./uploads/admin/'.$path);
         if ($info) {
-            $data['images'] = '/uploads/admin/'.$path.'/'.$info->getSaveName();
-            $this->success('文件上传成功',$data);
+            $img_url = '/uploads/admin/'.$path.'/'.$info->getSaveName();
+            $this->success('文件上传成功',['img_url'=>$img_url]);
         } else {
             // 上传失败获取错误信息
             $this->error($file->getError());
