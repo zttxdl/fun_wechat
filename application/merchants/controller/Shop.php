@@ -308,17 +308,6 @@ class Shop extends MerchantsBase
         $this->success('success');
     }
 
-    //邀请好友领取红包
-    public function invite(Request $request)
-    {
-        $uid = $request->param('uid');
-        $vuid = $request->param('vuid');
-
-        if($uid == $vuid) {
-            $this->error('邀请人只能是自己');
-        }
-    }
-
 
 
 
