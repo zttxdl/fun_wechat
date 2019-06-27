@@ -6,3 +6,5 @@ thinkphp
 .env
 .DS_Store
 /runtime/
+/public/uploads/
+/public/log/
