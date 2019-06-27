@@ -46,21 +46,20 @@ class Orders extends RiderBase
 		}else{
 			//获取已接单
             $where[] = ['school_id','=',$this->auth->school_id];
-            $where[] = ['status','<>','1'];
             $where[] = ['rider_id','=',$this->auth->id];
-
+            $count = model('Takeout')->where($where)->where('status','in','3,4,5')->count();
+            $data['count'] = $count;
+            $where[] = ['status','<>','1'];
             $list = model('Takeout')
                 ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
                 ->where($where)
                 ->order('single_time')
                 ->select();
-            $count =  model('Takeout')->where($where)->count();
+
             foreach ($list as $key => $item) {
                 $item->rest_time = round(($item->expected_time - time()) / 60);
                 $item->expected_time = date('H:i',$item->expected_time);
             }
-
-            $data['count'] = $count;
             $data['list'] = $list;
 		}
 
