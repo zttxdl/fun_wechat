@@ -161,8 +161,10 @@ class Merchants extends MerchantsBase
         }
 
 
-        if ($type){
-            $where[] = ['type','=',$type];
+        if ($type == 1){
+            $where[] = ['star','>=',3];
+        }elseif($type == 2){
+            $where[] = ['star','<',3];
         }
 
         $list = Db::table('fun_shop_comments a ')
