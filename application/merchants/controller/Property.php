@@ -78,6 +78,8 @@ class Property extends MerchantsBase
 
         foreach ($res as $key => $row){
             $szmx[$key] = [
+                'id' => $row['id'],
+                'shop_id' => $row['shop_id'],
                 'title' => $row['title'],
                 'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                 'money' => $row['money'],//收入支出金额

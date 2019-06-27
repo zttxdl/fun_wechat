@@ -16,6 +16,7 @@ class Merchants extends MerchantsBase
 {
 
     protected $noNeedLogin = ['getSchool','getBack','getCategory'];
+    //protected $noNeedLogin = ['*'];
 
     /**
      * 新建商家
@@ -187,5 +188,7 @@ class Merchants extends MerchantsBase
         $this->success('success',$data);
 
     }
+
+
 
 }
