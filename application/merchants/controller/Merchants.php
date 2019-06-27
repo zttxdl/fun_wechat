@@ -161,9 +161,9 @@ class Merchants extends MerchantsBase
             $data['star'] = 0;
         }
         //好评总数
-        $hp_count = $count = model('ShopComments')->where($where)->where('star','>=',3)->count();
+        $hp_count  = model('ShopComments')->where($where)->where('star','>=',3)->count();
         //差评总数
-        $cp_count = $count = model('ShopComments')->where($where)->where('star','<',3)->count();
+        $cp_count  = model('ShopComments')->where($where)->where('star','<',3)->count();
         $data['all_count']  =$count;
         $data['hp_count']  =$hp_count;
         $data['cp_count']  =$cp_count;
