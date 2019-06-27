@@ -331,6 +331,7 @@ Route::group('r-login', function () {
 Route::group('r-member', function () {
     Route::get('/index', 'index');
     Route::get('/check_status', 'checkStatus');
+    Route::get('/set_status', 'setCheckStatus');
     Route::post('/update-tel', 'setRiderPhone');
     Route::post('/apply', 'applyRider');
     Route::get('/edit', 'edit');
