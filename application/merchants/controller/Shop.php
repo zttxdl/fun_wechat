@@ -283,10 +283,6 @@ class Shop extends MerchantsBase
 
     /**
      * 修改密码
-     */
-
-    /**
-     * 修改密码
      * @param  \think\Request  $request
      * @return \think\Response
      */
@@ -310,6 +306,17 @@ class Shop extends MerchantsBase
         model('ShopInfo')->where('id',$this->shop_id)->update(['password'=>md5($new_password)]);
 
         $this->success('success');
+    }
+
+    //邀请好友领取红包
+    public function invite(Request $request)
+    {
+        $uid = $request->param('uid');
+        $vuid = $request->param('vuid');
+
+        if($uid == $vuid) {
+            $this->error('邀请人只能是自己');
+        }
     }
 
 

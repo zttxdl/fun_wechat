@@ -89,10 +89,6 @@ class JwtAuth
 
     }
 
-    public function clearToken()
-    {
-
-    }
 
 
 

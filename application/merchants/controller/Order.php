@@ -124,24 +124,7 @@ class Order extends MerchantsBase
         $type = '';
         foreach ($orders['data'] as $row)
         {
-
-            //商家端状态
-            if(in_array($row['status'],[2])) {//等待处理
-                $type = '等待处理';
-            }
-
-            if(in_array($row['status'],[3,5])) {//已接单
-                $type = '已接单';
-            }
-
-            if(in_array($row['status'],[6])) {//配送中
-                $type = '配送中';
-            }
-
-            if(in_array($row['status'],[7,8])) {//已完成
-                $type = '已完成';
-            }
-
+            $type = $this->getShopType($row['status']);
             $data[] = [
                 'orders_sn' => $row['orders_sn'],
                 'orders_id' => $row['id'],
@@ -168,6 +151,32 @@ class Order extends MerchantsBase
         $result['pageSize'] = $orders['per_page'];
         $this->success('获取成功',$result);
 
+    }
+
+    /**
+     * 商家端状态展示
+     */
+
+    public function getShopType($status)
+    {
+        //商家端状态
+        if(in_array($status,[2])) {//等待处理
+            $type = '等待处理';
+        }
+
+        if(in_array($status,[3,5])) {//已接单
+            $type = '已接单';
+        }
+
+        if(in_array($status,[6])) {//配送中
+            $type = '配送中';
+        }
+
+        if(in_array($status,[7,8])) {//已完成
+            $type = '已完成';
+        }
+
+        return $type;
     }
 
 
@@ -216,6 +225,7 @@ class Order extends MerchantsBase
             'ping_fee' => $orders['ping_fee'],
             'discount_money' => $orders['shop_discounts_money'] + $orders['platform_coupon_money'],
             'money' => $orders['money'],
+            'type' => $this->getShopType($orders['status'])
         ];
         $result['detail'] = $this->detail($orders['id']);
 
@@ -292,6 +302,10 @@ class Order extends MerchantsBase
 
         if(!$order_info) {
             $this->error('订单不存在!');
+        }
+
+        if($order_info['status'] == '3') {
+            $this->error('订单已接单,无法拒单');
         }
 
         if($order_info['status'] == '4') {
