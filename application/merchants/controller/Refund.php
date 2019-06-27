@@ -8,32 +8,57 @@ use think\Request;
 
 class Refund extends MerchantsBase
 {
+    protected $noNeedLogin = ['*'];
     /*
      * 退款申请查询
      */
     public function index(Request $request) {
         $shop_id = $this->shop_id;
-        $status = $request->param('status','');//1申请退款， 2退款成功， 3退款失败
-        $map = ' 1=1';
+        $type = $request->param('type','');//1申请退款， 2退款成功， 3退款失败
+        $map = [];
 
-        if($status) {
-            $map = [
-                'status'=>$status
-            ];
+        if($type) {
+            $map[] = ['status','=',$type];
         }
 
+        if($shop_id) {
+            $map[] = ['shop_id','=',$shop_id];
+        }
+
+
         $refund_info = Model('Refund')
-            ->where('shop_id',$shop_id)
+            ->field('')
             ->where($map)
             ->select();
 
+//        dump($refund_info);
+
         foreach ($refund_info as &$row) {
-            $refund_detail = Model('OrdersInfo')->where('orders_id',$row['orders_id'])->select();
-            $row['detail'] = $refund_detail;
+            $row['add_time'] = date('m-d H:i',$row['add_time']);//申请退款时间
+            $row['refund_time'] = date('m-d H:i',$row['refund_time']);//退款完成时间
+            $row['detail'] = $this->detail($row['id']);
         }
 
 
         return $this->success('获取成功',$refund_info);
+    }
+
+    /**
+     * 获取店铺订单详情
+     */
+    public function detail($id)
+    {
+        $detail = model('OrdersInfo')
+            ->field('id,orders_id,product_id,num,ping_fee,box_money,attr_ids,total_money,old_money')
+            ->where('orders_id','=',$id)
+            ->select();
+
+        foreach ($detail as &$row)
+        {
+            $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
+            $row['name'] = model('Product')->getNameById($row['product_id']);
+        }
+        return $detail;
     }
 
     /**
@@ -42,26 +67,28 @@ class Refund extends MerchantsBase
     public function refund(Request $request) {
         $orders_sn = $request->param('orders_sn');
 
-        if(!$orders_sn) {
-            $this->error('订单号不能为空');
-        }
-        $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
-
-        if($find['status'] == 2) {
-            $this->error('商家已退款!');
-        }
-
         try{
+            if(!$orders_sn) {
+                throw new \Exception('订单号不能为空!');
+            }
+            $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
+
+            if($find['status'] == 2) {
+                throw new \Exception('商家已退款!');
+            }
+
             $res = $this->wxRefund($orders_sn);
+            //dump($res);
 
             if('SUCCESS' == $res['data']['return_code'] && 'SUCCESS' == $res['data']['result_code']) {
 
                 model('Refund')->where('out_trade_no',$orders_sn)->setField('status',2);
                 model('Orders')->where('orders_sn',$orders_sn)->setField('status',13);
 
-                $this->success('退款成功');
+                return json_success('退款成功');
             }
 
+            throw new \Exception($res['err_code_des']);
 
 
         }catch (\Exception $e) {
@@ -133,7 +160,7 @@ class Refund extends MerchantsBase
         $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
             // 可在此处传入其他参数，详细参数见微信支付文档
             'refund_desc' => '取消订单退款',
-            'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+            //'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
         ]);
 
 

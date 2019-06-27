@@ -2,7 +2,8 @@
 
 namespace app\common\Auth;
 
-use \Firebase\JWT\JWT; //导入JWT
+use \Firebase\JWT\JWT;
+use think\Exception; //导入JWT
 
 class JwtAuth
 {
@@ -67,6 +68,9 @@ class JwtAuth
         $key=config('token_key');
 
         try {
+            if(empty($jwt)) {
+                throw new Exception('token 为空,请重新登录');
+            }
             JWT::$leeway = 60;//当前时间减去60，把时间留点余地
             $decoded = JWT::decode($jwt, $key, ['HS256']); //HS256方式，这里要和签发的时候对应
             $arr = (array)$decoded;
@@ -80,8 +84,13 @@ class JwtAuth
         }catch(\Firebase\JWT\ExpiredException $e) {
             $this->error('token过期，请重新登录','203');
         }catch(Exception $e) {  //其他错误
-            $this->error('其他错误','299');
+            $this->error($e->getMessage(),'299');
         }
+
+    }
+
+    public function clearToken()
+    {
 
     }
 

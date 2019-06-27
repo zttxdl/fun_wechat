@@ -261,10 +261,56 @@ class Shop extends MerchantsBase
         $shop_id = $this->shop_id;
 
 
+
     }
 
 
+    /**
+     * 退出登录
+     */
+    public function loginOut()
+    {
 
+    }
+
+    /**
+     * 关于我们
+     */
+    public function ShopInfo()
+    {
+
+    }
+
+    /**
+     * 修改密码
+     */
+
+    /**
+     * 修改密码
+     * @param  \think\Request  $request
+     * @return \think\Response
+     */
+    public function updatePwd(Request $request)
+    {
+        $old_password = $request->param('old_password');
+        $new_password = $request->param('new_password');
+        $true_password = $request->param('true_password');
+
+
+        $data = model('ShopInfo')->where('id',$this->shop_id)->find();
+
+        if (md5($old_password) != $data->password){
+            $this->error('输入的旧密码不正确');
+        }
+
+        if ($new_password != $true_password){
+            $this->error('两次密码不一致');
+        }
+
+        model('ShopInfo')->where('id',$this->shop_id)->update(['password'=>md5($new_password)]);
+
+        $this->success('success');
+    }
 
 
 
