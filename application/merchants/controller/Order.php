@@ -121,9 +121,27 @@ class Order extends MerchantsBase
         }
 
         //$result = [];
-
+        $type = '';
         foreach ($orders['data'] as $row)
         {
+
+            //商家端状态
+            if(in_array($row['status'],[2])) {//等待处理
+                $type = '等待处理';
+            }
+
+            if(in_array($row['status'],[3,5])) {//已接单
+                $type = '已接单';
+            }
+
+            if(in_array($row['status'],[6])) {//配送中
+                $type = '配送中';
+            }
+
+            if(in_array($row['status'],[7,8])) {//已完成
+                $type = '已完成';
+            }
+
             $data[] = [
                 'orders_sn' => $row['orders_sn'],
                 'orders_id' => $row['id'],
@@ -131,7 +149,12 @@ class Order extends MerchantsBase
                 'add_time' => date('Y-m-d H:i',$row['add_time']),
                 'money' => $row['money'],
                 'status' => $row['status'],
+                'type'=>$type
             ];
+
+
+
+
         }
         //写入缓存
         //Cache::store('redis')->set($key,$orders);
