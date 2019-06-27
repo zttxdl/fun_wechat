@@ -53,6 +53,7 @@ class Orders extends RiderBase
             $count =  model('Takeout')->where($where)->count();
             foreach ($list as $key => $item) {
                 $item->rest_time = round(($item->expected_time - time()) / 60);
+                $item->expected_time = date('H:i',$item->expected_time);
             }
 
             $data['count'] = $count;
