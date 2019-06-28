@@ -175,7 +175,7 @@ class Member extends RiderBase
         $type = $request->param('type','');
 
         $where[] = ['rider_id','=',$this->auth->id];
-        if ($type == 1){
+        if ($type){
             $where[] = ['star','=',$type];
         }
 
