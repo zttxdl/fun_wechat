@@ -3,7 +3,7 @@
 namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
-use think\Env;
+use think\facade\Env;
 use think\Request;
 
 class Upload extends MerchantsBase
