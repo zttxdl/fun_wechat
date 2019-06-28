@@ -105,6 +105,9 @@ Route::group('admin',function (){
 // 企业打款给用户
 Route::group('transfer',function (){
     Route::rule('send-money','admin/Transfer/sendMoney');
+    Route::rule('pass','admin/Transfer/riderTxCheckPass');
+    Route::rule('list','admin/Transfer/riderTxList');
+    Route::rule('nopass','admin/Transfer/riderTxCheckNopass');
 })->middleware('IsLogin');
 
 // 会员模块
