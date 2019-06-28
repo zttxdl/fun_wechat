@@ -53,7 +53,7 @@ class Orders extends RiderBase
             $list = model('Takeout')
                 ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
                 ->where($where)
-                ->order('single_time')
+                ->order('single_time desc')
                 ->select();
 
             foreach ($list as $key => $item) {
