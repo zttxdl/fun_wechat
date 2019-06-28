@@ -72,7 +72,7 @@ class Merchants extends MerchantsBase
      */
     public function checkStatus()
     {
-        $check_info = model('ShopInfo')->where('id',$this->auth->id)->field('remark,status,check_status')->find();
+        $check_info = model('ShopInfo')->where('id',$this->shop_id)->field('remark,status,check_status')->find();
         if ($check_info['status'] == 2) { // 审核未通过
             $check_info['mb_remark'] = Db::name('check_status')->where('type','=',1)->where('id','in',$check_info['remark'])->column('name');
         }
@@ -86,7 +86,7 @@ class Merchants extends MerchantsBase
      */
     public function setCheckStatus()
     {
-        $res = Db::name('shop_info')->where('id',$this->auth->id)->setField('check_status',1);
+        $res = Db::name('shop_info')->where('id',$this->shop_id)->setField('check_status',1);
         if (!$res) {
             $this->error('设置失败');
         }
