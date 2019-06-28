@@ -72,7 +72,7 @@ class Refund extends MerchantsBase
     public function refund(Request $request) {
         $orders_sn = $request->param('orders_sn');
 
-        error_log(print_r($orders_sn,1),3,Env::get('root_path')."./logs/refund.log");
+        //error_log(print_r($orders_sn,1),3,Env::get('root_path')."./logs/refund.log");
 
         try{
             if(empty($orders_sn) && !isset($orders_sn)) {
@@ -114,7 +114,7 @@ class Refund extends MerchantsBase
     public function refuse(Request $request) {
         $orders_sn = $request->param('orders_sn');
 
-        error_log(print_r($orders_sn,1),3,Env::get('root_path')."./logs/refund.log");
+        //error_log(print_r($orders_sn,1),3,Env::get('root_path')."./logs/refund.log");
 
         if(empty($orders_sn) && !isset($orders_sn)) {
             throw new \Exception('订单号不能为空!');
@@ -192,5 +192,15 @@ class Refund extends MerchantsBase
         $result = $app->refund->queryByOutTradeNumber($outTradeNumber);
 
         $this->success('success',$result);
+    }
+
+    public function test(Request $request)
+    {
+//        $email = new \app\common\service\Email();
+        //$email = Email();
+        dump($request->env());
+
+
+        //echo $email->sendEmail('2323@qq.com');
     }
 }

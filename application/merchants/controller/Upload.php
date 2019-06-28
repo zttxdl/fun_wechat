@@ -3,6 +3,7 @@
 namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
+use think\facade\Env;
 use think\Request;
 
 class Upload extends MerchantsBase
@@ -19,6 +20,8 @@ class Upload extends MerchantsBase
     {
         // 获取表单上传文件
         $file = $request->file('file');
+
+        error_log(print_r($file,1),3,Env::get('root_path')."./logs/file.log");
         // 上传文件验证
         $result = $this->validate(['file' => $file], ['file'=>'require|image'],['file.require' => '请选择上传文件', 'file.image' => '非法图像文件']);
         if(true !== $result){
