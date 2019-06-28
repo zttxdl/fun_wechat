@@ -26,7 +26,7 @@ class IncomeExpend extends RiderBase
         $can_tx_money = model('RiderIncomeExpend')->getCanTxMoney($this->auth->id);
         // 将可提现金额写入缓存， 方便在提现过程中的判断可提现金额
         $key = 'rider_can_tx_money'.$this->auth->id;
-        Cache::store('redis')->set($key,$can_tx_money,3600);  
+        Cache::store('redis')->set($key,$can_tx_money,600);  
 
         // 未结算收入
         $not_tx_money = model('RiderIncomeExpend')->getNotTxMoney($this->auth->id);
@@ -74,6 +74,11 @@ class IncomeExpend extends RiderBase
      */
     public function withdraw(Request $request)
     {
+        // 判断提现金额【不能少于1元】
+        if ($request->param('money') < 1) {
+            $this->error('提现金额不能少于1元');            
+        }
+
         // 计入缓存，每天只能提现一次  # 这块可写一脚本：每天凌晨清除当前缓存【在存缓冲的时候，设置缓存标签，即可指向性的清楚某一标签下的缓存Cache::clear('rider_tx');】
         $key = 'rider_tx_'.$this->auth->id;
         $check = Cache::tag('rider_tx')->store('redis')->has($key);  

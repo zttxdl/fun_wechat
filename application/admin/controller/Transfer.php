@@ -70,6 +70,7 @@ class Transfer extends Controller
 
         // 获取企业付款的相关参数信息
         $info = Db::name('rider_income_expend rie')->join('rider_info ri','rie.rider_id = ri.id')->where('rie.id','=',$tx_id)->field('rie.current_money,rie.serial_number,ri.openid,ri.name')->find();
+        
         $this->sendMoney($info['current_money'],$info['openid'],$info['serial_number'],$info['name']);
 
         // $this->success('已提现');
