@@ -12,6 +12,7 @@ use app\common\controller\MerchantsBase;
 use app\common\model\Orders;
 use app\common\model\ShopInfo;
 use app\common\model\ShopMoreInfo;
+use think\facade\Cache;
 use think\Request;
 use think\Db;
 
@@ -288,16 +289,36 @@ class Shop extends MerchantsBase
      */
     public function updatePwd(Request $request)
     {
-        $old_password = $request->param('old_password');
+        $phone = $request->param('phone');
         $new_password = $request->param('new_password');
-        $true_password = $request->param('true_password');
+        $true_password = $request->param('sure_password');
+        $code = $request->param('code');
 
+        //参数过滤
+        $check = $this->validate($request->param(), 'Shop');
+        if ($check !== true) {
+            $this->error($check);
+        }
+
+        //手机号验证
+        $key = 'alisms_' . 'auth' . '_' . $phone;
+
+        $result        = model('ShopInfo')
+            ->field('account')
+            ->where('account',$phone)
+            ->find();
+
+        if(!$result){
+            $this->error('账户不存在!');
+        }
+
+        $result = model('Alisms', 'service')->checkCode($phone, 'auth', $code);
+        if (!$result) {
+            $this->error(model('Alisms', 'service')->getError());
+        }
 
         $data = model('ShopInfo')->where('id',$this->shop_id)->find();
 
-        if (md5($old_password) != $data->password){
-            $this->error('输入的旧密码不正确');
-        }
 
         if ($new_password != $true_password){
             $this->error('两次密码不一致');

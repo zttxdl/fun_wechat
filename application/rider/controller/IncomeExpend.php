@@ -6,6 +6,7 @@ use think\Controller;
 use think\Request;
 use app\common\controller\RiderBase;
 use think\Db;
+use think\facade\Cache;
 
 class IncomeExpend extends RiderBase
 {
@@ -73,13 +74,13 @@ class IncomeExpend extends RiderBase
      */
     public function withdraw(Request $request)
     {
-        // 计入缓存，每天只能提现一次  # 这块可写一脚本：每天凌晨清除当前缓存【需确认缓存清除这块，是否可单方面清除某一前缀的缓存】
+        // 计入缓存，每天只能提现一次  # 这块可写一脚本：每天凌晨清除当前缓存【在存缓冲的时候，设置缓存标签，即可指向性的清楚某一标签下的缓存Cache::clear('rider_tx');】
         $key = 'rider_tx_'.$this->auth->id;
-        $check = Cache::store('redis')->has($key);  
+        $check = Cache::tag('rider_tx')->store('redis')->has($key);  
         if($check){  
             $this->error('每天只能提现一次！',202);
         }else{   
-            Cache::store('redis')->set($key,1,3600*24);  
+            Cache::tag('rider_tx')->store('redis')->set($key,1,3600*24);  
         }
         
         // 优先读取缓存，当缓存过期时， 从数据库进行读取

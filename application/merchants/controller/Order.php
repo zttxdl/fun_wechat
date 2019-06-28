@@ -103,6 +103,8 @@ class Order extends MerchantsBase
         }
         if($status) {
             $map[] = ['status','=',$status];
+        }else{
+            $map[] = ['status','notin',[1,9,10,11,12]];
         }
 
         if($date) {
@@ -162,6 +164,10 @@ class Order extends MerchantsBase
         //商家端状态
         if(in_array($status,[2])) {//等待处理
             $type = '等待处理';
+        }
+
+        if(in_array($status,[4])) {//等待处理
+            $type = '商家已拒单';
         }
 
         if(in_array($status,[3,5])) {//已接单
@@ -315,6 +321,8 @@ class Order extends MerchantsBase
         //去微信查一下订单是否退款,没有退款在走下面的退款接口
         $res = $this->refundQuery($orders_sn);
 
+//        dump($res);
+
         if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
             $this->error('订单已拒单,请勿重复提交!');
         }
@@ -322,14 +330,15 @@ class Order extends MerchantsBase
         try{
             $res = $this->wxRefund($orders_sn);//商家拒绝接单把钱退给用户
 
-            if($res['data']['result_code'] == 'SUCCESS' && $res['data']['return_code'] == 'SUCCESS') {
+//            dump($res);
+            if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
                 $result = model('Orders')->where('orders_sn',$orders_sn)->setField('status',4);
 
                 if($result) {
-                    $this->success('拒单成功');
+                    return json_success('拒单成功');
                 }
             }else{
-                $this->success('拒单失败');
+                throw new Exception('拒单失败');
             }
 
         }catch (\Exception $e) {
