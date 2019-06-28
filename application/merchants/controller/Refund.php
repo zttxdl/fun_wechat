@@ -77,8 +77,6 @@ class Refund extends MerchantsBase
             }
             $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
 
-            dump($find);
-
             if($find['status'] == 2) {
                 throw new \Exception('商家已退款!');
             }
