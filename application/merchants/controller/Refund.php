@@ -27,7 +27,6 @@ class Refund extends MerchantsBase
 
 
         $refund_info = Model('Refund')
-            ->field('')
             ->where($map)
             ->select();
 
@@ -36,7 +35,9 @@ class Refund extends MerchantsBase
         foreach ($refund_info as &$row) {
             $row['add_time'] = date('m-d H:i',$row['add_time']);//申请退款时间
             $row['refund_time'] = date('m-d H:i',$row['refund_time']);//退款完成时间
-            $row['detail'] = $this->detail($row['id']);
+            $detail = $this->detail($row['id']);
+            $row['box_money'] = $detail['box_money'];
+            $row['detail'] = $detail['detail'];
         }
 
 
@@ -48,6 +49,7 @@ class Refund extends MerchantsBase
      */
     public function detail($id)
     {
+        $box_money = 0;
         $detail = model('OrdersInfo')
             ->field('id,orders_id,product_id,num,ping_fee,box_money,attr_ids,total_money,old_money')
             ->where('orders_id','=',$id)
@@ -57,8 +59,10 @@ class Refund extends MerchantsBase
         {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
             $row['name'] = model('Product')->getNameById($row['product_id']);
+            $box_money += $row['num'] * $row['box_money'];
         }
-        return $detail;
+
+        return ['detail'=>$detail,'box_money'=>$box_money];
     }
 
     /**
@@ -68,7 +72,7 @@ class Refund extends MerchantsBase
         $orders_sn = $request->param('orders_sn');
 
         try{
-            if(!$orders_sn) {
+            if(empty($orders_sn) && !isset($orders_sn)) {
                 throw new \Exception('订单号不能为空!');
             }
             $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
@@ -77,18 +81,23 @@ class Refund extends MerchantsBase
                 throw new \Exception('商家已退款!');
             }
 
-            $res = $this->wxRefund($orders_sn);
-            //dump($res);
+            if($find['status'] == 3) {
+                throw new \Exception('商家已拒绝退款');
+            }
 
-            if('SUCCESS' == $res['data']['return_code'] && 'SUCCESS' == $res['data']['result_code']) {
+            $res = $this->wxRefund($orders_sn);
+
+            if('SUCCESS' == $res['return_code'] && 'SUCCESS' == $res['result_code']) {
 
                 model('Refund')->where('out_trade_no',$orders_sn)->setField('status',2);
                 model('Orders')->where('orders_sn',$orders_sn)->setField('status',13);
 
                 return json_success('退款成功');
+            }else{
+                throw new \Exception($res['err_code_des']);
             }
 
-            throw new \Exception($res['err_code_des']);
+
 
 
         }catch (\Exception $e) {
@@ -155,6 +164,7 @@ class Refund extends MerchantsBase
 
         //dump($pay_config);
         $app    = Factory::payment($pay_config);//pay_config 微信配置
+
 
         //根据商户订单号退款
         $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
