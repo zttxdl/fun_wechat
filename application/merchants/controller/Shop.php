@@ -304,7 +304,7 @@ class Shop extends MerchantsBase
             ->field('account')
             ->where('account',$phone)
             ->find();
-        dump($res);exit;
+
         if(!$res){
             $this->error('账户不存在!');
         }
