@@ -65,6 +65,35 @@ class Merchants extends MerchantsBase
 
     }
 
+
+    /**
+     * 商家审核状态 
+     * 
+     */
+    public function checkStatus()
+    {
+        $check_info = model('ShopInfo')->where('id',$this->auth->id)->field('remark,status,check_status')->find();
+        if ($check_info['status'] == 2) { // 审核未通过
+            $check_info['mb_remark'] = Db::name('check_status')->where('type','=',1)->where('id','in',$check_info['remark'])->column('name');
+        }
+        unset($check_info['remark']);
+        return json_success('获取审核状态成功',['check_info'=>$check_info]);
+    }
+     
+
+    /**
+     * 设置商家已审核通过状态【前端单独用】
+     */
+    public function setCheckStatus()
+    {
+        $res = Db::name('shop_info')->where('id',$this->auth->id)->setField('check_status',1);
+        if (!$res) {
+            $this->error('设置失败');
+        }
+        $this->success('设置成功');
+    }
+
+
     /**
      * 获取学校
      * @param  \think\Request  $request
