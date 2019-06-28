@@ -450,6 +450,7 @@ class Order extends ApiBase
             'imgs' => $imgs,
             'refund_fee' => $orders['money'] - $orders['ping_fee'],//退单
             'total_fee' => $orders['money'],
+            'ping_fee' => $orders['ping_fee'],//配送费
             'num' => $orders['num'],
             'status' => '1',
             'add_time' => time(),
