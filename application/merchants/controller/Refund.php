@@ -5,6 +5,7 @@ namespace app\merchants\controller;
 use app\common\controller\MerchantsBase;
 use EasyWeChat\Factory;
 use think\Request;
+use think\facade\Env;
 
 class Refund extends MerchantsBase
 {
@@ -71,6 +72,8 @@ class Refund extends MerchantsBase
     public function refund(Request $request) {
         $orders_sn = $request->param('orders_sn');
 
+        error_log(print_r($orders_sn,1),3,Env::get('root_path')."./logs/refund.log");
+
         try{
             if(empty($orders_sn) && !isset($orders_sn)) {
                 throw new \Exception('订单号不能为空!');
@@ -111,8 +114,10 @@ class Refund extends MerchantsBase
     public function refuse(Request $request) {
         $orders_sn = $request->param('orders_sn');
 
-        if(!$orders_sn) {
-            $this->error('订单号不能为空');
+        error_log(print_r($orders_sn,1),3,Env::get('root_path')."./logs/refund.log");
+
+        if(empty($orders_sn) && !isset($orders_sn)) {
+            throw new \Exception('订单号不能为空!');
         }
 
         $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
