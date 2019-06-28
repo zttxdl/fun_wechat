@@ -27,7 +27,6 @@ class Refund extends MerchantsBase
 
 
         $refund_info = Model('Refund')
-            ->field('')
             ->where($map)
             ->select();
 
@@ -73,27 +72,34 @@ class Refund extends MerchantsBase
         $orders_sn = $request->param('orders_sn');
 
         try{
-            if(!$orders_sn) {
+            if(empty($orders_sn) && !isset($orders_sn)) {
                 throw new \Exception('订单号不能为空!');
             }
             $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
+
+            dump($find);
 
             if($find['status'] == 2) {
                 throw new \Exception('商家已退款!');
             }
 
-            $res = $this->wxRefund($orders_sn);
-            //dump($res);
+            if($find['status'] == 3) {
+                throw new \Exception('商家已拒绝退款');
+            }
 
-            if('SUCCESS' == $res['data']['return_code'] && 'SUCCESS' == $res['data']['result_code']) {
+            $res = $this->wxRefund($orders_sn);
+
+            if('SUCCESS' == $res['return_code'] && 'SUCCESS' == $res['result_code']) {
 
                 model('Refund')->where('out_trade_no',$orders_sn)->setField('status',2);
                 model('Orders')->where('orders_sn',$orders_sn)->setField('status',13);
 
                 return json_success('退款成功');
+            }else{
+                throw new \Exception($res['err_code_des']);
             }
 
-            throw new \Exception($res['err_code_des']);
+
 
 
         }catch (\Exception $e) {
@@ -160,6 +166,7 @@ class Refund extends MerchantsBase
 
         //dump($pay_config);
         $app    = Factory::payment($pay_config);//pay_config 微信配置
+
 
         //根据商户订单号退款
         $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
