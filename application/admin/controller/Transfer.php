@@ -99,9 +99,4 @@ class Transfer extends Controller
 
 
 
-    }
-     
-
-     
-
 }

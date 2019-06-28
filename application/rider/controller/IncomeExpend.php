@@ -6,6 +6,7 @@ use think\Controller;
 use think\Request;
 use app\common\controller\RiderBase;
 use think\Db;
+use think\facade\Cache;
 
 class IncomeExpend extends RiderBase
 {
