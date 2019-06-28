@@ -12,6 +12,7 @@ use app\common\controller\MerchantsBase;
 use app\common\model\Orders;
 use app\common\model\ShopInfo;
 use app\common\model\ShopMoreInfo;
+use think\facade\Cache;
 use think\Request;
 use think\Db;
 
