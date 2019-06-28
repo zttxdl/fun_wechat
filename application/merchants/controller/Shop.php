@@ -293,12 +293,22 @@ class Shop extends MerchantsBase
         $true_password = $request->param('sure_password');
         $code = $request->param('code');
 
+        //参数过滤
         $check = $this->validate($request->param(), 'Shop');
         if ($check !== true) {
             $this->error($check);
         }
 
-        $result = model('Alisms', 'service')->checkCode($phone, 'login', $code);
+        //手机号验证
+        $res = model('ShopInfo')
+            ->field('account')
+            ->where('account',$phone)
+            ->find();
+        if(!$res){
+            $this->error('账户不存在!');
+        }
+
+        $result = model('Alisms', 'service')->checkCode($phone, 'auth', $code);
         if (!$result) {
             $this->error(model('Alisms', 'service')->getError());
         }
