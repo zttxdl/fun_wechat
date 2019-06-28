@@ -81,13 +81,12 @@ class IncomeExpend extends RiderBase
 
         // 计入缓存，每天只能提现一次  # 这块可写一脚本：每天凌晨清除当前缓存【在存缓冲的时候，设置缓存标签，即可指向性的清楚某一标签下的缓存Cache::clear('rider_tx');】
         $key = 'rider_tx_'.$this->auth->id;
-        $check = Cache::tag('rider_tx')->store('redis')->has($key);  
+        $check = Cache::store('redis')->get($key);  
+
         if($check){  
             $this->error('每天只能提现一次！',202);
-        }else{   
-            Cache::tag('rider_tx')->store('redis')->set($key,1,3600*24);  
         }
-        
+
         // 优先读取缓存，当缓存过期时， 从数据库进行读取
         $can_money = Cache::store('redis')->get('rider_can_tx_money'.$this->auth->id);  
         if (!$can_money) {
@@ -111,9 +110,11 @@ class IncomeExpend extends RiderBase
 
         if (!$res) {
             $this->error('您的提现申请失败');
+        } else {
+            Cache::store('redis')->set($key,1,3600*24);
+            $this->success('您的提现申请已提交');
         }
-
-        $this->success('您的提现申请已提交');
+        
         
     }
 
