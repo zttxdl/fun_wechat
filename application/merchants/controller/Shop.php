@@ -303,9 +303,12 @@ class Shop extends MerchantsBase
         //手机号验证
         $key = 'alisms_' . 'auth' . '_' . $phone;
 
-        $res = Cache::store('redis')->exists($key);
+        $result        = model('ShopInfo')
+            ->field('account')
+            ->where('account',$phone)
+            ->find();
 
-        if(!$res){
+        if(!$result){
             $this->error('账户不存在!');
         }
 
