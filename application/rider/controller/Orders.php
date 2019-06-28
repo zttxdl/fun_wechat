@@ -38,7 +38,9 @@ class Orders extends RiderBase
 
             $list = model('Takeout')
                 ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
-                ->where($where)->select();
+                ->where($where)
+                ->order('create_time desc')
+                ->select();
             foreach ($list as $item) {
                 $item->expected_time = date('H:i',$item->expected_time);
             }
