@@ -24,7 +24,7 @@ class Property extends MerchantsBase
     /**
      * 我的资产
      */
-    public function myIndex($shop_id)
+    public function myIndex(Request $request)
     {
 
         $shop_id = $this->shop_id;//从Token中获取
