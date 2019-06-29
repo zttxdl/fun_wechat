@@ -239,9 +239,9 @@ if (!function_exists('delete_dir_file'))
  * @param string $type   日志后缀文件类型
  */
 if (!function_exists('write_log')) {
-    function set_log($param,$data,$type = '')
+    function set_log($param = '',$data,$type = '')
     {
-        error_log($param.print_r($data),1,3,ROOT_PATH."./logs/".date('Y-m-d').$type.".log");
+        error_log($param.print_r($data),1,3,\think\facade\Env::get('root_path')."./logs/".date('Y-m-d').$type.".log");
     }
 }
 
