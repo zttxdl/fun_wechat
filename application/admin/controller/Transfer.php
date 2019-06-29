@@ -33,8 +33,20 @@ class Transfer extends Controller
             'desc' => $desc, // 企业付款操作说明信息。必填
         ]);
 
-        var_dump($result);die;
-
+        // TODO  退款成功时回调处理
+        if ($result['return_code']=='SUCCESS' && $result['result_code']=='SUCCESS') {
+            // 更新提现表
+            $res = Db::name('rider_income_expend')->where('serial_number','=',$withdraw_sn)->setField('status',2);
+            if ($res) {
+                $str = '企业付款成功'; 
+            } else {
+                $str = '企业付款成功，数据库更新失败';
+            }
+        } else {
+            $str = $result['return_msg'];
+        }
+        
+        return $str;
         
     }
 
@@ -55,8 +67,6 @@ class Transfer extends Controller
 
         $this->success('获取骑手提现申请列表成功',['list'=>$list]);
 
-
-
     }
 
 
@@ -69,11 +79,21 @@ class Transfer extends Controller
         $tx_id = $request->get('id');
 
         // 获取企业付款的相关参数信息
-        $info = Db::name('rider_income_expend rie')->join('rider_info ri','rie.rider_id = ri.id')->where('rie.id','=',$tx_id)->field('rie.current_money,rie.serial_number,ri.openid,ri.name')->find();
+        $info = Db::name('rider_income_expend rie')->join('rider_info ri','rie.rider_id = ri.id')->where('rie.id','=',$tx_id)->field('rie.current_money,rie.serial_number,ri.openid,ri.name,rie.status')->find();
         
-        $this->sendMoney($info['current_money'],$info['openid'],$info['serial_number'],$info['name']);
+        // 判断是否已提现
+        if ($info['status'] == 2) {
+            $this->error('已提现，请勿重复提交');
+        }
 
-        // $this->success('已提现');
+        // 调用企业付款接口
+        $res = $this->sendMoney($info['current_money'],$info['openid'],$info['serial_number'],$info['name']);
+
+        if ($res == '企业付款成功') {
+            $this->success($res);
+        }
+        $this->error($res);
+
     }
 
 
