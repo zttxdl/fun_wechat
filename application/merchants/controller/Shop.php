@@ -52,6 +52,7 @@ class Shop extends MerchantsBase
             'day_order' => $day_order,//今日订单数
             'day_sales' => $day_sales,//今日销售额
             'day_uv' => '20',//今日访客数
+            'logo_img'=>$result['logo_img'],
             'order_cancel_num' => $day_cancel_order,//订单取消数量
         ];
 
