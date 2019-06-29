@@ -499,6 +499,8 @@ class Order extends ApiBase
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
 
+        set_log('order=',$order,'sureOrder');
+        set_log('detail=',$detail,'sureOrder');
 //        set_log("request请求",$request->param(),'order');
 
         /*dump($order);
