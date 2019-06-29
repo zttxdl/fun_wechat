@@ -32,7 +32,9 @@ class Transfer extends Controller
             'amount' => $amount * 100, // 企业付款金额，单位为分
             'desc' => $desc, // 企业付款操作说明信息。必填
         ]);
-
+        
+        var_dump($result);
+        die;
         // TODO  退款成功时回调处理
         if ($result['return_code']=='SUCCESS' && $result['result_code']=='SUCCESS') {
             // 更新提现表
