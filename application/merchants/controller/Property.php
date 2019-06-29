@@ -16,7 +16,7 @@ use think\Db;
 class Property extends MerchantsBase
 {
 
-    protected $noNeedLogin = ['*'];
+    protected $noNeedLogin = [];
 
 
 
@@ -24,13 +24,11 @@ class Property extends MerchantsBase
     /**
      * 我的资产
      */
-    public function myIndex(Request $request)
+    public function myIndex($shop_id)
     {
 
         $shop_id = $this->shop_id;//从Token中获取
 
-
-        $shop_id = isset($shop_id) ? $shop_id : $request->param('shop_id');
 
         $acount_money = model('Withdraw')->getAcountMoney($shop_id);
 
@@ -52,7 +50,7 @@ class Property extends MerchantsBase
      */
     public function receiptPay(Request $request)
     {
-        $shop_id = isset($this->shop_id) ? $this->shop_id : 15;
+        $shop_id = $this->shop_id;
         $type = $request->param('type',0);//1 收入;2 支出; 0 默认全部
 
         isset($shop_id) ? $shop_id : $request->param('shop_id');
@@ -105,8 +103,7 @@ class Property extends MerchantsBase
      */
     public function withdraw(Request $request)
     {
-        //$shop_id = $this->shop_id;
-        $shop_id = 15;
+        $shop_id = $this->shop_id;
         $withdraw_sn = build_order_no('TXBH');
         $moeny = $request->param('money');//提现金额
 
@@ -115,14 +112,14 @@ class Property extends MerchantsBase
         $end = strtotime(date('Y-m-d').'23:59:59');
 
         //提现次数
-        $num = Db::name('Withdraw')
+        /*$num = Db::name('Withdraw')
             ->where('add_time','between time',[$start,$end])
             ->where('shop_id',$shop_id)
             ->find();
 
         if($num){
             $this->error('一天只能提现一次哦!');
-        }
+        }*/
 
         //账户余额
         $balance_money = model('Withdraw')->getAcountMoney($shop_id);
@@ -150,4 +147,6 @@ class Property extends MerchantsBase
         $this->error('申请失败');
 
     }
+
+
 }

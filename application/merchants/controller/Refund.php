@@ -9,7 +9,7 @@ use think\facade\Env;
 
 class Refund extends MerchantsBase
 {
-    protected $noNeedLogin = ['*'];
+    protected $noNeedLogin = [];
     /*
      * 退款申请查询
      */
@@ -192,15 +192,5 @@ class Refund extends MerchantsBase
         $result = $app->refund->queryByOutTradeNumber($outTradeNumber);
 
         $this->success('success',$result);
-    }
-
-    public function test(Request $request)
-    {
-//        $email = new \app\common\service\Email();
-        //$email = Email();
-        dump($request->env());
-
-
-        //echo $email->sendEmail('2323@qq.com');
     }
 }
