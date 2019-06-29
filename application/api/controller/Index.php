@@ -10,7 +10,7 @@ class Index extends ApiBase
 
     protected $noNeedLogin = ['*'];
 
-    //首页
+    //首页11
     public function index(Request $request)
     {
         $lat = $request->param('latitude','');
