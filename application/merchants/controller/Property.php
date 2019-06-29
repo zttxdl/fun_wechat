@@ -16,7 +16,7 @@ use think\Db;
 class Property extends MerchantsBase
 {
 
-    protected $noNeedLogin = ['*'];
+    protected $noNeedLogin = [];
 
 
 
@@ -29,7 +29,6 @@ class Property extends MerchantsBase
 
         $shop_id = $this->shop_id;//从Token中获取
 
-        set_log('shop_id',$shop_id,'MyIndex');
 
         $acount_money = model('Withdraw')->getAcountMoney($shop_id);
 
@@ -51,7 +50,7 @@ class Property extends MerchantsBase
      */
     public function receiptPay(Request $request)
     {
-        $shop_id = isset($this->shop_id) ? $this->shop_id : 15;
+        $shop_id = $this->shop_id;
         $type = $request->param('type',0);//1 收入;2 支出; 0 默认全部
 
         isset($shop_id) ? $shop_id : $request->param('shop_id');
@@ -104,8 +103,7 @@ class Property extends MerchantsBase
      */
     public function withdraw(Request $request)
     {
-        //$shop_id = $this->shop_id;
-        $shop_id = 15;
+        $shop_id = $this->shop_id;
         $withdraw_sn = build_order_no('TXBH');
         $moeny = $request->param('money');//提现金额
 
