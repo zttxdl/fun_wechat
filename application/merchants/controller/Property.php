@@ -36,9 +36,9 @@ class Property extends MerchantsBase
         $monthMoney = model("Shop")->getMonthSales($shop_id);
 
         $data = [
-            'balanceMoney' => isset($acount_money) ? $acount_money : 0,//可提现余额
-            'totalMoney' => isset($totalMoney) ? $totalMoney: 0,//总收入
-            'monthMoney' => isset($monthMoney) ? $totalMoney: 0//本月收入
+            'balanceMoney' => !empty($acount_money) ? $acount_money : 0,//可提现余额
+            'totalMoney' => !empty($totalMoney) ? $totalMoney: 0,//总收入
+            'monthMoney' => !empty($monthMoney) ? $totalMoney: 0//本月收入
         ];
 
         $this->success('获取成功',$data);

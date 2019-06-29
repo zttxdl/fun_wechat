@@ -792,22 +792,20 @@ class Order extends ApiBase
     public function refund($orders_sn)
     {
         $number = $orders_sn;//商户订单号
-        $refund_info = Model('refund')->getRefundInfo($number);
 
-        $refundNumber = $refund_info('out_refund_no');//生成唯一商户退款单号
-        $totalFee = $refund_info('total_fee');//订单金额
-        $refundFee = $refund_info('refund_fee');//退款金额
-
-        if (!$number || !$refundNumber){
+        if (!$number){
             $this->error('非法传参');
         }
 
-        if ($totalFee < $refundFee){
-            $this->error('退款金额不能大于订单总额');
+        $find = model('Orders')->where('orders_sn',$number)->find();
+
+        if (!$find){
+            $this->error('商户订单号错误');
         }
 
-        $totalFee = $totalFee*100;
-        $refundFee = $refundFee*100;
+        $totalFee = $find->money * 100; //订单金额
+        $refundFee =  $find->money * 100;//退款金额
+        $refundNumber = build_order_no('T');//商户退款单号
 
         $pay_config = config('wx_pay');
         $app    = Factory::payment($pay_config);//pay_config 微信配置
