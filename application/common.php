@@ -131,7 +131,7 @@ if (!function_exists('build_order_no')) {
 
     function build_order_no($letter = '')
     {
-        return $letter . date('Ymd') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf('%02d', rand(0, 99));
+        return $letter . date('ymd') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf('%02d', rand(0, 99));
     }
 }
 
