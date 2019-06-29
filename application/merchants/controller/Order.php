@@ -45,6 +45,9 @@ class Order extends MerchantsBase
         }
 
         $orders = Orders::where($map)->paginate($page_size)->toArray();
+
+        //dump($orders);
+
         foreach ($orders['data'] as $key => &$row)
         {
             $data[] = [
@@ -52,7 +55,11 @@ class Order extends MerchantsBase
                 'add_time' => date('m-d H:i',$row['add_time']),//下单时间
                 'address' => $row['address'],
                 'message' => $row['message'],
-                'detail' => $this->detail($row['id'])
+                'box_money' => $row['box_money'],
+                'ping_fee' => $row['ping_fee'],
+                'num'=> $row['num'],
+                'type' => $this->getShopType($row['status']),
+                'detail' => $this->detail($row['id']),
             ];
         }
 
