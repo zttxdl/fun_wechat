@@ -362,7 +362,7 @@ Route::group('r-orders', function () {
 Route::group('r-inc-exp', function () {
     Route::get('/mywallet', 'myWallet');
     Route::get('/detail', 'detail');
-    Route::post('/withdraw', 'withdraw');
+    Route::post('/withdraw', 'withdraw')->middleware('WithdrawalAuth');
 })->prefix('rider/IncomeExpend/');
 
 
