@@ -33,8 +33,6 @@ class Transfer extends Controller
             'desc' => $desc, // 企业付款操作说明信息。必填
         ]);
         
-        var_dump($result);
-        die;
         // TODO  退款成功时回调处理
         if ($result['return_code']=='SUCCESS' && $result['result_code']=='SUCCESS') {
             // 更新提现表
@@ -45,7 +43,7 @@ class Transfer extends Controller
                 $str = '企业付款成功，数据库更新失败';
             }
         } else {
-            $str = $result['return_msg'];
+            $str = $result['err_code_des'];
         }
         
         return $str;
