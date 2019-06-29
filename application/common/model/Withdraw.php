@@ -25,7 +25,7 @@ class Withdraw extends Model
         foreach ($data as $key=>$row)
         {
             if($row['type'] == 2) {//支出
-                if(in_array($row['status'],[1,2])) {
+                if(in_array($row['status'],[2])) {
                     unset($data[$key]);
                 }
             }
