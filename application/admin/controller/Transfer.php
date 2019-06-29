@@ -5,7 +5,7 @@ namespace app\admin\controller;
 use think\Controller;
 use think\Request;
 use EasyWeChat\Factory;
-
+use think\Db;
 
 class Transfer extends Controller
 {
