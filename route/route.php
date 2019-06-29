@@ -161,7 +161,9 @@ Route::group('merchants',function (){
 	Route::rule('createShop','merchants/Merchants/createShop');
 	Route::rule('getSchool','merchants/Merchants/getSchool');
 	Route::rule('getCategory','merchants/Merchants/getCategory');
-	Route::rule('getBack','merchants/Merchants/getBack');
+    Route::rule('getBack','merchants/Merchants/getBack');
+    Route::get('check_status', 'merchants/Merchants/checkStatus');
+    Route::get('set_status', 'merchants/Merchants/setCheckStatus');
 	//文件上传
 	Route::rule('upload','merchants/Upload/up');
 
