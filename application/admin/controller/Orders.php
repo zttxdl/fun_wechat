@@ -142,25 +142,29 @@ class Orders extends Controller
         $result['user_info'] = [
             'headimgurl' => $list['headimgurl'],
             'nickname' => $list['nickname'],
-            'type' => $list['type'],
+            'type' => $list['type']==1 ? '普通会员' : '',
             'phone' => $list['phone'],
         ];
 
-        //商家信息
-        $result['shop_info'] = [
-            'logo_img' => $list['logo_img'],
-            'shop_name' => $list['shop_name'],
-            'link_tel' => $list['link_tel'],
-            'link_name' => $list['link_name'],
-            'school_name' => model('School')->getNameById($list['school_id']),
-        ];
+        if(!in_array($list['status'],[1,2])) {
+            //商家信息
+            $result['shop_info'] = [
+                'logo_img' => $list['logo_img'],
+                'shop_name' => $list['shop_name'],
+                'link_tel' => $list['link_tel'],
+                'link_name' => $list['link_name'],
+                'school_name' => model('School')->getNameById($list['school_id']),
+            ];
+        }
 
-        //骑手信息
-        $result['rider_info'] = [
-            'rider_img' => $list['rider_img'],
-            'link_tel' => $list['link_tel'],
-            'name' => $list['name'],
-        ];
+        if(in_array($list['status'],[5,6,7,8])){
+            //骑手信息
+            $result['rider_info'] = [
+                'rider_img' => $list['rider_img'],
+                'link_tel' => $list['link_tel'],
+                'name' => $list['name'],
+            ];
+        }
 
         //商品信息
         $goods_list  = Db::name('orders_info')
