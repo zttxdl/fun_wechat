@@ -112,7 +112,8 @@ Route::group('transfer',function (){
 
 // 会员模块
 Route::group('admin',function (){
-    Route::rule('userList','admin/User/getList');//会员列表
+    Route::rule('userList/:status','admin/User/getList');//会员列表
+    Route::rule('set_status','admin/User/setStatus');//会员状态
     Route::rule('userDetail','admin/User/getDetail');//会员详情
     Route::rule('userRecycle','admin/User/recycle');//回收站
 })->middleware('IsLogin');

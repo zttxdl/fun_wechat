@@ -10,13 +10,12 @@ class Orders extends Model
     protected $json = ['address'];
     //
     /**
-     * 获取会员消费记录
+     * 获取会员累计消费金额、次数
      * @param $uid
      */
     public function getUserConsume($uid)
     {
-        $data['total_money'] = $this->name('orders')->where('user_id',$uid)->where('status',1)->count('money');
-        $data['order_num'] = $this->name('orders')->where('user_id',$uid)->where('status',1)->count('id');
+        $data = model('Orders')->where('user_id','=',$uid)->field('SUM(money) as total_money,count(id) as count_num')->find();
         return $data;
     }
 

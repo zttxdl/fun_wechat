@@ -241,7 +241,7 @@ if (!function_exists('delete_dir_file'))
 if (!function_exists('set_log')) {
     function set_log($param = '',$data,$type = '')
     {
-        error_log($param.print_r($data,1),3,Env::get('root_path')."./logs/".$type.date('Y-m-d')."log");
+        error_log($param.print_r($data,1),3,Env::get('root_path')."./logs/".$type.date('Y-m-d').".log");
     }
 }
 

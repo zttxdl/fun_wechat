@@ -60,4 +60,33 @@ class User extends Model
     }
      
 
+    /**
+     * 获取创建时间字符串格式 
+     * 
+     */
+    public function getAddTimeAttr($value)
+    {
+        return date('Y-m-d H:i:s', $value);
+    }
+
+    /**
+     * 获取最近登录时间字符串格式 
+     * 
+     */
+    public function getLastLoginTimeAttr($value)
+    {
+        return date('Y-m-d H:i:s', $value);
+    }
+
+    /**
+     * 获取会员类型
+     * 
+     */
+    public function getTypeAttr($value,$data)
+    {
+        $type = ['1' => '普通会员'];
+        return $type[$data['type']];
+    }
+
+
 }
