@@ -185,6 +185,8 @@ class Shop extends MerchantsBase
             $this->error($check,201);
         }
 
+        $data['open_type'] = '平台配送';
+
         // 更新数据
         $result = ShopInfo::where('id','=',$this->shop_id)->update($data);;
 
