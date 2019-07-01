@@ -152,11 +152,11 @@ return [
     'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
     //阿里云sms
     'aliyun_sms'              => [
-        'accessKeyId'        => 'LTAIcb85TcMQSaws',
-        'accessSecret'        => 'cCDJVkSrZATCXvY9BuicOHFyb6rzeX',
+        'accessKeyId'        => 'LTAI0TdZqOBUjYc4',
+        'accessSecret'        => 'Mo5gW1xE90p25dVxPpfAxKiaQBXAk7',
         'RegionId'       => 'scn-hangzhou',
-        'SignName'     => '南京合羿科技',
-        'SMSTemplateCode' => 'SMS_158840158',
+        'SignName'     => '南京食聚荟',
+        'SMSTemplateCode' => 'SMS_168116283',
         //'SMS_141915147',
     ],
     // 微信小程序的用户端账号信息
@@ -177,24 +177,15 @@ return [
     'wx_rider'  =>[
         'app_id'        => 'wx51ecddea44f0ffed',
         'secret'        =>  '90a92131b5844dc7498d28b510386d97',
-
-        // 下面为可选项
-        // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
-        'response_type' => 'array',
-
-        'log' => [
-            'level' => 'debug',
-            'file' => __DIR__.'/wechat_rider.log',
-        ],
+        'mch_id'             => '1538416851',
+        'key'                => 'iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
+        // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
+        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
+        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
+        'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
+        'sandbox' => false
     ],
 
-    // 仅供本人测试使用
-    'wx_mike'  =>[
-        'app_id'        => 'wxeee3b70a6b0cd505',
-        'secret'        =>  'e3526bec1f07ebae5af36bdc78a7e456',
-    ],
-
-    
     'wx_pay'=>[
         // 必要配置
         'app_id'             => 'wx7e84dbf300d4764d',
@@ -206,4 +197,5 @@ return [
         'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
         'sandbox' => false,
     ]
+
 ];

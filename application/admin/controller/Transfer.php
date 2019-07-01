@@ -22,7 +22,7 @@ class Transfer extends Controller
      */
     public function sendMoney($amount,$openid,$withdraw_sn,$check_name='',$desc='提现')
     {
-        $config = config('wx_pay');
+        $config = config('wx_rider');
         $payment = Factory::payment($config);
         $result = $payment->transfer->toBalance([
             'partner_trade_no' => $withdraw_sn, // 商户订单号，需保持唯一性(只能是字母或者数字，不能包含有符号)

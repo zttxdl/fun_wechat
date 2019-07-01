@@ -6,8 +6,9 @@ use think\Request;
 
 class WithdrawalAuth
 {
-    use \traits\controller\Jump;
-
+    /**
+     * 骑手提现时间
+     */
     public function handle($request, \Closure $next)
     {
         // 每周二为提现日
