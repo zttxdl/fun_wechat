@@ -158,7 +158,7 @@ class Shop extends MerchantsBase
                 'shop_name' => $row['shop_name'],
                 'link_tel' => $row['link_tel'],
                 'open_time' => $row['open_time'],
-                'run_type' => config('run_type')[$row['run_type']],
+                'run_type' => $row['run_type'],
                 'ping_fee' => $row['ping_fee'],
                 'up_to_send_money' => $row['up_to_send_money'],
                 'notice' => $row['notice'],
@@ -185,7 +185,7 @@ class Shop extends MerchantsBase
             $this->error($check,201);
         }
 
-        $data['open_type'] = '平台配送';
+        $data['run_type'] = '平台配送';
 
         // 更新数据
         $result = ShopInfo::where('id','=',$this->shop_id)->update($data);;
