@@ -58,6 +58,17 @@ class GoodsAttribute extends MerchantsBase
      */
     public function delete($id)
     {
+        //获取商品信息
+        $duct = model('Product')->field('attr_ids')->where('shop_id','=',$this->shop_id)->select();
+        foreach ($duct as $item) {
+            if ($item->attr_ids){
+                $item->attr_ids = explode(',',$item->attr_ids);
+                if (in_array($id,$item->attr_ids)){
+                    $this->error('删除失败,该属性已有商品在使用');
+                }
+            }
+
+        }
         $result = ProductAttrClassify::get(['pid'=>$id]);
         if ($result){
             //获取子级
