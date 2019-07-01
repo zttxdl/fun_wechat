@@ -22,11 +22,11 @@ class TodaySpecial extends MerchantsBase
     {
         $today = date('Y-m-d',time());
         $result = model('TodayDeals')
-            ->field('id,name,product_id,old_price,price,num,limit_buy_num,thumb')
+            ->field('id,name,product_id,old_price,price,num,limit_buy_num,thumb,start_time,end_time')
             ->where('shop_id',$this->shop_id)
             ->where('today',$today)
             ->find();
-
+        $result->res_time = $result->end_time - $result->start_time;
         $this->success('success',$result);
 
     }

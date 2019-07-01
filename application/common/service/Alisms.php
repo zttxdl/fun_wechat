@@ -14,9 +14,9 @@ class Alisms extends Model
     protected function  getTemplateCode($type)
     {
         $arr = [
-            'auth'=> 'SMS_158840158',
-            'login'=> 'SMS_158840157',
-            'register'=> 'SMS_158840155',
+            'auth'=> 'SMS_168116283',
+            'login'=> 'SMS_168116282',
+            'register'=> 'SMS_168116280',
         ];
 
         return $arr[$type];

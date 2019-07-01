@@ -152,11 +152,11 @@ return [
     'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
     //阿里云sms
     'aliyun_sms'              => [
-        'accessKeyId'        => 'LTAIcb85TcMQSaws',
-        'accessSecret'        => 'cCDJVkSrZATCXvY9BuicOHFyb6rzeX',
+        'accessKeyId'        => 'LTAI0TdZqOBUjYc4',
+        'accessSecret'        => 'Mo5gW1xE90p25dVxPpfAxKiaQBXAk7',
         'RegionId'       => 'scn-hangzhou',
-        'SignName'     => '南京合羿科技',
-        'SMSTemplateCode' => 'SMS_158840158',
+        'SignName'     => '南京食聚荟',
+        'SMSTemplateCode' => 'SMS_168116283',
         //'SMS_141915147',
     ],
     // 微信小程序的用户端账号信息
