@@ -177,11 +177,15 @@ class Shop extends MerchantsBase
     {
         $data = $request->post();
 
+        set_log('req==',$data,'serInfo');
+
         // 验证表单数据
         $check = $this->validate($data, 'ShopInfo');
         if ($check !== true) {
             $this->error($check,201);
         }
+
+        $data['open_type'] = '平台配送';
 
         // 更新数据
         $result = ShopInfo::where('id','=',$this->shop_id)->update($data);;
