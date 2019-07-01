@@ -58,17 +58,29 @@ class GoodsAttribute extends MerchantsBase
      */
     public function delete($id)
     {
-        $result = ProductAttrClassify::get($id);
-        if ($result->shop_id != $this->shop_id) {
-            $this->error('没有权限删除');
-        }
+        //获取商品信息
+        $duct = model('Product')->field('attr_ids')->where('shop_id','=',$this->shop_id)->select();
+        foreach ($duct as $item) {
+            if ($item->attr_ids){
+                $item->attr_ids = explode(',',$item->attr_ids);
+                if (in_array($id,$item->attr_ids)){
+                    $this->error('删除失败,该属性已有商品在使用');
+                }
+            }
 
+        }
         $result = ProductAttrClassify::get(['pid'=>$id]);
         if ($result){
-            $this->error('请先删除标签属性');
+            //获取子级
+            $id = model('ProductAttrClassify')->where('pid','=',$id)->column('id');
         }
-        $result = ProductAttrClassify::destroy($id);
-        $this->success('success',$result);
+
+        $ret = ProductAttrClassify::destroy($id);
+        if (!$ret){
+            $this->error('删除失败');
+
+        }
+        $this->success('success');
     }
 
 

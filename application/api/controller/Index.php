@@ -10,7 +10,7 @@ class Index extends ApiBase
 
     protected $noNeedLogin = ['*'];
 
-    //首页11
+    //首页
     public function index(Request $request)
     {
         $lat = $request->param('latitude','');
@@ -24,6 +24,20 @@ class Index extends ApiBase
         $this->success('success',$data);
     }
 
+    //通过经纬度获取最近学校
+    public function  getSchool(Request $request)
+    {
+        $lat = $request->param('latitude','');
+        $lng = $request->param('longitude','');
+
+        $data = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
+            ->having('distance < 5')
+            ->where('level',2)
+            ->order('distance asc')
+            ->find();
+
+        $this->success('success',$data);
+    }
 
     //获取轮播图
     protected function getSlide()
