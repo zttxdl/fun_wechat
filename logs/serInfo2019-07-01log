@@ -1,0 +1,199 @@
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 8:00-21:00
+    [open_type] => 平台配送
+    [ping_fee] => 0.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 13:00-22:30  13:00-22:30  13:00-22:30  
+    [ping_fee] => 0.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 13:00-22:30  13:00-22:30  13:00-22:30  
+    [open_type] => 平台
+    [ping_fee] => 0.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 05:00-15:00  
+    [open_type] => 平台
+    [ping_fee] => 0.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 8:00-21:00
+    [run_type] => 平台配送
+    [ping_fee] => 0.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 8:00-21:00
+    [run_type] => 平台配送
+    [ping_fee] => 0.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 8:00-21:00
+    [run_type] => 平台配送2
+    [ping_fee] => 0.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 8:00-21:00
+    [ping_fee] => 0.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 8:00-21:00
+    [ping_fee] => 1.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 08:00-23:00  08:00-23:00  
+    [ping_fee] => 1.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 04:00-12:14  
+    [ping_fee] => 1.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 00:04-12:06  00:04-12:06  00:04-12:06  
+    [ping_fee] => 1.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 00:04-12:06  00:04-12:06   
+    [ping_fee] => 1.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 00:04-12:06,00:04-12:06,00:04-12:06,
+    [ping_fee] => 1.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 00:12-24:00,00:12-24:0000:12-24:00,00:12-24:00,00:12-24:0000:12-24:0000:12-24:00,00:12-24:00,00:12-24:0000:12-24:00,00:12-24:00,00:12-24:0000:12-24:0000:12-24:00
+    [ping_fee] => 1.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 00:12-24:00,00:12-24:0000:12-24:00,00:12-24:00,00:12-24:0000:12-24:0000:12-24:00,00:12-24:00,00:12-24:0000:12-24:00,00:12-24:00,00:12-24:0000:12-24:0000:12-24:00
+    [ping_fee] => 1.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点
+    [link_tel] => 17521086195
+    [open_time] => 03:00-12:15,03:00-12:15,03:00-12:15,
+    [ping_fee] => 1.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点11
+    [link_tel] => 17521086195
+    [open_time] => 03:00-12:15,03:00-12:15,03:00-12:15,
+    [ping_fee] => 1.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
+req==Array
+(
+    [shop_name] => 一点点11
+    [link_tel] => 17521086195
+    [open_time] => 12:00-12:21 12:00-12:21 12:00-12:21 
+    [ping_fee] => 1.00
+    [up_to_send_money] => 20.00
+    [notice] => 用餐高峰期,请耐心等待
+    [info] => 连锁企业,品质保障
+)
