@@ -196,6 +196,13 @@ return [
         'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
         'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
         'sandbox' => false,
-    ]
+    ],
+    'qiniu' => [        
+        'accesskey' => 'ueTsuzNrh87IDPcySNgOcmCscPgiqKxYzlKLigEM',
+        'secretkey' => 'ry5EoNTy63Hi3Iy2SFHeIYNj1Icrwb1pw98KrSPK',
+        'bucket'    => 'abily',
+        'domain'    =>  'http://img.daigefan.com',
+        'style'    =>  'imageView2/0/format/jpg/q/70',
+    ],
 
 ];
