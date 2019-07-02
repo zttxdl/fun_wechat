@@ -29,7 +29,7 @@ class School extends ApiBase
 
     /**
      * 学校地区
-     *
+     * 
      */
     public function schoolLevel2()
     {

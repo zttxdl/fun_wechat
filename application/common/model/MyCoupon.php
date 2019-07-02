@@ -54,4 +54,15 @@ class MyCoupon extends Model
     }
 
 
+    /**
+     * 优惠券的使用情况
+     * 
+     */
+    public function getStatusAttr($value,$data)
+    {
+        $status = ['1' => '未使用','2' => '已使用','3' => '已过期',];
+        return $status[$data['status']];
+    }
+
+
 }

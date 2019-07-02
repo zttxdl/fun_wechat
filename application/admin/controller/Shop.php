@@ -24,20 +24,28 @@ class Shop extends Controller
      */
     public function getList(Request $request)
     {
-        $page_no = $request->param('page_no');
-        $page_size = config('page_size');
+
+        $pwd = '123456';
+        dump(md5($pwd));
+        $page_no = $request->param('page');
+        $page_size = $request->param('pageSize');
 
         $list = model('ShopInfo')
             ->alias('a')
             ->page($page_no,$page_size)
             ->whereIn('status','3,4')
-            ->select();
+            ->paginate($page_size)
+            ->toArray();
 
-        $shop_list = [];
-        foreach ($list as $row)
+        if(!$list['data']) {
+            $this->error('暂无数据');
+        }
+
+        $result = [];
+        foreach ($list['data'] as $row)
         {
             if($row['id']) {
-                $shop_list[] = [
+                $result['data'][] = [
                     'shop_name' => $row['shop_name'],
                     'logo_img' => $row['logo_img'],
                     'link_name' => $row['link_name'],
@@ -50,7 +58,10 @@ class Shop extends Controller
             }
         }
 
-        $this->success('获取成功',$shop_list);
+        $result['count'] = $list['total'];
+        $result['page'] = $list['current_page'];
+        $result['pageSize'] = $list['per_page'];
+        $this->success('获取成功',$result);
     }
 
     /**
@@ -161,12 +172,10 @@ class Shop extends Controller
      */
     public function checkList(Request $request)
     {
-        $page_no = $request->param('page_no');
-        $page_size = 5;
+        $page = $request->param('page');
+        $page_size = $request->param('pageSize',20);
 
-        if(!$page_no) {
-            $this->error('非法传参');
-        }
+        dump($page_size);
 
         $data = model('shopInfo')
                             ->alias('a')
@@ -174,12 +183,16 @@ class Shop extends Controller
                             ->join('school c','a.school_id = c.id')
                             ->whereIn('a.status','1,2,3')
                             ->field(['a.id,a.logo_img','a.shop_name','a.link_name','a.link_tel','a.status','b.name'=>'manage_category_name','c.name'=>'school_name'])
-                            ->select();
+                            ->paginate($page_size)->toArray();
 
-        $shop_check_list = [];
+        if(!$data['data']) {
+            $this->error('暂无数据');
+        }
 
-        foreach ($data as $row){
-            $shop_check_list[] = [
+        $result = [];
+
+        foreach ($data['data'] as $row){
+            $result['info'][] = [
                 'id' => $row['id'],
                 'logo_img' => $row['logo_img'],
                 'shop_name' => $row['shop_name'],
@@ -191,9 +204,10 @@ class Shop extends Controller
 
             ];
         }
-
-        $this->success('查询成功',$shop_check_list);
-
+        $result['count'] = $data['total'];
+        $result['page'] = $data['current_page'];
+        $result['pageSize'] = $data['per_page'];
+        $this->success('获取成功',$result);
 
     }
 
