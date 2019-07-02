@@ -45,7 +45,7 @@ class Shop extends Controller
         foreach ($list['data'] as $row)
         {
             if($row['id']) {
-                $result[] = [
+                $result['data'][] = [
                     'shop_name' => $row['shop_name'],
                     'logo_img' => $row['logo_img'],
                     'link_name' => $row['link_name'],
