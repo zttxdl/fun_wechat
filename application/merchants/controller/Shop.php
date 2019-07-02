@@ -258,34 +258,6 @@ class Shop extends MerchantsBase
         $this->success('获取成功',$result);
     }
 
-    /**
-     * 商家审核反馈
-     */
-
-    public function checkStatus()
-    {
-        $shop_id = $this->shop_id;
-
-
-
-    }
-
-
-    /**
-     * 退出登录
-     */
-    public function loginOut()
-    {
-
-    }
-
-    /**
-     * 关于我们
-     */
-    public function ShopInfo()
-    {
-
-    }
 
     /**
      * 修改密码
