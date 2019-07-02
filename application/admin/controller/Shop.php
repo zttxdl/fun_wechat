@@ -24,9 +24,6 @@ class Shop extends Controller
      */
     public function getList(Request $request)
     {
-
-        $pwd = '123456';
-        dump(md5($pwd));
         $page_no = $request->param('page');
         $page_size = $request->param('pageSize');
 
