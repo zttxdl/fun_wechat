@@ -14,9 +14,9 @@ class User extends Controller
     public function getList()
     {
 
-        $page_no = Request::param('page_no');
-        $page_size = 5;
-        $user_list = Db::name('user')->order('id','desc')->page($page_no,$page_size)->select();
+        $page_no = Request::param('pageNoo');
+        $page_size = Request::param('pageSize');
+        $user_list = Db::name('user')->order('id','desc')->paginate($page_size);
 
         $this->success('获取成功',$user_list);
 
