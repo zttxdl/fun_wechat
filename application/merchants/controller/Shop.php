@@ -201,8 +201,7 @@ class Shop extends MerchantsBase
      */
     public function moreInfo(Request $request)
     {
-        //$shop_id = $this->shop_id;
-        $shop_id = 2;
+        $shop_id = $this->shop_id;
 
         if(!$shop_id) {
             $this->error('非法传参','404');
