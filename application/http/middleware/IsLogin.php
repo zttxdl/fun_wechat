@@ -14,7 +14,7 @@ class IsLogin
     {
         try{
             $phone = session('admin_user.phone');
-
+            dump($phone);
             if($phone) {
                 return $next($request);
             } else {

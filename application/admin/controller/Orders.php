@@ -22,6 +22,9 @@ class Orders extends Controller
             ->order('id','DESC')
             ->paginate($page_size)->toArray();
 
+        if(!$order_list['data']) {
+            $this->error('暂无数据');
+        }
 
         $result = [];
 
@@ -45,8 +48,6 @@ class Orders extends Controller
         $result['page'] = $order_list['current_page'];
         $result['pageSize'] = $order_list['per_page'];
         $this->success('获取成功',$result);
-
-        return $this->success('获取成功',$result);
 
     }
 
