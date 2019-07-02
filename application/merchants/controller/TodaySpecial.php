@@ -26,7 +26,8 @@ class TodaySpecial extends MerchantsBase
             ->where('shop_id',$this->shop_id)
             ->where('today',$today)
             ->find();
-        $result->res_time = $result->end_time - $result->start_time;
+        $result->res_time = $result->end_time - time();
+
         $this->success('success',$result);
 
     }
