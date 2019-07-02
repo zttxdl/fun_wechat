@@ -15,7 +15,6 @@ class IsLogin extends Controller
     {
         try{
             $phone = session('admin_user.phone');
-
             if($phone) {
                 return $next($request);
             } else {
