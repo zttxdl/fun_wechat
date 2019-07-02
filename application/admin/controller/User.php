@@ -13,12 +13,14 @@ class User extends Controller
 {
     /**
      * 会员列表
-     * @param $status  会员状态 【1：正常会员 2：禁用的会员】
      */
-    public function getList(Request $request,$status)
+    public function getList(Request $request)
     {
-        $where[] = ['status','=',$status];
         // 搜索条件
+        if (empty($request->get('status/d'))) {
+            $this->error('非法参数');
+        }
+        $where[] = ['status','=',$request->get('status/d')];
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
         !empty($request->get('name/s')) ? $where[] = ['nickname','=',$request->get('name/d')] : null;
         !empty($request->get('type/d')) ? $where[] = ['type','=',$request->get('type/d')] : null;
@@ -26,6 +28,7 @@ class User extends Controller
         $user_list = model('User')
                     ->field('id,nickname,phone,add_time,last_login_time,type')
                     ->order('id','desc')->where($where)->paginate($pagesize)->each(function($item, $key){
+                        // 获取会员消费信息
                         $temp = Model('Orders')->getUserConsume($item['id']);
                         $item['count_num'] = $temp['count_num'];
                         $item['total_money'] = !empty($temp['total_money']) ? sprintf("%.2f", $temp['total_money']) : 0;
@@ -48,10 +51,9 @@ class User extends Controller
         }
 
         $result = [];
-
-
         $result['user_detail'] = model('User')->where('id',$uid)->field('nickname,phone,last_login_time,add_time,headimgurl,type')->find();
-
+        
+        // 获取会员消费信息
         $data = Model('Orders')->getUserConsume($uid);
         //会员消费总金额
         $result['user_detail']['total_money'] = !empty($data['total_money']) ? sprintf("%.2f", $data['total_money']) : 0;

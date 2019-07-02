@@ -239,10 +239,11 @@ class Coupon extends Controller
         // 参与优惠券的店铺信息
         $shop_info = Db::name('shop_info')->where('id','in',$coupon_info['shop_ids'])->field('id,logo_img,shop_name,link_tel')->select();
 
-        // 优惠券使用列表
-        $coupon_used_list = Db::name('my_coupon mc')
+        // 当前优惠券使用列表
+        $coupon_used_list = model('my_coupon')->alias('mc')
                             ->join('user u','mc.user_id = u.id')   
                             ->join('platform_coupon pc','mc.platform_coupon_id = pc.id')
+                            ->where('pc.id','=',$id)
                             ->field('pc.id,pc.name,pc.face_value,u.nickname,u.phone,mc.indate,mc.order_sn,mc.status')
                             ->select();
 

@@ -18,7 +18,7 @@ class IsLogin
             if($phone) {
                 return $next($request);
             } else {
-                $this->error('用户未登录');
+                $this->error('用户未登录','','10001');
             }
         }catch (ErrorException $e){
             $this->error($e->getMessage());
