@@ -17,6 +17,7 @@ class User extends Controller
      */
     public function getList(Request $request,$status)
     {
+
         $where[] = ['status','=',$status];
         // 搜索条件
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
