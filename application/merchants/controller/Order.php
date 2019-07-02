@@ -87,21 +87,6 @@ class Order extends MerchantsBase
         $shop_id = $this->shop_id;
         $date = $request->param('date',date('Ymd'));//默认时间是当天
 
-
-
-        /*if(!$status ) {
-            $this->error('非法传参');
-        }*/
-
-
-        //从缓存中获取
-        /*$key = "shop_info:shop_id:$shop_id:status:$status";
-        $orders = Cache::store('redis')->get($key);
-
-        if($orders) {
-            $this->success('获取成功',$orders);
-        }*/
-
         //构建查询表达式
         $map = [];
 

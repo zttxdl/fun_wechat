@@ -43,7 +43,7 @@ class Coupon extends Controller
                             // 用户类型
                             $item['user_type'] = config('user_type')[$item['user_type']];
                             // 限品类
-                            $item['limit_use'] = Db::name('manage_category')->where('id','in',$item['limit_use'])->value('name');
+                            $item['limit_use'] = !empty($item['limit_use']) ? implode(',',Db::name('manage_category')->where('id','in',$item['limit_use'])->column('name')) : '全部';
                             // 有效期
                             $item['type'] == 2 ? $item['indate'] = date('Y-m-d',$item['start_time']).'-'.date('Y-m-d',$item['end_time']) : $item['indate'] = '领取日起'.$item['other_time'].'天';
                             return $item;
