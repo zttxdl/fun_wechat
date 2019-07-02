@@ -12,7 +12,7 @@ use Qiniu\Storage\UploadManager;
 
 class Upload extends MerchantsBase
 {
-    protected $noNeedLogin = ['upload'];
+    protected $noNeedLogin = ['*'];
 
     /**
      * 文件上传提交
