@@ -25,6 +25,7 @@ class TodaySpecial extends MerchantsBase
             ->field('id,name,product_id,old_price,price,num,limit_buy_num,thumb,start_time,end_time')
             ->where('shop_id',$this->shop_id)
             ->where('today',$today)
+            ->order('create_time desc')
             ->find();
         $result->res_time = $result->end_time - time();
 
@@ -45,6 +46,7 @@ class TodaySpecial extends MerchantsBase
         $data['start_time'] = strtotime($request->param('start_time'));
         $data['end_time'] = strtotime($request->param('end_time'));
         $data['today'] = date('Y-m-d',$data['start_time']);
+        $data['create_time'] = time();
 
         $product = model('Product')
             ->field('thumb,name,old_price')
