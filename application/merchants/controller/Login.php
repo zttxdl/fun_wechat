@@ -39,7 +39,7 @@ class Login extends MerchantsBase
         }
 
 
-        if ($user->status == 2 ) {
+        if ($user->status == 4 ) {
 
             $this->error('帐户锁定');
         }
