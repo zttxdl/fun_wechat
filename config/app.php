@@ -198,11 +198,11 @@ return [
         'sandbox' => false,
     ],
     'qiniu' => [        
-        'accesskey' => 'ueTsuzNrh87IDPcySNgOcmCscPgiqKxYzlKLigEM',
-        'secretkey' => 'ry5EoNTy63Hi3Iy2SFHeIYNj1Icrwb1pw98KrSPK',
-        'bucket'    => 'abily',
-        'domain'    =>  'http://img.daigefan.com',
-        'style'    =>  'imageView2/0/format/jpg/q/70',
+        'accesskey' => '_s0jSVLN7y5AGSlCA7LAHnzRv6ne0bEsvc_RoE-C',
+        'secretkey' => 'N-Z1qiYlUhTOdGHHnSQETmGdLqtbOcupxlkoDMF0',
+        'bucket'    => 'daigefun',
+        'domain'    =>  'http://picture.daigefan.com',
+        'style'    =>  'imageView2/0/format/jpg/interlace/1/q/75|imageslim',
     ],
 
 ];
