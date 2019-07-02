@@ -66,7 +66,7 @@ class Upload extends MerchantsBase
         $upload = new UploadManager();
         list($ret, $err) = $upload->putFile($token, $key, $path);
         if (!$err) {
-            $data['path'] = $ym . '/' . $ret['key'].'?'.config('qiniu')['style'];
+            $data['images'] = $ym . '/' . $ret['key'].'?'.config('qiniu')['style'];
             $this->success('文件上传成功',$data);
         }else {
             // 上传失败获取错误信息
