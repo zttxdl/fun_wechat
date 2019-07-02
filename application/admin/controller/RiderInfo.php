@@ -23,14 +23,17 @@ class RiderInfo extends Controller
 
         $list = Db::name('rider_info')->where($where)->field('id,name,link_tel,status,add_time,last_login_time')->order('id desc')
                 ->paginate($pagesize)->each(function ($item, $key) {
+                    // 当前骑手的送餐信息
+                    $temp = Db::name('rider_income_expend')->where('rider_id','=',$item['id'])->where('type','=',1)->field('count(id) as order_nums, sum(current_money) as earnings')->find();
                     // 完成送餐单数
-                    $item['order_nums'] = Db::name('orders')->where('rider_id',$item['id'])->count('id');
+                    $item['order_nums'] = $temp['order_nums'];
                     // 累计收益
-                    $item['earnings'] = '';
+                    $item['earnings'] = !empty($temp['earnings']) ? sprintf("%.2f", $temp['earnings']) : 0;
                     // 注册时间
                     $item['add_time'] = date('Y-m-d H:i:s',$item['add_time']);
                     // 最近登录时间
                     $item['last_login_time'] = date('Y-m-d H:i:s',$item['last_login_time']);
+                    $item['mb_status'] = $item['status'] == 3 ? '禁用' : '启用';
 
                     return $item;
                 });
@@ -50,7 +53,7 @@ class RiderInfo extends Controller
         if (!$result) {
             $this->error('设置失败');
         }
-        $this->success('ok');
+        $this->success('设置成功');
     }
 
 
@@ -63,35 +66,55 @@ class RiderInfo extends Controller
         // 骑手的基本信息
         $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status')->find($id);
 
+        $info['mb_status'] = config('rider_check_status')[$info['status']];
+
         $this->success('ok',['info'=>$info]);
     }
 
 
     /**
-     * 展示审核骑手详情 
+     * 展示骑手详情 
      * @param $id 骑手信息表主键值
      */
     public function show($id)
     {
         // 骑手的基本信息
-        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status')->find($id);
+        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status,pass_time')->find($id);
 
-        // 结算信息
-        // $statistics_info = '';
+        /** 结算信息 */
+        // 已结算收入【骑手除去当天未结算的所有金额】
+        $settlement['already_money'] = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($id);
+
+        // 提现金额【包括 申请提现、申请提现】
+        $tx_money = (string)model('RiderIncomeExpend')->getTxMoney($id);
+        
+        // 可结算金额【骑手可提现金额】
+        $settlement['can_tx_money'] = $settlement['already_money'] - $tx_money;
+
+        // 待结算金额【骑手当天未结算的金额】
+        $settlement['not_tx_money'] = model('RiderIncomeExpend')->getNotJsMoney($id);
+
+        // 总配送单数
+        $settlement['all_nums'] = (string)model('RiderIncomeExpend')->allNums($id);
+
+        // 本月配送单数
+        $settlement['mouth_nums'] = (string)model('RiderIncomeExpend')->mouthNums($id);
+
+        // 当前骑手入驻天数
+        $days = date('d',time()-$info['pass_time']);
+        // 日配送单数【总配送单数 / 入驻天数】
+        $settlement['avg_nums'] = sprintf("%.2f", $settlement['all_nums'] / $days) ;
 
         // 订单流水
-        $order_list = Db::name('orders o')->join('shop_info s','o.shop_id = s.id')->where('o.rider_id',$id)->field('o.orders_sn,o.address,s.shop_name,o.money,o.add_time,o.issuing_time,o.status')->select();
+        $order_list = Db::name('orders o')->join('takeout t','o.id = t.order_id')->join('user u','o.user_id = u.id')->join('shop_info s','o.shop_id = s.id')->where('t.rider_id',$id)->field('o.orders_sn,s.shop_name,o.money,o.add_time,t.create_time,t.status,u.nickname as user_name,u.phone as user_phone')->select();
         
         foreach ($order_list as $k => &$v) {
-            $temp = json_decode($v['address'],true);
-            $v['user_name'] = $temp['name'];
-            $v['user_phone'] = $temp['phone'];
             $v['add_time'] = date('Y-m-d H:i:s',$v['add_time']);
-            $v['issuing_time'] = date('Y-m-d H:i:s',$v['issuing_time']);
-            $v['mb_status'] = config('order_status')[$v['status']];
+            $v['issuing_time'] = date('Y-m-d H:i:s',$v['create_time']);
+            $v['mb_status'] = config('rider_order_status')[$v['status']];
         }
 
-        $this->success('ok',['info'=>$info,'order_list'=>$order_list]);
+        $this->success('ok',['info'=>$info,'order_list'=>$order_list,'settlement'=>$settlement]);
     }
 
 
@@ -126,19 +149,19 @@ class RiderInfo extends Controller
     public function setCheckStatus(Request $request)
     {
         $data = $request->post();
-        $data['check_time'] = time();
+        $data['pass_time'] = time();
 
         $result = Db::name('rider_info')->update($data);
         if (!$result) {
             $this->error('设置失败');
         }
 
-        $this->success('ok');
+        $this->success('设置成功');
     }
 
 
     /**
-     * 商家审核展示
+     * 骑手审核展示
      */
     public function checkStatusList()
     {
