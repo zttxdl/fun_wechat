@@ -28,7 +28,7 @@ class Merchants extends MerchantsBase
     {
         $data = $request->param();
         $data['shop_id'] = $this->shop_id;
-        $data['status'] = 3;
+        $data['status'] = 1;
         $check = $this->validate($request->param(), 'Merchants');
         if ($check !== true) {
             $this->error($check);
