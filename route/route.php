@@ -116,7 +116,7 @@ Route::group('admin',function (){
     Route::rule('set_user_status','admin/User/setStatus');//会员状态
     Route::rule('userDetail','admin/User/getDetail');//会员详情
     Route::rule('userRecycle','admin/User/recycle');//回收站
-});
+})->middleware('IsLogin');
 
 // 商家模块
 Route::group('admin',function (){
@@ -133,7 +133,7 @@ Route::group('admin',function (){
     Route::rule('shopSortInfo','admin/Shop/SortInfo');//展示商家排序列表
     Route::rule('shopSort','admin/Shop/Sort');//商家排序
     Route::rule('editShopSort','admin/Shop/editShopSort');// 展示当前学校的编辑排序页面
-});
+})->middleware('IsLogin');
 
 // 订单模块
 Route::group('admin',function (){
