@@ -84,6 +84,10 @@ class Shop extends MerchantsBase
         $shop_id = $this->shop_id;
         $logo_img = $request->param('logo_img');
 
+        if(empty($logo_img) && !isset($logo_img)){
+            $this->error('图标不能为空');
+        }
+
 
         $res = Model('shopInfo')->where('id',$shop_id)->setField('logo_img',$logo_img);
 

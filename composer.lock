@@ -63,16 +63,16 @@
         },
         {
             "name": "alibabacloud/client",
-            "version": "1.5.9",
+            "version": "1.5.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aliyun/openapi-sdk-php-client.git",
-                "reference": "5bbb1d9e611b930edcd265c1707cffe5002d3054"
+                "reference": "d4df3b5b47ac7eae5e1670841c71451ecbcc1e3c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aliyun/openapi-sdk-php-client/zipball/5bbb1d9e611b930edcd265c1707cffe5002d3054",
-                "reference": "5bbb1d9e611b930edcd265c1707cffe5002d3054",
+                "url": "https://api.github.com/repos/aliyun/openapi-sdk-php-client/zipball/d4df3b5b47ac7eae5e1670841c71451ecbcc1e3c",
+                "reference": "d4df3b5b47ac7eae5e1670841c71451ecbcc1e3c",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -146,7 +146,7 @@
                 "sdk",
                 "tool"
             ],
-            "time": "2019-06-04T10:16:45+00:00"
+            "time": "2019-06-20T05:31:48+00:00"
         },
         {
             "name": "clagiordano/weblibs-configmanager",
@@ -495,16 +495,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "1.5.2",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "9f83dded91781a01c63574e387eaa769be769115"
+                "reference": "239400de7a173fe9901b9ac7c06497751f00727a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/9f83dded91781a01c63574e387eaa769be769115",
-                "reference": "9f83dded91781a01c63574e387eaa769be769115",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/239400de7a173fe9901b9ac7c06497751f00727a",
+                "reference": "239400de7a173fe9901b9ac7c06497751f00727a",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -516,18 +516,22 @@
             "require": {
                 "php": ">=5.4.0",
                 "psr/http-message": "~1.0",
-                "ralouphie/getallheaders": "^2.0.5"
+                "ralouphie/getallheaders": "^2.0.5 || ^3.0.0"
             },
             "provide": {
                 "psr/http-message-implementation": "1.0"
             },
             "require-dev": {
+                "ext-zlib": "*",
                 "phpunit/phpunit": "~4.8.36 || ^5.7.27 || ^6.5.8"
+            },
+            "suggest": {
+                "zendframework/zend-httphandlerrunner": "Emit PSR-7 responses"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.5-dev"
+                    "dev-master": "1.6-dev"
                 }
             },
             "autoload": {
@@ -564,7 +568,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2018-12-04T20:46:45+00:00"
+            "time": "2019-07-01T23:21:34+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -713,16 +717,16 @@
         },
         {
             "name": "overtrue/socialite",
-            "version": "2.0.8",
+            "version": "2.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/overtrue/socialite.git",
-                "reference": "913f2f7a0a01f2b7a0cecc8dba57ec88af082b4d"
+                "reference": "e8f0e7f1159b743e3d2ba1de55ff5e7d9f53dbd3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/overtrue/socialite/zipball/913f2f7a0a01f2b7a0cecc8dba57ec88af082b4d",
-                "reference": "913f2f7a0a01f2b7a0cecc8dba57ec88af082b4d",
+                "url": "https://api.github.com/repos/overtrue/socialite/zipball/e8f0e7f1159b743e3d2ba1de55ff5e7d9f53dbd3",
+                "reference": "e8f0e7f1159b743e3d2ba1de55ff5e7d9f53dbd3",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -737,7 +741,7 @@
                 "symfony/http-foundation": "^2.7|^3.0|^4.0"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9",
+                "mockery/mockery": "~1.2",
                 "phpunit/phpunit": "~6"
             },
             "type": "library",
@@ -765,20 +769,20 @@
                 "wechat",
                 "weibo"
             ],
-            "time": "2019-03-26T08:12:31+00:00"
+            "time": "2019-06-24T22:24:28+00:00"
         },
         {
             "name": "overtrue/wechat",
-            "version": "4.1.25",
+            "version": "4.1.28",
             "source": {
                 "type": "git",
                 "url": "https://github.com/overtrue/wechat.git",
-                "reference": "dad1e50a1e0af86b47991f01b4134b3128fd94b9"
+                "reference": "47f5ba22e56331ef8125638c44829068b83f8e5c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/overtrue/wechat/zipball/dad1e50a1e0af86b47991f01b4134b3128fd94b9",
-                "reference": "dad1e50a1e0af86b47991f01b4134b3128fd94b9",
+                "url": "https://api.github.com/repos/overtrue/wechat/zipball/47f5ba22e56331ef8125638c44829068b83f8e5c",
+                "reference": "47f5ba22e56331ef8125638c44829068b83f8e5c",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -798,7 +802,7 @@
                 "php": ">=7.0",
                 "pimple/pimple": "^3.0",
                 "psr/simple-cache": "^1.0",
-                "symfony/cache": "^3.3 || ^4.0",
+                "symfony/cache": "^3.3 || ^4.3",
                 "symfony/http-foundation": "^2.7 || ^3.0 || ^4.0",
                 "symfony/psr-http-message-bridge": "^0.3 || ^1.0"
             },
@@ -835,7 +839,7 @@
                 "weixin",
                 "weixin-sdk"
             ],
-            "time": "2019-06-04T04:53:24+00:00"
+            "time": "2019-07-03T02:01:50+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
@@ -1293,16 +1297,16 @@
         },
         {
             "name": "qiniu/php-sdk",
-            "version": "v7.2.7",
+            "version": "v7.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/qiniu/php-sdk.git",
-                "reference": "88d11a5857ebc6871204e9be6ceec54bf5f381e6"
+                "reference": "464f3eb3b0f51586d274733aee67f372fc6276ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/qiniu/php-sdk/zipball/88d11a5857ebc6871204e9be6ceec54bf5f381e6",
-                "reference": "88d11a5857ebc6871204e9be6ceec54bf5f381e6",
+                "url": "https://api.github.com/repos/qiniu/php-sdk/zipball/464f3eb3b0f51586d274733aee67f372fc6276ef",
+                "reference": "464f3eb3b0f51586d274733aee67f372fc6276ef",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -1315,7 +1319,7 @@
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0",
+                "phpunit/phpunit": "~8.0",
                 "squizlabs/php_codesniffer": "~2.3"
             },
             "type": "library",
@@ -1346,20 +1350,20 @@
                 "sdk",
                 "storage"
             ],
-            "time": "2018-11-06T13:34:32+00:00"
+            "time": "2019-06-21T06:22:05+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
-            "version": "2.0.5",
+            "version": "3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ralouphie/getallheaders.git",
-                "reference": "5601c8a83fbba7ef674a7369456d12f1e0d0eafa"
+                "reference": "120b605dfeb996808c31b6477290a714d356e822"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ralouphie/getallheaders/zipball/5601c8a83fbba7ef674a7369456d12f1e0d0eafa",
-                "reference": "5601c8a83fbba7ef674a7369456d12f1e0d0eafa",
+                "url": "https://api.github.com/repos/ralouphie/getallheaders/zipball/120b605dfeb996808c31b6477290a714d356e822",
+                "reference": "120b605dfeb996808c31b6477290a714d356e822",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -1369,11 +1373,11 @@
                 ]
             },
             "require": {
-                "php": ">=5.3"
+                "php": ">=5.6"
             },
             "require-dev": {
-                "phpunit/phpunit": "~3.7.0",
-                "satooshi/php-coveralls": ">=1.0"
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^5 || ^6.5"
             },
             "type": "library",
             "autoload": {
@@ -1392,20 +1396,20 @@
                 }
             ],
             "description": "A polyfill for getallheaders.",
-            "time": "2016-02-11T07:05:27+00:00"
+            "time": "2019-03-08T08:55:37+00:00"
         },
         {
             "name": "symfony/cache",
-            "version": "v4.3.1",
+            "version": "v4.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache.git",
-                "reference": "2edc417da273bafee589a8758f0278416d04af38"
+                "reference": "4acf343c9e3aea5a00d51926c01125441707635c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache/zipball/2edc417da273bafee589a8758f0278416d04af38",
-                "reference": "2edc417da273bafee589a8758f0278416d04af38",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/4acf343c9e3aea5a00d51926c01125441707635c",
+                "reference": "4acf343c9e3aea5a00d51926c01125441707635c",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -1476,20 +1480,20 @@
                 "caching",
                 "psr6"
             ],
-            "time": "2019-06-06T10:05:02+00:00"
+            "time": "2019-06-26T07:55:28+00:00"
         },
         {
             "name": "symfony/cache-contracts",
-            "version": "v1.1.1",
+            "version": "v1.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache-contracts.git",
-                "reference": "7ff3902cc747dd5e2c6f26dc42603ed07b530293"
+                "reference": "ec5524b669744b5f1dc9c66d3c2b091eb7e7f0db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache-contracts/zipball/7ff3902cc747dd5e2c6f26dc42603ed07b530293",
-                "reference": "7ff3902cc747dd5e2c6f26dc42603ed07b530293",
+                "url": "https://api.github.com/repos/symfony/cache-contracts/zipball/ec5524b669744b5f1dc9c66d3c2b091eb7e7f0db",
+                "reference": "ec5524b669744b5f1dc9c66d3c2b091eb7e7f0db",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -1499,10 +1503,10 @@
                 ]
             },
             "require": {
-                "php": "^7.1.3"
+                "php": "^7.1.3",
+                "psr/cache": "^1.0"
             },
             "suggest": {
-                "psr/cache": "",
                 "symfony/cache-implementation": ""
             },
             "type": "library",
@@ -1540,20 +1544,20 @@
                 "interoperability",
                 "standards"
             ],
-            "time": "2019-05-22T12:23:29+00:00"
+            "time": "2019-06-13T11:15:36+00:00"
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v4.3.1",
+            "version": "v4.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "b7e4945dd9b277cd24e93566e4da0a87956392a9"
+                "reference": "e1b507fcfa4e87d192281774b5ecd4265370180d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/b7e4945dd9b277cd24e93566e4da0a87956392a9",
-                "reference": "b7e4945dd9b277cd24e93566e4da0a87956392a9",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/e1b507fcfa4e87d192281774b5ecd4265370180d",
+                "reference": "e1b507fcfa4e87d192281774b5ecd4265370180d",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -1601,11 +1605,11 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2019-06-06T10:05:02+00:00"
+            "time": "2019-06-26T09:25:00+00:00"
         },
         {
             "name": "symfony/mime",
-            "version": "v4.3.1",
+            "version": "v4.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mime.git",
@@ -1935,16 +1939,16 @@
         },
         {
             "name": "symfony/service-contracts",
-            "version": "v1.1.2",
+            "version": "v1.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/service-contracts.git",
-                "reference": "191afdcb5804db960d26d8566b7e9a2843cab3a0"
+                "reference": "f391a00de78ec7ec8cf5cdcdae59ec7b883edb8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/191afdcb5804db960d26d8566b7e9a2843cab3a0",
-                "reference": "191afdcb5804db960d26d8566b7e9a2843cab3a0",
+                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/f391a00de78ec7ec8cf5cdcdae59ec7b883edb8d",
+                "reference": "f391a00de78ec7ec8cf5cdcdae59ec7b883edb8d",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -1954,10 +1958,10 @@
                 ]
             },
             "require": {
-                "php": "^7.1.3"
+                "php": "^7.1.3",
+                "psr/container": "^1.0"
             },
             "suggest": {
-                "psr/container": "",
                 "symfony/service-implementation": ""
             },
             "type": "library",
@@ -1995,20 +1999,20 @@
                 "interoperability",
                 "standards"
             ],
-            "time": "2019-05-28T07:50:59+00:00"
+            "time": "2019-06-13T11:15:36+00:00"
         },
         {
             "name": "symfony/var-exporter",
-            "version": "v4.3.1",
+            "version": "v4.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-exporter.git",
-                "reference": "2b7c857d553423b2317ac0741fb2581d9bfd8fb7"
+                "reference": "9dee83031dcf6dcb53bb7ec1c51de085329bf5cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-exporter/zipball/2b7c857d553423b2317ac0741fb2581d9bfd8fb7",
-                "reference": "2b7c857d553423b2317ac0741fb2581d9bfd8fb7",
+                "url": "https://api.github.com/repos/symfony/var-exporter/zipball/9dee83031dcf6dcb53bb7ec1c51de085329bf5cb",
+                "reference": "9dee83031dcf6dcb53bb7ec1c51de085329bf5cb",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -2061,7 +2065,7 @@
                 "instantiate",
                 "serialize"
             ],
-            "time": "2019-04-10T19:42:49+00:00"
+            "time": "2019-06-22T08:39:44+00:00"
         },
         {
             "name": "topthink/framework",
