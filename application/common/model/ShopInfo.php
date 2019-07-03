@@ -9,9 +9,6 @@ class ShopInfo extends Model
     //获取周边5公里的学校
 	public function getDistance($lat,$lng,$page=1,$pagesize=15)
     {
-        set_log('modellat==',$lat,'index');
-        set_log('modellng==',$lng,'index');
-
         $data = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
             ->having('distance < 5')
             ->where('level',2)
