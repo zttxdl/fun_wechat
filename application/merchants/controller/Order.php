@@ -10,12 +10,8 @@ namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
 use app\common\model\Orders;
-use app\common\model\OrdersInfo;
 use EasyWeChat\Factory;
 use think\Exception;
-use think\facade\Cache;
-use think\facade\Env;
-use think\Model;
 use think\Request;
 use think\Db;
 
