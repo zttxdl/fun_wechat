@@ -209,7 +209,7 @@ class Order extends ApiBase
         }
 
         if(in_array($orders['status'],[3,5,6,7,8])) { //商家接单 和 骑手取货配货显示时间 送达时间
-            $result['plan_arrive_time'] = date("i:s",$orders['plan_arrive_time']);
+            $result['plan_arrive_time'] = date("H:i",$orders['plan_arrive_time']);
         }
 
 
