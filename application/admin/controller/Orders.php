@@ -10,6 +10,10 @@ use think\Db;
 
 class Orders extends Controller
 {
+    /**
+     * 订单列表
+     * @param Request $request
+     */
     public function getList(Request $request)
     {
         $page = $request->param('page');

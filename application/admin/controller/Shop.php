@@ -150,10 +150,11 @@ class Shop extends Controller
             if($row['attr_ids']) {
                 $res = $this->shopModel->getGoodsAttrName($row['attr_ids']);
 
-                $row['attr_names'] = $res;
                 //dump($res);exit;
 
-                $row['attr_names'] = isset($row['attr_names']) ? $row['attr_names'] : '--';
+                $row['attr_names'] = isset($res) ? $res : '--';
+
+                $row['class_name'] = $row['class_name'];
             }
         }
 

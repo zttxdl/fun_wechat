@@ -93,7 +93,7 @@ class Shop extends MerchantsBase
         $logo_img = $request->param('logo_img');
 
 
-        if(empty($shop_id) || empty($shop_name)) {
+        if(empty($shop_id) || empty($logo_img)) {
             json_error('非法传参');
         }
 
