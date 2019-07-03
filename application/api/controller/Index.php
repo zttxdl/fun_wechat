@@ -20,7 +20,6 @@ class Index extends ApiBase
         $data['channel'] = $this->getChannel();
         $data['special'] = $this->getSpecial($lat,$lng);
         $data['recommend'] = $this->getRecommendList($lat,$lng);
-
         $this->success('success',$data);
     }
 

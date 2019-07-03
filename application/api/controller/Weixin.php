@@ -263,7 +263,7 @@ class Weixin extends ApiBase
     }
 
     public function index() {
-        //phpinfo();
+        phpinfo();
         $redis = new Client(
             ['scheme' => 'tcp',
                 'host'   => '127.0.0.1',

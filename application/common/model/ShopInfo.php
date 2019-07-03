@@ -9,12 +9,12 @@ class ShopInfo extends Model
     //获取周边5公里的学校
 	public function getDistance($lat,$lng,$page=1,$pagesize=15)
     {
-
         $data = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
             ->having('distance < 5')
             ->where('level',2)
             ->order('distance asc')
             ->find();
+        set_log('data==',$data,'index');
 
         if ($data){
             $list = $this->field("id,shop_name,logo_img,marks,sales,up_to_send_money,run_time,
@@ -23,7 +23,7 @@ class ShopInfo extends Model
                 ->page($page,$pagesize)
                 ->select()
                 ->toArray();
-
+            set_log('list==',$list,'index');
             return $list;
         }else{
             return false;

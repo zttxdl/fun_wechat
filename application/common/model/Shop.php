@@ -74,8 +74,7 @@ class Shop extends Model
             ->whereBetweenTime('add_time',$start_time,$end_time)
             ->sum('money');
 
-        return $data;
-
+        return sprintf("%.2f",$data);
     }
 
 
@@ -148,7 +147,7 @@ class Shop extends Model
             ->where('shop_id',$shop_id)
             ->sum('money');
 
-        $data = abs($data);
+        $data = sprintf("%.2f",abs($data));
 
         return $data;
     }
@@ -164,7 +163,7 @@ class Shop extends Model
             ->where('shop_id',$shop_id)
             ->sum('money');
 
-        $data = abs($data);
+        $data = sprintf("%.2f",abs($data));
 
         return $data;
     }

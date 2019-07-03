@@ -28,7 +28,6 @@ class Shop extends MerchantsBase
         $shop_id = $this->shop_id;
         $result = ShopInfo::where('id',$shop_id)->find();
 
-       //dump($result);
         if($result->isEmpty()) {
             $this->error('暂无店铺信息');
         }
@@ -46,7 +45,7 @@ class Shop extends MerchantsBase
             'shop_name' => $result['shop_name'],//店铺名称
             'status' => $result['open_status'],//店铺营业状态
             'day_order' => $day_order,//今日订单数
-            'day_sales' => $day_sales,//今日销售额
+            'day_sales' => sprintf("%.2f",$day_sales),//今日销售额
             'day_uv' => '20',//今日访客数
             'logo_img'=>$result['logo_img'],
             'order_cancel_num' => $day_cancel_order,//订单取消数量
