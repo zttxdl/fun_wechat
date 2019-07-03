@@ -87,7 +87,7 @@ class Advers extends Controller
             $this->error('修改失败',201);
         }
         
-        return  json_success('ok');
+        $this->success('修改成功');
         
     }
 

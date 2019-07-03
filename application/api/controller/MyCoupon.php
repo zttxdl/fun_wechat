@@ -227,7 +227,25 @@ class MyCoupon extends ApiBase
     }
      
      
-     
+    /**
+     * 判断当前用户是否当天第一次进入本页面【用于判断是否弹红包】 
+     * 
+     */
+    public function judgeActiveCoupon()
+    {
+        // 从缓存中判断， 当前用户当天是否已登录，如果已登录，直接返回 `false`  
+        $key = 'active_coupon_'.$this->auth->id;
+        $check = Cache::store('redis')->tag('active_coupon')->get($key);  
+
+        if($check){  
+            $this->error('每天只能弹 1 次红包 ！',20001);
+        } else {
+            Cache::store('redis')->tag('active_coupon')->set($key,1,3600*24);
+        }
+
+        $this->success('今天第一次进入小程序，有弹红包的机会哦',20000);
+        
+    }
      
 
      

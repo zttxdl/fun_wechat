@@ -64,6 +64,17 @@ class RiderIncomeExpend extends Model
         
     }
 
+
+    /**
+     * 获取提现处理状态【方法很好用，但是前段需要status的原始数值，所以需要另写一个字段来标注】
+     * 
+     */
+    public function getMbStatusAttr($value,$data)
+    {
+        $status = ['1' => '待审核','2' => '已提现','3' => '已拒绝',];
+        return $status[$data['status']];
+    }
+
      
      
 
