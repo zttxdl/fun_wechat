@@ -74,8 +74,7 @@ class Shop extends Model
             ->whereBetweenTime('add_time',$start_time,$end_time)
             ->sum('money');
 
-        return $data;
-
+        return sprintf("%.2f",$data);
     }
 
 

@@ -43,6 +43,7 @@ class Shop extends Controller
         {
             if($row['id']) {
                 $result['data'][] = [
+                    'id' => $row['id'],
                     'shop_name' => $row['shop_name'],
                     'logo_img' => $row['logo_img'],
                     'link_name' => $row['link_name'],
@@ -51,6 +52,8 @@ class Shop extends Controller
                     'school_name' =>  Model('School')->getNameById($row['school_id']),
                     'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
                     'status' => config('shop_check_status')[$row['status']],
+                    'month_sales' => model('Shop')->getMonthSales($row['id']),
+                    'count_sales' => model('Shop')->getCountSales($row['id']),
                 ];
             }
         }
