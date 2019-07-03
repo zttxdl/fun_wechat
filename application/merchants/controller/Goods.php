@@ -32,9 +32,9 @@ class Goods extends MerchantsBase
         $preferential = [];
         //获取热销商品
         foreach ($list as $item) {
-            if ($item['type'] == 1){
+            if ($item['type'] == 2){
                 $cakes[] = $item;
-            }elseif($item['type'] == 2){
+            }elseif($item['type'] == 3){
                 $preferential[] = $item;
             }
         }
