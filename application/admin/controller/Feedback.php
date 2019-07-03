@@ -39,8 +39,11 @@ class Feedback extends Controller
     {
         $info = model('feedback')->alias('f')->join('user u','f.user_id = u.id')->where('f.id',$id)->append(['mb_status'])->field('f.*,u.nickname,u.phone')->find();
         
-        if (!$info) {
-            $this->error('非法参数');
+        // 图片 【如果存在， 转化为数组】
+        if ($info['imgs']) {
+            $info['imgs'] = explode(',',$info['imgs']);
+        } else {
+            $info['imgs'] = [];
         }
 
         $this->success('ok',['info'=>$info]);
@@ -60,7 +63,7 @@ class Feedback extends Controller
             $this->error('设置失败');
         }
         
-        $this->success('ok');
+        $this->success('设置成功');
     }
      
 
