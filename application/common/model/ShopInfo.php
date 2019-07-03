@@ -17,6 +17,7 @@ class ShopInfo extends Model
             ->where('level',2)
             ->order('distance asc')
             ->find();
+        set_log('data==',$data,'index');
 
         if ($data){
             $list = $this->field("id,shop_name,logo_img,marks,sales,up_to_send_money,run_time,
@@ -25,7 +26,7 @@ class ShopInfo extends Model
                 ->page($page,$pagesize)
                 ->select()
                 ->toArray();
-
+            set_log('list==',$list,'index');
             return $list;
         }else{
             return false;
