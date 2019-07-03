@@ -67,10 +67,6 @@ class Shop extends MerchantsBase
         $shop_name = $request->param('shop_name');
 
 
-        if(empty($shop_id) || empty($shop_name)) {
-            json_error('非法传参');
-        }
-
         $res = Model('shopInfo')->where('id',$shop_id)->setField('shop_name',$shop_name);
 
         if($res) {
@@ -88,11 +84,6 @@ class Shop extends MerchantsBase
         $shop_id = $this->shop_id;
         $logo_img = $request->param('logo_img');
 
-
-        if(empty($shop_id) || empty($logo_img)) {
-            $this->error('非法传参');
-
-        }
 
         $res = Model('shopInfo')->where('id',$shop_id)->setField('logo_img',$logo_img);
 
@@ -113,11 +104,6 @@ class Shop extends MerchantsBase
         $shop_id = $this->shop_id;
 
         $open_status = $request->param('open_status');
-
-
-        if(empty($shop_id) || empty($open_status)) {
-            $this->error('非法传参');
-        }
 
         $res = Model('shopInfo')->where('id',$shop_id)->setField('open_status',$open_status);
 
@@ -199,10 +185,6 @@ class Shop extends MerchantsBase
     public function moreInfo()
     {
         $shop_id = $this->shop_id;
-
-        if(!$shop_id) {
-            $this->error('非法传参','404');
-        }
 
         $result = [];
 
