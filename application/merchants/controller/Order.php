@@ -276,7 +276,7 @@ class Order extends MerchantsBase
 
 
 
-            $result = model('Orders')->where('orders_sn',$orders_sn)->setField('status',3);
+            $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time']]);
 
             return json_success('success');
 
