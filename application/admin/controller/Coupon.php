@@ -84,9 +84,12 @@ class Coupon extends Controller
     {
         $data = $request->param();
         $data['add_time'] = time();
-        if ($data['type'] == 2) {
+        if ($data['type'] == 2) {   // 平台发放
             $data['start_time'] = strtotime($data['start_time']);
             $data['end_time'] = strtotime($data['end_time']);
+        } else {    // 自主领取、消费赠送、邀请赠送
+            $data['start_time'] = 0;
+            $data['end_time'] = 0;
         }
         $data['surplus_num'] = $data['num'];
 
@@ -156,11 +159,11 @@ class Coupon extends Controller
         // 当优惠券未发放时，可修改所以
         if ($info['status'] == 1) {
             $data['surplus_num'] = $data['num'];
-            if ($data['type'] == 2) {
+            if ($data['type'] == 2) {   // 平台发放
                 $data['start_time'] = strtotime($data['start_time']);
                 $data['end_time'] = strtotime($data['end_time']);
                 $data['other_time'] = 0;
-            } else {
+            } else {    // 自主领取、消费赠送、邀请赠送
                 $data['start_time'] = 0;
                 $data['end_time'] = 0;
             }
