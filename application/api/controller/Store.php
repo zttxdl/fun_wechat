@@ -50,9 +50,9 @@ class Store extends ApiBase
         //获取热销商品
 //        dump($list);exit;
         foreach ($list as $value) {
-            if ($value['type'] === 1){
+            if ($value['type'] === 2){
                 $cakes[] = $value;
-            }elseif($value['type'] == 2){
+            }elseif($value['type'] == 3){
                 $preferential[] = $value;
             }
         }

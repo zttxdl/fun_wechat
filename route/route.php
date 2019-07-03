@@ -239,6 +239,7 @@ Route::group('u-coupon', function () {
     Route::get('/myorder_coupon', 'myOrderCoupon');
     Route::get('/get_coupon', 'getCoupon');
     Route::get('/show_coupon', 'showCoupon');
+    Route::get('/judge_coupon', 'judgeActiveCoupon');
 
 })->prefix('api/MyCoupon/');
 

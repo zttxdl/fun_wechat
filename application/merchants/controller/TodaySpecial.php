@@ -50,7 +50,8 @@ class TodaySpecial extends MerchantsBase
         $data['end_time'] = strtotime($request->param('end_time'));
         $data['today'] = date('Y-m-d',$data['start_time']);
         $data['create_time'] = time();
-
+        //获取学校主键
+        $data['school_id'] = model('ShopInfo')->where('id',$this->shop_id)->value('school_id');
         $product = model('Product')
             ->field('thumb,name,old_price')
             ->where('id',$data['product_id'])
@@ -61,7 +62,7 @@ class TodaySpecial extends MerchantsBase
 
         $result = TodayDeals::create($data);
 
-        $this->success('success');
+        $this->success('success',$result);
     }
 
 

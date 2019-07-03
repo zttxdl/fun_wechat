@@ -33,7 +33,13 @@ class Merchants extends MerchantsBase
             $this->error($check);
         }
 
-        Db::startTrans();
+        //百度地图BD09坐标转中国正常GCJ02坐标
+        $lng = $request->param('longitude');
+        $lat = $request->param('latitude');
+        $map = Convert_BD09_To_GCJ02($lat,$lng);
+        $data['longitude'] = $map['lng'];
+        $data['latitude'] = $map['lat'];
+
         try {
             model('ShopInfo')
                 ->where('id',$data['shop_id'])

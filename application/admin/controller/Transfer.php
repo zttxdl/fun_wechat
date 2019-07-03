@@ -60,8 +60,10 @@ class Transfer extends Controller
         // 搜索条件
         $where[] = ['rie.type','=',2];
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
+        !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : null;
+
         // 获取集合
-        $list = Db::name('rider_income_expend rie')->join('rider_info ri','rie.rider_id = ri.id')
+        $list = model('RiderIncomeExpend')->alias('rie')->join('rider_info ri','rie.rider_id = ri.id')
                 ->field('rie.id,rie.status,rie.current_money,rie.serial_number,rie.add_time,ri.name,ri.link_tel')
                 ->append(['mb_status'])->order('rie.id desc')->where($where)->paginate($pagesize);
 
@@ -108,9 +110,9 @@ class Transfer extends Controller
         $res = Db::name('rider_income_expend')->where('id','=',$tx_id)->setField('status',3);
 
         if (!$res) {
-            $this->error('提现审核失败设置失败');
+            $this->error('拒绝提现设置失败');
         }
-        $this->success('审核不通过');
+        $this->success('拒绝提现设置成功');
 
     }
 
