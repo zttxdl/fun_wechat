@@ -15,8 +15,8 @@ class Index extends ApiBase
     {
         $lat = $request->param('latitude','');
         $lng = $request->param('longitude','');
-        trace($lat,'info');
-        trace($lng,'info');
+        set_log('lat',$lat,'index');
+        set_log('lng',$lng,'index');
         $data['slide'] = $this->getSlide();
         $data['channel'] = $this->getChannel();
         $data['special'] = $this->getSpecial($lat,$lng);
