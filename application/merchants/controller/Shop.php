@@ -88,6 +88,9 @@ class Shop extends MerchantsBase
             $this->error('图标不能为空');
         }
 
+        if(empty($shop_id) && !isset($shop_id)){
+            $this->error('店铺ID不能为空');
+        }
 
         $res = Model('shopInfo')->where('id',$shop_id)->setField('logo_img',$logo_img);
 
