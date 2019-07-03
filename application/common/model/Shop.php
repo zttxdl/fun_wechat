@@ -29,6 +29,7 @@ class Shop extends Model
         return $data;
 
     }
+    
 
     /**
      * 获取指定商家信息
@@ -46,6 +47,7 @@ class Shop extends Model
         return $data;
     }
 
+
     /**
      * 获取店铺在售商品
      */
@@ -54,6 +56,7 @@ class Shop extends Model
         $data = DB::name('product')->where('shop_id',$shop_id)->count('id');
         return $data;
     }
+
 
     /**
      * 获取店铺月销售额
@@ -66,9 +69,6 @@ class Shop extends Model
 
         $start_time = strtotime($start_time);
 
-//        dump($start_time);
-//        dump($end_time);
-
         $data = Db::name('orders')->where('status',8)
             ->where('shop_id',$shop_id)
             ->whereBetweenTime('add_time',$start_time,$end_time)
@@ -78,8 +78,6 @@ class Shop extends Model
 
     }
 
-
-    /**
 
     /**
      * 获取店铺销售总额
