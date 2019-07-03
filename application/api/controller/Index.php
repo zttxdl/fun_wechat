@@ -15,13 +15,12 @@ class Index extends ApiBase
     {
         $lat = $request->param('latitude','');
         $lng = $request->param('longitude','');
-        set_log('lat',$lat,'index');
-        set_log('lng',$lng,'index');
+
         $data['slide'] = $this->getSlide();
         $data['channel'] = $this->getChannel();
         $data['special'] = $this->getSpecial($lat,$lng);
         $data['recommend'] = $this->getRecommendList($lat,$lng);
-
+        set_log('recommend==',$data['recommend'],'index');
         $this->success('success',$data);
     }
 
