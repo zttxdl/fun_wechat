@@ -12,9 +12,7 @@ use app\common\controller\MerchantsBase;
 use app\common\model\Orders;
 use app\common\model\ShopInfo;
 use app\common\model\ShopMoreInfo;
-use think\facade\Cache;
 use think\Request;
-use think\Db;
 
 class Shop extends MerchantsBase
 {
@@ -24,12 +22,10 @@ class Shop extends MerchantsBase
      * @param Request $request
      * @return array
      */
-    public function index(Request $request)
+    public function index()
     {
 
         $shop_id = $this->shop_id;
-        $shop_info = [];
-
         $result = ShopInfo::where('id',$shop_id)->find();
 
        //dump($result);
@@ -94,7 +90,7 @@ class Shop extends MerchantsBase
 
 
         if(empty($shop_id) || empty($shop_name)) {
-            json_error('非法传参');
+            $this->error('非法传参');
         }
 
         $res = Model('shopInfo')->where('id',$shop_id)->setField('logo_img',$logo_img);
@@ -119,7 +115,7 @@ class Shop extends MerchantsBase
 
 
         if(empty($shop_id) || empty($open_status)) {
-            json_error('非法传参','404');
+            $this->error('非法传参');
         }
 
         $res = Model('shopInfo')->where('id',$shop_id)->setField('open_status',$open_status);
@@ -135,7 +131,7 @@ class Shop extends MerchantsBase
     /**
      * 商家信息
      */
-    public function info(Request $request)
+    public function info()
     {
         $shop_id = $this->shop_id;
 
@@ -199,7 +195,7 @@ class Shop extends MerchantsBase
     /**
      * 商家入驻信息
      */
-    public function moreInfo(Request $request)
+    public function moreInfo()
     {
         $shop_id = $this->shop_id;
 
