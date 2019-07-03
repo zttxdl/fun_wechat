@@ -163,16 +163,22 @@ class MyCoupon extends ApiBase
         // 启动事务
         Db::startTrans();
         try {
-            Db::name('my_coupon')->insert($data);
-            Db::name('platform_coupon')->where('id',$info->id)->setDec('surplus_num');
+           $res_add =  Db::name('my_coupon')->insert($data);
+           $res_dec =  Db::name('platform_coupon')->where('id',$info->id)->setDec('surplus_num');
             // 提交事务
             Db::commit();
-            $this->success('领取成功');
+            
         } catch (\Exception $e) {
             // 回滚事务
             Db::rollback();
-            $this->error('网络繁忙，领取失败');
+            
         }
+
+        if ($res_add && $res_dec) {
+            $this->success('领取成功');
+        }
+        $this->error('网络繁忙，领取失败');
+        
         
     }
 

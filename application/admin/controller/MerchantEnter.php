@@ -44,7 +44,7 @@ class MerchantEnter extends Controller
             $this->error('设置失败');
         }
         
-        $this->success('ok');
+        $this->success('设置成功');
 
     }
 

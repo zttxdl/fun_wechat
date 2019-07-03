@@ -25,7 +25,7 @@ class Agreement extends Controller
         !empty($request->get('title/s')) ? $where[] = ['title','like',$request->get('title/s').'%'] : null;
         !empty($request->get('platfrom/d')) ? $where[] = ['platfrom','=',$request->get('platfrom/d')] : null;
         
-        $list = Db::name('agreement')->where($where)->order('id desc')->select();
+        $list = Db::name('agreement')->where($where)->field('id,title,platfrom,save_time')->order('id desc')->select();
 
         foreach ($list as $k => &$vo) {
             $vo['platfrom'] = config('show_platfrom')[$vo['platfrom']];
@@ -78,7 +78,7 @@ class Agreement extends Controller
             $this->error('修改失败',201);
         }
         
-        return  json_success('ok');
+        $this->success('修改成功');
     }
 
 
