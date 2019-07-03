@@ -158,7 +158,7 @@ class Shop extends Controller
         }
 
         //结算信息
-        $result['shop_settle'] = $this->shopModel->getSettle();
+        $result['shop_settle'] = $this->shopModel->getSettle($shop_id);
 //        dump($result);
         $this->success('获取成功',$result);
     }
@@ -171,8 +171,6 @@ class Shop extends Controller
     {
         $page = $request->param('page');
         $page_size = $request->param('pageSize',20);
-
-        dump($page_size);
 
         $data = model('shopInfo')
                             ->alias('a')
@@ -401,4 +399,5 @@ class Shop extends Controller
         }
         $this->success('设置成功');
     }
+
 }
