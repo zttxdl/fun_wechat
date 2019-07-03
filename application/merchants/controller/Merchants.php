@@ -9,7 +9,6 @@ namespace  app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
 use think\Db;
-use think\Model;
 use think\Request;
 
 class Merchants extends MerchantsBase

@@ -64,7 +64,7 @@ class GoodsClassify extends MerchantsBase
      */
     public function delete($id)
     {
-        $result = Product::get(['products_classify_id'=>$id,'delete'=>0]);
+        $result = Product::get(['products_classify_id'=>$id,'status'=>1]);
 
         if ($result) {
             $this->error('该分类下有商品，请先删除商品');
