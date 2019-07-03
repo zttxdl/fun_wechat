@@ -96,6 +96,17 @@ class Order extends ApiBase
                 'product_id' => $row['product_id'],
                 'shop_tel' => $row['link_tel']
             ];
+
+            if(in_array($row['status'],[5,6,7,8])) {//骑手取货、配货、已送达、已完成显示配送信息
+
+                $rider_link_tel = Db::name('takeout')->alias('a')
+                    ->leftJoin('rider_info b','a.rider_id = b.id')
+                    ->where('a.order_id',$row['id'])
+                    ->value('b.link_tel');
+
+                $result[]['rider_link_tel'] = $rider_link_tel;
+
+            }
         }
 
         $this->success('success',$result);

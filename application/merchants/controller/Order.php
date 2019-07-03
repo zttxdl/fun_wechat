@@ -276,7 +276,7 @@ class Order extends MerchantsBase
 
 
 
-            $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time']]);
+            $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time()]);
 
             return json_success('success');
 
@@ -320,7 +320,7 @@ class Order extends MerchantsBase
 
 //            dump($res);
             if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
-                $result = model('Orders')->where('orders_sn',$orders_sn)->setField('status',4);
+                $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>4,'shop_receive_time'=>time()]);
 
                 if($result) {
                     return json_success('拒单成功');
@@ -388,6 +388,21 @@ class Order extends MerchantsBase
 
         //$this->success('success',$result);
         return $result;
+    }
+
+    /**
+     * 商家确认送出
+     */
+    public function songChu(Request $request)
+    {
+        $order_sn = $request->param('orders_sn');
+
+        $res = Db::name('orders')->where('orders_sn',$order_sn)->setField('issuing_time',time());
+
+        if($res){
+            $this->success('送出成功');
+        }
+        $this->success('送出成功');
     }
 
 
