@@ -18,6 +18,7 @@ class Orders extends Controller
     {
         $page = $request->param('page');
         $page_size = $request->param('pageSize',10);
+        $search = $request->param('search');
 
         $order_list = Db::name('orders')->alias('a')
             ->leftJoin('user b','a.user_id = b.id')
