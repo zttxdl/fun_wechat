@@ -30,6 +30,7 @@ class Upload extends MerchantsBase
         }
         // 要上传图片的本地路径
         $path = $file->getRealPath();
+        var_dump($path);die;
         $ext = pathinfo($file->getInfo('name'), PATHINFO_EXTENSION);//后缀
         // 上传到七牛后保存的文件名
         $key = substr(md5($file->getRealPath()) , 0, 5). date('YmdHis') . rand(0, 9999) . '.' . $ext;;
