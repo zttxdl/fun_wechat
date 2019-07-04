@@ -383,6 +383,7 @@ class Order extends ApiBase
 
         $data2 = [
             'orders_id'=>$param['orders_id'],
+            'shop_id'=>$param['shop_id'],
             'user_id'=>$this->auth->id,
             'rider_id'=>$param['rider_id'],
             'content'=>$param['rider_content'],
@@ -413,6 +414,9 @@ class Order extends ApiBase
         }
         //改变商品状态
         model('Orders')->where('id',$param['orders_id'])->update(['status'=>8,'update_time'=>time()]);
+        //获取商家评分
+        $maks = model('ShopComments')->getStar($param['shop_id']);
+        model('ShopInfo')->where('id',$param['shop_id'])->update(['marks'=>$maks]);
 
         $this->success('success');
     }
