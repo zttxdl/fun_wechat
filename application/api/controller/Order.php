@@ -335,6 +335,11 @@ class Order extends ApiBase
 
         $data['price'] = $order['money'];
 
+        if($data['price'] == 0) {
+            Db::name('orders')->where('orders_sn',$orders_sn)->setField('status',2);
+            $this->success('支付成功','10000');
+        }
+
         $config = config('wx_pay');
         $app_id = config('wx_pay')['app_id'];
         $app = Factory::payment($config);
