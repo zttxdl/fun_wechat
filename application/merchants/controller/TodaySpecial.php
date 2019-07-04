@@ -58,7 +58,6 @@ class TodaySpecial extends MerchantsBase
             ->find();
         $data['thumb'] = $product->thumb;
         $data['name'] = $product->name;
-        $data['old_price'] = $product->old_price;
 
         $result = TodayDeals::create($data);
 
