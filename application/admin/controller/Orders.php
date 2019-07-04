@@ -18,14 +18,23 @@ class Orders extends Controller
     {
         $page = $request->param('page');
         $page_size = $request->param('pageSize',10);
-        $search = $request->param('search');
+        $search = $request->param('keyword');//搜索条件
+
+        $map = [];
+        if($search) {
+            $map[] = ['a.orders_sn|b.nickname|b.phone|c.shop_name','like',$search.'%'];
+        }
 
         $order_list = Db::name('orders')->alias('a')
             ->leftJoin('user b','a.user_id = b.id')
             ->leftJoin('shop_info c','a.shop_id = c.id')
+            ->where($map)
             ->field('a.id as id,a.orders_sn,b.nickname,b.phone,c.shop_name,a.money,a.add_time,a.status,a.pay_mode,a.source')
             ->order('id','DESC')
             ->paginate($page_size)->toArray();
+
+
+//        dump($order_list);
 
         if(!$order_list['data']) {
             $this->error('暂无数据');
@@ -161,6 +170,8 @@ class Orders extends Controller
                 'link_name' => $list['link_name'],
                 'school_name' => model('School')->getNameById($list['school_id']),
             ];
+        }else{
+            $result['shop_info'] = [];
         }
 
         if(in_array($list['status'],[5,6,7,8])){
@@ -170,6 +181,8 @@ class Orders extends Controller
                 'link_tel' => $list['link_tel'],
                 'name' => $list['name'],
             ];
+        }else{
+            $result['rider_info'] = [];
         }
 
         //商品信息
