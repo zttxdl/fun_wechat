@@ -78,9 +78,9 @@ class Order extends ApiBase
 
         $result = [];
 
-        foreach ($data as $row) {
+        foreach ($data as $key => $row) {
 
-            $result[] = [
+            $result[$key] = [
                 'id' => $row['id'],
                 'shop_id' => $row['shop_id'],
                 'user_id' => $row['user_id'],
@@ -104,7 +104,7 @@ class Order extends ApiBase
                     ->where('a.order_id',$row['id'])
                     ->value('b.link_tel');
 
-                $result[]['rider_link_tel'] = $rider_link_tel;
+                $result[$key]['rider_link_tel'] = $rider_link_tel;
 
             }
         }
