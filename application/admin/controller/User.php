@@ -26,7 +26,7 @@ class User extends Controller
         !empty($request->get('type/d')) ? $where[] = ['type','=',$request->get('type/d')] : null;
 
         $user_list = model('User')
-                    ->field('id,nickname,phone,add_time,last_login_time,type')
+                    ->field('id,nickname,phone,add_time,last_login_time,type,status')
                     ->order('id','desc')->where($where)->paginate($pagesize)->each(function($item, $key){
                         // 获取会员消费信息
                         $temp = Model('Orders')->getUserConsume($item['id']);
