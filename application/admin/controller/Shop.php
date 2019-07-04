@@ -26,11 +26,30 @@ class Shop extends Controller
     {
         $page_no = $request->param('page');
         $page_size = $request->param('pageSize');
+        $key_word = $request->param('keyword');
+        $school_id = $request->param('school_id/d');
 
+
+        $map[] = ['status','in','3,4'];
+        // 搜索条件
+        if($key_word) {
+            $map[] = ['a.shop_name|a.link_name|a.link_tel','like',$key_word.'%'];
+        }
+
+        // 学校列表
+        $school_list = Model('school')->getSchoolList();
+
+        if ($school_id) {
+            $map[] = ['school_id','=',$school_id];
+        }
+
+
+
+        // 获取当前学校的已审核通过的商铺列表
         $list = model('ShopInfo')
             ->alias('a')
             ->page($page_no,$page_size)
-            ->whereIn('status','3,4')
+            ->where($map)
             ->paginate($page_size)
             ->toArray();
 
@@ -61,6 +80,7 @@ class Shop extends Controller
         $result['count'] = $list['total'];
         $result['page'] = $list['current_page'];
         $result['pageSize'] = $list['per_page'];
+        $result['school_list'] = $school_list;
         $this->success('获取成功',$result);
     }
 
@@ -175,13 +195,28 @@ class Shop extends Controller
     {
         $page = $request->param('page');
         $page_size = $request->param('pageSize',20);
+        $key_word = $request->param('keyword');
+        $status = $request->param('status');
+
+        $map = [];
+        if($key_word) {
+            $map[] = ['a.shop_name|a.link_name|a.link_tel|b.name|c.name','like',$key_word.'%'];
+        }
+
+        if($status) {
+            $map[] = ['a.status','=',$status];
+        }else{
+            $map[] = ['a.status','in','1,2,3'];
+        }
 
         $data = model('shopInfo')
                             ->alias('a')
                             ->join('ManageCategory b','a.manage_category_id = b.id')
                             ->join('school c','a.school_id = c.id')
-                            ->whereIn('a.status','1,2,3')
-                            ->field(['a.id,a.logo_img','a.shop_name','a.link_name','a.link_tel','a.status','b.name'=>'manage_category_name','c.name'=>'school_name'])
+                            ->where($map)
+//                            ->whereIn('a.status','1,2,3')
+                            ->field(['a.id','a.logo_img','a.shop_name','a.link_name','a.link_tel','a.status','b.name'=>'manage_category_name','c.name'=>'school_name'])
+//                            ->fetchSql()
                             ->paginate($page_size)->toArray();
 
         if(!$data['data']) {
