@@ -377,6 +377,6 @@ Route::group('r-upload', function () {
 /*************** 定时脚本接口 *********************************************************************************************/
 
 // 用户端
-Route::group('u-auto', function () {
-    Route::rule('/set-mycoupon-overtime', 'setMyCouponOvertime');
+Route::group('auto', function () {
+    Route::rule('/zero_execute', 'zeroExecute');
 })->prefix('api/AutoShell/');
