@@ -337,7 +337,7 @@ class Order extends ApiBase
 
         if($data['price'] == 0) {
             Db::name('orders')->where('orders_sn',$orders_sn)->setField('status',2);
-            $this->success('支付成功','10000');
+            $this->error('支付成功','10000');
         }
 
         $config = config('wx_pay');
