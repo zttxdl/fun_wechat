@@ -132,7 +132,6 @@ Route::group('admin',function (){
     Route::rule('shopCheckStatus','admin/Shop/checkStatus');//商家审核状态
     Route::rule('shopSortInfo','admin/Shop/SortInfo');//展示商家排序列表
     Route::rule('shopSort','admin/Shop/Sort');//商家排序
-    Route::rule('editShopSort','admin/Shop/editShopSort');// 展示当前学校的编辑排序页面
 })->middleware('IsLogin');
 
 // 订单模块

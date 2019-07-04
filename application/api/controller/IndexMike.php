@@ -5,7 +5,7 @@ namespace app\api\controller;
 use app\common\controller\ApiBase;
 use think\Request;
 
-class Index extends ApiBase
+class IndexMike extends ApiBase
 {
 
     protected $noNeedLogin = ['*'];
