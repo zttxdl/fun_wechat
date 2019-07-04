@@ -309,7 +309,7 @@ class Order extends ApiBase
         $openid = $this->auth->openid;
         $user_id = $this->auth->id;
 
-
+        
         if(!$orders_sn){
 
             $this->error('订单号不能为空');
@@ -342,6 +342,7 @@ class Order extends ApiBase
 
         $config = config('wx_pay');
         $app_id = config('wx_pay')['app_id'];
+        $key = config('wx_pay')['key'];
         $app = Factory::payment($config);
 
         $ip   = request()->ip();
@@ -359,7 +360,7 @@ class Order extends ApiBase
             $result['openid']=$openid;
             $result['timeStamp']=strval(time());
             $result['package']="prepay_id=".$result['prepay_id'];
-            $result['paySign']=MD5("appId=".$app_id."&nonceStr=".$result['nonce_str']."&package=".$result['package']."&signType=MD5&timeStamp=".$result['timeStamp']."&key=iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs");
+            $result['paySign']=MD5("appId=".$app_id."&nonceStr=".$result['nonce_str']."&package=".$result['package']."&signType=MD5&timeStamp=".$result['timeStamp']."&key=".$key);
 
             $this->success('success',$result);
         }else{
