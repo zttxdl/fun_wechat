@@ -27,7 +27,7 @@ class Coupon extends Controller
         // 搜索条件
         $where = [];
         !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
-        !empty($request->get('category/d')) ? $where[] = ['limit_use','between',implode(',',array_column($category_list,'id'))]: null;
+        !empty($request->get('category/d')) ? $where[] = ['limit_use',['like',$request->get('category/d').',%'],['like','%,'.$request->get('category/d').',%'],['like','%,'.$request->get('category/d')]]: null;
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
     
