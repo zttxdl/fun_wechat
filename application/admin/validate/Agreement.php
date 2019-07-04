@@ -13,7 +13,6 @@ class Agreement extends Validate
      * @var array
      */	
 	protected $rule = [
-        'title'     =>'require|max:20',
         'content'     =>'require',
     ];
     
@@ -24,8 +23,6 @@ class Agreement extends Validate
      * @var array
      */	
     protected $message = [
-        'title.require'      => '协议标题不能为空',
-        'title.max'          => '协议标题不能超过20位',
         'content.require'       => '协议内容不能为空',
     ];
 }
