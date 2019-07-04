@@ -17,10 +17,10 @@ class Invitation extends ApiBase
     public function index()
     {
         $id = $this->auth->id;
-        $info['num'] = model('Invitation')->getUserCount($id);
-        $info['money'] = model('Invitation')->getLuckyMoney($id);
+        $data['num'] = model('Invitation')->getUserCount($id);
+        $data['money'] = model('Invitation')->getLuckyMoney($id);
 
-        $this->success('success',['info'=>$info]);
+        $this->success('success',$data);
     }
 
 }

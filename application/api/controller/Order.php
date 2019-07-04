@@ -78,9 +78,9 @@ class Order extends ApiBase
 
         $result = [];
 
-        foreach ($data as $row) {
+        foreach ($data as $key => $row) {
 
-            $result[] = [
+            $result[$key] = [
                 'id' => $row['id'],
                 'shop_id' => $row['shop_id'],
                 'user_id' => $row['user_id'],
@@ -96,6 +96,17 @@ class Order extends ApiBase
                 'product_id' => $row['product_id'],
                 'shop_tel' => $row['link_tel']
             ];
+
+            if(in_array($row['status'],[5,6,7,8])) {//骑手取货、配货、已送达、已完成显示配送信息
+
+                $rider_link_tel = Db::name('takeout')->alias('a')
+                    ->leftJoin('rider_info b','a.rider_id = b.id')
+                    ->where('a.order_id',$row['id'])
+                    ->value('b.link_tel');
+
+                $result[$key]['rider_link_tel'] = $rider_link_tel;
+
+            }
         }
 
         $this->success('success',$result);
@@ -372,6 +383,7 @@ class Order extends ApiBase
 
         $data2 = [
             'orders_id'=>$param['orders_id'],
+            'shop_id'=>$param['shop_id'],
             'user_id'=>$this->auth->id,
             'rider_id'=>$param['rider_id'],
             'content'=>$param['rider_content'],
@@ -402,6 +414,9 @@ class Order extends ApiBase
         }
         //改变商品状态
         model('Orders')->where('id',$param['orders_id'])->update(['status'=>8,'update_time'=>time()]);
+        //获取商家评分
+        $maks = model('ShopComments')->getStar($param['shop_id']);
+        model('ShopInfo')->where('id',$param['shop_id'])->update(['marks'=>$maks]);
 
         $this->success('success');
     }
