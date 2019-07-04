@@ -26,7 +26,7 @@ class Upload extends ApiBase
         // 获取表单上传文件
         $file = $request->file('file');
         $path = $request->param('path');
-        // 上传文件验证
+	// 上传文件验证
         $result = $this->validate(['file' => $file], ['file'=>'require|image'],['file.require' => '请选择上传文件', 'file.image' => '非法图像文件']);
         if(true !== $result){
             $this->error($result);
