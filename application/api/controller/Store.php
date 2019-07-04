@@ -82,17 +82,12 @@ class Store extends ApiBase
 
         $where[] = ['shop_id','=',$shop_id];
 
-
-        $count = model('ShopComments')->where($where)->count();
-        $sum = model('ShopComments')->where($where)->sum('star');
-
-        if ($count != 0){
-            $data['star'] = round($sum / $count,2);
-        }else{
-            $data['star'] = 0;
-        }
+        //获取商家评论评分
+        $data['star'] = model('ShopComments')->getStar($shop_id);
+        //获取商家配送评分
+        $data['r_star'] = model('RiderComments')->getStar($shop_id);
         //获取评价标签
-        $data['tips'] = Db::query("SELECT a.tips_id,a.comments_id,b.`name`,COUNT(a.tips_id) as conuts  FROM fun_shop_comments_tips as a 
+        $data['tips'] = Db::query("SELECT a.tips_id,a.comments_id,b.`name`,COUNT(a.tips_id) as counts  FROM fun_shop_comments_tips as a 
 LEFT JOIN fun_tips as b  ON a.tips_id = b.id 
 LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop_id GROUP BY a.tips_id");
 
