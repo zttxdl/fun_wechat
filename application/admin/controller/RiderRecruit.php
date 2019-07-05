@@ -22,6 +22,7 @@ class RiderRecruit extends Controller
     {
         //搜索条件
         $where = [];
+        !empty($request->get('name/s')) ? $where[] = ['u.nickname','like',$request->get('name/s').'%'] : null;
         !empty($request->get('status/d')) ? $where[] = ['r.status','=',$request->get('status/d')] : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
 
