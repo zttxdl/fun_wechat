@@ -128,7 +128,7 @@ class Property extends MerchantsBase
         $balance_money = model('Withdraw')->getAcountMoney($shop_id);
 
         if($balance_money < $money) {
-            $this->error('提现金额不正确');
+            $this->error('您的提现金额大于可提现金额！');
         }
 
         //提现申请入库
