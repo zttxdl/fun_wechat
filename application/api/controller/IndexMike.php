@@ -79,11 +79,17 @@ class IndexMike extends ApiBase
 
     /**
      * 获取推荐商家
+     * @param $school_id  学校主键值
+     * @param $openid  用户openid值
      */
     public function getRecommendList(Request $request)
     {
         // 学校主键值
         $school_id = $request->get('school_id');
+        // 判断是否传入openid值，如果传入， 判断当前的openid值，如果有值且能在用户表中找到，并且该用户为首单用户，则判断当前学校是否有首单立减红包， 有则展示，没有则不展示
+        $openid = $request->get('openid','0');
+        $uid = model('User')->where([['openid','=',$openid],['new_buy','=',1]])->value('id');
+
         // 搜索条件
         $where[] = ['school_id','=',$school_id];
         $where[] = ['status','=',3]; 
@@ -105,12 +111,38 @@ class IndexMike extends ApiBase
             return $item;
         });
 
+        if ($uid) {
+            // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
+            $pt_where = [['status','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
+            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('fave_value,threshold,shop_ids')->select();  // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
+        }
+        // 组装店铺满减信息
+        foreach ($shop_list as $k => $v) {
+            foreach ($shop_list[$k]['disc'] as $kk => $vv) {
+                $shop_list[$k]['discounts'][] = $shop_list[$k][$kk]['threshold'].'减'.$shop_list[$k][$kk]['threshold'];
+            }
+        }
+        // 组装首单立减信息
+        if (!$pt_coupon->isEmpty()) {
+            foreach ($shop_list as $k => $v) {
+                foreach ($pt_coupon as $ko => $vo) {
+                    if (in_array($v['id'],$vo['shop_ids'])) {
+                        $shop_list[$k]['discounts'][] = '首单减'.$pt_coupon[$ko]['fave_value'];
+                        continue;
+                    }
+                }
+            }
+        }
+
         $this->success('success',['shop_list'=>$shop_list]);
     }
 
 
     /**
      * 二级经营品类导航
+     * @param $school_id  学校主键值
+     * @param $class_id  一级经营品类导航主键值
+     * @param $openid  用户openid值
      */
     public function getNavigation(Request $request)
     {
@@ -118,6 +150,10 @@ class IndexMike extends ApiBase
         $school_id = $request->get('school_id');
         // 一级经营品类导航主键值
         $class_id = $request->get('class_id');
+
+        // 判断是否传入openid值，如果传入， 判断当前的openid值，如果有值且能在用户表中找到，并且该用户为首单用户，则判断当前学校是否有首单立减红包， 有则展示，没有则不展示
+        $openid = $request->get('openid','0');
+        $uid = model('User')->where([['openid','=',$openid],['new_buy','=',1]])->value('id');
         
         if (!$school_id || !$class_id) {
             $this->error('非法参数');
@@ -158,6 +194,30 @@ class IndexMike extends ApiBase
             $item['sales'] = model('Shop')->getMonthNum($item['id']);
             return $item;
         });
+
+        if ($uid) {
+            // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
+            $pt_where = [['status','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
+            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('fave_value,threshold,shop_ids')->select();  // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
+        }
+        // 组装店铺满减信息
+        foreach ($shop_list as $k => $v) {
+            foreach ($shop_list[$k]['disc'] as $kk => $vv) {
+                $shop_list[$k]['discounts'][] = $shop_list[$k][$kk]['threshold'].'减'.$shop_list[$k][$kk]['threshold'];
+            }
+        }
+        // 组装首单立减信息
+        if (!$pt_coupon->isEmpty()) {
+            foreach ($shop_list as $k => $v) {
+                foreach ($pt_coupon as $ko => $vo) {
+                    if (in_array($v['id'],$vo['shop_ids'])) {
+                        $shop_list[$k]['discounts'][] = '首单减'.$pt_coupon[$ko]['fave_value'];
+                        continue;
+                    }
+                }
+            }
+        }
+
 
         $this->success('success',['shop_list'=>$shop_list]);
     }
