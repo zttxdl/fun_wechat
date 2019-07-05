@@ -23,7 +23,7 @@ class AutoShell extends Controller
      */
     public function zeroExecute()
     {
-        /***************** 更新红包的过期状态  ******************************************************************/
+        /***************** 更新我的红包的过期状态  ******************************************************************/
         $list = Db::name('my_coupon')->where('status',1)->field('id,indate,status')->select();
         // 判断红包是否过期，并更新状态
         foreach ($list as $k => $v) {
