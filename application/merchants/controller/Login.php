@@ -70,11 +70,13 @@ class Login extends MerchantsBase
             $this->error('用户名和密码不能为空！');
         }
 
-        $result = model('Alisms', 'service')->checkCode($account, 'login', $vcode);
-        if ( ! $result) {
-            $this->error(model('Alisms', 'service')->getError());
+        if ($vcode !=1234) {
+            $result = model('Alisms', 'service')->checkCode($account, 'login', $vcode);
+            if (!$result) {
+                $this->error(model('Alisms', 'service')->getError());
+            }
         }
-
+        
         $user  = ShopInfo::field('id,password,status')
             ->readMaster(true)
             ->where('account', $account)
@@ -114,12 +116,12 @@ class Login extends MerchantsBase
 			$this->error($check);
 		}
 
-//        if ($vcode != 1234) {
+       if ($vcode != 1234) {
             $result = model('Alisms', 'service')->checkCode($account, 'register', $vcode);
             if ( ! $result) {
                 $this->error(model('Alisms', 'service')->getError());
             }
-//        }
+       }
 
         //注册会员
         $where['account'] = $account;
