@@ -283,14 +283,6 @@ if (!function_exists('createOrderSn')) {
     }
 }
 
-if (!function_exists('visitor')) {
-    /**
-     * 访客统计
-     */
-    function visitor() {
-
-    }
-}
 
 /**
  * GCJ02坐标转换BD09
