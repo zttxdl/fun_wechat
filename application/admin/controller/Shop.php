@@ -139,26 +139,30 @@ class Shop extends Controller
         $shop_qualification = [];
         $shop_account = [];
 
-        foreach ($shop_more_info as $row)
-        {
-            //商家资质
-            $shop_qualification = [
-                'business_license' => $row['business_license'],
-                'proprietor' => $row['proprietor'],
-                'hand_card_front' => $row['hand_card_front'],
-                'hand_card_back' => $row['hand_card_back'],
-                'user_name' => $row['user_name'],
-                'identity_num' => $row['identity_num'],
-                'sex' => config('sex')[$row['sex']],
-                'licence' => $row['licence'],
-            ];
-            //收款信息
-            $shop_account = [
-                'branch_back' => $row['branch_back'],
-                'back_hand_name' => $row['back_hand_name'],
-                'back_card_num' => $row['back_card_num'],
-            ];
+        if($shop_more_info) {
+            foreach ($shop_more_info as $row)
+            {
+                //商家资质
+                $shop_qualification = [
+                    'business_license' => $row['business_license'],
+                    'proprietor' => $row['proprietor'],
+                    'hand_card_front' => $row['hand_card_front'],
+                    'hand_card_back' => $row['hand_card_back'],
+                    'user_name' => $row['user_name'],
+                    'identity_num' => $row['identity_num'],
+                    'sex' => config('sex')[$row['sex']],
+                    'licence' => $row['licence'],
+                ];
+                //收款信息
+                $shop_account = [
+                    'branch_back' => $row['branch_back'],
+                    'back_hand_name' => $row['back_hand_name'],
+                    'back_card_num' => $row['back_card_num'],
+                ];
+            }
         }
+
+
 
         $result['shop_qualification'] = $shop_qualification;
         $result['shop_account'] = $shop_account;
