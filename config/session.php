@@ -23,4 +23,6 @@ return [
     'type'           => '',
     // 是否自动开启 SESSION
     'auto_start'     => true,
+    //失效时间
+    'expire'         => 24*3600,
 ];

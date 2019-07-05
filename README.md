@@ -2,7 +2,7 @@
 
 ThinkPHP 5.1（LTS版本） —— 12载初心，你值得信赖的PHP框架
 ===============
-
+   
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/top-think/framework/badges/quality-score.png?b=5.1)](https://scrutinizer-ci.com/g/top-think/framework/?branch=5.1)
 [![Build Status](https://travis-ci.org/top-think/framework.svg?branch=master)](https://travis-ci.org/top-think/framework)
 [![Total Downloads](https://poser.pugx.org/topthink/framework/downloads)](https://packagist.org/packages/topthink/framework)
@@ -11,6 +11,7 @@ ThinkPHP 5.1（LTS版本） —— 12载初心，你值得信赖的PHP框架
 [![License](https://poser.pugx.org/topthink/framework/license)](https://packagist.org/packages/topthink/framework)
 
 ThinkPHP5.1对底层架构做了进一步的改进，减少依赖，其主要特性包括：
+
 
  + 采用容器统一管理对象
  + 支持Facade
