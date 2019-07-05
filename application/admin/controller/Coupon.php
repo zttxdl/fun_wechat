@@ -224,10 +224,12 @@ class Coupon extends Controller
         }
 
         // 优惠券详情信息
-        $coupon_info = Db::name('platform_coupon pc')->join('school s','pc.school_id = s.id')->where('pc.id',$id)->field('pc.*,s.name as school_name')->find();
+        $coupon_info = Db::name('platform_coupon')->where('id',$id)->find();
 
-        if (empty($coupon_info)) {
-            $this->error('非法参数',202);
+        if ($coupon_info['type'] != 4) { // 非邀请赠送
+            $coupon_info['school_name'] = model('School')->getNameById($coupon_info['school_id']);
+        } else {
+            $coupon_info['school_name'] = '全平台适用';
         }
 
         // 优惠券状态

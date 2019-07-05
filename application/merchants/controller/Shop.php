@@ -166,7 +166,7 @@ class Shop extends MerchantsBase
     {
         $data = $request->post();
 
-        set_log('req==',$data,'serInfo');
+        set_log('req==',$data,'setInfo');
 
         // 验证表单数据
         $check = $this->validate($data, 'ShopInfo');
