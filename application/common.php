@@ -242,7 +242,7 @@ if (!function_exists('set_log')) {
     function set_log($param = '',$data,$type = '')
     {
         $path = Env::get('root_path')."./logs/";
-        if(file_exists($path)){
+        if(!file_exists($path)){
             mkdir($path,"0777");
         }
         error_log($param.print_r($data,1),3,$path.$type.date('Y-m-d').".log");
