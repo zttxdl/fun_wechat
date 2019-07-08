@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 use think\Db;
 use app\common\model\ManageCategory;
@@ -14,7 +14,7 @@ use app\common\model\School;
  * @author Mike
  * date 2019/5/23
  */
-class Coupon extends Controller
+class Coupon extends Base
 {
     /**
      * 红包列表

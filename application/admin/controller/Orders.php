@@ -4,11 +4,11 @@
 namespace app\admin\controller;
 
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 use think\Db;
 
-class Orders extends Controller
+class Orders extends Base
 {
     /**
      * 订单列表

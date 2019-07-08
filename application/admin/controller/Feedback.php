@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 use think\Db;
 
@@ -12,7 +12,7 @@ use think\Db;
  * @author Mike
  * date 2019/5/27
  */
-class Feedback extends Controller
+class Feedback extends Base
 {
     /**
      * 反馈建议列表
