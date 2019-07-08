@@ -35,9 +35,8 @@ class Search extends ApiBase
     {
         $user_id = $this->auth->id;
         $keywords = $request->param('keywords');
-        $lat = $request->param('latitude');
-        $lng = $request->param('longitude');
-        $pagesize = $request->param('pagesize',15);
+        $school_id = $request->param( 'school_id');
+        $pagesize = $request->param('pagesize',20);
         $page = $request->param('page',1);
 
         //记录历史搜索
@@ -53,11 +52,12 @@ class Search extends ApiBase
 
         //搜索周边
         $list = Db::name('shop_info a')
+            ->distinct(true)
             ->join('product b','a.id = b.shop_id')
             ->field("a.id,a.shop_name,a.marks,a.sales,a.logo_img,a.up_to_send_money,a.run_time,
-            a.address,a.manage_category_id,a.ping_fee,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( a.latitude ) ) * cos( radians( a.longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( a.latitude ) ) ),1 ) AS distance ")
+            a.address,a.manage_category_id,a.ping_fee")
             ->where('a.shop_name|b.name','like','%'.$keywords.'%')
-            ->having('distance < 3')
+            ->where( 'a.school_id','=', $school_id)
             ->page($page,$pagesize)
             ->select();
 

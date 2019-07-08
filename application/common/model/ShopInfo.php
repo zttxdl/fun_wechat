@@ -21,7 +21,6 @@ class ShopInfo extends Model
                 ->page($page,$pagesize)
                 ->select()
                 ->toArray();
-            set_log('list==',$list,'index');
             return $list;
         }else{
             return false;
