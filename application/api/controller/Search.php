@@ -51,13 +51,21 @@ class Search extends ApiBase
             model('Search')->insert($data);
         }
 
+        //通过经纬度获取最近学校
+        $school = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
+            ->having('distance < 5')
+            ->where('level', 2)
+            ->order('distance asc')
+            ->find();
+        $school_id = $school->id;
         //搜索周边
         $list = Db::name('shop_info a')
+            ->distinct(true)
             ->join('product b','a.id = b.shop_id')
             ->field("a.id,a.shop_name,a.marks,a.sales,a.logo_img,a.up_to_send_money,a.run_time,
-            a.address,a.manage_category_id,a.ping_fee,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( a.latitude ) ) * cos( radians( a.longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( a.latitude ) ) ),1 ) AS distance ")
+            a.address,a.manage_category_id,a.ping_fee")
             ->where('a.shop_name|b.name','like','%'.$keywords.'%')
-            ->having('distance < 3')
+            ->where( 'a.school_id','=', $school_id)
             ->page($page,$pagesize)
             ->select();
 
