@@ -3,16 +3,15 @@
 namespace app\common\controller;
 
 use think\App;
-use think\Controller;
+use app\common\controller\Base;
 use app\common\Auth\JwtAuth;
-use think\facade\Cache;
 
 
 
 /**
  * 商品规格属性模块控制器
  */
-class RiderBase extends Controller
+class RiderBase extends Base
 {
     protected $noNeedLogin = [];
     protected $auth;
@@ -54,51 +53,6 @@ class RiderBase extends Controller
         }
 
         return false;
-    }
-
-    /**
-     * 获得子分类
-     * @param $category
-     * @param int $parent_id
-     * @return array
-     */
-    protected function getSonCategory($category, $pid = 0)
-    {
-        $arr  = array();
-        foreach ($category as $key => $value) {
-            if ($value['pid'] == $pid) {
-                $value['son'] = $this->getSonCategory($category, $value['id']);
-                $arr[] = $value;
-            }
-        }
-        return $arr;
-    }
-
-    /**
-     * 获取缓存
-     * @param $param
-     * @param null $options
-     * @return mixed
-     */
-    public function getDataCache($param, $options = null)
-    {
-        $store = 'file'; //redis,file
-
-        return Cache::store($store)
-            ->get('rider_' . $param['name']);
-    }
-
-    /**
-     * 设置缓存
-     * @param $param
-     * @param $data
-     * @param int $options
-     */
-    public function setDataCache($param, $data, $options = 60)
-    {
-        $store = 'file'; //redis,file
-        Cache::store($store)
-            ->set('rider_' . $param['name'], $data, $options, $param['tag']);
     }
 
     

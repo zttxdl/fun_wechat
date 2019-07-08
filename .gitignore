@@ -2,9 +2,10 @@
 /.vscode
 /vendor
 *.log
-thinkphp
+/thinkphp
 .env
 .DS_Store
-/runtime/
-/public/uploads/
-/public/log/
+/runtime/*
+/public/uploads/*
+/public/log/*
+/composer.lock

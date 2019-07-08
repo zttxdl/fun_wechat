@@ -4,12 +4,11 @@
 namespace app\admin\controller;
 
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Db;
 use think\Request;
-//use think\facade\Validate;
 
-class User extends Controller
+class User extends Base
 {
     /**
      * 会员列表

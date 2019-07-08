@@ -3,13 +3,10 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
-use think\Db;
-use think\facade\Validate;
-use think\captcha\Captcha;
+use app\common\controller\Base;
 use think\Request;
 
-class Login extends Controller
+class Login extends Base
 {
     /**
      * 登录

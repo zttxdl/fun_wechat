@@ -4,14 +4,15 @@
  * 用法：
  * class index
  * {
- *     use \traits\controller\Jump;
+ *     use \app\common\controller\Jump;
  *     public function index(){
  *         $this->error();
  *         $this->redirect();
  *     }
  * }
  */
-namespace traits\controller;
+
+namespace app\common\controller;
 
 use think\Container;
 use think\exception\HttpResponseException;
@@ -37,7 +38,6 @@ trait Jump
     protected function success($msg = '', $data = null, $code = 200, $type = null, array $header = [])
     {
         $this->result($data, $code, $msg, $type, $header);
-
     }
 
     /**
@@ -48,9 +48,9 @@ trait Jump
      * @param string $type   输出类型
      * @param array  $header 发送的 Header 信息
      */
-    protected function error($msg = '', $code = 201, $type = null, array $header = [])
+    protected function error($msg = '', $code = 201, $data = null, $type = null, array $header = [])
     {
-        $this->result($data = '', $code, $msg, $type, $header);
+        $this->result($data, $code, $msg, $type, $header);
     }
 
     /**
@@ -116,7 +116,7 @@ trait Jump
         $config = $this->app['config'];
 
         return $isAjax
-        ? $config->get('default_ajax_return')
-        : $config->get('default_return_type');
+            ? $config->get('default_ajax_return')
+            : $config->get('default_return_type');
     }
 }

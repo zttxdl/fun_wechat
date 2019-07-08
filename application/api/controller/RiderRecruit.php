@@ -2,7 +2,6 @@
 
 namespace app\api\controller;
 
-use think\Controller;
 use think\Request;
 use app\common\model\RiderRecruit as RiderRecruitModel;
 use app\common\controller\ApiBase;

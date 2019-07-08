@@ -31,24 +31,28 @@ class Store extends ApiBase
 
             if ($item['attr_ids']) {
                 $attr_list = model('ProductAttrClassify')
-                    ->field('id,name,pid')
+                    ->field('id,name')
                     ->where('id','in',$item['attr_ids'])
-                    ->select()
-                    ->toArray();
+                    ->select();
+                // dump($attr_list);die;
+                foreach ($attr_list as  $v) {
+                    $v->son = model('ProductAttrClassify')
+                        ->field('id,name')
+                        ->where('pid', '=', $v->id)
+                        ->select();
+                }
 
-                $attr = $this->getSonCategory($attr_list);
-                $item['attr'] = $attr;
+                $item['attr'] = $attr_list;
             }else{
                 $item['attr'] = '';
             }
 
         }
-//        dump($list);exit;
+    //    dump($list);exit;
         $data['goods'] = $list;
         $cakes = [];
         $preferential = [];
         //获取热销商品
-//        dump($list);exit;
         foreach ($list as $value) {
             if ($value['type'] === 2){
                 $cakes[] = $value;
@@ -78,12 +82,10 @@ class Store extends ApiBase
         $order = $request->param('order');
         $tips_id = $request->param('tips_id');
 
-
-
         $where[] = ['shop_id','=',$shop_id];
 
         //获取商家评论评分
-        $data['star'] = model('ShopComments')->getStar($shop_id);
+        $data['star'] = (float)model('ShopInfo')->where('id',$shop_id)->value( 'marks');
         //获取商家配送评分
         $data['r_star'] = model('RiderComments')->getStar($shop_id);
         //获取评价标签
@@ -137,7 +139,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $shop_id = $request->param('shop_id');
 
         $data = model('ShopInfo')
-            ->field('shop_name,logo_img,ping_fee,info,up_to_send_money,run_time,address,marks,sales,notice,manage_category_id,school_id')
+            ->field('shop_name,logo_img,ping_fee,info,up_to_send_money,run_time,address,marks,sales,notice,manage_category_id,school_id,open_status')
             ->where('id',$shop_id)
             ->find()
             ->toArray();
@@ -148,9 +150,10 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $data['categoryName'] = model('ManageCategory')->where('id',$data['manage_category_id'])->value('name');
         //判断店铺是否营业
         if (! empty($data['run_time'])){
-            $data['business'] = model('ShopInfo')->getBusiness($data['run_time']);
+            $open_status = model('ShopInfo')->getBusiness($data['run_time']);
+            $data['open_status'] = isset($open_status) ? $data['open_status'] : $open_status;
         }else{
-            $data['business'] = 0;
+            $data['open_status'] = 0;
         }
 
         //判断是否存在优惠
@@ -175,7 +178,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $product_id = $request->param('product_id');
 
         $where[] = ['id', '=', $product_id];
-//        $where[] = ['status', '=', 1];
+        $where[] = ['status', '=', 1];
 
         $product = model('Product')
             ->field('name,box_money,sales,price,old_price,thumb,info,type,attr_ids,status,shop_id')
@@ -197,13 +200,17 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         //判断是否存在属性规格
         $attr = '';
         if (isset($product['attr_ids'])) {
-            $data = model('ProductAttrClassify')
+            $attr = model('ProductAttrClassify')
                 ->field('id,name,pid')
                 ->where('id','in',$product['attr_ids'])
-                ->select()
-                ->toArray();
+                ->select();
 
-            $attr = $this->getSonCategory($data);
+            foreach ($attr as  $v) {
+                $v->son = model('ProductAttrClassify')
+                    ->field('id,name')
+                    ->where('pid', '=', $v->id)
+                    ->select();
+            }
 
         }
         $product['attr'] = $attr;
@@ -221,44 +228,4 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
     }
 
-
-
-    public function test()
-    {
-        $data['order'] = [
-            'money' => 200,
-            'total_money' => 230,
-            'pay_mode' => 0,
-            'address' => '清河南园北园',
-            'num' => '5',
-            'remark' => '微麻,微辣',
-        ];
-        $data['detail'] = [
-          [
-              'product_id'=>'1',
-              'name'=>'1',
-              'money'=>'100'
-          ],
-          [
-              'product_id'=>'2',
-              'name'=>'2',
-              'money'=>'50'
-          ],
-          [
-              'product_id'=>'3',
-              'name'=>'3',
-              'money'=>'10'
-          ]
-        ];
-        $data['platform_discount'] = [
-            'platform_coupon_id' => 1,
-            'platform_coupon_money' => 10
-        ];
-        $data['shop_discounts_money'] = [
-            'shop_discounts_id' => 1,
-            'shop_discounts_money' => 10,
-        ];
-
-        return json($data);
-    }
 }

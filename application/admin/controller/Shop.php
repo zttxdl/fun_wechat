@@ -3,14 +3,11 @@
 
 namespace app\admin\controller;
 
-//use think\Model;
-use think\Controller;
-use think\Model;
+use app\common\controller\Base;
 use think\Request;
-use think\Db;
 use app\common\model\Shop as ShopInfoModel;
 
-class Shop extends Controller
+class Shop extends Base
 {
 
     public function __construct()

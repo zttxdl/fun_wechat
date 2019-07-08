@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 use think\Db;
 use think\facade\Cache;
@@ -12,7 +12,7 @@ use think\facade\Cache;
  * @author Mike
  * date 2019/5/27
  */
-class Agreement extends Controller
+class Agreement extends Base
 {
     /**
      * 图文协议列表

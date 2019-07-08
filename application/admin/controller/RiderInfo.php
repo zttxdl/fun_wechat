@@ -2,12 +2,11 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 use think\Db;
-use app\common\model\CheckStatus;
 
-class RiderInfo extends Controller
+class RiderInfo extends Base
 {
     /**
      * 骑手列表 

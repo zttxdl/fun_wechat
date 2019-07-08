@@ -2,12 +2,12 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 use EasyWeChat\Factory;
 use think\Db;
 
-class Transfer extends Controller
+class Transfer extends Base
 {
 
     /**

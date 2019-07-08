@@ -10,7 +10,6 @@ namespace app\api\controller;
 use app\common\controller\ApiBase;
 use EasyWeChat\Factory;
 use think\Db;
-use think\Model;
 use think\Request;
 use think\facade\Env;
 
@@ -772,18 +771,6 @@ class Order extends ApiBase
 
         foreach ($order_detail  as $row)
         {
-            /*$attr_list  = model('ProductAttrClassify')
-                ->field('id,name,pid')
-                ->where('id','in',$row['attr_ids'])
-                ->select()
-                ->toArray();
-            $attr = $this->getSonCategory($attr_list);
-            ttrs = [];//二级规格集合
-            foreach ($attr as $k => &$v){
-                if(empty($v['son'])) {
-                    $v['son'] = '';
-                }
-            }*/
             $product_info = Model('Product')->where('id',$row['product_id'])->find();
 
 

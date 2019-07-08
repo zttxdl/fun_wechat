@@ -2,10 +2,7 @@
 
 namespace app\api\controller;
 
-use think\Controller;
 use think\Request;
-use app\common\model\ManageCategory;
-use app\common\model\School;
 use app\common\model\MerchantEnter as MerchantEnterModel;
 use app\common\controller\ApiBase;
 

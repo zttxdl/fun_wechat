@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 use think\Db;
 
@@ -12,7 +12,7 @@ use think\Db;
  * @author Mike
  * date 2019/5/27
  */
-class RiderRecruit extends Controller
+class RiderRecruit extends Base
 {
     /**
      * 意向骑手列表
