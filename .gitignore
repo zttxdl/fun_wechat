@@ -2,7 +2,7 @@
 /.vscode
 /vendor
 *.log
-thinkphp
+/thinkphp
 .env
 .DS_Store
 /runtime/

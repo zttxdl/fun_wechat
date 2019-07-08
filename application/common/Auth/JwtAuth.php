@@ -7,7 +7,7 @@ use think\Exception; //导入JWT
 
 class JwtAuth
 {
-    use \traits\controller\Jump;
+    use  \app\common\controller\Jump;
 
     /**
      * 头部 公共参数
