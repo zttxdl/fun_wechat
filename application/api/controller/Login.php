@@ -5,7 +5,6 @@ namespace app\api\controller;
 use app\common\Auth\JwtAuth;
 use app\common\controller\ApiBase;
 use think\Request;
-use think\captcha\Captcha;
 use app\common\model\User;
 use EasyWeChat\Factory;
 

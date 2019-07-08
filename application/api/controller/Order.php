@@ -10,7 +10,6 @@ namespace app\api\controller;
 use app\common\controller\ApiBase;
 use EasyWeChat\Factory;
 use think\Db;
-use think\Model;
 use think\Request;
 use think\facade\Env;
 

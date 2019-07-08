@@ -2,7 +2,6 @@
 
 namespace app\api\controller;
 
-use think\Controller;
 use think\Request;
 use think\Db;
 use app\common\controller\ApiBase;

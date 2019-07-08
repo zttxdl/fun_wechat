@@ -2,7 +2,6 @@
 
 namespace app\api\controller;
 
-use think\Controller;
 use think\Request;
 use think\facade\Cache;
 use app\common\model\Feedback as FeedbackModel;
