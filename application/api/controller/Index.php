@@ -136,10 +136,12 @@ class Index extends ApiBase
         }
 
         foreach ($list as &$value) {
+            //判断店铺是否营业
             if (! empty($value['run_time'])){
-                $value['business'] = model('ShopInfo')->getBusiness($value['run_time']);
+                $open_status = model('ShopInfo')->getBusiness($value['run_time']);
+                $value['open_status'] = isset($open_status) ? $value['open_status'] : $open_status;
             }else{
-                $value['business'] = 0;
+                $value['open_status'] = 0;
             }
 
             $value['disc'] = model('ShopDiscounts')

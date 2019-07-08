@@ -146,7 +146,7 @@ class Shop extends MerchantsBase
             $result = [
                 'shop_name' => $row['shop_name'],
                 'link_tel' => $row['link_tel'],
-                'open_time' => $row['open_time'],
+                'run_time' => $row['run_time'],
                 'run_type' => $row['run_type'],
                 'ping_fee' => $row['ping_fee'],
                 'up_to_send_money' => $row['up_to_send_money'],
