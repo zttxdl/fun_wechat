@@ -116,7 +116,7 @@ class Shop extends Base
 
 
         if(!$shop_info) {
-            return json_error('店铺不存在');
+            $this->error('店铺不存在');
         }
         $result = [];
         foreach ($shop_info as $row)

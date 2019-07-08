@@ -37,7 +37,7 @@ class Advers extends Base
             return $item;
         });
         
-        return  json_success('ok',['list'=>$list]);
+        $this->success('ok',['list'=>$list]);
 
     }
 
@@ -58,7 +58,7 @@ class Advers extends Base
         // 展示平台
         $info['platfrom'] = config('show_platfrom')[$info['platfrom']];
 
-        return  json_success('ok',['info'=>$info]);
+        $this->success('ok',['info'=>$info]);
         
     }
 
