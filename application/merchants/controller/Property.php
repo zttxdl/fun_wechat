@@ -28,6 +28,10 @@ class Property extends MerchantsBase
     {
         $shop_id = $this->shop_id;//从Token中获取
 
+        if(!isset($shop_id)) {
+            $this->error('shop_id 不能为空!');
+        }
+
 
         $acount_money = model('Withdraw')->getAcountMoney($shop_id);
 
@@ -67,8 +71,7 @@ class Property extends MerchantsBase
         $szmx = [];//收支明细
 
         $res = Db::name('withdraw')->where($map)->select();
-        //echo $res;exit;
-        //dump($res);
+
         if(!$res) {
             $this->error('暂时没有提现记录');
         }
@@ -104,34 +107,38 @@ class Property extends MerchantsBase
     {
         $shop_id = $this->shop_id;
         $withdraw_sn = build_order_no('TXBH');
-        $moeny = $request->param('money');//提现金额
+        $money = $request->param('money');//提现金额
+
+        if($money < 1) {
+            $this->error('提现金额不能少于1元');
+        }
 
 
         $start = strtotime(date('Y-m-d').'00:00:00');
         $end = strtotime(date('Y-m-d').'23:59:59');
 
         //提现次数
-        /*$num = Db::name('Withdraw')
+        $num = Db::name('Withdraw')
             ->where('add_time','between time',[$start,$end])
             ->where('shop_id',$shop_id)
             ->find();
 
         if($num){
             $this->error('一天只能提现一次哦!');
-        }*/
+        }
 
         //账户余额
         $balance_money = model('Withdraw')->getAcountMoney($shop_id);
 
-        if($balance_money < $moeny) {
-            $this->error('提现金额不正确');
+        if($balance_money < $money) {
+            $this->error('您的提现金额大于可提现金额！');
         }
 
         //提现申请入库
         $txsq = [
             'shop_id' => $shop_id,
             'withdraw_sn' => $withdraw_sn,
-            'money' => -$moeny,
+            'money' => -$money,
             'status' => 1,
             'type' => 2,
             'add_time'=>time(),

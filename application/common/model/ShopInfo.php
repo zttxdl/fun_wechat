@@ -16,12 +16,11 @@ class ShopInfo extends Model
             ->find();
         if ($data){
             $list = $this->field("id,shop_name,logo_img,marks,sales,up_to_send_money,run_time,
-            address,manage_category_id,ping_fee,school_id")
+            address,manage_category_id,ping_fee,school_id,open_status")
                 ->where('school_id',$data->id)
                 ->page($page,$pagesize)
                 ->select()
                 ->toArray();
-            set_log('list==',$list,'index');
             return $list;
         }else{
             return false;

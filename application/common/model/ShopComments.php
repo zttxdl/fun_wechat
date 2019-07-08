@@ -16,7 +16,7 @@ class ShopComments extends Model
         if ($count != 0){
             $star = round($sum / $count,2);
         }else{
-            $star = 0;
+            $star = 5;
         }
 
         return $star;
