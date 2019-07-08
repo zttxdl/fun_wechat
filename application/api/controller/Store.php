@@ -31,24 +31,28 @@ class Store extends ApiBase
 
             if ($item['attr_ids']) {
                 $attr_list = model('ProductAttrClassify')
-                    ->field('id,name,pid')
+                    ->field('id,name')
                     ->where('id','in',$item['attr_ids'])
-                    ->select()
-                    ->toArray();
+                    ->select();
+                // dump($attr_list);die;
+                foreach ($attr_list as  $v) {
+                    $v->son = model('ProductAttrClassify')
+                        ->field('id,name')
+                        ->where('pid', '=', $v->id)
+                        ->select();
+                }
 
-                $attr = $this->getSonCategory($attr_list);
-                $item['attr'] = $attr;
+                $item['attr'] = $attr_list;
             }else{
                 $item['attr'] = '';
             }
 
         }
-//        dump($list);exit;
+    //    dump($list);exit;
         $data['goods'] = $list;
         $cakes = [];
         $preferential = [];
         //获取热销商品
-//        dump($list);exit;
         foreach ($list as $value) {
             if ($value['type'] === 2){
                 $cakes[] = $value;
