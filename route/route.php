@@ -256,6 +256,7 @@ Route::group('u-addr', function () {
 Route::group('u-school', function () {
     Route::get('/index', 'index');
     Route::get('/school-level2', 'schoolLevel2');
+    Route::get('/choose-school', 'chooseSchool');
 })->prefix('api/school/');
 
 // 经营品类组

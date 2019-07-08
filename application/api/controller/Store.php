@@ -137,7 +137,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $shop_id = $request->param('shop_id');
 
         $data = model('ShopInfo')
-            ->field('shop_name,logo_img,ping_fee,info,up_to_send_money,run_time,address,open_time,marks,sales,notice,manage_category_id,school_id')
+            ->field('shop_name,logo_img,ping_fee,info,up_to_send_money,run_time,address,marks,sales,notice,manage_category_id,school_id')
             ->where('id',$shop_id)
             ->find()
             ->toArray();

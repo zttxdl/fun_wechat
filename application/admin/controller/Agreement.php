@@ -32,7 +32,7 @@ class Agreement extends Controller
             $vo['save_time'] = date('Y-m-d H:i',$vo['save_time']);
         }
 
-        return  json_success('ok',['list'=>$list]);
+        $this->success('ok',['list'=>$list]);
 
     }
 
@@ -61,6 +61,7 @@ class Agreement extends Controller
     public function update(Request $request)
     {
         $data = $request->param();
+        $data['save_time'] = time();
 
         if (!isset($data['id']) || empty((int)$data['id'])) {
             $this->error('非法参数',201);
