@@ -28,6 +28,10 @@ class Property extends MerchantsBase
     {
         $shop_id = $this->shop_id;//从Token中获取
 
+        if(!isset($shop_id)) {
+            $this->error('shop_id 不能为空!');
+        }
+
 
         $acount_money = model('Withdraw')->getAcountMoney($shop_id);
 
@@ -67,8 +71,7 @@ class Property extends MerchantsBase
         $szmx = [];//收支明细
 
         $res = Db::name('withdraw')->where($map)->select();
-        //echo $res;exit;
-        //dump($res);
+
         if(!$res) {
             $this->error('暂时没有提现记录');
         }

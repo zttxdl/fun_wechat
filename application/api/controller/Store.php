@@ -221,44 +221,4 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
     }
 
-
-
-    public function test()
-    {
-        $data['order'] = [
-            'money' => 200,
-            'total_money' => 230,
-            'pay_mode' => 0,
-            'address' => '清河南园北园',
-            'num' => '5',
-            'remark' => '微麻,微辣',
-        ];
-        $data['detail'] = [
-          [
-              'product_id'=>'1',
-              'name'=>'1',
-              'money'=>'100'
-          ],
-          [
-              'product_id'=>'2',
-              'name'=>'2',
-              'money'=>'50'
-          ],
-          [
-              'product_id'=>'3',
-              'name'=>'3',
-              'money'=>'10'
-          ]
-        ];
-        $data['platform_discount'] = [
-            'platform_coupon_id' => 1,
-            'platform_coupon_money' => 10
-        ];
-        $data['shop_discounts_money'] = [
-            'shop_discounts_id' => 1,
-            'shop_discounts_money' => 10,
-        ];
-
-        return json($data);
-    }
 }
