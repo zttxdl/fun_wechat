@@ -82,12 +82,10 @@ class Store extends ApiBase
         $order = $request->param('order');
         $tips_id = $request->param('tips_id');
 
-
-
         $where[] = ['shop_id','=',$shop_id];
 
         //获取商家评论评分
-        $data['star'] = model('ShopComments')->getStar($shop_id);
+        $data['star'] = (float)model('ShopInfo')->where('id',$shop_id)->value( 'marks');
         //获取商家配送评分
         $data['r_star'] = model('RiderComments')->getStar($shop_id);
         //获取评价标签
@@ -179,7 +177,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $product_id = $request->param('product_id');
 
         $where[] = ['id', '=', $product_id];
-//        $where[] = ['status', '=', 1];
+        $where[] = ['status', '=', 1];
 
         $product = model('Product')
             ->field('name,box_money,sales,price,old_price,thumb,info,type,attr_ids,status,shop_id')
@@ -201,13 +199,17 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         //判断是否存在属性规格
         $attr = '';
         if (isset($product['attr_ids'])) {
-            $data = model('ProductAttrClassify')
+            $attr = model('ProductAttrClassify')
                 ->field('id,name,pid')
                 ->where('id','in',$product['attr_ids'])
-                ->select()
-                ->toArray();
+                ->select();
 
-            $attr = $this->getSonCategory($data);
+            foreach ($attr as  $v) {
+                $v->son = model('ProductAttrClassify')
+                    ->field('id,name')
+                    ->where('pid', '=', $v->id)
+                    ->select();
+            }
 
         }
         $product['attr'] = $attr;
@@ -225,44 +227,4 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
     }
 
-
-
-    public function test()
-    {
-        $data['order'] = [
-            'money' => 200,
-            'total_money' => 230,
-            'pay_mode' => 0,
-            'address' => '清河南园北园',
-            'num' => '5',
-            'remark' => '微麻,微辣',
-        ];
-        $data['detail'] = [
-          [
-              'product_id'=>'1',
-              'name'=>'1',
-              'money'=>'100'
-          ],
-          [
-              'product_id'=>'2',
-              'name'=>'2',
-              'money'=>'50'
-          ],
-          [
-              'product_id'=>'3',
-              'name'=>'3',
-              'money'=>'10'
-          ]
-        ];
-        $data['platform_discount'] = [
-            'platform_coupon_id' => 1,
-            'platform_coupon_money' => 10
-        ];
-        $data['shop_discounts_money'] = [
-            'shop_discounts_id' => 1,
-            'shop_discounts_money' => 10,
-        ];
-
-        return json($data);
-    }
 }
