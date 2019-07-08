@@ -77,7 +77,6 @@ class Merchants extends MerchantsBase
      */
     public function checkStatus()
     {
-        dump($this->shop_id);die;
         $check_info = model('ShopInfo')->where('id',$this->shop_id)->field('remark,status,check_status')->find();
         if ($check_info['status'] == 2) { // 审核未通过
             $check_info['mb_remark'] = Db::name('check_status')->where('type','=',1)->where('id','in',$check_info['remark'])->column('name');
