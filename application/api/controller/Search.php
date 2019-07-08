@@ -35,9 +35,8 @@ class Search extends ApiBase
     {
         $user_id = $this->auth->id;
         $keywords = $request->param('keywords');
-        $lat = $request->param('latitude');
-        $lng = $request->param('longitude');
-        $pagesize = $request->param('pagesize',15);
+        $school_id = $request->param( 'school_id');
+        $pagesize = $request->param('pagesize',20);
         $page = $request->param('page',1);
 
         //记录历史搜索
@@ -51,13 +50,6 @@ class Search extends ApiBase
             model('Search')->insert($data);
         }
 
-        //通过经纬度获取最近学校
-        $school = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
-            ->having('distance < 5')
-            ->where('level', 2)
-            ->order('distance asc')
-            ->find();
-        $school_id = $school->id;
         //搜索周边
         $list = Db::name('shop_info a')
             ->distinct(true)
