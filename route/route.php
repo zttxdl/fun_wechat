@@ -233,11 +233,11 @@ Route::group('u-member', function () {
 
 // 首页
 Route::group('u-index', function () {
-    Route::get('/index', 'index');
-    Route::get('/special', 'getSpecial');
-    Route::get('/recommend', 'getRecommendList');
-    Route::get('/navigation', 'getNavigation');
-    Route::get('/special-list', 'getSpecialList');
+    Route::rule('/index', 'index');
+    Route::rule('/special', 'getSpecial');
+    Route::rule('/recommend', 'getRecommendList');
+    Route::rule('/navigation', 'getNavigation');
+    Route::rule('/special-list', 'getSpecialList');
 })->prefix('api/IndexMike/');
 
 // 红包组

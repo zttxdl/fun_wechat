@@ -102,11 +102,9 @@ class Orders extends Model
      * @param $uid
      * @return bool
      */
-    public function isFirstOrder($uid)
+    public function isFirstOrder($map)
     {
-        $data = $this->name('orders')->where('user_id',$uid)->find();
-
-        return isset($data) ? true : false;
+        return $this->where($map)->value('new_buy');
     }
 
     /**
