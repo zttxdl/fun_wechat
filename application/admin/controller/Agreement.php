@@ -46,10 +46,7 @@ class Agreement extends Base
         if (empty((int)$id) ) {
             $this->error('非法参数',201);
         }
-
         $info = Db::name('agreement')->where('id',$id)->field('id,title,content')->find();
-        // 设置缓存
-        Cache::store('redis')->set('agreement_'.$id,$info,3600*24*7*30);
         $this->success('ok',['info'=>$info]);
     }
 
@@ -60,10 +57,11 @@ class Agreement extends Base
      */
     public function update(Request $request)
     {
-        $data = $request->param();
+        $id = (int)$request->param('id');
+        $data['content'] = $request->param('content');
         $data['save_time'] = time();
 
-        if (!isset($data['id']) || empty((int)$data['id'])) {
+        if (empty($id)) {
             $this->error('非法参数',201);
         }
 
@@ -74,10 +72,15 @@ class Agreement extends Base
         }
 
         // 提交表单
-        $result = Db::name('agreement')->update($data);
+        $result = Db::name('agreement')->where('id','=',$id)->update($data);
         if (!$result) {
             $this->error('修改失败',201);
         }
+
+        // 获取当前协议
+        $info = Db::name('agreement')->where('id',$id)->field('id,title,content')->find();
+        // 设置缓存
+        Cache::store('redis')->set('agreement_'.$id,$info,3600*24*7*30);
         
         $this->success('修改成功');
     }
