@@ -11,7 +11,7 @@ class IndexMike extends ApiBase
     protected $noNeedLogin = ['*'];
 
     /**
-     * 首页
+     * 首页22
      */
     public function index(Request $request)
     {
@@ -63,15 +63,15 @@ class IndexMike extends ApiBase
     public function getSpecial(Request $request)
     {
         // 学校主键值
-        $school_id = $request->get('school_id');
+        $school_id = $request->param('school_id');
         // 搜索条件
         $day = date('Y-m-d',time());
         $where[] = ['today','=',$day];
         $where[] = ['status','=',1];
         $where[] = ['school_id','=',$school_id];
-
+        $where[] = ['end_time', '>=',time()];
         $today_sale = model('TodayDeals')->field('name,shop_id,product_id,old_price,price,num,limit_buy_num,thumb')
-            ->where($where)->whereTime('end_time', '>=', time())->limit(4)->select();
+            ->where($where)->limit(4)->select();
 
         $this->success('success',['today_sale'=>$today_sale]);
     }
@@ -85,56 +85,65 @@ class IndexMike extends ApiBase
     public function getRecommendList(Request $request)
     {
         // 学校主键值
-        $school_id = $request->get('school_id');
+        $school_id = $request->param('school_id');
         // 判断是否传入openid值，如果传入， 判断当前的openid值，如果有值且能在用户表中找到，并且该用户为首单用户，则判断当前学校是否有首单立减红包， 有则展示，没有则不展示
-        $openid = $request->get('openid','0');
+        $openid = $request->param('openid','0');
         $uid = model('User')->where([['openid','=',$openid],['new_buy','=',1]])->value('id');
 
         // 搜索条件
         $where[] = ['school_id','=',$school_id];
-        $where[] = ['status','=',3]; 
-        !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 6;
+        $where[] = ['status','=',3];
+        $pagesize = $request->param('pagesize',10);
+        
 
         // 依据商家排序获取推荐商家
-        $shop_list = model('ShopInfo')->where($where)->field('id,shop_name,logo_img,marks,ping_fee,up_to_send_money,open_status as business,run_time')->order('sort','asc')->paginate($pagesize)->each(function ($item, $key) {
-            // 判断是否休息中
-            if ($item['business'] == 1 && !empty($item['run_time'])) {
-                $item['business'] = model('ShopInfo')->getBusiness($item['run_time']);
-            } else {
-                $item['business'] = 0;
-            }
+        $shop_list = model('ShopInfo')->where($where)->field('id,shop_name,logo_img,marks,ping_fee,up_to_send_money,open_status as business,run_time')->order('sort','asc')->paginate($pagesize)->each(function ($item) {
 
+            // 判断是否休息中
+            if ($item->business == 1 && !empty($item->run_time)) {
+                $item->business = model('ShopInfo')->getBusiness($item->run_time);
+            } else {
+                $item->business = 0;
+            }
+            
            // 获取优惠券信息
-            $item['disc'] = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item['id'])->where('delete',0)->select();
+            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('id desc')->select();
             // 获取月销售额
-            $item['sales'] = model('Shop')->getMonthNum($item['id']);
-            return $item;
+            $item->sales = model('Shop')->getMonthNum($item->id);
         });
+        // 组装店铺满减信息
+        $shop_list = $shop_list->toArray();
+        foreach ($shop_list['data'] as &$v) {
+            foreach ($v['disc'] as &$vv) {
+                $vv['discounts'] = $vv['threshold'].'减'. $vv['face_value'];
+                unset($vv['threshold']);
+                unset($vv['face_value']);
+            }
+        }
+
+        $pt_coupon = '';
 
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
-            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('fave_value,threshold,shop_ids')->select();  // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
-        }
-        // 组装店铺满减信息
-        foreach ($shop_list as $k => $v) {
-            foreach ($shop_list[$k]['disc'] as $kk => $vv) {
-                $shop_list[$k]['discounts'][] = $shop_list[$k][$kk]['threshold'].'减'.$shop_list[$k][$kk]['threshold'];
-            }
+            $pt_where = [['status','=',2],['type','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
+            // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
+            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
+
         }
         // 组装首单立减信息
-        if (!$pt_coupon->isEmpty()) {
-            foreach ($shop_list as $k => $v) {
+        if ($pt_coupon) {
+            foreach ($shop_list['data'] as $k => &$v) {
                 foreach ($pt_coupon as $ko => $vo) {
-                    if (in_array($v['id'],$vo['shop_ids'])) {
-                        $shop_list[$k]['discounts'][] = '首单减'.$pt_coupon[$ko]['fave_value'];
+                    $shopids = explode(',',$vo['shop_ids']);
+                    if (in_array($v['id'],$shopids)) {
+                        $v['disc'][]['discounts'] = '首单减'.$vo['face_value'];
                         continue;
                     }
                 }
             }
         }
 
-        $this->success('success',['shop_list'=>$shop_list]);
+        $this->success('success',$shop_list);
     }
 
 
@@ -147,12 +156,12 @@ class IndexMike extends ApiBase
     public function getNavigation(Request $request)
     {
         // 学校主键值
-        $school_id = $request->get('school_id');
+        $school_id = $request->param('school_id');
         // 一级经营品类导航主键值
-        $class_id = $request->get('class_id');
+        $class_id = $request->param('class_id');
 
         // 判断是否传入openid值，如果传入， 判断当前的openid值，如果有值且能在用户表中找到，并且该用户为首单用户，则判断当前学校是否有首单立减红包， 有则展示，没有则不展示
-        $openid = $request->get('openid','0');
+        $openid = $request->param('openid','0');
         $uid = model('User')->where([['openid','=',$openid],['new_buy','=',1]])->value('id');
         
         if (!$school_id || !$class_id) {
@@ -165,48 +174,55 @@ class IndexMike extends ApiBase
         /********* 搜索条件 ***************************************************************/
         $where[] = ['school_id','=',$school_id];
         $where[] = ['manage_category_id','in',$class_ids];
-        !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 6;
+        $pagesize = $request->param('pagesize',10);
         
         /********* 依据商家排序、搜索条件，获取二级经营品类的商家信息 ********************************/
-        $shop_list = model('ShopInfo')->where($where)->field('id,shop_name,logo_img,marks,ping_fee,up_to_send_money,open_status as business,run_time')->order('sort','asc')->paginate($pagesize)->each(function ($item, $key) {
+        $shop_list = model('ShopInfo')->where($where)->field('id,shop_name,logo_img,marks,ping_fee,up_to_send_money,open_status as business,run_time')->order('sort','asc')->paginate($pagesize)->each(function ($item) {
             // 判断是否休息中
-            if ($item['business'] == 1 && !empty($item['run_time'])) {
-                $item['business'] = model('ShopInfo')->getBusiness($item['run_time']);
+            if ($item->business == 1 && !empty($item->run_time)) {
+                $item->business = model('ShopInfo')->getBusiness($item->run_time);
             } else {
-                $item['business'] = 0;
+                $item->business = 0;
             }
 
-           // 获取优惠券信息
-            $item['disc'] = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item['id'])->where('delete',0)->select();
+            // 获取优惠券信息
+            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('id desc')->select();
             // 获取月销售额
-            $item['sales'] = model('Shop')->getMonthNum($item['id']);
-            return $item;
+            $item->sales = model('Shop')->getMonthNum($item->id);
         });
+
+        // 组装店铺满减信息
+        $shop_list = $shop_list->toArray();
+        foreach ($shop_list['data'] as &$v) {
+            foreach ($v['disc'] as &$vv) {
+                $vv['discounts'] = $vv['threshold'].'减'. $vv['face_value'];
+                unset($vv['threshold']);
+                unset($vv['face_value']);
+            }
+        }
+
+        $pt_coupon = '';
 
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
-            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('fave_value,threshold,shop_ids')->select();  // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
-        }
-        // 组装店铺满减信息
-        foreach ($shop_list as $k => $v) {
-            foreach ($shop_list[$k]['disc'] as $kk => $vv) {
-                $shop_list[$k]['discounts'][] = $shop_list[$k][$kk]['threshold'].'减'.$shop_list[$k][$kk]['threshold'];
-            }
+            $pt_where = [['status','=',2],['type','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
+            // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
+            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
+
         }
         // 组装首单立减信息
-        if (!$pt_coupon->isEmpty()) {
-            foreach ($shop_list as $k => $v) {
+        if ($pt_coupon) {
+            foreach ($shop_list['data'] as $k => &$v) {
                 foreach ($pt_coupon as $ko => $vo) {
-                    if (in_array($v['id'],$vo['shop_ids'])) {
-                        $shop_list[$k]['discounts'][] = '首单减'.$pt_coupon[$ko]['fave_value'];
+                    $shopids = explode(',',$vo['shop_ids']);
+                    if (in_array($v['id'],$shopids)) {
+                        $v['disc'][]['discounts'] = '首单减'.$vo['face_value'];
                         continue;
                     }
                 }
             }
         }
-        
-        $this->success('success',['shop_list'=>$shop_list]);
+        $this->success('success',$shop_list);
     }
 
 
@@ -217,18 +233,18 @@ class IndexMike extends ApiBase
     public function getSpecialList(Request $request)
     {
         // 学校主键值
-        $school_id = $request->get('school_id');
+        $school_id = $request->param('school_id');
         // 搜索条件
         $day = date('Y-m-d',time());
         $where[] = ['t.today','=',$day];
         $where[] = ['t.status','=',1];
         $where[] = ['t.school_id','=',$school_id];
-        !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 6;
+        $pagesize = $request->param('pagesize',10);
 
         $today_sale = model('TodayDeals')->alias('t')->join('shop_info s','t.shop_id = s.id')->field('t.name,t.shop_id,t.product_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,s.shop_name,s.up_to_send_money,s.ping_fee')
             ->where($where)->whereTime('t.end_time', '>=', time())->paginate($pagesize);
 
-        $this->success('success',['today_sale'=>$today_sale]);
+        $this->success('success',$today_sale);
     }
      
 }

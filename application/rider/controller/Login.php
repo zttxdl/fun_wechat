@@ -2,7 +2,7 @@
 
 namespace app\rider\controller;
 
-use think\Controller;
+use app\common\controller\RiderBase;
 use think\Request;
 use app\common\model\RiderInfo;
 use app\common\Auth\JwtAuth;
@@ -12,8 +12,9 @@ use EasyWeChat\Factory;
 /**
  * 骑手登录注册
  */
-class Login extends Controller
+class Login extends RiderBase
 {
+    protected  $noNeedLogin = ['*'];
     /**
      * 授权获取openid、session_key信息
      * 
@@ -114,7 +115,7 @@ class Login extends Controller
         $rider_info = RiderInfo::where('id','=',$rid)->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($rider_info,604800);
+        $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
             'token' => $token
         ]);
@@ -157,7 +158,7 @@ class Login extends Controller
         $rider_info = RiderInfo::where('id','=',$rid)->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($rider_info,604800);
+        $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
             'token' => $token
         ]);

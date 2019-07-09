@@ -130,9 +130,10 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
     /**
      * 获取商家详情
-     *
-     * @param  int  $id
-     * @return \think\Response
+     * @param Request $request
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function getDetail(Request $request)
     {
@@ -162,6 +163,23 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             ->where('shop_id',$shop_id)
             ->where('delete',0)
             ->select();
+        //判断是否存在首单减
+        if ($this->auth->new_buy == 1){
+            // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
+            $pt_where = [['status','=',2],['type','=',2],['school_id','=',$data['school_id']],['surplus_num','>',0],['end_time','>',time()]];
+            // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
+            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
+
+            if ($pt_coupon){
+                foreach ($pt_coupon as $ko => $vo) {
+                    $shopids = explode(',',$vo['shop_ids']);
+                    if (in_array($shop_id,$shopids)) {
+                        $data['single'] = $vo['face_value'];
+                        continue;
+                    }
+                }
+            }
+        }
 
         $this->success('success',$data);
     }
