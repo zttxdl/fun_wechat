@@ -489,21 +489,33 @@ class Order extends ApiBase
         }
     }
 
+    public function getArray($openid){
+        return [$uid,$openid];
+    }
+
     /**
      * 是否首单
      */
-    public function is_first_order()
+    public function is_first_order(Request $request)
     {
         $uid = $this->auth->id;
+        $openid = $this->auth->openid;
 
-        $data  = model('orders')->isFirstOrder($uid);
+        $openid = isset($uid) ? $openid : $request->param('openid');
 
-        if(!$data) {
-            return json_success('success',['is_first_order'=> 1]);
+        if($uid) {
+            $new_buy = model('orders')->isFirstOrder(['uid',$uid]);
         }
 
-        return json_success('success',['is_first_order'=> 0]);
+        if($openid){
+            $new_buy = model('orders')->isFirstOrder(['openid',$openid]);
+        }
 
+        if($new_buy == '1'){
+            $this->success('success',['is_first_order'=>1]);//首单
+        }else{
+            $this->success('success',['is_first_order'=>2]);//老用户
+        }
 
     }
 
@@ -522,24 +534,11 @@ class Order extends ApiBase
 
         set_log('order=',$order,'sureOrder');
         set_log('detail=',$detail,'sureOrder');
-//        set_log("request请求",$request->param(),'order');
 
-        /*dump($order);
-        dump($detail);
-        dump($platform_discount);
-        dump($shop_discount);*/
-
-
-        /*if(!$order || !$detail || !$platform_discount || !$shop_discount) {
-            $this->error('非法传参');
-        }*/
 
         $orders_sn = build_order_no('D');//生成唯一订单号
         $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
-      /*  $orders = Model('Orders');
-        $orders->address = [
 
-        ];*/
         //启动事务
         Db::startTrans();
         try{
