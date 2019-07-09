@@ -2,7 +2,6 @@
 
 namespace app\rider\controller;
 
-use think\Controller;
 use think\Request;
 use app\common\controller\RiderBase;
 use think\Db;

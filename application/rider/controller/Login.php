@@ -2,7 +2,7 @@
 
 namespace app\rider\controller;
 
-use think\Controller;
+use app\common\controller\RiderBase;
 use think\Request;
 use app\common\model\RiderInfo;
 use app\common\Auth\JwtAuth;
@@ -12,7 +12,7 @@ use EasyWeChat\Factory;
 /**
  * 骑手登录注册
  */
-class Login extends Controller
+class Login extends RiderBase
 {
     /**
      * 授权获取openid、session_key信息
