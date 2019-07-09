@@ -2,10 +2,10 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 
-class Index extends Controller
+class Index extends Base
 {
     /**
      * 显示资源列表

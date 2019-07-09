@@ -2,14 +2,15 @@
 
 namespace app\merchants\controller;
 
-use think\Controller;
+use app\common\controller\MerchantsBase;
+use app\common\model\Product;
 use think\Request;
 use app\common\model\ProductsClassify;
 
 /**
  * 商品分类模块控制器
  */
-class GoodsClassify extends Controller
+class GoodsClassify extends MerchantsBase
 {
     protected $noNeedLogin = [];
 
@@ -21,7 +22,7 @@ class GoodsClassify extends Controller
     public function index()
     {
         $data = ProductsClassify::all(['shop_id'=>$this->shop_id]);
-        return json_success('success',$data);
+        $this->success('success',$data);
 
     }
 
@@ -37,7 +38,7 @@ class GoodsClassify extends Controller
         $data['shop_id'] = $this->shop_id;
         $result = ProductsClassify::create($data);
 
-        return json_success('success',$result);
+        $this->success('success',$result);
     }
 
 
@@ -48,11 +49,11 @@ class GoodsClassify extends Controller
      * @param  int  $id
      * @return \think\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $data   = $request->param();
-        $result = ProductsClassify::update($data, ['id' => $id]);
-        return json_success('success',$result);
+        $result = ProductsClassify::update($data, ['id' => $request->param('id')]);
+        $this->success('success',$result);
     }
 
     /**
@@ -63,7 +64,14 @@ class GoodsClassify extends Controller
      */
     public function delete($id)
     {
+        $result = Product::get(['products_classify_id'=>$id,'status'=>1]);
+
+        if ($result) {
+            $this->error('该分类下有商品，请先删除商品');
+        }
+
         $result = ProductsClassify::destroy($id);
-        return json_success('success',$result);
+
+        $this->success('success',$result);
     }
 }

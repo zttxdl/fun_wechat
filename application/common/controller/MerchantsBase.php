@@ -3,14 +3,13 @@
 namespace app\common\controller;
 
 use think\App;
-use think\Controller;
+use app\common\controller\Base;
 use app\common\Auth\JwtAuth;
-
 
 /**
  * 商品规格属性模块控制器
  */
-class MerchantsBase extends Controller
+class MerchantsBase extends Base
 {
     protected $noNeedLogin = [];
     protected $shop_id;
@@ -26,11 +25,13 @@ class MerchantsBase extends Controller
         }
     }
 
-    protected function valid_token()
+    public function valid_token()
     {
         $token = $this->request->header('api-token','');
         $jwtAuth = new JwtAuth();
+
         $jwt = $jwtAuth->checkToken($token);
+
         $this->shop_id = substr($jwt['data'],9);
     }
 
@@ -69,4 +70,5 @@ class MerchantsBase extends Controller
         }
         return $arr;
     }
+
 }

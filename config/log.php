@@ -17,12 +17,12 @@ return [
     'type'        => 'File',
     // 日志保存目录
     'path'        => '',
-    // 日志记录级别
-    'level'       => [],
+    // 日志记录级别 【'sql级别' 仅当开启数据库调试模式有效】
+    'level'       => ['warning','error','emergency','alert','critical','sql'],
     // 单文件日志写入
     'single'      => false,
     // 独立日志级别
-    'apart_level' => [],
+    'apart_level' => ['error','sql'],
     // 最大日志文件数量
     'max_files'   => 0,
     // 是否关闭日志写入

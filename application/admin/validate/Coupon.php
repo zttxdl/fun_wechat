@@ -33,8 +33,8 @@ class Coupon extends Validate
         'name.max'              => '优惠券名称不能超过20位',
         'face_value.number'     => '面额格式不正确',
         'threshold.number'      => '使用门槛格式不正确',
-        'num.number'            => '请填写联系地址',
-        'assume_ratio.number'   => '联系地址最多50个字',
+        'num.number'            => '发行量必须为正整数',
+        'assume_ratio.number'   => '商家承担比例不能为空',
     ];
 
 }

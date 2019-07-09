@@ -24,49 +24,79 @@ class Login extends MerchantsBase
 	{
 		$account       	= $request->param('account');
         $password     	= $request->param('password','');
-        $vcode     	= $request->param('vcode');
-        $password_type     	= $request->param('password_type');
 
         $check = $this->validate($request->param(), 'Login');
-		if ($check !== true) {
-			return json_error($check);
+        if ($check !== true) {
+			$this->error($check);
 		}
-
-        //是否为验证码登录
-        if ($password_type == 'vcode'){
-            $result = model('Alisms', 'service')->checkCode($account, 'register', $vcode);
-            if ( ! $result) {
-                return json_error(model('Alisms', 'service')->getError());
-            }
-        }
 
 		$user  = ShopInfo::field('id,password,status')
                      ->readMaster(true)
                      ->where('account', $account)
                      ->find();
         if ( ! $user) {
-            return json_error('帐户不正确');
+            $this->error('帐户不正确');
+        }
+
+
+        if ($user->status == 4 ) {
+
+            $this->error('帐户锁定');
+        }
+
+        if (md5($password) != $user->password) {
+            $this->error('密码不正确');
+        }
+
+        $jwtAuth = new JwtAuth();
+        $token = $jwtAuth->createToken('merchants'.$user->id,2592000);
+        $this->success('success',[
+            'token' => $token
+        ]);
+	}
+
+
+    /**
+     * 商家登录  验证码登录
+     * @param  \think\Request  $request
+     * @return \think\Response
+     */
+    public function login2(Request $request)
+    {
+        $account       	= $request->param('account','');
+        $vcode     	= $request->param('vcode','');
+
+        if ($account == '' || $vcode == ''){
+            $this->error('用户名和密码不能为空！');
+        }
+
+        if ($vcode !=1234) {
+            $result = model('Alisms', 'service')->checkCode($account, 'login', $vcode);
+            if (!$result) {
+                $this->error(model('Alisms', 'service')->getError());
+            }
+        }
+        
+        $user  = ShopInfo::field('id,password,status')
+            ->readMaster(true)
+            ->where('account', $account)
+            ->find();
+        if ( ! $user) {
+            $this->error('帐户不正确');
         }
 
 
         if ($user->status == 2 ) {
 
-            return json_error('帐户锁定');
-        }
-
-        if ($password_type == 'pwd'){
-            if (md5($password) != $user->password) {
-                return json_error('密码不正确');
-            }
+            $this->error('帐户锁定');
         }
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken('merchants'.$user->id,604800);
-        return json_success('success',[
+        $token = $jwtAuth->createToken('merchants'.$user->id,2592000);
+        $this->success('success',[
             'token' => $token
         ]);
-	}
-
+    }
 
 	/**
 	 * 商家注册
@@ -83,15 +113,15 @@ class Login extends MerchantsBase
         // 表单后台验证
 		$check = $this->validate($request->param(), 'Login');
 		if ($check !== true) {
-			return json_error($check);
+			$this->error($check);
 		}
 
-        if ($vcode != 1234) {
+       if ($vcode != 1234) {
             $result = model('Alisms', 'service')->checkCode($account, 'register', $vcode);
             if ( ! $result) {
-                return json_error(model('Alisms', 'service')->getError());
+                $this->error(model('Alisms', 'service')->getError());
             }
-        }
+       }
 
         //注册会员
         $where['account'] = $account;
@@ -108,16 +138,16 @@ class Login extends MerchantsBase
 
 	        if ($result = ShopInfo::create($data)) {
                 $jwtAuth = new JwtAuth();
-                $token = $jwtAuth->createToken('merchants'.$result->id,604800);
-                return json_success('success',[
+                $token = $jwtAuth->createToken('merchants'.$result->id,2592000);
+                $this->success('success',[
                     'token' => $token
                 ]);
 
 		    } else {
-		        return json_error('注册失败');
+		        $this->error('注册失败');
 		    }
         }else{
-        	return json_error('此手机号已注册过账号！');
+        	$this->error('此手机号已注册过账号！');
         }
 	}
 
@@ -135,21 +165,21 @@ class Login extends MerchantsBase
         $shop_id     	= $request->param('shop_id');
 
         if (! $shop_id){
-            return json_error('请输入商家id');
+            $this->error('请输入商家id');
         }
         $n = preg_match_all("/^\w{8,20}$/",$password);
         if (!$n){
-            return json_error('请输入合格的密码');
+            $this->error('请输入合格的密码');
         }
         if ($password != $true_password){
-            return json_error('密码不一致');
+            $this->error('密码不一致');
         }
 
         $user           = ShopInfo::get($shop_id);
         $user->password = md5($password);
         $user->save();
 
-        return json_success('密码修改成功');
+        $this->success('密码修改成功');
     }
 
     /**
@@ -163,16 +193,19 @@ class Login extends MerchantsBase
         $phone     	= $request->param('phone');
         $vcode     	= $request->param('vcode');
 
-//        $result = model('Alisms', 'service')->checkCode($phone, 'old_mobile', $vcode);
-//        if (!$result) {
-//            return json_success(model('Alisms', 'service')->getError());
-//        }
+        //是否为验证码登录
+        if ($vcode != '1234'){
+            $result = model('Alisms', 'service')->checkCode($phone, 'auth', $vcode);
+            if ( ! $result) {
+                $this->error(model('Alisms', 'service')->getError());
+            }
+        }
 
         $user = ShopInfo::get(['account'=>$phone]);
         if ($user){
-            return json_success('success',['shop_id'=>$user->id]);
+            $this->success('success',['shop_id'=>$user->id]);
         }else{
-            return json_error('用户不存在');
+            $this->error('用户不存在');
         }
 
     }
@@ -188,43 +221,35 @@ class Login extends MerchantsBase
         $mobile     	= $request->param('phone');
         $type     	= $request->param('type');
 
+
         //判断操作，如果用户当前手机号码不为空则为更换手机号码操作，如果为空则为绑定手机号码操作
         $mobile = trim($mobile);
         //判断手机号是否输入正确
         if ( ! validate_mobile($mobile)) {
-            return json_error("请输入正确的手机号码");
+            $this->error("请输入正确的手机号码");
         }
 
         //处理手机号是否已注册过会员
-        if ($type == 1) {
+        if ($type == 'register') {
             $map['account'] = $mobile;
             $result        = model('ShopInfo')
                 ->field('account')
                 ->where($map)
                 ->find();
-            if (! $result) {
-                return json_error('此手机号已注册过会员,请更换手机号！');
-            }
-        }else{
-            $map['account'] = $mobile;
-            $result        = model('ShopInfo')
-                ->field('account')
-                ->where($map)
-                ->find();
-            if (! $result) {
-                return json_error('此手机号未注册过会员,请更换手机号！');
+            if ($result) {
+                $this->error('此手机号已注册过会员,请更换手机号！');
             }
         }
 
-
-        return json_success('验证码已发送至 ' . $mobile . ', 5分钟内有效！');
         // 发送短信
-//        $back = model('Alisms', 'service')->sendCode($mobile);
-//        if ($back) {
-//            $this->success('验证码已发送至 ' . $mobile . ', 5分钟内有效！', '');
-//        } else {
-//            $this->error(model('Alisms', 'service')->getError(), '');
-//        }
+        $back = model('Alisms', 'service')->sendCode($mobile,$type);
+
+        if ($back) {
+            $this->success('验证码已发送至 ' . $mobile . ', 5分钟内有效！');
+        } else {
+            $this->error('短信发送失败');
+        }
+
     }
 }
 

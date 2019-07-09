@@ -2,11 +2,12 @@
 
 namespace app\common\Auth;
 
-use \Firebase\JWT\JWT; //导入JWT
-
+use \Firebase\JWT\JWT;
+use think\Exception; //导入JWT
 
 class JwtAuth
 {
+    use  \app\common\controller\Jump;
 
     /**
      * 头部 公共参数
@@ -64,11 +65,30 @@ class JwtAuth
      * @return string $msg 返回消息
      */
     public function checkToken($jwt){
-        $key=config('token_key');;
-        $decoded = JWT::decode($jwt, $key, ['HS256']); //HS256方式，这里要和签发的时候对应
-        $arr = (array)$decoded;
-        return $arr; //返回信息
+        $key=config('token_key');
+
+        try {
+            if(empty($jwt)) {
+                throw new Exception('token 为空,请重新登录');
+            }
+            JWT::$leeway = 60;//当前时间减去60，把时间留点余地
+            $decoded = JWT::decode($jwt, $key, ['HS256']); //HS256方式，这里要和签发的时候对应
+            $arr = (array)$decoded;
+
+            return $arr;
+
+        } catch(\Firebase\JWT\SignatureInvalidException $e) {  //签名不正确
+            $this->error('签名不正确','204');
+        }catch(\Firebase\JWT\BeforeValidException $e) {  // 签名在某个时间点之后才能用
+            $this->error('签名在某个时间点之后才能用','202');
+        }catch(\Firebase\JWT\ExpiredException $e) {
+            $this->error('token过期，请重新登录','203');
+        }catch(Exception $e) {  //其他错误
+            $this->error($e->getMessage(),'299');
+        }
+
     }
+
 
 
 

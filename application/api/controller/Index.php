@@ -1,72 +1,265 @@
 <?php
+
 namespace app\api\controller;
 
-
-use think\Controller;
+use app\common\controller\ApiBase;
 use think\Request;
 
-
-class Index extends Base
+class Index extends ApiBase
 {
-    /**
-     * 获取用户登录信息
-     * @url /api/v1.index/login
-     * @method POST
-     * @param integer $page 页数
-     * @param integer $limit 每页个数
-     * @return integer $code 状态码
-     * @return string $msg 返回消息
-    */
-    public function login(){
-        
-            //登录思路：客户端通过用户名密码登录以后，服务端返回给客户端两个token：access_token和refresh_token。
-                //access_token：请求接口的token
-                //refresh_token：刷新access_token
-                //举个例子：比如access_token设置2个小时过期，refresh_token设置7天过期，2小时候后，access_token过期，但是refresh_token还在7天以内，那么客户端通过refresh_token来服务端刷新，服务端重新生成一个access_token；
-                //如果refresh_token也超过了7天，那么客户端需要重新登录获取access_token和refresh_token。
-                //为了区分两个token，我们在载荷（payload)加一个字段 scopes ：作用域。
-                //access_token中设置：scopes:role_access
-                //refresh_token中设置：scopes:role_refresh
-    
-                //自定义信息，不要定义敏感信息
-                    $data['userid']=21;//用户ID
-                    $data['username']="李小龙";//用户ID
-                
-                //请求接口的token
-                    $exp_time1=7200; //token过期时间,这里设置2个小时
-                    $scopes1='role_access'; //token标识，请求接口的token
-                    $access_token = action('createToken',['data'=>$data,'exp_time'=>$exp_time1,'scopes'=>$scopes1]);
-                
-                //刷新refresh_token
-                    $exp_time2=86400 * 30; //refresh_token过期时间,这里设置30天
-                    $scopes2='role_refresh'; //token标识，刷新access_token
-                    $refresh_token = action('createToken',['data'=>$data,'exp_time'=>$exp_time2,'scopes'=>$scopes2]);
 
-                 //公用信息
-                $time =time();
-                 $token = [
-                             'iss' => 'http://www.helloweba.net', //签发者 可选
-                             'aud' => 'http://www.helloweba.net', //接收该JWT的一方，可选
-                             'iat' => $time, //签发时间
-                             'nbf' => $time, //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
-                             'data' => $data
-                 ];
-             //请求接口的token 用户名登录验证通过时生成的
-                         $access_token = $token; // access_token
-                         $access_token['scopes'] = 'role_access'; //token标识，请求接口的token
-                         $access_token['exp'] = $time+7200; //access_token过期时间,这里设置2个小时
-             //刷新access_token
-                         $refresh_token = $token; //refresh_token
-                         $refresh_token['scopes'] = 'role_refresh'; //token标识，刷新access_token
-                         $refresh_token['exp'] = $time+(86400 * 30); //refresh_token过期时间,这里设置30天
-        
-                $jsonList = [
-                        'access_token'=>$access_token,
-                        'refresh_token'=>$refresh_token,
-                        'token_type'=>'bearer' //token_type：表示令牌类型，该值大小写不敏感，这里用bearer
-                ];
-            
+    protected $noNeedLogin = ['*'];
+
+    //首页
+    public function index(Request $request)
+    {
+        $lat = $request->param('latitude','');
+        $lng = $request->param('longitude','');
+
+        $data['slide'] = $this->getSlide();
+        $data['channel'] = $this->getChannel();
+        $data['special'] = $this->getSpecial($lat,$lng);
+        $data['recommend'] = $this->getRecommendList($lat,$lng);
+        $this->success('success',$data);
+    }
+
+    //通过经纬度获取最近学校
+    public function  getSchool(Request $request)
+    {
+        $lat = $request->param('latitude','');
+        $lng = $request->param('longitude','');
+
+        $data = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
+            ->having('distance < 5')
+            ->where('level',2)
+            ->order('distance asc')
+            ->find();
+
+        $this->success('success',$data);
+    }
+
+    //获取轮播图
+    protected function getSlide()
+    {
+
+        $where[] = [
+            'status',
+            '=',
+            1,
+        ];
+            $where[] = [
+                'platfrom',
+                '=',
+                1,
+            ];
+        $data = model('Advers')
+            ->field('id,name,img,link_url')
+            ->where($where)
+            ->order('sort','asc')
+            ->select();
+
+        return $data;
+    }
+
+    //分类导航
+    public function getChannel()
+    {
+        $where[] = [
+            'status',
+            '=',
+            1,
+        ];
+
+        $where[] = [
+            'level',
+            '=',
+            1,
+        ];
+
+        $data = model('ManageCategory')
+            ->field('id,name,img')
+            ->where($where)
+            ->order('sort','asc')
+            ->limit(4)
+            ->select();
+
+        return $data;
+    }
+
+    //今日特价
+    public function getSpecial($lat,$lng)
+    {
+        $list = model('ShopInfo')->getDistance($lat,$lng);
+        if (! $list) {
+            return [];
+        }
+
+        $data = array_column($list,'id');
+        $shop_ids=  implode(",",$data);
+        $where[] = [
+            'status',
+            '=',
+            1,
+        ];
+
+        $where[] = [
+            'shop_id',
+            'in',
+            $shop_ids,
+        ];
+        $day = date('Y-m-d',time());
+        $where[] = [
+            'today',
+            '=',
+            $day,
+        ];
+
+        $data = model('TodayDeals')
+            ->field('name,shop_id,product_id,old_price,price,num,limit_buy_num,thumb')
+            ->where($where)
+            ->whereTime('end_time', '>=', time())
+            ->limit(4)
+            ->select();
+
+        return $data;
+    }
+
+    //推荐商家
+    public function getRecommendList($lat,$lng)
+    {
+        $pagesize = input('pagesize',15);
+        $page = input('page',1);
+        $list = model('ShopInfo')->getDistance($lat,$lng,$page,$pagesize);
+
+        if (empty($list)) {
+            return [];
+        }
+
+        foreach ($list as &$value) {
+            //判断店铺是否营业
+            if (! empty($value['run_time'])){
+                $open_status = model('ShopInfo')->getBusiness($value['run_time']);
+                $value['open_status'] = isset($open_status) ? $value['open_status'] : $open_status;
+            }else{
+                $value['open_status'] = 0;
+            }
+
+            $value['disc'] = model('ShopDiscounts')
+                ->field('face_value,threshold')
+                ->where('shop_id',$value['id'])
+                ->where('delete',0)
+                ->select();
+        }
+
+        return $list;
+    }
+
+    //推荐商家分页加载
+    public function getRecommend(Request $request)
+    {
+        $lat = $request->param('latitude','');
+        $lng = $request->param('longitude','');
+
+        $list = $this->getRecommendList($lat,$lng);
+
+        $this->success('success',$list);
     }
 
 
+    //二级导航
+    public function getNavigation(Request $request)
+    {
+        $lat = $request->param('latitude','');
+        $lng = $request->param('longitude','');
+        $class_id = $request->param('class_id','');
+        $pagesize = input('pagesize',15);
+        $page = input('page',1);
+
+        $data = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
+            ->having('distance < 5')
+            ->where('level',2)
+            ->order('distance asc')
+            ->find();
+
+        $list = [];
+        if ($data){
+            $list = model('ShopInfo')->field("id,shop_name,logo_img,marks,sales,up_to_send_money,run_time,address,manage_category_id,ping_fee,school_id")
+                ->where('school_id',$data->id)
+                ->where('manage_category_id',$class_id)
+                ->page($page,$pagesize)
+                ->select()
+                ->toArray();
+
+        }
+
+
+        if (empty($list)){
+            $this->success('success',$list);
+        }
+
+        foreach ($list as &$value) {
+            if (! empty($value['run_time'])){
+                $value['business'] = model('ShopInfo')->getBusiness($value['run_time']);
+            }else{
+                $value['business'] = 0;
+            }
+            $value['disc'] = model('ShopDiscounts')
+                ->field('face_value,threshold')
+                ->where('shop_id',$value['id'])
+                ->where('delete',0)
+                ->select();
+        }
+
+        $this->success('success',$list);
+    }
+
+    //今日特价
+    public function getSpecialList(Request $request)
+    {
+        $lat = $request->param('latitude');
+        $lng = $request->param('longitude');
+        $page = $request->param('page');
+        $pagesize = $request->param('pagesize');
+
+        $list = model('ShopInfo')->getDistance($lat,$lng);
+        if (! $list) {
+            return [];
+        }
+
+        $data = array_column($list,'id');
+        $shop_ids=  implode(",",$data);
+        $where[] = [
+            'status',
+            '=',
+            1,
+        ];
+
+        $where[] = [
+            'shop_id',
+            'in',
+            $shop_ids,
+        ];
+        $day = date('Y-m-d',time());
+        $where[] = [
+            'today',
+            '=',
+            $day,
+        ];
+
+        $data = model('TodayDeals')
+            ->field('name,shop_id,product_id,old_price,price,num,limit_buy_num,thumb')
+            ->where($where)
+            ->whereTime('end_time', '>=', time())
+            ->page($page,$pagesize)
+            ->select()
+            ->toArray();
+        foreach ($data as &$val) {
+            $fin = model('ShopInfo')->field('shop_name,up_to_send_money,ping_fee')->where('id',$val['shop_id'])->find();
+            $val['shop_name'] = $fin->shop_name;
+            $val['up_to_send_money'] = $fin->up_to_send_money;
+            $val['ping_fee'] = $fin->ping_fee;
+        }
+
+        $this->success('success',$data);
+    }
 }

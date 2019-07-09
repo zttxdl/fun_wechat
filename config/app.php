@@ -13,11 +13,15 @@
 // | 应用设置
 // +----------------------------------------------------------------------
 
+// 设置报错等级
+error_reporting(E_ALL ^ E_NOTICE);
+
+
 return [
     // 应用名称
     'app_name'               => '',
     // 应用地址
-    'app_host'               => 'https://dev.api.hzbin.cn',
+    'app_host'               => '',
     // 应用调试模式
     'app_debug'              => true,
     // 应用Trace
@@ -29,7 +33,7 @@ return [
     // 注册的根命名空间
     'root_namespace'         => [],
     // 默认输出类型
-    'default_return_type'    => 'html',
+    'default_return_type'    => 'json',
     // 默认AJAX 数据返回格式,可选json xml ...
     'default_ajax_return'    => 'json',
     // 默认JSONP格式返回的处理方法
@@ -101,13 +105,13 @@ return [
     // 合并路由规则
     'route_rule_merge'       => false,
     // 路由是否完全匹配
-    'route_complete_match'   => false,
+    'route_complete_match'   => true,
     // 使用注解路由
     'route_annotation'       => false,
     // 域名根，如thinkphp.cn
     'url_domain_root'        => '',
     // 是否自动转换URL中的控制器和操作名
-    'url_convert'            => true,
+    'url_convert'            => false,
     // 默认的访问控制器层
     'url_controller_layer'   => 'controller',
     // 表单请求类型伪装变量
@@ -141,8 +145,64 @@ return [
     // 显示错误信息
     'show_error_msg'         => false,
     // 异常处理handle类 留空使用 \think\exception\Handle
-    'exception_handle'       => '\app\common\exception\Http',
+
+//     'exception_handle'       => '\app\common\exception\Http',
+    //'exception_handle'       => '',
     //jwt定义的key
     'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
+    //阿里云sms
+    'aliyun_sms'              => [
+        'accessKeyId'        => 'LTAI0TdZqOBUjYc4',
+        'accessSecret'        => 'Mo5gW1xE90p25dVxPpfAxKiaQBXAk7',
+        'RegionId'       => 'scn-hangzhou',
+        'SignName'     => '南京食聚荟',
+        'SMSTemplateCode' => 'SMS_168116283',
+        //'SMS_141915147',
+    ],
+    // 微信小程序的用户端账号信息
+    'wx_user'    =>  [
+        'app_id'        => 'wx7e84dbf300d4764d',
+        'secret'        =>  '7c6bd82277d5b1d7f77c05d4cb1987b7',
+        // 下面为可选项
+        // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
+        'response_type' => 'array',
+
+        'log' => [
+            'level' => 'debug',
+            'file' => __DIR__.'/wechat_user.log',
+        ],
+    ],
+
+    // 微信小程序的骑手端账号信息
+    'wx_rider'  =>[
+        'app_id'        => 'wx51ecddea44f0ffed',
+        'secret'        =>  '90a92131b5844dc7498d28b510386d97',
+        'mch_id'             => '1538416851',
+        'key'                => 'iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
+        // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
+        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
+        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
+        'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
+        'sandbox' => false
+    ],
+
+    'wx_pay'=>[
+        // 必要配置
+        'app_id'             => 'wx7e84dbf300d4764d',
+        'mch_id'             => '1538416851',
+        'key'                => 'iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
+        // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
+        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
+        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
+        'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
+        'sandbox' => false,
+    ],
+    'qiniu' => [        
+        'accesskey' => '_s0jSVLN7y5AGSlCA7LAHnzRv6ne0bEsvc_RoE-C',
+        'secretkey' => 'N-Z1qiYlUhTOdGHHnSQETmGdLqtbOcupxlkoDMF0',
+        'bucket'    => 'daigefun',
+        'domain'    =>  'http://picture.daigefan.com',
+        'style'    =>  'imageView2/0/format/jpg/interlace/1/q/75|imageslim',
+    ],
 
 ];

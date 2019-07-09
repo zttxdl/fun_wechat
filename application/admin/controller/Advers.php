@@ -2,14 +2,20 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 use think\Db;
 
-class Advers extends Controller
+
+/**
+ * 广告控制器
+ * @author Mike
+ * date 2019/5/24
+ */
+class Advers extends Base
 {
     /**
-     * 广告管理控制器
+     * 广告列表
      *
      */
     public function index(Request $request)
@@ -19,39 +25,40 @@ class Advers extends Controller
         !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
         !empty($request->get('platfrom/d')) ? $where[] = ['platfrom','=',$request->get('platfrom/d')] : null;
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : null;
+        !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
 
         // 广告列表
-        $list = Db::name('advers')->where($where)->paginate(10)->each(function ($item, $key) {
+        $list = Db::name('advers')->where($where)->order('id desc')->paginate($pagesize)->each(function ($item, $key) {
             // 是否启用
-            $item['status'] = config('advers_status')[$item['status']];
+            $item['mb_status'] = config('advers_status')[$item['status']];
             // 展示平台
             $item['platfrom'] = config('show_platfrom')[$item['platfrom']];
 
             return $item;
         });
         
-        return  json_success('ok',['list'=>$list]);
+        $this->success('ok',['list'=>$list]);
 
     }
 
 
     /**
      * 展示编辑广告页面 
-     * 
+     * @param $id 广告表主键值
      */
-    public function edit(Request $request,$id)
+    public function edit($id)
     {
-        if (empty((int)$id) ) {
-            return json_error('非法参数',201);
+        if (empty((int)$id)) {
+            $this->error('非法参数',201);
         }
 
         $info = Db::name('advers')->find($id);  
         // 是否启用
-        $info['status'] = config('advers_status')[$info['status']];
+        $info['mb_status'] = config('advers_status')[$info['status']];
         // 展示平台
         $info['platfrom'] = config('show_platfrom')[$info['platfrom']];
 
-        return  json_success('ok',['info'=>$info]);
+        $this->success('ok',['info'=>$info]);
         
     }
 
@@ -64,38 +71,38 @@ class Advers extends Controller
     {
         $data = $request->param();
 
-        if (empty((int)$data['id'])) {
-            return json_error('非法参数',201);
+        if (!isset($data['id']) || empty((int)$data['id'])) {
+            $this->error('非法参数',201);
         }
 
         // 验证表单数据
         $check = $this->validate($data, 'Advers');
         if ($check !== true) {
-            return json_error($check,201);
+            $this->error($check,201);
         }
 
         // 提交表单
         $result = Db::name('advers')->update($data);
-        if ($result === false) {
-            return json_error('修改失败',201);
+        if (!$result) {
+            $this->error('修改失败',201);
         }
-
-        return  json_success('ok');
+        
+        $this->success('修改成功');
         
     }
 
 
     /**
      * 删除广告 
-     * 
+     * @param $id 广告表主键值
      */
     public function delete($id)
     {
         $result = Db::name('advers')->delete($id);
         if (!$result) {
-            return json_error('删除失败',201);
+            $this->error('删除失败',201);
         }
-        return json_success('删除成功');
+        $this->success('删除成功');
     }
      
      

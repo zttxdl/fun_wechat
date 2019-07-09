@@ -15,6 +15,6 @@ class ProductAttrClassify extends Model
         'id'          => 'int',
         'create_time' => 'int',
         'update_time' => 'int',
-        'name','shop_id','fid',
+        'name','shop_id','pid',
     ];
 }
