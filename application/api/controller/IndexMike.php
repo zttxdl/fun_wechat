@@ -11,7 +11,7 @@ class IndexMike extends ApiBase
     protected $noNeedLogin = ['*'];
 
     /**
-     * 首页
+     * 首页22
      */
     public function index(Request $request)
     {
