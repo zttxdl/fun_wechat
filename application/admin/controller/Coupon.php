@@ -70,8 +70,9 @@ class Coupon extends Base
         $mg_model = new ManageCategory();
         $manage_category_list = $mg_model->getManageCategoryList();
 
-        // 红包批次ID
-        $bacth_id = uniqid();
+        // 设置当前的红包批次ID
+        $sum = Db::name('platform_coupon')->where('batch_id','like',date('ymd').'%')->count('id');
+        $bacth_id = date('ymdHis').'_No'.sprintf('%04d',$sum+1);
 
         $this->success('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list,'bacth_id'=>$bacth_id]);
 
