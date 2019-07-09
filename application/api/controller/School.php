@@ -37,6 +37,29 @@ class School extends ApiBase
 
         $this->success('获取学校列表成功',['school_list'=>$school_list]);
     }
+
+
+    /**
+     * 用户端首页部分【选择学校】
+     */
+    public function chooseSchool(Request $request)
+    {
+        $model = new SchoolModel();
+        $current_school_id = $request->param('school_id');
+
+        // 学区学校三级关联列表
+        $school_list = $model->getSchoolList();
+        
+        // 获取当前学校信息
+        if ($current_school_id) {
+            $current_school = $model->getSchoolInfoById($current_school_id);
+        } else {
+            // 获取第一个学校
+            $current_school = $school_list[0]['children'][0];
+        }
+
+        $this->success('获取学校地区列表成功',['school_list'=>$school_list,'current_school'=>$current_school]);
+    }
     
 
     

@@ -32,6 +32,15 @@ class AutoShell extends Controller
             }
         }
 
+        /***************** 更新平台红包的过期状态 【当为平台发放时，会存在过期问题】 ******************************************************************/
+        $platform_coupon_list = Db::name('platform_coupon')->where([['type','=',2],['status','in','1,2,3']])->field('id,end_time,status')->select();
+        // 判断红包是否过期，并更新状态
+        foreach ($platform_coupon_list as $k => $v) {
+            if ($v['end_time'] < time()) {
+                Db::name('platform_coupon')->where('id',$v['id'])->setField('status',5);
+            }
+        }
+
         /***************** 清除骑手提现申请的缓存记录  ******************************************************************/
         Cache::store('redis')->clear('rider_tx');
 

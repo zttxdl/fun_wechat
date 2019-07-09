@@ -165,18 +165,6 @@ class IndexMike extends ApiBase
         /********* 搜索条件 ***************************************************************/
         $where[] = ['school_id','=',$school_id];
         $where[] = ['manage_category_id','in',$class_ids];
-
-        // // 判断是否有搜索控件
-        // if (!empty($request->get('name/s'))) {
-        //     // 查询商家表，获取商家主键值集合
-        //     $shop_shop_ids = model('ShopInfo')->where(['shop_name','like',$request->get('name/s').'%'])->column('id');
-        //     // 查询商品表，获取商家主键值集合
-        //     $product_shop_ids = model('Product')->where(['name','like',$request->get('name/s').'%'])->distinct(true)->column('shop_id');
-        //     // 去重商家主键值
-        //     $shop_ids = array_unique(array_merge($shop_shop_ids,$product_shop_ids));
-        //     $where[] = ['id','in',$shop_ids];
-        // }
-        !empty($request->get('shop_name/s')) ?  : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 6;
         
         /********* 依据商家排序、搜索条件，获取二级经营品类的商家信息 ********************************/
@@ -217,8 +205,7 @@ class IndexMike extends ApiBase
                 }
             }
         }
-
-
+        
         $this->success('success',['shop_list'=>$shop_list]);
     }
 
