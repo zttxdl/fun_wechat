@@ -10,10 +10,6 @@ class IndexMike extends ApiBase
 
     protected $noNeedLogin = ['*'];
 
-    public function  aaa(){
-        return 1212;
-    }
-
     /**
      * 首页
      */
