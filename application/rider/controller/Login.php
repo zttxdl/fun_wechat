@@ -115,7 +115,7 @@ class Login extends RiderBase
         $rider_info = RiderInfo::where('id','=',$rid)->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($rider_info,604800);
+        $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
             'token' => $token
         ]);
@@ -158,7 +158,7 @@ class Login extends RiderBase
         $rider_info = RiderInfo::where('id','=',$rid)->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($rider_info,604800);
+        $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
             'token' => $token
         ]);
