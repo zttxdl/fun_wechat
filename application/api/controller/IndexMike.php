@@ -10,8 +10,12 @@ class IndexMike extends ApiBase
 
     protected $noNeedLogin = ['*'];
 
+    public function  aaa(){
+        return 1212;
+    }
+
     /**
-     * 首页22
+     * 首页
      */
     public function index(Request $request)
     {
@@ -115,33 +119,31 @@ class IndexMike extends ApiBase
         $shop_list = $shop_list->toArray();
         foreach ($shop_list['data'] as &$v) {
             foreach ($v['disc'] as &$vv) {
-                $vv['discounts'] = $vv['threshold'].'减'. $vv['face_value'];
-                unset($vv['threshold']);
-                unset($vv['face_value']);
+                $v['discounts'][] = $vv['threshold'].'减'. $vv['face_value'];
+                unset($v['disc']);
             }
         }
-
-        $pt_coupon = '';
 
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
             $pt_where = [['status','=',2],['type','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
             // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
             $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
+            // 组装首单立减信息
+            if ($pt_coupon) {
+                foreach ($shop_list['data'] as $k => &$v) {
+                    foreach ($pt_coupon as $ko => $vo) {
+                        $shopids = explode(',',$vo['shop_ids']);
+                        if (in_array($v['id'],$shopids)) {
+                            $v['discounts'][] = '首单减'.$vo['face_value'];
 
-        }
-        // 组装首单立减信息
-        if ($pt_coupon) {
-            foreach ($shop_list['data'] as $k => &$v) {
-                foreach ($pt_coupon as $ko => $vo) {
-                    $shopids = explode(',',$vo['shop_ids']);
-                    if (in_array($v['id'],$shopids)) {
-                        $v['disc'][]['discounts'] = '首单减'.$vo['face_value'];
-                        continue;
+                            continue;
+                        }
                     }
                 }
             }
         }
+
 
         $this->success('success',$shop_list);
     }
@@ -195,9 +197,8 @@ class IndexMike extends ApiBase
         $shop_list = $shop_list->toArray();
         foreach ($shop_list['data'] as &$v) {
             foreach ($v['disc'] as &$vv) {
-                $vv['discounts'] = $vv['threshold'].'减'. $vv['face_value'];
-                unset($vv['threshold']);
-                unset($vv['face_value']);
+                $v['discounts'][] = $vv['threshold'].'减'. $vv['face_value'];
+                unset($v['disc']);
             }
         }
 
@@ -216,7 +217,7 @@ class IndexMike extends ApiBase
                 foreach ($pt_coupon as $ko => $vo) {
                     $shopids = explode(',',$vo['shop_ids']);
                     if (in_array($v['id'],$shopids)) {
-                        $v['disc'][]['discounts'] = '首单减'.$vo['face_value'];
+                        $v['discounts'][] = '首单减'.$vo['face_value'];
                         continue;
                     }
                 }
