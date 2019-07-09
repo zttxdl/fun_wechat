@@ -34,7 +34,6 @@ class Store extends ApiBase
                     ->field('id,name')
                     ->where('id','in',$item['attr_ids'])
                     ->select();
-                // dump($attr_list);die;
                 foreach ($attr_list as  $v) {
                     $v->son = model('ProductAttrClassify')
                         ->field('id,name')
@@ -48,7 +47,7 @@ class Store extends ApiBase
             }
 
         }
-    //    dump($list);exit;
+
         $data['goods'] = $list;
         $cakes = [];
         $preferential = [];
@@ -63,6 +62,13 @@ class Store extends ApiBase
 
         $data['cakes'] = $cakes;
         $data['preferential'] = $preferential;
+        //获取今日特价
+        $today = date('Y-m-d',time());
+        $data['today_deals'] = model('TodayDeals')
+            ->field('id,name,product_id,old_price,price,num,limit_buy_num,thumb,start_time,end_time')
+            ->where('shop_id',$shop_id)
+            ->where('today',$today)
+            ->find();
 
         //获取分类
         $data['class'] = model('ProductsClassify')
