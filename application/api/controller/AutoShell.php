@@ -27,8 +27,17 @@ class AutoShell extends Controller
         // 判断红包是否过期，并更新状态
         foreach ($list as $k => $v) {
             $indate_time = strtotime(str_replace('.','-',end(explode('-',$v['indate'])))) + 3600*24;
-            if ($indate_time < time()) {
+            if ($indate_time < (time() - 10)) {   // 为防止网络延时，将时间延后10秒
                 Db::name('my_coupon')->where('id',$v['id'])->setField('status',3);
+            }
+        }
+
+        /***************** 更新平台红包的过期状态 【当为平台发放时，会存在过期问题】 ******************************************************************/
+        $platform_coupon_list = Db::name('platform_coupon')->where([['type','=',2],['status','in','1,2,3']])->field('id,end_time,status')->select();
+        // 判断红包是否过期，并更新状态
+        foreach ($platform_coupon_list as $k => $v) {
+            if ($v['end_time'] < (time() - 10)) {  // 为防止网络延时，将时间延后10秒
+                Db::name('platform_coupon')->where('id',$v['id'])->setField('status',5);
             }
         }
 

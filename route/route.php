@@ -231,6 +231,15 @@ Route::group('u-member', function () {
     Route::post('/bind-tel', 'BindUserPhone');
 })->prefix('api/Member/');
 
+// 首页
+Route::group('u-index', function () {
+    Route::get('/index', 'index');
+    Route::get('/special', 'getSpecial');
+    Route::get('/recommend', 'getRecommendList');
+    Route::get('/navigation', 'getNavigation');
+    Route::get('/special-list', 'getSpecialList');
+})->prefix('api/IndexMike/');
+
 // 红包组
 Route::group('u-coupon', function () {
     Route::get('/index', 'index');

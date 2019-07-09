@@ -222,7 +222,6 @@ class IndexMike extends ApiBase
                 }
             }
         }
-
         $this->success('success',$shop_list);
     }
 

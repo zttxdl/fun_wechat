@@ -116,7 +116,7 @@ class Shop extends Base
 
 
         if(!$shop_info) {
-            $this->error('店铺不存在');
+            return json_error('店铺不存在');
         }
         $result = [];
         foreach ($shop_info as $row)
@@ -235,7 +235,8 @@ class Shop extends Base
                 'link_tel' => $row['link_tel'],
                 'manage_category_name' => $row['manage_category_name'],
                 'school_name' => $row['school_name'],
-                'status' => config('shop_check_status')[$row['status']]
+                'status' => $row['status'],
+                'mb_status' => config('shop_check_status')[$row['status']]
 
             ];
         }
