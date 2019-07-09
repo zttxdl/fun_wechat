@@ -14,6 +14,7 @@ use EasyWeChat\Factory;
  */
 class Login extends RiderBase
 {
+    protected  $noNeedLogin = ['*'];
     /**
      * 授权获取openid、session_key信息
      * 
