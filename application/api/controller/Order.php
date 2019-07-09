@@ -172,6 +172,7 @@ class Order extends ApiBase
         foreach ($result['detail'] as $row) {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
             $row['name'] = Model('Product')->getNameById($row['product_id']);
+            $row['goods_img'] = Model('Product')->getImgById($row['product_id']);
             $row['id'] = $row['product_id'];
             $result['platform_discount']['id'] = $row['platform_coupon_id'];
             $result['platform_discount']['face_value'] = (int)$row['platform_coupon_money'];

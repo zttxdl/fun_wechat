@@ -22,4 +22,12 @@ class Product extends Model
     public function getNameById($id){
         return $this->where('id',$id)->limit(1)->value('name');
     }
+
+    /**
+     *获取商品图片
+     *
+     */
+    public function getImgById($id){
+        return $this->where('id',$id)->value('thumb');
+    }
 }
