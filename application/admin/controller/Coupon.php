@@ -34,10 +34,7 @@ class Coupon extends Base
         // 优惠券列表
         $coupon_list = Db::name('platform_coupon')->field('id,batch_id,name,user_type,face_value,threshold,start_time,end_time,other_time,limit_use,num,surplus_num,status,type')
                         ->where($where)->order('id desc')->paginate($pagesize)->each(function ($item, $key) {
-                            // 优惠券状态
-                            // if ($item['type'] == 2 && (time() > $item['end_time'])) {
-                            //     $item['mb_status'] = '已过期';
-                            // } else {}
+                            // 设置优惠券中文状态
                             $item['mb_status'] = config('coupon_status')[$item['status']];
                             
                             // 优惠券发放类型
