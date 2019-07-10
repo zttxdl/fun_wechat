@@ -15,7 +15,7 @@ class Goods extends MerchantsBase
     protected $noNeedLogin = [];
 
     /**
-     * 获取商家列表
+     * 获取商品列表
      */
     public function index()
     {
@@ -25,7 +25,6 @@ class Goods extends MerchantsBase
         $list = model('Product')
             ->field('id,name,price,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
             ->where($where)
-            ->where('status',1)
             ->select()
             ->toArray();
         $cakes = [];
