@@ -64,6 +64,9 @@ class IndexMike extends ApiBase
     {
         // 学校主键值
         $school_id = $request->param('school_id');
+        if (! $school_id){
+            $this->error('非法传参');
+        }
         // 搜索条件
         $day = date('Y-m-d',time());
         $where[] = ['today','=',$day];
@@ -73,7 +76,7 @@ class IndexMike extends ApiBase
         $today_sale = model('TodayDeals')->field('name,shop_id,product_id,old_price,price,num,limit_buy_num,thumb')
             ->where($where)->limit(4)->select();
 
-        $this->success('success',['today_sale'=>$today_sale]);
+        $this->success('success',$today_sale);
     }
 
 
@@ -231,6 +234,9 @@ class IndexMike extends ApiBase
     {
         // 学校主键值
         $school_id = $request->param('school_id');
+        if (!$school_id){
+            $this->error('非法传参');
+        }
         // 搜索条件
         $day = date('Y-m-d',time());
         $where[] = ['t.today','=',$day];
