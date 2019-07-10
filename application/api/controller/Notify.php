@@ -64,19 +64,8 @@ class Notify extends Collection
     {
         Db::startTrans();
         try {
-            $orders = model('orders')->where('orders_sn',$orders_sn)->find();
-
             //处理的业务逻辑，更新订单
-            model('orders')
-                ->where('orders_sn',$orders_sn)
-                ->update(['status'=>2,'pay_status'=>1,'pay_time'=>time(),'trade_no'=>$wx_id]);
-
-
-            if($orders['platform_coupon_id']) {
-                model('myCoupon')->where('platform_coupon_id',$orders['platform_coupon_id'])
-                    ->update(['status'=>'2','order_sn'=>$orders_sn]);
-            }
-
+            model('orders')->where('orders_sn',$orders_sn)->update(['status'=>2,'pay_status'=>1,'pay_time'=>time(),'trade_no'=>$wx_id]);
             Db::commit();
         } catch (\Throwable $e) {
             Db::rollback();

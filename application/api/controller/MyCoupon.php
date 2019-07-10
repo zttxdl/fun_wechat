@@ -200,7 +200,6 @@ class MyCoupon extends ApiBase
         foreach ($list as $k => &$v) {
             // 老用户 去掉首单立减
             if ($new_buy == 2 && $v['coupon_type'] == 2) { 
-                // unset($v);  // 删除数组元素后，新数组不会重新建立索引
                 array_splice($list,$k,1); // 删除数组元素后，新数组会自动重新建立索引
                 continue;
             }
