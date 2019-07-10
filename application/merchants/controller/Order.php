@@ -54,6 +54,7 @@ class Order extends MerchantsBase
                 'box_money' => $row['box_money'],
                 'ping_fee' => $row['ping_fee'],
                 'num'=> $row['num'],
+                'money' => $row['money'],
                 'type' => $this->getShopType($row['status']),
                 'detail' => $this->detail($row['id']),
             ];

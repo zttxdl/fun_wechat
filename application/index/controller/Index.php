@@ -8,7 +8,7 @@ use app\common\Libs\Redis;
 class Index extends Controller{
 	public function index(Request $request)
 	{
-		$redis = Redis::getInstance(config('redis_config'));
+		return "404";
 		
 	}
 
