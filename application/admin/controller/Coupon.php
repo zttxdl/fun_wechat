@@ -156,7 +156,8 @@ class Coupon extends Base
         }
         
         $info = Db::name('platform_coupon')->where('id',$data['id'])->field('num,surplus_num,status')->find();
-        // 当优惠券未发放时，可修改所以
+        /*********** $info['status']【此处可由前端传过来 `status` 的状态值进行判断，目前以后端查表获取】************************/
+        // 当优惠券未发放时，可修改所以 
         if ($info['status'] == 1) {
             $data['surplus_num'] = $data['num'];
             if ($data['type'] == 2) {   // 平台发放
@@ -173,7 +174,7 @@ class Coupon extends Base
                 $this->error($check,201);
             }
         }
-        // 当优惠券已发放时，仅可修改发放量
+        // 当优惠券已发放时，仅可修改发放量 
         if ($info['status'] == 2) {
             // 已领取数量
             $temp = $info['num'] - $info['surplus_num'];

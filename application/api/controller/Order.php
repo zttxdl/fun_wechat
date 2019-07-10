@@ -239,64 +239,6 @@ class Order extends ApiBase
         $this->success('获取成功',$result);
     }
 
-    /**
-     * 小程序支付
-     * @param Request $request
-     */
-    public function orderPay(Request $request)
-    {
-        $orders_sn = $request->param('orders_sn');
-        $openid = $this->auth->openid;
-        $user_id = $this->auth->id;
-
-
-        if(!$orders_sn){
-
-            $this->error('订单号不能为空');
-        }
-
-        $order = model('Orders')->getOrder($orders_sn);
-
-        if(!$order){
-            $this->error('订单id错误');
-        }
-
-        if($order->user_id != $user_id){
-            $this->error('非法操作');
-        }
-        if($order->pay_status == 1){
-            $this->error('订单已支付');
-        }
-
-        if($order->status == 11){
-            $this->error('订单已取消');
-        }
-
-        if((time()-$order->add_time) > 15*60){//15分钟失效
-            $this->error('订单已失效');
-        }
-
-        $data['price'] = $order['money'];
-
-        $data = [
-            'openid' => $openid,
-            'body' => "11",
-            'detail' => "11",
-            'out_trade_no' => $orders_sn,
-            'total_fee' => $data['price'],
-        ];
-
-        error_log('request=='.print_r($data,1),3,Env::get('root_path')."./logs/order.log");
-        $wx = new \app\api\controller\Weixin();
-        $result = $wx->pay($data);
-
-        error_log('result=='.print_r($result,1),3,Env::get('root_path')."./logs/order.log");
-
-        if($result) {
-            $this->success('success',$result);
-        }
-
-    }
 
     /**
      * 订单支付真实
@@ -336,8 +278,8 @@ class Order extends ApiBase
         $data['price'] = $order['money'];
 
         if($data['price'] == 0) {
-            Db::name('orders')->where('orders_sn',$orders_sn)->setField('status',2);
-            $this->error('支付成功','10000');
+            model('orders')->where('orders_sn',$orders_sn)->update(['status'=>2,'pay_status'=>1,'pay_time'=>time(),'trade_no'=>'0元付']);
+            $this->success('支付成功','10000');
         }
 
         $config = config('wx_pay');
@@ -489,35 +431,6 @@ class Order extends ApiBase
         }
     }
 
-    public function getArray($openid){
-        return [$uid,$openid];
-    }
-
-    /**
-     * 是否首单
-     */
-    public function is_first_order(Request $request)
-    {
-        $uid = $this->auth->id;
-        $openid = $this->auth->openid;
-
-        $openid = isset($uid) ? $openid : $request->param('openid');
-
-        if($uid) {
-            $new_buy = model('orders')->isFirstOrder(['uid',$uid]);
-        }
-
-        if($openid){
-            $new_buy = model('orders')->isFirstOrder(['openid',$openid]);
-        }
-
-        if($new_buy == '1'){
-            $this->success('success',['is_first_order'=>1]);//首单
-        }else{
-            $this->success('success',['is_first_order'=>2]);//老用户
-        }
-
-    }
 
     /**
      * 确认订单，生成订单
@@ -531,10 +444,6 @@ class Order extends ApiBase
         $platform_discount = $request->param('platform_discount');//平台活动
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
-
-        set_log('order=',$order,'sureOrder');
-        set_log('detail=',$detail,'sureOrder');
-
 
         $orders_sn = build_order_no('D');//生成唯一订单号
         $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');

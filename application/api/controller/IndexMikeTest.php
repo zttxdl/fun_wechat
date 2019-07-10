@@ -5,7 +5,7 @@ namespace app\api\controller;
 use app\common\controller\ApiBase;
 use think\Request;
 
-class IndexMike extends ApiBase
+class IndexMikeTest extends ApiBase
 {
 
     protected $noNeedLogin = ['*'];
@@ -113,7 +113,7 @@ class IndexMike extends ApiBase
 
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['type','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
+            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id],['surplus_num','>',0]];
             $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select();  // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
         }
         // 组装店铺满减信息
@@ -190,25 +190,32 @@ class IndexMike extends ApiBase
         });
 
         if ($uid) {
-            // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
-            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('fave_value,threshold,shop_ids')->select();  // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
+            // 首单立减红包仅平台发放这种形式  ，搜索条件如下
+            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id],['surplus_num','>',0]];
+            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select();  // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
         }
         // 组装店铺满减信息
         foreach ($shop_list as $k => $v) {
-            foreach ($shop_list[$k]['disc'] as $kk => $vv) {
-                $shop_list[$k]['discounts'][] = $shop_list[$k][$kk]['threshold'].'减'.$shop_list[$k][$kk]['threshold'];
+            $temp = [];
+            foreach ($v['disc'] as $kk => $vv) {
+                $temp[] = $vv['threshold'].'减'.$vv['face_value'];
             }
+            unset($v['disc']);
+            $v['discounts'] = $temp;
         }
+
+        
         // 组装首单立减信息
         if (!$pt_coupon->isEmpty()) {
             foreach ($shop_list as $k => $v) {
+                $temp = $v['discounts'];
                 foreach ($pt_coupon as $ko => $vo) {
-                    if (in_array($v['id'],$vo['shop_ids'])) {
-                        $shop_list[$k]['discounts'][] = '首单减'.$pt_coupon[$ko]['fave_value'];
+                    if (in_array($v['id'],explode(',',$vo['shop_ids']))) {
+                        $temp[] =  '首单减'.$vo['face_value'];
                         continue;
                     }
                 }
+                $v['discounts'] = $temp;
             }
         }
         

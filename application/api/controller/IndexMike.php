@@ -125,7 +125,7 @@ class IndexMike extends ApiBase
 
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['type','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
+            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id],['surplus_num','>',0]];
             // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
             $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
             // 组装首单立减信息
@@ -205,7 +205,7 @@ class IndexMike extends ApiBase
 
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['type','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
+            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id],['surplus_num','>',0]];
             // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
             $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
 
