@@ -97,8 +97,8 @@ class Goods extends MerchantsBase
 
         $data   = $request->param();
 
-        Product::update($data, ['id' => $id]);
-        $this->success('success');
+        $result = Product::update($data, ['id' => $id]);
+        $this->success('success',$result);
     }
 
     /**
