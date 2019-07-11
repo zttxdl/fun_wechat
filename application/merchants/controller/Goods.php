@@ -15,7 +15,7 @@ class Goods extends MerchantsBase
     protected $noNeedLogin = [];
 
     /**
-     * 获取商家列表
+     * 获取商品列表
      */
     public function index()
     {
@@ -23,9 +23,8 @@ class Goods extends MerchantsBase
         $where = ['shop_id'=>$this->shop_id];
         //获取商品
         $list = model('Product')
-            ->field('id,name,price,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
+            ->field('id,name,price,old_price,attr_ids,thumb,sales,products_classify_id as classId,type,status')
             ->where($where)
-            ->where('status',1)
             ->select()
             ->toArray();
         $cakes = [];

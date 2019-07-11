@@ -17,15 +17,19 @@ class IndexMike extends ApiBase
     {
         $lat = $request->param('latitude','');
         $lng = $request->param('longitude','');
+        $school_id = $request->param('school_id',0);
 
         // 调用轮播图
         $data['slide'] = $this->getSlide();
         // 调用分类导航
         $data['channel'] = $this->getChannel();
-        
-        // 通过经纬度获取最近学校
-        $data['current_school'] = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
+
+        if ($school_id) { // 如果有学校主键值，则直接获取学校信息
+            $data['current_school'] = model('School')->field("id,name")->where('id','=',$school_id)->find();
+        } else { // 如果没有学校主键值，通过经纬度获取最近学校
+            $data['current_school'] = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
             ->having('distance < 5')->where('level',2)->order('distance asc')->find();
+        }
 
         $this->success('success',$data);
     }
@@ -125,7 +129,7 @@ class IndexMike extends ApiBase
 
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['type','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
+            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id],['surplus_num','>',0]];
             // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
             $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
             // 组装首单立减信息
@@ -205,7 +209,7 @@ class IndexMike extends ApiBase
 
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['type','=',2],['school_id','=',$school_id],['surplus_num','>',0],['end_time','>',time()]];
+            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id],['surplus_num','>',0]];
             // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
             $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
 

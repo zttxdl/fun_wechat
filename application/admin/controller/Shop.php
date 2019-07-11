@@ -40,8 +40,6 @@ class Shop extends Base
             $map[] = ['school_id','=',$school_id];
         }
 
-
-
         // 获取当前学校的已审核通过的商铺列表
         $list = model('ShopInfo')
             ->alias('a')
@@ -113,10 +111,8 @@ class Shop extends Base
         }
         $shop_info = $this->shopModel->getShopInfo($shop_id);
 
-
-
         if(!$shop_info) {
-            return json_error('店铺不存在');
+            $this->error('店铺不存在');
         }
         $result = [];
         foreach ($shop_info as $row)
