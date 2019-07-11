@@ -130,7 +130,9 @@ class MyCoupon extends ApiBase
             // 品类使用条件判断
             if (($limit_use != 0) && !in_array($category_id,$limit_use)) {
                 $row['is_use'] = 0;
-                $row['remark'] = '仅限部分品类使用';
+                // 通过 $limit_use 去获取品类名称，并展示
+                $category_names = model('ManageCategory')->getNames($limit_use);
+                $row['remark'] = '仅限'.$category_names.'品类使用';
                 continue;
             }
         }

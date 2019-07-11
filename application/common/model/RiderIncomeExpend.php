@@ -29,7 +29,7 @@ class RiderIncomeExpend extends Model
 
 
     /**
-     * 未结算收入[今日订单为未结算收入，也称待 ‘结算金额’ ] 
+     * 未结算收入[今日订单为未结算收入，也称‘待结算金额’ ] 
      * 
      */
     public function getNotJsMoney($id)
