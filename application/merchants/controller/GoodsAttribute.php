@@ -45,8 +45,8 @@ class GoodsAttribute extends MerchantsBase
             }
 
         }
-        $result = ProductAttrClassify::create($data);
-        $this->success('success',$result);
+        ProductAttrClassify::create($data);
+        $this->success('success');
     }
 
 
@@ -58,6 +58,10 @@ class GoodsAttribute extends MerchantsBase
      */
     public function delete($id)
     {
+        if (!$id){
+            $this->error('非法参数');
+        }
+
         //获取商品信息
         $duct = model('Product')->field('attr_ids')->where('shop_id','=',$this->shop_id)->select();
         foreach ($duct as $item) {
