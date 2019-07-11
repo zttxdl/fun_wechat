@@ -9,7 +9,7 @@ use think\Controller;
 
 class IsLogin extends Controller
 {
-
+    use  \app\common\controller\Jump;
 
     public function handle($request, \Closure $next)
     {
