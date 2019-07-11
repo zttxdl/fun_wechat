@@ -23,7 +23,7 @@ class Goods extends MerchantsBase
         $where = ['shop_id'=>$this->shop_id];
         //获取商品
         $list = model('Product')
-            ->field('id,name,price,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
+            ->field('id,name,price,old_price,attr_ids,thumb,sales,products_classify_id as classId,type,status')
             ->where($where)
             ->select()
             ->toArray();
