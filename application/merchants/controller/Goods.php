@@ -25,6 +25,7 @@ class Goods extends MerchantsBase
         $list = model('Product')
             ->field('id,name,price,old_price,attr_ids,thumb,sales,products_classify_id as classId,type,status')
             ->where($where)
+            ->order('create_time desc')
             ->select()
             ->toArray();
         $cakes = [];
@@ -73,6 +74,7 @@ class Goods extends MerchantsBase
     {
         $data   = $request->param();
         $data['shop_id'] = $this->shop_id;
+        $data['create_time'] = time();
         Product::create($data);
 
         $this->success('success');
