@@ -27,6 +27,20 @@ class Store extends ApiBase
             ->where('status',1)
             ->select()
             ->toArray();
+        //获取今日特价
+        $today = date('Y-m-d',time());
+        $toWhere[] = ['a.today','=',$today];
+        $toWhere[] = ['a.shop_id','=',$shop_id];
+        $toWhere[] = ['a.end_time','>=',time()];
+        $days = Db::name('today_deals')->alias('a')
+            ->join('product b','a.product_id = b.id ')
+            ->field('b.id,b.name,a.old_price,a.price,a.num,a.limit_buy_num,a.thumb,a.start_time,a.end_time,b.products_classify_id as classId,b.attr_ids,b.box_money,b.sales')
+            ->where($toWhere)
+            ->find();
+
+        if ($days){
+            $list[] = $days;
+        }
         foreach ($list as &$item) {
 
             if ($item['attr_ids']) {
@@ -62,14 +76,6 @@ class Store extends ApiBase
 
         $data['cakes'] = $cakes;
         $data['preferential'] = $preferential;
-        //获取今日特价
-        $today = date('Y-m-d',time());
-        $data['today_deals'] = model('TodayDeals')
-            ->field('id,name,product_id,old_price,price,num,limit_buy_num,thumb,start_time,end_time')
-            ->where('shop_id',$shop_id)
-            ->where('today',$today)
-            ->find();
-
         //获取分类
         $data['class'] = model('ProductsClassify')
             ->field('id as classId,name as className')
