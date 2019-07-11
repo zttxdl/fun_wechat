@@ -272,6 +272,9 @@ class Order extends ApiBase
 
         if((time()-$order->add_time) > 15*60){//15分钟失效
             Model('Orders')->updateStatus($orders_sn,9);
+            // TODO 订单失效后，如果使用了红包，或者有今日特价的商品，需处理红包回滚，今日特价商品的数量回滚！
+            // 代码待更新。。。。。
+
             $this->error('订单已失效');
         }
 
@@ -616,6 +619,7 @@ class Order extends ApiBase
             $this->error('订单已取消');
         }
 
+        // 这块判断有问题， 状态值 2 跟 3 不能同时存在
         if($order_info['status'] == 2) {//已经支付
 
             if($order_info['status'] == 3) {
