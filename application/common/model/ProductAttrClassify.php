@@ -17,4 +17,18 @@ class ProductAttrClassify extends Model
         'update_time' => 'int',
         'name','shop_id','pid',
     ];
+
+    /**
+     * 获取属性名称
+     * @param $id
+     * @return mixed
+     */
+    public function getNameByIds($id){
+        $name =  $this->where('id','in',$id)->column('name');
+
+        $name = implode(',',$name);
+
+        return $name;
+    }
+
 }

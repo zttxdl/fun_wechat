@@ -120,6 +120,9 @@ class Goods extends MerchantsBase
     public function detail($id)
     {
         $result = Product::get($id);
+        $result->class_name = model('ProductsClassify')->getNameById($result->products_classify_id);
+        $result->attr_name = model('ProductAttrClassify')->getNameByIds($result->attr_ids);
+
         $data = TodayDeals::get(['product_id'=>$id]);
         if ($data){
             $result->old_price = $data->old_price;
