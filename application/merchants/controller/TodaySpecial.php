@@ -26,11 +26,10 @@ class TodaySpecial extends MerchantsBase
             ->where('shop_id',$this->shop_id)
             ->where('today',$today)
             ->order('create_time desc')
-            ->find()
-            ->toArray();
+            ->find();
         if ($result) {
-            $result['res_time'] = $result->end_time - time();
-            $result['length'] = 1;
+            $result->res_time = $result->end_time - time();
+            $result->length = 1;
         }else {
             $result['length'] = 0;
         }
