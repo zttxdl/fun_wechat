@@ -119,9 +119,13 @@ class Property extends MerchantsBase
 
         //提现次数
         $num = Db::name('Withdraw')
-            ->where('add_time','between time',[$start,$end])
+            ->whereTime('add_time','d')
+            ->fetchSql()
+            // ->where('add_time','between time',[$start,$end])
             ->where('shop_id',$shop_id)
             ->find();
+
+            dump($num);exit;
 
         if($num){
             $this->error('一天只能提现一次哦!');
