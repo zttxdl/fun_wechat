@@ -6,6 +6,7 @@ use think\Request;
 use think\Db;
 use app\common\controller\ApiBase;
 use app\common\model\PlatformCoupon;
+use think\facade\Cache;
 
 /**
  * 我的红包控制器
