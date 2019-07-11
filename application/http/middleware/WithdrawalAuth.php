@@ -6,8 +6,8 @@ use think\Request;
 
 class WithdrawalAuth
 {
-    use \traits\controller\Jump;
-    
+    use  \app\common\controller\Jump;
+
     /**
      * 骑手提现时间
      */
