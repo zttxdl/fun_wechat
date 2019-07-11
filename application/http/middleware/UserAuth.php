@@ -7,7 +7,7 @@ use app\common\model\User;
 
 class UserAuth
 {
-    use \traits\controller\Jump;
+    use  \app\common\controller\Jump;
 
     public function handle($request, \Closure $next)
     {

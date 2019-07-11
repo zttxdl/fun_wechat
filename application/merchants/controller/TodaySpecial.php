@@ -31,7 +31,7 @@ class TodaySpecial extends MerchantsBase
             $result->res_time = $result->end_time - time();
             $result->length = 1;
         }else {
-            $result->length = 0;
+            $result['length'] = 0;
         }
 
         $this->success('success',$result);

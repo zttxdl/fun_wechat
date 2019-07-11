@@ -24,6 +24,19 @@ class ManageCategory extends Model
         $list = $this->where('level',2)->field('id,name')->select();
         return $list;
     }
+
+
+    /**
+     * 获取经营品类名称集合
+     * 
+     */
+    public function getNames($ids)
+    {
+        $category_arrs = $this->where('id','in',$ids)->column('name');
+        $category_names = implode('、',$category_arrs);
+        return $category_names;
+    }
+    
      
 
 }
