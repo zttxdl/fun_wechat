@@ -186,13 +186,11 @@ class MyCoupon extends ApiBase
         $check = Cache::store('redis')->tag('active_coupon')->get($key);  
 
         if($check){  
-            $this->error('每天只能弹 1 次红包 ！',20001);
+            $this->error('每天只能弹 1 次红包的机会 ！');
         } else {
             Cache::store('redis')->tag('active_coupon')->set($key,1,3600*24);
+            $this->success('今天第一次进入小程序，有弹红包的机会哦');
         }
-
-        $this->success('今天第一次进入小程序，有弹红包的机会哦',20000);
-        
     }
      
 
