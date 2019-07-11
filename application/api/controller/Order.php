@@ -448,6 +448,9 @@ class Order extends ApiBase
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
 
+        set_log('order=',$order,'sureOrder');
+        set_log('detail=',$detail,'sureOrder');
+
         $orders_sn = build_order_no('D');//生成唯一订单号
         $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
 
