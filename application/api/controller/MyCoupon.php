@@ -144,8 +144,11 @@ class MyCoupon extends ApiBase
         $new_buy = model('user')->getNewBuy($user_id);
         
         foreach ($list as $k => &$v) {
-            // 老用户 去掉首单立减
-            if ($new_buy == 2 && $v['coupon_type'] == 2) { 
+            // 判断用户是否已领取
+            $check_get = Db::name('my_coupon')->where([['platform_coupon_id','=',$v['id']],['user_id','=',$user_id]])->count('id');
+
+            // 老用户 去掉首单立减  || 用户已领取，则直接返回，进入下一次循环
+            if (($new_buy == 2 && $v['coupon_type'] == 2) || $check_get) { 
                 array_splice($list,$k,1); // 删除数组元素后，新数组会自动重新建立索引
                 continue;
             }
