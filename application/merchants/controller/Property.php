@@ -10,6 +10,7 @@ namespace app\merchants\controller;
 
 
 use app\common\controller\MerchantsBase;
+use think\facade\Cache;
 use think\Request;
 use think\Db;
 
@@ -117,19 +118,15 @@ class Property extends MerchantsBase
         $start = strtotime(date('Y-m-d').'00:00:00');
         $end = strtotime(date('Y-m-d').'23:59:59');
 
+        $key = 'shop_tx:'.$shop_id;
+
         //提现次数
-        $num = Db::name('Withdraw')
-            ->whereTime('add_time','d')
-            ->fetchSql()
-            // ->where('add_time','between time',[$start,$end])
-            ->where('shop_id',$shop_id)
-            ->find();
+        $data = cache::store('redis')->get($key);
 
-            dump($num);exit;
-
-        if($num){
+        if($data && ($data['add_time'] < $end)){
             $this->error('一天只能提现一次哦!');
         }
+        
 
         //账户余额
         $balance_money = model('Withdraw')->getAcountMoney($shop_id);
@@ -152,6 +149,7 @@ class Property extends MerchantsBase
         $res = DB::name('withdraw')->insert($txsq);
 
         if($res) {
+            $num = cache::store('redis')->set($key,$txsq);
             $this->success('申请成功');
         }
         $this->error('申请失败');
