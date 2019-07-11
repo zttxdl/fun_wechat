@@ -272,9 +272,9 @@ class Order extends MerchantsBase
                 'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
             ];
 
-            Db::name('orders')->where('order_id',$$order_info['id'])->setField('meal_sn',$takeout_info['meal_sn']);//更新主表取餐号
+            Db::name('orders')->where('id',$order_info['id'])->setField('meal_sn',$takeout_info['meal_sn']);//更新主表取餐号
 
-            $takeout = Db::name('takeout')->where('order_id',$$order_info['id'])->value('order_id');
+            $takeout = Db::name('takeout')->where('order_id',$order_info['id'])->value('order_id');
 
             if($takeout) {
                 throw new Exception('订单ID重复');
