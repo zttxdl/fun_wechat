@@ -118,12 +118,12 @@ class Property extends MerchantsBase
         $start = strtotime(date('Y-m-d').'00:00:00');
         $end = strtotime(date('Y-m-d').'23:59:59');
 
-        $key = 'shop_tx:'.$shop_id;
+        $key = 'shop_tx_'.$shop_id;
 
         //提现次数
-        $data = cache::store('redis')->get($key);
+        $check = Cache::store('redis')->tag('rider_tx')->get($key); 
 
-        if($data && ($data['add_time'] < $end)){
+        if($check){
             $this->error('一天只能提现一次哦!');
         }
         
@@ -149,7 +149,7 @@ class Property extends MerchantsBase
         $res = DB::name('withdraw')->insert($txsq);
 
         if($res) {
-            $num = cache::store('redis')->set($key,$txsq);
+            Cache::store('redis')->tag('rider_tx')->set($key,1,3600*24);
             $this->success('申请成功');
         }
         $this->error('申请失败');

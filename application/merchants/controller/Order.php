@@ -123,8 +123,8 @@ class Order extends MerchantsBase
                 'add_time' => date('Y-m-d H:i',$row['add_time']),
                 'money' => $row['money'],
                 'status' => $row['status'],
-                'type'=>$type
-                'meal_sn'=>
+                'type'=>$type,
+                'meal_sn'=> $row['meal_sn']
             ];
 
 
