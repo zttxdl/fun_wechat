@@ -373,8 +373,8 @@ Route::group('r-orders', function () {
 Route::group('r-inc-exp', function () {
     Route::get('/mywallet', 'myWallet');
     Route::get('/detail', 'detail');
-    // Route::post('/withdraw', 'withdraw'); // 因前期每天都可提现， 所以暂不走中间件（每周二提现）
-    Route::post('/withdraw', 'withdraw')->middleware('WithdrawalAuth'); 
+    Route::post('/withdraw', 'withdraw'); // 因前期每天都可提现， 所以暂不走中间件（每周二提现）
+    // Route::post('/withdraw', 'withdraw')->middleware('WithdrawalAuth'); 
 })->prefix('rider/IncomeExpend/');
 
 
