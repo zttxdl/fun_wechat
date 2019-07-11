@@ -83,7 +83,6 @@ class Redis
         $k    =    md5(implode('', $config).$attr['db_id']);
         if(! (static::$_instance[$k] instanceof self))
         {
-           
             static::$_instance[$k] = new self($config,$attr);
             static::$_instance[$k]->k        =    $k;
             static::$_instance[$k]->dbId    =    $attr['db_id'];
