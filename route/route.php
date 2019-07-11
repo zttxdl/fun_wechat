@@ -390,4 +390,5 @@ Route::group('r-upload', function () {
 // 用户端
 Route::group('auto', function () {
     Route::rule('/zero_execute', 'zeroExecute');
+    Route::rule('/cancel_orders', 'cancelOrders');
 })->prefix('api/AutoShell/');
