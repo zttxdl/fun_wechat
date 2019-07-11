@@ -73,9 +73,9 @@ class Goods extends MerchantsBase
     {
         $data   = $request->param();
         $data['shop_id'] = $this->shop_id;
-        $result = Product::create($data);
+        Product::create($data);
 
-        $this->success('success',$result);
+        $this->success('success');
     }
 
 
@@ -88,9 +88,15 @@ class Goods extends MerchantsBase
      */
     public function update(Request $request)
     {
+        $id   = $request->param('id');
+        if (!$id){
+            $this->error('非法参数');
+        }
+
         $data   = $request->param();
-        $result = Product::update($data, ['id' => $request->param('id')]);
-        $this->success('success',$result);
+
+        Product::update($data, ['id' => $id]);
+        $this->success('success');
     }
 
     /**
@@ -101,14 +107,17 @@ class Goods extends MerchantsBase
      */
     public function delete($id)
     {
+        if (!$id){
+            $this->error('非法参数');
+        }
         $result = Product::get($id);
         
         if ($result->shop_id != $this->shop_id) {
             $this->error('没有权限删除');
         }
 
-        $result = Product::destroy($id);
-        $this->success('success',$result);
+        Product::destroy($id);
+        $this->success('success');
     }
 
     /**
@@ -119,6 +128,10 @@ class Goods extends MerchantsBase
      */
     public function detail($id)
     {
+        if (!$id){
+            $this->error('非法参数');
+        }
+
         $result = Product::get($id);
         $result->class_name = model('ProductsClassify')->getNameById($result->products_classify_id);
         $result->attr_name = model('ProductAttrClassify')->getNameByIds($result->attr_ids);
