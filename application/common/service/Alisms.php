@@ -9,7 +9,7 @@ use think\Model;
 
 class Alisms extends Model
 {
-    use \traits\controller\Jump;
+    use  \app\common\controller\Jump;
     //定义短信模版
     protected function  getTemplateCode($type)
     {
