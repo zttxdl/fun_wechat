@@ -55,8 +55,12 @@ class Order extends MerchantsBase
                 'ping_fee' => $row['ping_fee'],
                 'num'=> $row['num'],
                 'money' => $row['money'],
+                'meal_sn'=> $row['meal_sn'],
+                'rider_tel'=> Model('RiderInfo')->getPhoneById($row['rider_id']),
+                'issuing_status' => $row['issuing_status'],
                 'type' => $this->getShopType($row['status']),
                 'detail' => $this->detail($row['id']),
+
             ];
         }
 
@@ -124,7 +128,9 @@ class Order extends MerchantsBase
                 'money' => $row['money'],
                 'status' => $row['status'],
                 'type'=>$type,
-                'meal_sn'=> $row['meal_sn']
+                'meal_sn'=> $row['meal_sn'],
+                'rider_tel'=> Model('RiderInfo')->getPhoneById($row['rider_id']),
+                'issuing_status' => $row['issuing_status']//出餐状态 0:未出餐 1:已出餐
             ];
 
 
@@ -399,7 +405,7 @@ class Order extends MerchantsBase
     {
         $order_sn = $request->param('orders_sn');
 
-        $res = Db::name('orders')->where('orders_sn',$order_sn)->setField('issuing_time',time());
+        $res = Db::name('orders')->where('orders_sn',$order_sn)->update(['issuing_time'=>time(),'issuing_status'=>1]);
 
         if($res){
             $this->success('送出成功');
