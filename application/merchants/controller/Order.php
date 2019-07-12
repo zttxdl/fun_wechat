@@ -339,6 +339,13 @@ class Order extends MerchantsBase
             if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
                 $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>4,'shop_receive_time'=>time()]);
 
+                //如果使用红包 状态回滚
+                if($order_info['platform_coupon_money'] > 0){
+                    $data['status'] = 1;//未使用
+                    Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
+                }
+
+
                 if($result) {
                     return json_success('拒单成功');
                 }

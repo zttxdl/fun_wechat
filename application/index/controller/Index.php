@@ -16,7 +16,7 @@ class Index extends Controller{
 		$key = 'name';
 
 		if($redis->exists($key)) {
-			echo $redis->get('name');
+			echo $fv redis->get('name');
 			echo "<br>";
 			echo $redis->ttl('name');
 		}else{

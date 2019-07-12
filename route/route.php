@@ -238,7 +238,7 @@ Route::group('u-index', function () {
     Route::rule('/recommend', 'getRecommendList');
     Route::rule('/navigation', 'getNavigation');
     Route::rule('/special-list', 'getSpecialList');
-})->prefix('api/IndexMike/');
+})->prefix('api/Index/');
 
 // 红包组
 Route::group('u-coupon', function () {

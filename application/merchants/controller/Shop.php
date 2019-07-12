@@ -113,11 +113,13 @@ class Shop extends MerchantsBase
 
         $res = Model('shopInfo')->where('id',$shop_id)->setField('open_status',$open_status);
 
+        $result = ShopInfo::where('id',$shop_id)->find();
+
         if($res) {
-            $this->success('更新成功');
+            $this->success('更新成功',['open_status'=>$result['open_status']]);
         }
 
-        $this->error('更新失败');
+        $this->error('更新失败',201,['open_status'=>$result['open_status']]);
 
     }
 
