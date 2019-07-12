@@ -140,6 +140,11 @@ class Order extends ApiBase
             ->where('a.order_id',$orders_id)
             ->find();
 
+        $rider_info['delivery_time'] = floor(($rider_info['accomplish_time'] - $rider_info['single_time']) / 60);
+        $rider_info['accomplish_time'] = date('H:i',$rider_info['accomplish_time']);//送达时间
+
+
+
         if(!$rider_info) {
             $this->error('暂无骑手信息');
         }
