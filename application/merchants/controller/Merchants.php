@@ -61,12 +61,13 @@ class Merchants extends MerchantsBase
             }
 
             Db::commit();
+            return json_success('success');
         } catch (\Throwable $e) {
             Db::rollback();
-            $this->error($e->getMessage());
+            return json_error($e->getMessage());
         }
 
-        $this->success('success');
+
 
     }
 
