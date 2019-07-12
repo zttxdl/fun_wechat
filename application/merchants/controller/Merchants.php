@@ -39,6 +39,7 @@ class Merchants extends MerchantsBase
         $data['latitude'] = $map['lat'];
         $data['shop_id'] = $this->shop_id;
         $data['status'] = 1;
+        set_log('req==',$data,'createShop');
         try {
             model('ShopInfo')
                 ->where('id',$data['shop_id'])
