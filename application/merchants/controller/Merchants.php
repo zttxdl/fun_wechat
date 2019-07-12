@@ -39,6 +39,7 @@ class Merchants extends MerchantsBase
         $data['latitude'] = $map['lat'];
         $data['shop_id'] = $this->shop_id;
         $data['status'] = 1;
+        set_log('req==',$data,'createShop');
         try {
             model('ShopInfo')
                 ->where('id',$data['shop_id'])
@@ -60,12 +61,13 @@ class Merchants extends MerchantsBase
             }
 
             Db::commit();
+            return json_success('success');
         } catch (\Throwable $e) {
             Db::rollback();
-            $this->error($e->getMessage());
+            return json_error($e->getMessage());
         }
 
-        $this->success('success');
+
 
     }
 
