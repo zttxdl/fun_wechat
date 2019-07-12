@@ -11,6 +11,7 @@ namespace app\merchants\controller;
 use app\common\controller\MerchantsBase;
 use app\common\model\Orders;
 use EasyWeChat\Factory;
+use think\facade\Cache;
 use think\Exception;
 use think\Request;
 use think\Db;
@@ -55,8 +56,12 @@ class Order extends MerchantsBase
                 'ping_fee' => $row['ping_fee'],
                 'num'=> $row['num'],
                 'money' => $row['money'],
+                'meal_sn'=> $row['meal_sn'],
+                'rider_tel'=> Model('RiderInfo')->getPhoneById($row['rider_id']),
+                'issuing_status' => $row['issuing_status'],
                 'type' => $this->getShopType($row['status']),
                 'detail' => $this->detail($row['id']),
+
             ];
         }
 
@@ -123,8 +128,10 @@ class Order extends MerchantsBase
                 'add_time' => date('Y-m-d H:i',$row['add_time']),
                 'money' => $row['money'],
                 'status' => $row['status'],
-                'type'=>$type
-                'meal_sn'=>
+                'type'=>$type,
+                'meal_sn'=> $row['meal_sn'],
+                'rider_tel'=> Model('RiderInfo')->getPhoneById($row['rider_id']),
+                'issuing_status' => $row['issuing_status']//出餐状态 0:未出餐 1:已出餐
             ];
 
 
@@ -238,6 +245,7 @@ class Order extends MerchantsBase
 
         $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
 
+
         if($order_info['status'] == 3) {
             $this->error('商家已接单');
         }
@@ -252,6 +260,8 @@ class Order extends MerchantsBase
             'name' => $shop_info['link_name'],
         ];
 
+        //启动事务
+        Db::startTrans();
         try{
             //封装外卖数据
             $takeout_info = [
@@ -266,23 +276,28 @@ class Order extends MerchantsBase
                 'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
             ];
 
-            Db::name('orders')->where('order_id',$$order_info['id'])->setField('meal_sn',$takeout_info['meal_sn']);//更新主表取餐号
+            Db::name('orders')->where('id',$order_info['id'])->setField('meal_sn',$takeout_info['meal_sn']);//更新主表取餐号
 
-            $takeout = Db::name('takeout')->where('order_id',$$order_info['id'])->value('order_id');
+            // $takeout = Db::name('takeout')->where('order_id',$order_info['id'])->value('order_id');
+            $check = cache::store('redis')->get('fun_takeout_'.$order_info['id']);
 
-            if($takeout) {
+            if($check) {
                 throw new Exception('订单ID重复');
             }
             //外卖数据入库
+            cache::store('redis')->set('fun_takeout_'.$order_info['id'],1);
             Db::name('takeout')->insert($takeout_info);
 
 
 
             $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time()]);
 
+            Db::commit();
+
             return json_success('success');
 
         }catch (\Exception $e) {
+            Db::rollback();
             $this->error($e->getMessage());
         }
 
@@ -399,7 +414,7 @@ class Order extends MerchantsBase
     {
         $order_sn = $request->param('orders_sn');
 
-        $res = Db::name('orders')->where('orders_sn',$order_sn)->setField('issuing_time',time());
+        $res = Db::name('orders')->where('orders_sn',$order_sn)->update(['issuing_time'=>time(),'issuing_status'=>1]);
 
         if($res){
             $this->success('送出成功');

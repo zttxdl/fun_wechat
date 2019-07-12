@@ -93,7 +93,7 @@ class Orders extends RiderBase
         ];
         model('Takeout')->where('order_id',$orderId)->update($data);
 
-        model('Orders')->where('id',$orderId)->update(['status'=>5,'rider_receive_time'=>time()]);
+        model('Orders')->where('id',$orderId)->update(['status'=>5,'rider_id'=>$this->auth->id,'rider_receive_time'=>time()]);
 
         $this->success('success');
 
