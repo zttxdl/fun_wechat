@@ -77,6 +77,14 @@ class IncomeExpend extends RiderBase
      */
     public function withdraw(Request $request)
     {
+        // 判断当前骑手的所在学校的提现周期
+        $info = Db::name('rider_withdraw_period')->where('school_id','=',$this->auth->school_id)->field('type,days')->find();
+        if ($info['type'] == 2) {   // 当设定为每周的某一天提现时
+            if (date('w') != $info['days']) {
+                $this->error('每周'.config('rider_withdraw_period')[$info['days']].'为提现日！今天不可提现', 205);
+            }
+        }
+
         // 判断提现金额【不能少于1元】
         if ($request->param('money') < 1) {
             $this->error('提现金额不能少于1元');            
@@ -106,6 +114,7 @@ class IncomeExpend extends RiderBase
             $this->error('您的提现金额大于可提现金额！');
         }
 
+        // 组装数据
         $data['current_money'] = $request->param('money');
         $data['rider_id'] = $this->auth->id;
         $data['type'] = 2;
@@ -114,6 +123,7 @@ class IncomeExpend extends RiderBase
         $data['add_time'] = time();
         $data['status'] = 1;
 
+        // 存表
         $res = model('RiderIncomeExpend')::create($data);
 
         if (!$res) {

@@ -87,7 +87,7 @@ class MyCoupon extends ApiBase
 
 
     /**
-     * 领取优惠券 
+     * 领取优惠券 【针对自主领取， 自主领取的优惠券有效期均为 （领取日起 + N），N 表示天数 】
      * 
      */
     public function getCoupon(Request $request)

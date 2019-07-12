@@ -266,16 +266,13 @@ class Order extends ApiBase
         if($order->user_id != $user_id){
             $this->error('非法操作');
         }
-        if($order->pay_status == 1){
-            $this->error('订单已支付');
+        // 订单超时15分钟，自动失效
+        if($order->status == 9){
+            $this->error('订单已失效');
         }
 
-        if((time()-$order->add_time) > 15*60){//15分钟失效
-            Model('Orders')->updateStatus($orders_sn,9);
-            // TODO 订单失效后，如果使用了红包，或者有今日特价的商品，需处理红包回滚，今日特价商品的数量回滚！
-            // 代码待更新。。。。。
-
-            $this->error('订单已失效');
+        if($order->pay_status == 1){
+            $this->error('订单已支付');
         }
 
         $data['price'] = $order['money'];
