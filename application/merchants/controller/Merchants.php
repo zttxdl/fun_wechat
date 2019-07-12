@@ -26,8 +26,6 @@ class Merchants extends MerchantsBase
     public function createShop(Request $request)
     {
         $data = $request->param();
-        $data['shop_id'] = $this->shop_id;
-        $data['status'] = 1;
         $check = $this->validate($request->param(), 'Merchants');
         if ($check !== true) {
             $this->error($check);
@@ -39,7 +37,8 @@ class Merchants extends MerchantsBase
         $map = Convert_BD09_To_GCJ02($lat,$lng);
         $data['longitude'] = $map['lng'];
         $data['latitude'] = $map['lat'];
-
+        $data['shop_id'] = $this->shop_id;
+        $data['status'] = 1;
         try {
             model('ShopInfo')
                 ->where('id',$data['shop_id'])
