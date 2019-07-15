@@ -39,6 +39,8 @@ class Store extends ApiBase
             ->find();
 
         if ($days){
+            $days['price'] = (float)$days['price'];
+            $days['old_price'] = (float)$days['old_price'];
             $list[] = $days;
         }
         foreach ($list as &$item) {
