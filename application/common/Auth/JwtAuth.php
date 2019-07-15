@@ -78,11 +78,11 @@ class JwtAuth
             return $arr;
 
         } catch(\Firebase\JWT\SignatureInvalidException $e) {  //签名不正确
-            $this->error('签名不正确','204');
+            $this->error('签名不正确','291');
         }catch(\Firebase\JWT\BeforeValidException $e) {  // 签名在某个时间点之后才能用
-            $this->error('签名在某个时间点之后才能用','202');
+            $this->error('签名在某个时间点之后才能用','292');
         }catch(\Firebase\JWT\ExpiredException $e) {
-            $this->error('token过期，请重新登录','203');
+            $this->error('token过期，请重新登录','293');
         }catch(Exception $e) {  //其他错误
             $this->error($e->getMessage(),'299');
         }
