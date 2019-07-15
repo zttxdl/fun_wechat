@@ -49,7 +49,7 @@ class Login extends MerchantsBase
         }
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken('merchants'.$user->id,2592000);
+        $token = $jwtAuth->createToken($user,2592000);
         $this->success('success',[
             'token' => $token
         ]);
@@ -92,7 +92,7 @@ class Login extends MerchantsBase
         }
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken('merchants'.$user->id,2592000);
+        $token = $jwtAuth->createToken($user,2592000);
         $this->success('success',[
             'token' => $token
         ]);
@@ -138,7 +138,7 @@ class Login extends MerchantsBase
 
 	        if ($result = ShopInfo::create($data)) {
                 $jwtAuth = new JwtAuth();
-                $token = $jwtAuth->createToken('merchants'.$result->id,2592000);
+                $token = $jwtAuth->createToken($result,2592000);
                 $this->success('success',[
                     'token' => $token
                 ]);

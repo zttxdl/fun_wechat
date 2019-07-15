@@ -25,9 +25,7 @@ class Merchants extends MerchantsBase
 
     public function createShop(Request $request)
     {
-        $data = $request->param();
-        $data['shop_id'] = $this->shop_id;
-        $data['status'] = 1;
+
         $check = $this->validate($request->param(), 'Merchants');
         if ($check !== true) {
             $this->error($check);
@@ -39,24 +37,62 @@ class Merchants extends MerchantsBase
         $map = Convert_BD09_To_GCJ02($lat,$lng);
         $data['longitude'] = $map['lng'];
         $data['latitude'] = $map['lat'];
+        $data['shop_id'] = $this->shop_id;
+        $data['status'] = 1;
+        $data['update_time'] = time();
+        $data['shop_name'] = $request->param('shop_name');
+        $data['logo_img'] = $request->param('logo_img');
+        $data['school_id'] = $request->param('school_id');
+        $data['manage_category_id'] = $request->param('manage_category_id');
+        $data['link_name'] = $request->param('link_name');
+        $data['link_tel'] = $request->param('link_tel');
+        $data['address'] = $request->param('address');
+        //明细
+        $data2['shop_id'] = $this->shop_id;
+        $data2['business_license'] = $request->param('business_license');
+        $data2['proprietor'] = $request->param('proprietor');
+        $data2['hand_card_front'] = $request->param('hand_card_front');
+        $data2['hand_card_back'] = $request->param('hand_card_back');
+        $data2['user_name'] = $request->param('user_name');
+        $data2['identity_num'] = $request->param('identity_num');
+        $data2['sex'] = $request->param('sex');
+        $data2['licence'] = $request->param('licence');
+        $data2['branch_back'] = $request->param('branch_back');
+        $data2['back_hand_name'] = $request->param('back_hand_name');
+        $data2['back_card_num'] = $request->param('back_card_num');
+        $data2['account_type'] = $request->param('account_type');
 
+
+        $token['token'] = $request->header('api-token');
+        $token['id'] = $this->shop_id;
+        set_log('token',$token);
+        Db::startTrans();
         try {
-            model('ShopInfo')
-                ->where('id',$data['shop_id'])
+            $ret = model('ShopInfo')
+                ->where('id',$this->shop_id)
                 ->update($data);
+            if (!$ret){
+                throw new \Exception("更新失败");
+            }
+            $id = model('ShopMoreInfo')
+                ->where('shop_id',$this->shop_id)
+                ->value('id');
 
-            $info = model('ShopMoreInfo')
-                ->field('id')
-                ->where('shop_id',$data['shop_id'])
-                ->find();
-
-            if ($info){
-                model('ShopMoreInfo')
-                    ->where('shop_id',$data['shop_id'])
-                    ->update($data);
+            if ($id){
+                $data2['update_time'] = time();
+                $ret = model('ShopMoreInfo')
+                    ->where('shop_id',$this->shop_id)
+                    ->update($data2);
+                if (!$ret){
+                    throw new \Exception("入驻失败");
+                }
 
             }else{
-                model('ShopMoreInfo')->insert($data);
+                $data2['create_time'] = time();
+                $ret = model('ShopMoreInfo')->insert($data2);
+                if (!$ret){
+                    throw new \Exception("入驻失败");
+                }
 
             }
 

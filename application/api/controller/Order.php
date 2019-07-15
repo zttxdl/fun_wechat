@@ -136,9 +136,14 @@ class Order extends ApiBase
 
         $rider_info = Db::name('takeout')->alias('a')
             ->join('rider_info b','a.rider_id = b.id')
-            ->field('a.single_time,a.accomplish_time,b.id,b.name,b.headimgurl,b.sex,b.link_tel')
+            ->field('a.single_time,a.accomplish_time,a.single_time,a.accomplish_time,b.id,b.name,b.headimgurl,b.sex,b.link_tel')
             ->where('a.order_id',$orders_id)
             ->find();
+
+        $rider_info['delivery_time'] = floor(($rider_info['accomplish_time'] - $rider_info['single_time']) / 60);
+        $rider_info['accomplish_time'] = date('H:i',$rider_info['accomplish_time']);//送达时间
+
+
 
         if(!$rider_info) {
             $this->error('暂无骑手信息');

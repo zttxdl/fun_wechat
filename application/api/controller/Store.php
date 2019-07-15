@@ -39,6 +39,8 @@ class Store extends ApiBase
             ->find();
 
         if ($days){
+            $days['price'] = (float)$days['price'];
+            $days['old_price'] = (float)$days['old_price'];
             $list[] = $days;
         }
         foreach ($list as &$item) {
@@ -176,7 +178,8 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             ->where('delete',0)
             ->select();
         //判断是否存在首单减
-        if ($this->auth->new_buy == 1){
+        $new_buy = model('User')->where('id',$this->auth->id)->value('new_buy');
+        if ($new_buy == 1){
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
             $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$data['school_id']],['surplus_num','>',0]];
             // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
