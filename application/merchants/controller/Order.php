@@ -335,6 +335,8 @@ class Order extends MerchantsBase
         try{
             $res = $this->wxRefund($orders_sn);//商家拒绝接单把钱退给用户
 
+            set_log('result==',$res,'refuse');
+
 //            dump($res);
             if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
                 $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>4,'shop_receive_time'=>time()]);
