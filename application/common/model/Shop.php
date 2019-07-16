@@ -100,7 +100,7 @@ class Shop extends Model
     {
         $data = Db::name('orders')
             ->where('shop_id',$shop_id)
-            ->where('status','notin',[1])
+            ->where('status','notin',[1,4,9])
             ->count('id');
 
         return $data;
@@ -112,7 +112,7 @@ class Shop extends Model
     public function getMonthNum($shop_id)
     {
         $data = Db::name('orders')
-            ->where('status','notin',[1])
+            ->where('status','notin',[1,4,9])
             ->where('shop_id',$shop_id)
             ->whereTime('add_time', 'month')
             ->count('id');
@@ -127,7 +127,7 @@ class Shop extends Model
     public function getDayNum($shop_id)
     {
         $data = Db::name('orders')
-            ->where('status','notin',[1])
+            ->where('status','notin',[1,4,9])
             ->where('shop_id',$shop_id)
             ->whereTime('add_time', 'today')
 //            ->fetchSql('true')
