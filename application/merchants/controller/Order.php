@@ -19,7 +19,7 @@ use think\Db;
 class Order extends MerchantsBase
 {
 
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['*'];
 
     /**
      * 订单管理
@@ -367,21 +367,23 @@ class Order extends MerchantsBase
     public function wxRefund($orders_sn)
     {
 
-        $number = trim($orders_sn);//商户订单号
+        $request['number'] = trim($orders_sn);//商户订单号
 
-        if (!$number){
+        if (!$request['number']){
             $this->error('非法传参');
         }
 
-        $find = model('Orders')->where('orders_sn',$number)->find();
+        $find = model('Orders')->where('orders_sn',$request['number'])->find();
 
         if (!$find){
             $this->error('商户订单号错误');
         }
 
-        $totalFee = $find->money * 100; //订单金额
-        $refundFee =  $find->money * 100;//退款金额
-        $refundNumber = build_order_no('T');//商户退款单号
+        $request['totalFee'] = $find->money * 100;
+        $request['refundFee'] = $find->money * 100;
+        $request['refundNumber'] = build_order_no('T');
+
+        set_log('request==',$request,'wexRefund');
 
         $pay_config = config('wx_pay');
 
@@ -389,7 +391,7 @@ class Order extends MerchantsBase
         $app    = Factory::payment($pay_config);//pay_config 微信配置
 
         //根据商户订单号退款
-        $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
+        $result = $app->refund->byOutTradeNumber( $request['number'], $request['refundNumber'], $request['totalFee'], $request['refundFee'], $config = [
             // 可在此处传入其他参数，详细参数见微信支付文档
             'refund_desc' => '取消订单退款',
             //'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
