@@ -87,6 +87,7 @@ class PushEvent
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
         $res = curl_exec($ch);
         curl_close($ch);
+        dump($res);  // 先保留，当测试功能完整时，会删掉
     }
 
 }
