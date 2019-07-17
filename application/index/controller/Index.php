@@ -25,10 +25,11 @@ class Index extends Controller{
 	}
 	 
 
-	public function test()
+	public function test($sid)
 	{
 
-		
+		$socket = new PushEvent();
+		$socket->setUser($sid)->setContent('新订单来了')->push();
 
 	}
 
