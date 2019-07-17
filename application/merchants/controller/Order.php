@@ -43,8 +43,11 @@ class Order extends MerchantsBase
 
         $orders = Orders::where($map)->paginate($page_size)->toArray();
 
-        //dump($orders);
-        $data = '';
+        if(!$orders) {
+            $this->error('暂无订单');
+        }
+
+        $data = [];
         foreach ($orders['data'] as $key => &$row)
         {
             $data[] = [
@@ -65,9 +68,7 @@ class Order extends MerchantsBase
             ];
         }
 
-        if(!$orders) {
-            $this->error('暂无订单');
-        }
+
 
 
         $result['list'] = $data;
