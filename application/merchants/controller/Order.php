@@ -44,7 +44,7 @@ class Order extends MerchantsBase
         $orders = Orders::where($map)->paginate($page_size)->toArray();
 
         //dump($orders);
-
+        $data = '';
         foreach ($orders['data'] as $key => &$row)
         {
             $data[] = [
@@ -276,9 +276,11 @@ class Order extends MerchantsBase
                 'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
             ];
 
-            Db::name('orders')->where('id',$order_info['id'])->setField('meal_sn',$takeout_info['meal_sn']);//更新主表取餐号
+            $ret = Db::name('orders')->where('id',$order_info['id'])->setField('meal_sn',$takeout_info['meal_sn']);//更新主表取餐号
+            if (!$ret){
+                throw new Exception('主表取餐号更新失败');
+            }
 
-            // $takeout = Db::name('takeout')->where('order_id',$order_info['id'])->value('order_id');
             $check = cache::store('redis')->get('fun_takeout_'.$order_info['id']);
 
             if($check) {
@@ -286,21 +288,25 @@ class Order extends MerchantsBase
             }
             //外卖数据入库
             cache::store('redis')->set('fun_takeout_'.$order_info['id'],1);
-            Db::name('takeout')->insert($takeout_info);
+            $ret = Db::name('takeout')->insert($takeout_info);
 
-
+            if (!$ret){
+                throw new Exception('接单失败');
+            }
 
             $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time()]);
+            if (!$result){
+                throw new Exception('接单失败');
+            }
 
             Db::commit();
-
-            return json_success('success');
 
         }catch (\Exception $e) {
             Db::rollback();
             $this->error($e->getMessage());
         }
 
+        $this->success('success');
     }
 
     /**
@@ -325,7 +331,6 @@ class Order extends MerchantsBase
 
         //去微信查一下订单是否退款,没有退款在走下面的退款接口
         $res = $this->refundQuery($orders_sn);
-        set_log('query==',$res,'refuse');
 
         if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
             $this->error('订单已拒单,请勿重复提交!');
@@ -333,7 +338,6 @@ class Order extends MerchantsBase
 
         try{
             $res = $this->wxRefund($orders_sn);//商家拒绝接单把钱退给用户
-            set_log('result==',$res,'refuse');
             if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
                 $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>4,'shop_receive_time'=>time()]);
 
@@ -343,9 +347,8 @@ class Order extends MerchantsBase
                     Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
                 }
 
-
-                if($result) {
-                    return json_success('拒单成功');
+                if(!$result) {
+                    throw new Exception('拒单失败');
                 }
             }else{
                 throw new Exception('拒单失败');
@@ -355,7 +358,7 @@ class Order extends MerchantsBase
             $this->error($e->getMessage());
         }
 
-
+        $this->success('拒单成功');
     }
 
     /**
@@ -375,9 +378,10 @@ class Order extends MerchantsBase
         if (!$find){
             $this->error('商户订单号错误');
         }
+        $totalFee = intval(round($find->money * 100));
+        $request['totalFee'] = $totalFee;
+        $request['refundFee'] = $totalFee;
 
-        $request['totalFee'] = $find->money * 100;
-        $request['refundFee'] = $find->money * 100;
         $request['refundNumber'] = build_order_no('T');
 
         set_log('request==',$request,'wexRefund');
