@@ -424,9 +424,9 @@ class Order extends MerchantsBase
         $res = Db::name('orders')->where('orders_sn',$order_sn)->update(['issuing_time'=>time(),'issuing_status'=>1]);
 
         if($res){
-            $this->success('送出成功');
+            $this->success('success',['issuing_status'=>1]);
         }
-        $this->error('送出失败');
+        $this->error('fail',201,['issuing_status'=>0]);
     }
 
 

@@ -117,6 +117,20 @@ class Orders extends RiderBase
             $Order->status = 6;
             $Takeout->status = 5;
             $Order->send_time = time();
+
+            //取餐离店 计算商家收入
+            $data = [
+                'withdraw_sn' => $Order->orders_sn,
+                'shop_id' => $Order->shop_id,
+                'money' => $Order->money,
+                'type' => 1,
+                'title' => date('m-d').'账单',
+                'add_time' => time()
+            ];
+
+            Db::name('fun_withdraw')->insert($data);
+
+
         }elseif ($type ==3){//确认送达
             $Order->arrive_time = time();
             $Order->status = 7;
