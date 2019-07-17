@@ -13,8 +13,15 @@ $last_online_count = 0;
 // 记录最后一次广播的在线页面数
 $last_online_page_count = 0;
 
+$context = array(
+    'ssl' => array(
+        'local_cert'  => '/www/server/panel/vhost/cert/dev.api.daigefan.com/fullchain.pem',
+        'local_pk'    => '/www/server/panel/vhost/cert/dev.api.daigefan.com/privkey.pem',
+        'verify_peer' => false,
+    )
+);
 // PHPSocketIO服务
-$sender_io = new SocketIO(2120);
+$sender_io = new SocketIO(2120,$context);
 // 客户端发起连接事件时，设置连接socket的各种事件回调
 $sender_io->on('connection', function($socket){
     // 当客户端发来登录事件时触发
