@@ -30,7 +30,7 @@ class PushEvent
     /**
      * @var string 推送服务地址
      */
-    protected $push_api_url = 'https://dev.api.daigefan.com:2121/';//如果在服务器上127.0.0.1换成服务器上的域名：2121
+    protected $push_api_url = 'http://dev.api.daigefan.com:2121/';//如果在服务器上127.0.0.1换成服务器上的域名：2121
  
 
     /**
