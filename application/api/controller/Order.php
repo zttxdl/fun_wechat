@@ -608,7 +608,7 @@ class Order extends ApiBase
         $hongbao_status = 1;//未使用
 
         if(isset($order_sn)) {
-           $orders_sn = trim($order_sn);
+            $order_sn = trim($order_sn);
         }
 
         $order_info = Model('Orders')->getOrder($order_sn);
@@ -728,9 +728,9 @@ class Order extends ApiBase
         if (!$find){
             $this->error('商户订单号错误');
         }
-
-        $totalFee = $find->money * 100; //订单金额
-        $refundFee =  $find->money * 100;//退款金额
+        $money = intval(round($find->money * 100));
+        $totalFee = $money; //订单金额
+        $refundFee =  $money;//退款金额
         $refundNumber = build_order_no('T');//商户退款单号
 
         $pay_config = config('wx_pay');
@@ -740,7 +740,7 @@ class Order extends ApiBase
         $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
             // 可在此处传入其他参数，详细参数见微信支付文档
             'refund_desc' => '取消订单退款',
-//            'notify_url'    => 'http' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+            'notify_url'    => 'http' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
         ]);
 
 
