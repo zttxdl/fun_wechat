@@ -348,7 +348,7 @@ class Order extends MerchantsBase
                 }
 
 
-                if($result) {
+                if(!$result) {
                     return json_success('拒单成功');
                 }
             }else{
@@ -358,7 +358,6 @@ class Order extends MerchantsBase
         }catch (\Exception $e) {
             $this->error($e->getMessage());
         }
-
 
 
     }
@@ -396,7 +395,7 @@ class Order extends MerchantsBase
         $result = $app->refund->byOutTradeNumber( $request['number'], $request['refundNumber'], $request['totalFee'], $request['refundFee'], $config = [
             // 可在此处传入其他参数，详细参数见微信支付文档
             'refund_desc' => '取消订单退款',
-            //'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+//            'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
         ]);
 
 

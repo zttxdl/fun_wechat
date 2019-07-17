@@ -82,7 +82,8 @@ class Notify extends Collection
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \EasyWeChat\Kernel\Exceptions\Exception
      */
-    public function refundBack(){
+    public function refundBack()
+    {
 
         $pay_config = config('wx_pay');
         $app    = Factory::payment($pay_config);//pay_config 微信配置
