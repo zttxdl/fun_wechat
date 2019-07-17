@@ -359,7 +359,7 @@ class Order extends MerchantsBase
     }
 
     /**
-     * 微信退款处理
+     * 微信退款处理【商家拒单的退款处理】
      */
     public function wxRefund($orders_sn)
     {
