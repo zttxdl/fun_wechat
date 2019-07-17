@@ -13,9 +13,9 @@ class Index extends Controller{
 	 *  
 	 * 
 	 */
-	public function index()
+	public function index($id)
 	{
-		return view('index/index',['uid'=>6]);
+		return view('index/index',['uid'=>$id]);
 	}
 	 
 
