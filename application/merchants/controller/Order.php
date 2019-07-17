@@ -326,7 +326,6 @@ class Order extends MerchantsBase
         //去微信查一下订单是否退款,没有退款在走下面的退款接口
         $res = $this->refundQuery($orders_sn);
         set_log('query==',$res,'refuse');
-//        dump($res);
 
         if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
             $this->error('订单已拒单,请勿重复提交!');
@@ -334,10 +333,7 @@ class Order extends MerchantsBase
 
         try{
             $res = $this->wxRefund($orders_sn);//商家拒绝接单把钱退给用户
-
             set_log('result==',$res,'refuse');
-
-//            dump($res);
             if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
                 $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>4,'shop_receive_time'=>time()]);
 
@@ -346,7 +342,6 @@ class Order extends MerchantsBase
                     $data['status'] = 1;//未使用
                     Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
                 }
-
 
                 if($result) {
                     return json_success('拒单成功');
@@ -389,14 +384,12 @@ class Order extends MerchantsBase
 
         $pay_config = config('wx_pay');
 
-        //dump($pay_config);
         $app    = Factory::payment($pay_config);//pay_config 微信配置
 
         //根据商户订单号退款
         $result = $app->refund->byOutTradeNumber( $request['number'], $request['refundNumber'], $request['totalFee'], $request['refundFee'], $config = [
             // 可在此处传入其他参数，详细参数见微信支付文档
-            'refund_desc' => '取消订单退款',
-            //'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+            'refund_desc' => '取消订单退款'
         ]);
 
 
@@ -413,8 +406,6 @@ class Order extends MerchantsBase
         $pay_config = config('wx_pay');
         $app    = Factory::payment($pay_config);//pay_config 微信配置
         $result = $app->refund->queryByOutTradeNumber($outTradeNumber);
-
-        //$this->success('success',$result);
         return $result;
     }
 

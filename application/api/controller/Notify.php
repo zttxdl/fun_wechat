@@ -27,7 +27,6 @@ class Notify extends Collection
         //转成数组
         $xml = XML::parse(strval($request->getContent()));
         //日志记录
-        trace($xml,'info');
         $config = config('wx_pay');
 
         $payment = Factory::payment($config);
