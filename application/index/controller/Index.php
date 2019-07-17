@@ -5,31 +5,28 @@ use think\Request;
 use think\Controller;
 use app\common\Libs\Redis;
 use Predis\Client;
+
 use think\facade\Cache; 
 
+use app\common\service\PushEvent;
+
+
 class Index extends Controller{
-	public function index(Request $request)
+
+
+	/**
+	 *  
+	 * 
+	 */
+	public function index($id)
 	{
-		$config = ['host'=>'127.0.0.1','port'=>'6379','db_id'=>0];
-		
-		$redis = new Client();
+		return view('index/index',['uid'=>$id]);
 
-		$key = 'name';
-
-		if($redis->exists($key)) {
-			echo $redis->get('name');
-			echo "<br>";
-			echo $redis->ttl('name');
-		}else{
-			$redis->set('name',111);
-			$redis->expire('name',60);
-
-		}	     
-		
 	}
+	 
 
 	public function test()
-	{
+
 		// return view('index');
 		phpinfo();
 		// $redis = Cache::store('redis');
@@ -56,6 +53,11 @@ class Index extends Controller{
 		$jssdk = $app->jssdk;
 		$config = $jssdk->sdkConfig($result['prepay_id']);
 		return $config;
+
+		// 向指定商家推送新订单消息
+		$push = new PushEvent();
+		$push->setUser(1)->setContent('您有新的校园外卖订单，请及时处理')->push();
+
 	}
 
 	/**

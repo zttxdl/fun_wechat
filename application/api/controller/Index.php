@@ -141,6 +141,7 @@ class Index extends ApiBase
                 $v['discounts'][] = $vv['threshold'].'减'. $vv['face_value'];
                 unset($v['disc']);
             }
+            $v['marks'] = (float)$v['marks'];
         }
 
         if ($uid) {
@@ -219,6 +220,7 @@ class Index extends ApiBase
                 $v['discounts'][] = $vv['threshold'].'减'. $vv['face_value'];
                 unset($v['disc']);
             }
+            $v['marks'] = (float)$v['marks'];
         }
 
         $pt_coupon = '';

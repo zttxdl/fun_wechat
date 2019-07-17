@@ -328,6 +328,8 @@ Route::group('api',function () {
     Route::post('getRiderInfo','api/Order/getRiderInfo');
     //获取订单商家信息
     Route::post('getShopInfo','api/Order/getShopInfo');
+    // 判断用户是否是禁用状态
+    Route::get('checkUserStatus','api/Order/checkUserDisabled');
 });
 
 

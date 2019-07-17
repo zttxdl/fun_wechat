@@ -140,7 +140,7 @@ class Refund extends MerchantsBase
     }
 
     /**
-     * 微信退款处理
+     * 微信退款处理【用户申请退款的后续退款处理】
      */
     public function wxRefund($orders_sn)
     {

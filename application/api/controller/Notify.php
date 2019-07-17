@@ -12,7 +12,7 @@ use EasyWeChat\Kernel\Support\XML;
 use think\Collection;
 use think\Db;
 use think\Request;
-
+use app\common\service\PushEvent;
 
 class Notify extends Collection
 {
@@ -27,7 +27,6 @@ class Notify extends Collection
         //转成数组
         $xml = XML::parse(strval($request->getContent()));
         //日志记录
-        trace($xml,'info');
         $config = config('wx_pay');
 
         $payment = Factory::payment($config);
@@ -47,7 +46,9 @@ class Notify extends Collection
                 // 支付成功后的业务逻辑
                 if ($message['result_code'] === 'SUCCESS') {
                     $this->returnResult($message['out_trade_no'], $message['transaction_id']);
-
+                    // 向指定商家推送新订单消息
+                    $push = new PushEvent();
+                    $push->setUser($order['shop_id'])->setContent('您有新的校园外卖订单，请及时处理')->push();
                 }
             }else {
                 return $fail('通信失败，请稍后再通知我');
@@ -80,7 +81,8 @@ class Notify extends Collection
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \EasyWeChat\Kernel\Exceptions\Exception
      */
-    public function refundBack(){
+    public function refundBack()
+    {
 
         $pay_config = config('wx_pay');
         $app    = Factory::payment($pay_config);//pay_config 微信配置
