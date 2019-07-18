@@ -728,7 +728,7 @@ class Order extends ApiBase
         if (!$find){
             $this->error('商户订单号错误');
         }
-        $money = intval(round($find->money * 100));
+        $money = intval((string)($find->money * 100));
         $totalFee = $money; //订单金额
         $refundFee =  $money;//退款金额
         $refundNumber = build_order_no('T');//商户退款单号

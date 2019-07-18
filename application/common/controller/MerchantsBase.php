@@ -13,6 +13,7 @@ class MerchantsBase extends Base
 {
     protected $noNeedLogin = [];
     protected $shop_id;
+    protected $auth;
 
     function __construct(App $app = null)
     {
