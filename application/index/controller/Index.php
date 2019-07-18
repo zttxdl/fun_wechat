@@ -1,51 +1,27 @@
 <?php 
 namespace app\Index\Controller;
 
-use think\Request;
 use think\Controller;
-use app\common\Libs\Redis;
-use Predis\Client;
 
-use think\facade\Cache; 
-
-use app\common\service\PushEvent;
+class Index extends Controller
+{
 
 
-class Index extends Controller{
-
-
-	/**
-	 *  
-	 * 
-	 */
+    //推送连接
 	public function index($id)
 	{
 		return view('index/index',['uid'=>$id]);
 
 	}
-	 
 
+    //测试推送
 	public function test($sid)
 	{
 
-		$socket = new PushEvent();
+		$socket = model('PushEvent','service');
 		$socket->setUser($sid)->setContent('新订单来了')->push();
 
 	}
 
 
-	public function testRedis()
-	{
-
-		// return view('index');
-		phpinfo();
-		// $redis = Cache::store('redis');
-		// // dump($redis);
-		// $redis->set('name','zhangtaotao');
-		// $redis->get('name');
-
-	}
-
 }
-
- ?>

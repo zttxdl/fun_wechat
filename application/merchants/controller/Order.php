@@ -307,6 +307,16 @@ class Order extends MerchantsBase
             $this->error($e->getMessage());
         }
 
+        //实例化socket
+        $socket = model('PushEvent','service');
+        $school_id = model('ShopInfo')->where('id',$this->shop_id)->value('school_id');
+        $r_list = model('RiderInfo')->where('school_id',$school_id)->select();
+
+        foreach ($r_list as $item) {
+            $rid = 'r'.$item->id;
+            $socket->setUser($rid)->setContent('带个饭来新订单啦！')->push();
+        }
+
         $this->success('success');
     }
 
@@ -379,9 +389,9 @@ class Order extends MerchantsBase
         if (!$find){
             $this->error('商户订单号错误');
         }
-        $totalFee = intval(round($find->money * 100));
-        $request['totalFee'] = $totalFee;
-        $request['refundFee'] = $totalFee;
+        $money = intval((string)($find->money * 100));
+        $request['totalFee'] = $money;
+        $request['refundFee'] = $money;
 
         $request['refundNumber'] = build_order_no('T');
 
