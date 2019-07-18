@@ -19,7 +19,7 @@ use think\Db;
 class Order extends MerchantsBase
 {
 
-    protected $noNeedLogin = ['*'];
+    protected $noNeedLogin = [];
 
     /**
      * 订单管理
