@@ -310,7 +310,10 @@ class Order extends MerchantsBase
         //实例化socket
         $socket = model('PushEvent','service');
         $school_id = model('ShopInfo')->where('id',$this->shop_id)->value('school_id');
-        $r_list = model('RiderInfo')->where('school_id',$school_id)->select();
+        $where[] = ['school_id','=',$school_id];
+        $where[] = ['open_status','=',1];
+        $where[] = ['status','=',3];
+        $r_list = model('RiderInfo')->where($where)->select();
 
         foreach ($r_list as $item) {
             $rid = 'r'.$item->id;
@@ -362,7 +365,7 @@ class Order extends MerchantsBase
                     throw new Exception('拒单失败');
                 }
             }else{
-                throw new Exception('拒单失败');
+                throw new Exception($res['return_msg']);
             }
 
         }catch (\Exception $e) {
