@@ -45,10 +45,7 @@ class Notify extends Collection
             if ($message['return_code'] === 'SUCCESS') {
                 // 支付成功后的业务逻辑
                 if ($message['result_code'] === 'SUCCESS') {
-                    $this->returnResult($message['out_trade_no'], $message['transaction_id']);
-                    // 向指定商家推送新订单消息
-                    $push = new PushEvent();
-                    $push->setUser($order['shop_id'])->setContent('您有新的校园外卖订单，请及时处理')->push();
+                    $this->returnResult($message['out_trade_no'], $message['transaction_id'],$order['shop_id']);
                 }
             }else {
                 return $fail('通信失败，请稍后再通知我');
@@ -61,7 +58,7 @@ class Notify extends Collection
     }
 
     //微信支付回调处理业务
-    public function returnResult($orders_sn,$wx_id)
+    public function returnResult($orders_sn,$wx_id,$shop_id)
     {
         Db::startTrans();
         try {
@@ -72,6 +69,10 @@ class Notify extends Collection
             Db::rollback();
             trace($e->getMessage(),'error');
         }
+
+        // 向指定商家推送新订单消息
+        $push = model('PushEvent','service');
+        $push->setUser('s_'.$shop_id)->setContent('您有新的校园外卖订单，请及时处理')->push();
 
         return true;
     }
