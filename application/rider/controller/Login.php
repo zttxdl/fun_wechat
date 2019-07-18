@@ -117,7 +117,8 @@ class Login extends RiderBase
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
-            'token' => $token
+            'token' => $token,
+            'uuid' => 'r'.$rid,
         ]);
 
         
@@ -160,7 +161,8 @@ class Login extends RiderBase
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
-            'token' => $token
+            'token' => $token,
+            'uuid' => 'r'.$rid,
         ]);
 
     }
