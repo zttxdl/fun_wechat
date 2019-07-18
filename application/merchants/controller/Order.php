@@ -37,10 +37,10 @@ class Order extends MerchantsBase
             $map[] = ['status','=',$status];
         }
 
-        if($shop_id) {
-            $map[] = ['shop_id','=',$this->shop_id];
+        if(!$shop_id) {
+            $this->error('缺少必要参数');
         }
-
+        $map[] = ['shop_id','=',$shop_id];
         $orders = Orders::where($map)->paginate($page_size)->toArray();
 
         if(!$orders) {
