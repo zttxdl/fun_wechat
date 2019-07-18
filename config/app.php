@@ -199,8 +199,8 @@ return [
         'mch_id'             => '1531654461',
         'key'                => 'iew0a4ek2d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
         // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
-        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
-        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
+        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert_1.pem', // XXX: 绝对路径！！！！
+        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key_1.pem',      // XXX: 绝对路径！！！！
         'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
         'sandbox' => false,
     ],
