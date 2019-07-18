@@ -71,7 +71,9 @@ class Notify extends Collection
         }
 
         // 向指定商家推送新订单消息
-        $push = model('PushEvent','service');
+        // $push = model('PushEvent','service');
+        $push = new PushEvent();
+
         $push->setUser('s_'.$shop_id)->setContent('您有新的校园外卖订单，请及时处理')->push();
 
         return true;
