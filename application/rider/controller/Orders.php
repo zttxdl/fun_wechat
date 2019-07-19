@@ -148,15 +148,15 @@ class Orders extends RiderBase
                 'add_time' => time(),
             ];
             Db::name('rider_income_expend')->insert($data);
-            $user = model('User')->field('phone,new_buy,invitation_id')->where('id',$Order->user_id)->find();
-            if ($user->new_buy == 1 && $user->invitation_id){
+            $user = model('User')->field('phone,invitation_id')->where('id',$Order->user_id)->find();
+            // 判断当前用户的订单数量【只要付款之后都算数量】
+            $count = model('Orders')->where([['user_id','=',$Order->user_id],['status','notin',1]])->count('id');
+            if ($count == 1 && $user->invitation_id){
+                // 调用邀请红包
                 $this->inviteGiving($Order->user_id,$user->invitation_id);
             }
-
+            // 调用消费赠送红包
             $this->consumptionGiving($Order->user_id,$Takeout->school_id,$Order->money,$user->phone);
-
-            $user->new_buy =2;
-            $user->save();
         }
 
         $Takeout->save();
