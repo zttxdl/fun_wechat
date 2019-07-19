@@ -4,6 +4,7 @@ namespace app\api\controller;
 
 use app\common\controller\ApiBase;
 use think\Request;
+use think\Db;
 
 class Index extends ApiBase
 {
