@@ -69,7 +69,7 @@ class Coupon extends Base
 
         // 设置当前的红包批次ID
         $sum = Db::name('platform_coupon')->where('batch_id','like',date('ymd').'%')->count('id');
-        $bacth_id = date('ymdHis').'_No'.sprintf('%04d',$sum+1);
+        $bacth_id = date('ymdH').'_No'.sprintf('%04d',$sum+1);
 
         $this->success('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list,'bacth_id'=>$bacth_id]);
 

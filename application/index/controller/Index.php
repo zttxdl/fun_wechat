@@ -24,4 +24,12 @@ class Index extends Controller
 	}
 
 
+	// 查看PHPinfo
+	public function phpinfo()
+	{
+		phpinfo();
+	}
+	 
+
+
 }
