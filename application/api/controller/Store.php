@@ -27,6 +27,7 @@ class Store extends ApiBase
             ->where('status',1)
             ->select()
             ->toArray();
+
         //获取今日特价
         $today = date('Y-m-d',time());
         $toWhere[] = ['a.today','=',$today];
@@ -44,23 +45,23 @@ class Store extends ApiBase
             $list[] = $days;
         }
         foreach ($list as &$item) {
-
-            if ($item['attr_ids']) {
+            if (isset($item['attr_ids'])) {
                 $attr_list = model('ProductAttrClassify')
                     ->field('id,name')
                     ->where('id','in',$item['attr_ids'])
                     ->select();
+
                 foreach ($attr_list as  $v) {
                     $v->son = model('ProductAttrClassify')
                         ->field('id,name')
                         ->where('pid', '=', $v->id)
                         ->select();
                 }
-
                 $item['attr'] = $attr_list;
             }else{
                 $item['attr'] = '';
             }
+            $item['sales'] = model('Product')->getMonthSales($item['id']);
 
         }
 
@@ -163,6 +164,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $data['marks'] = (float)$data['marks'];
         $data['up_to_send_money'] = (float)$data['up_to_send_money'];
         $data['categoryName'] = model('ManageCategory')->where('id',$data['manage_category_id'])->value('name');
+        $data['sales'] = model('Shop')->getMonthNum($shop_id);
         //判断店铺是否营业
         if (! empty($data['run_time'])){
             $open_status = model('ShopInfo')->getBusiness($data['run_time']);
@@ -216,14 +218,14 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $product = model('Product')
             ->field('name,box_money,sales,price,old_price,thumb,info,type,attr_ids,status,shop_id')
             ->where($where)
-            ->find()
-            ->toArray();
+            ->find();
 
         $data = model('TodayDeals')->where('product_id',$product_id)->find();
 
         if (! $product){
             $this->error('商品已下架');
         }else{
+            $product = $product->toArray();
             if ($data){
                 $product['old_price'] = $data->old_price;
                 $product['price'] = $data->price;

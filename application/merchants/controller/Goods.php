@@ -28,6 +28,9 @@ class Goods extends MerchantsBase
             ->order('create_time desc')
             ->select()
             ->toArray();
+        foreach ($list as &$value) {
+            $value['sales'] = model('Product')->getMonthSales($value['id']);
+        }
         $cakes = [];
         $preferential = [];
         //获取热销商品
