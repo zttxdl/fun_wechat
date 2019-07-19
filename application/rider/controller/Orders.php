@@ -128,7 +128,7 @@ class Orders extends RiderBase
                 'add_time' => time()
             ];
 
-            Db::name('fun_withdraw')->insert($data);
+            Db::name('withdraw')->insert($data);
 
 
         }elseif ($type ==3){//确认送达
