@@ -155,8 +155,11 @@ class Orders extends RiderBase
                 // 调用邀请红包
                 $this->inviteGiving($Order->user_id,$user->invitation_id);
             }
+            
             // 调用消费赠送红包
             $this->consumptionGiving($Order->user_id,$Takeout->school_id,$Order->money,$user->phone);
+            // 调用添加商品销量
+            $this->addProductSales($orderId,$Order->shop_id);
         }
 
         $Takeout->save();
@@ -273,6 +276,27 @@ class Orders extends RiderBase
 
         return true;
     }
+
+    /**
+     * 商品售量
+     */
+    public function addProductSales($orderId,$shopId)
+    {
+        $list = model('OrdersInfo')->field('product_id,num')->where('orders_id',$orderId)->select();
+        $data = [];
+        foreach ($list as $key => $value) {
+            $data[$key]['product_id'] = $value->product_id;
+            $data[$key]['num'] = $value->num;
+            $data[$key]['shop_id'] = $shopId;
+            $data[$key]['create_time'] = time();
+        }
+
+        
+        Db::name('product_sales')->insertAll($data);
+
+        return true;
+    }
+    
 }
 
 
