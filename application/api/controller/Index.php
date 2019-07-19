@@ -156,7 +156,7 @@ class Index extends ApiBase
             if ($pt_coupon_ids) {
                 $pt_coupon = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')
                                 ->where([['m.platform_coupon_id','in',$pt_coupon_ids],['m.user_id','=',$uid]])
-                                ->field('p.face_value,p.threshold,p.shop_ids')->select()->toArray();
+                                ->field('p.face_value,p.threshold,p.shop_ids')->select();
             }
         }
 
@@ -244,7 +244,7 @@ class Index extends ApiBase
             if ($pt_coupon_ids) {
                 $pt_coupon = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')
                                 ->where([['m.platform_coupon_id','in',$pt_coupon_ids],['m.user_id','=',$uid]])
-                                ->field('p.face_value,p.threshold,p.shop_ids')->select()->toArray();
+                                ->field('p.face_value,p.threshold,p.shop_ids')->select();
             }
         }
 
