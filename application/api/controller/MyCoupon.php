@@ -162,6 +162,7 @@ class MyCoupon extends ApiBase
                 $data['add_time'] = time();
                 $data['phone'] = $this->auth->phone;
                 Db::name('my_coupon')->insert($data);
+                Db::name('platform_coupon')->where('id',$v['id'])->setDec('surplus_num');
                 $v['indate'] = '有效期限至'.date('Y.m.d',$v['end_time']);
                 $v['tips'] = '立即使用';
             } else {

@@ -144,21 +144,30 @@ class Index extends ApiBase
             $v['marks'] = (float)$v['marks'];
         }
 
+        $pt_coupon = [];
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id],['surplus_num','>',0]];
+            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id]];
             // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
-            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
-            // 组装首单立减信息
-            if ($pt_coupon) {
-                foreach ($shop_list['data'] as $k => &$v) {
-                    foreach ($pt_coupon as $ko => $vo) {
-                        $shopids = explode(',',$vo['shop_ids']);
-                        if (in_array($v['id'],$shopids)) {
-                            $v['discounts'][] = '首单减'.$vo['face_value'];
+            $pt_coupon_ids = model('PlatformCoupon')->where($pt_where)->column('id');
+            
+            // 获取当前用户的首单红包
+            if ($pt_coupon_ids) {
+                $pt_coupon = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')
+                                ->where([['m.platform_coupon_id','in',$pt_coupon_ids],['m.user_id','=',$uid]])
+                                ->field('p.face_value,p.threshold,p.shop_ids')->select()->toArray();
+            }
+        }
 
-                            continue;
-                        }
+        // 组装首单立减信息
+        if ($pt_coupon) {
+            foreach ($shop_list['data'] as $k => &$v) {
+                foreach ($pt_coupon as $ko => $vo) {
+                    $shopids = explode(',',$vo['shop_ids']);
+                    if (in_array($v['id'],$shopids)) {
+                        $v['discounts'][] = '首单减'.$vo['face_value'];
+
+                        continue;
                     }
                 }
             }
@@ -223,15 +232,21 @@ class Index extends ApiBase
             $v['marks'] = (float)$v['marks'];
         }
 
-        $pt_coupon = '';
-
+        $pt_coupon = [];
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id],['surplus_num','>',0]];
+            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id]];
             // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
-            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
-
+            $pt_coupon_ids = model('PlatformCoupon')->where($pt_where)->column('id');
+            
+            // 获取当前用户的首单红包
+            if ($pt_coupon_ids) {
+                $pt_coupon = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')
+                                ->where([['m.platform_coupon_id','in',$pt_coupon_ids],['m.user_id','=',$uid]])
+                                ->field('p.face_value,p.threshold,p.shop_ids')->select()->toArray();
+            }
         }
+
         // 组装首单立减信息
         if ($pt_coupon) {
             foreach ($shop_list['data'] as $k => &$v) {
