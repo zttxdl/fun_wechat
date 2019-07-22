@@ -292,7 +292,6 @@ class Order extends MerchantsBase
                 throw new Exception('订单ID重复');
             }
             //外卖数据入库
-            cache::store('redis')->set('fun_takeout_'.$order_info['id'],1);
             $ret = Db::name('takeout')->insert($takeout_info);
 
             if (!$ret){
