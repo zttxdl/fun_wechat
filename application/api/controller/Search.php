@@ -35,7 +35,7 @@ class Search extends ApiBase
     {
         $user_id = $this->auth->id;
         $keywords = $request->param('keywords');
-        $school_id = $request->param( 'school_id');
+        $school_id = $request->param('school_id');
         $pagesize = $request->param('pagesize',20);
         $page = $request->param('page',1);
 
@@ -58,6 +58,7 @@ class Search extends ApiBase
             a.address,a.manage_category_id,a.ping_fee")
             ->where('a.shop_name|b.name','like','%'.$keywords.'%')
             ->where( 'a.school_id','=', $school_id)
+            ->where( 'a.status','=',3)
             ->page($page,$pagesize)
             ->select();
 
@@ -76,6 +77,8 @@ class Search extends ApiBase
                 ->where('shop_id',$value['id'])
                 ->where('delete',0)
                 ->select();
+                // 获取月销售额
+            $value['sales'] = model('Shop')->getMonthNum($value['id']);
         }
 
         $this->success('success',$list);
