@@ -49,6 +49,8 @@ class Notify extends Collection
                     // 向指定商家推送新订单消息
                     $push = new PushEvent();
                     $push->setUser($order['shop_id'])->setContent('您有新的校园外卖订单，请及时处理')->push();
+                    //用户下单 就更改状态
+                    model('User')->where('id',$order->user_id)->setField('new_buy',2);
                 }
             }else {
                 return $fail('通信失败，请稍后再通知我');

@@ -41,7 +41,7 @@ class Order extends MerchantsBase
             $map[] = ['shop_id','=',$this->shop_id];
         }
 
-        $orders = Orders::where($map)->paginate($page_size)->toArray();
+        $orders = Orders::where($map)->order('add_time DESC')->paginate($page_size)->toArray();
 
         if(!$orders) {
             $this->error('暂无订单');
@@ -110,6 +110,7 @@ class Order extends MerchantsBase
 
         $orders = model('orders')
             ->where($map)
+            ->order('add_time DESC')
             ->paginate($page_size)->toArray();
 
         //var_dump($result);exit;

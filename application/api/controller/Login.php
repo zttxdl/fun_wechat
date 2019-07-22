@@ -27,6 +27,9 @@ class Login extends ApiBase
         $code = $request->param('code');
         $result = $app->auth->session($code);
 
+        //记录微信返回日志
+        set_log('result',$result,'getAuthInfo');
+
         $this->success('获取 openid 成功',['auth_result'=>$result]);
     }
 

@@ -9,11 +9,12 @@ namespace app\api\controller;
 
 use app\common\controller\ApiBase;
 use think\Db;
+use think\facade\Cache;
 use think\Request;
 
 class Store extends ApiBase
 {
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['*'];
     //获取商家详情-菜单
     public function index(Request $request)
     {
@@ -261,4 +262,37 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
     }
 
+    /**
+     * 统计店铺当天的访客量
+     */
+    public function countUserVistor(Request $request)
+    {
+
+        $shop_id = $request->param('shop_id',1);
+        $user_id = $request->param('user_id',1);
+
+        if(empty($shop_id) || empty($user_id)) {
+            $this->error("必传参数不能为空!");
+        }
+
+        $redis = Cache::store('redis');
+        $key = "shop_uv_conut";
+
+        if($redis->hExists($key,$shop_id)) {
+            //获取店铺访客
+            $user_vistor = json_decode($redis->hGet($key,$shop_id));
+            if(!in_array($user_id, $user_vistor)){
+                array_push($user_vistor,$user_id);
+            }
+        }else{
+            $user_vistor[] = $user_id;
+        }
+
+        $user_vistor = json_encode($user_vistor);
+
+        $redis->hSet($key,$shop_id,$user_vistor);
+
+
+
+    }
 }
