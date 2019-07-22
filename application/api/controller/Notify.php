@@ -45,7 +45,8 @@ class Notify extends Collection
             if ($message['return_code'] === 'SUCCESS') {
                 // 支付成功后的业务逻辑
                 if ($message['result_code'] === 'SUCCESS') {
-                    $this->returnResult($message['out_trade_no'], $message['transaction_id'],$order['shop_id']);
+
+                    $this->returnResult($message['out_trade_no'], $message['transaction_id'],$order['shop_id'],$order['user_id']);
                 }
             }else {
                 return $fail('通信失败，请稍后再通知我');
@@ -58,12 +59,15 @@ class Notify extends Collection
     }
 
     //微信支付回调处理业务
-    public function returnResult($orders_sn,$wx_id,$shop_id)
+    public function returnResult($orders_sn,$wx_id,$shop_id,$user_id)
     {
         Db::startTrans();
         try {
             //处理的业务逻辑，更新订单
             model('orders')->where('orders_sn',$orders_sn)->update(['status'=>2,'pay_status'=>1,'pay_time'=>time(),'trade_no'=>$wx_id]);
+
+            //用户下单 就更改状态
+            model('User')->where('id',$user_id)->setField('new_buy',2);
             Db::commit();
         } catch (\Throwable $e) {
             Db::rollback();

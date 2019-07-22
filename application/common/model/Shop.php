@@ -4,6 +4,7 @@
 namespace app\common\model;
 
 
+use think\facade\Cache;
 use think\Model;
 use think\Db;
 
@@ -69,7 +70,8 @@ class Shop extends Model
 
         $start_time = strtotime($start_time);
 
-        $data = Db::name('orders')->where('status',8)
+        $data = Db::name('orders')
+            ->where('status','notin',[1,4,9])
             ->where('shop_id',$shop_id)
             ->whereBetweenTime('add_time',$start_time,$end_time)
             ->sum('money');
@@ -83,8 +85,24 @@ class Shop extends Model
      */
     public function getCountSales($shop_id)
     {
-        $data = Db::name('orders')->where('status','in',[8])
+        $data = Db::name('orders')
+            ->where('status','notin',[1,4,9])
             ->where('shop_id',$shop_id)
+            ->sum('money');
+
+        return sprintf("%.2f",$data);
+
+    }
+
+    /**
+     * 获取店铺日销售总额
+     */
+    public function getDaySales($shop_id)
+    {
+        $data = Db::name('orders')
+            ->where('status','notin',[1,4,9])
+            ->where('shop_id',$shop_id)
+            ->whereTime('add_time', 'today')
             ->sum('money');
 
         return sprintf("%.2f",$data);
@@ -128,6 +146,21 @@ class Shop extends Model
     {
         $data = Db::name('orders')
             ->where('status','notin',[1,4,9])
+            ->where('shop_id',$shop_id)
+            ->whereTime('add_time', 'today')
+//            ->fetchSql('true')
+            ->count('id');
+
+        return $data;
+    }
+
+    /**
+     * 获取店铺日取消订单量
+     */
+    public function getDayCancelNum($shop_id)
+    {
+        $data = Db::name('orders')
+            ->where('status','notin',[4])
             ->where('shop_id',$shop_id)
             ->whereTime('add_time', 'today')
 //            ->fetchSql('true')
@@ -336,6 +369,20 @@ class Shop extends Model
         return $school_id;
     }
 
+    /**
+     * 获取店铺日访问用户
+     */
+    public function getShopVistor($shop_id)
+    {
+        $redis = Cache::store('redis');
+        $day_uv = $redis->hGet('shop_uv_conut',$shop_id);
+
+        if(empty($day_uv)) {
+           return  0;
+        }
+
+        return count(json_decode($day_uv));
+    }
 
 
 

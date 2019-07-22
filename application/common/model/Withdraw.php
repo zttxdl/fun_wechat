@@ -18,24 +18,14 @@ class Withdraw extends Model
      */
     public function getAcountMoney($shop_id)
     {
-        $data = $this->where('shop_id',$shop_id)
-            ->select()->toArray();
+        //已结算收入
+        $shouru_money = $this->where([['shop_id','=',$shop_id],['status','=',1],['type','=',1],['add_time','<',strtotime(date('Y-m-d')) ]])
+            ->sum('money');
 
-        $acount_money = 0;
-        foreach ($data as $key=>$row)
-        {
-            if($row['type'] == 2) {//支出
-                if(in_array($row['status'],[2])) {
-                    unset($data[$key]);
-                }
-            }
+        //提现过程中的金额【包括 `已提现`，`申请提现`】
+        $tx_money = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']])->sum('money');
 
-        }
-
-        foreach ($data as $row)
-        {
-            $acount_money += $row['money'];
-        }
+        $acount_money = $shouru_money + $tx_money;
 
         return $acount_money;
     }

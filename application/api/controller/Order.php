@@ -28,7 +28,9 @@ class Order extends ApiBase
         '7'     =>  '订单已送达 ',
         '8'     =>  '订单已完成',
         '9'     =>  '订单已取消',
-        '10'     =>  '骑手待取餐',
+        '10'    =>  '退款中',
+        '11'    =>   '退款成功',
+        '12'    =>   '退款失败',
     ];
 
 
@@ -431,7 +433,7 @@ class Order extends ApiBase
 
         if($res) {
             //更新一下主表订单状态为退款中
-            Model('Orders')->updateStatus($orders['orders_sn'],11);
+            Model('Orders')->updateStatus($orders['orders_sn'],10);
             $this->success('售后申请已提交成功,等待商家处理');
         }
     }

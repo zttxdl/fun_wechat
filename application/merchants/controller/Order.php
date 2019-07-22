@@ -40,8 +40,11 @@ class Order extends MerchantsBase
         if(!$shop_id) {
             $this->error('缺少必要参数');
         }
+
         $map[] = ['shop_id','=',$shop_id];
-        $orders = Orders::where($map)->paginate($page_size)->toArray();
+
+        $orders = Orders::where($map)->order('add_time DESC')->paginate($page_size)->toArray();
+
 
         if(!$orders) {
             $this->error('暂无订单');
@@ -110,6 +113,7 @@ class Order extends MerchantsBase
 
         $orders = model('orders')
             ->where($map)
+            ->order('add_time DESC')
             ->paginate($page_size)->toArray();
 
         //var_dump($result);exit;
@@ -269,7 +273,7 @@ class Order extends MerchantsBase
                 'order_id' => $order_info['id'],
                 'shop_id' => $order_info['shop_id'],
                 'ping_fee' => $order_info['ping_fee'],//配送费
-                'meal_sn' => createOrderSn('shop_id:'.$order_info['shop_id']),//取餐号
+                'meal_sn' => getMealSn('shop_id:'.$order_info['shop_id']),//取餐号
                 'school_id' => Model('Shop')->getSchoolIdByID($order_info['shop_id']),
                 'create_time' => time(),//商家接单时间
                 'expected_time' => time()+30*60,//预计送达时间

@@ -13,6 +13,7 @@ use app\common\model\Orders;
 use app\common\model\ShopInfo;
 use app\common\model\ShopMoreInfo;
 use think\Request;
+use think\facade\Cache;
 
 class Shop extends MerchantsBase
 {
@@ -26,6 +27,10 @@ class Shop extends MerchantsBase
     {
 
         $shop_id = $this->shop_id;
+
+        if(!$shop_id) {
+            $this->error('关键参数不能为空');
+        }
         $result = ShopInfo::where('id',$shop_id)->find();
 
         if($result->isEmpty()) {
@@ -35,18 +40,17 @@ class Shop extends MerchantsBase
             $this->error('店铺待审核中!');
         }
 
-
-
-        $day_order = Orders::where('shop_id',$shop_id)->count('id');
-        $day_sales = Orders::where(['shop_id'=>$shop_id,'status'=>8])->sum('money');
-        $day_cancel_order = Orders::where(['shop_id'=>$shop_id,'status'=>9])->count('id');
+        $day_order = model('Shop')->getDayNum($shop_id);
+        $day_sales = model('Shop')->getDaySales($shop_id);
+        $day_cancel_order = model('Shop')->getDayCancelNum($shop_id);
+        $day_uv = model('Shop')->getShopVistor($shop_id);//店铺访客数
 
         $shop_info = [
             'shop_name' => $result['shop_name'],//店铺名称
             'status' => $result['open_status'],//店铺营业状态
             'day_order' => $day_order,//今日订单数
             'day_sales' => sprintf("%.2f",$day_sales),//今日销售额
-            'day_uv' => '20',//今日访客数
+            'day_uv' => !empty($day_uv) ? $day_uv : 0,//今日访客数
             'logo_img'=>$result['logo_img'],
             'order_cancel_num' => $day_cancel_order,//订单取消数量
         ];
