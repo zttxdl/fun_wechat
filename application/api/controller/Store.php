@@ -14,11 +14,12 @@ use think\Request;
 
 class Store extends ApiBase
 {
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['*'];
     //获取商家详情-菜单
     public function index(Request $request)
     {
         $shop_id = $request->param('shop_id');
+
 
         $where = ['shop_id'=>$shop_id];
         //获取商品
@@ -273,6 +274,8 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $shop_id = $request->param('shop_id',1);
         $user_id = $request->param('user_id',1);
 
+        // $user_id = model('User')->getUidByOpenId($openid);
+
         if(empty($shop_id) || empty($user_id)) {
             $this->error("必传参数不能为空!");
         }
@@ -285,6 +288,8 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             $user_vistor = json_decode($redis->hGet($key,$shop_id));
             if(!in_array($user_id, $user_vistor)){
                 array_push($user_vistor,$user_id);
+            }else{//如果用户已经访问 直接return
+                return true;
             }
         }else{
             $user_vistor[] = $user_id;
