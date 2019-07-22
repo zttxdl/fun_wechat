@@ -41,9 +41,9 @@ class Order extends MerchantsBase
             $this->error('缺少必要参数');
         }
 
-        $orders = Orders::where($map)->order('add_time DESC')->paginate($page_size)->toArray();
-
         $map[] = ['shop_id','=',$shop_id];
+
+        $orders = Orders::where($map)->order('add_time DESC')->paginate($page_size)->toArray();
 
 
         if(!$orders) {
