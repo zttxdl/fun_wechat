@@ -273,7 +273,7 @@ class Order extends MerchantsBase
                 'order_id' => $order_info['id'],
                 'shop_id' => $order_info['shop_id'],
                 'ping_fee' => $order_info['ping_fee'],//配送费
-                'meal_sn' => createOrderSn('shop_id:'.$order_info['shop_id']),//取餐号
+                'meal_sn' => getMealSn('shop_id:'.$order_info['shop_id']),//取餐号
                 'school_id' => Model('Shop')->getSchoolIdByID($order_info['shop_id']),
                 'create_time' => time(),//商家接单时间
                 'expected_time' => time()+30*60,//预计送达时间
