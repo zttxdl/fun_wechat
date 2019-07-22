@@ -272,13 +272,13 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
     {
 
         $shop_id = $request->param('shop_id',1);
-        $user_id = $request->param('user_id',1);
-
-        // $user_id = model('User')->getUidByOpenId($openid);
+        $openid = $request->param('openid',1);
 
         if(empty($shop_id) || empty($user_id)) {
             $this->error("必传参数不能为空!");
         }
+
+        $user_id = model('User')->getUidByOpenId($openid);
 
         $redis = Cache::store('redis');
         $key = "shop_uv_conut";
