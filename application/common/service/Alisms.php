@@ -7,6 +7,8 @@ use AlibabaCloud\Client\Exception\ServerException;
 use think\facade\Cache;
 use think\Model;
 
+
+// 这里继承model的意义是，方便在控制器端，通过model('Alisms','service') 的方式进行调用， 其实完全可不继承model ，直接在控制器端通过 new Alisms() 的方式进行调用
 class Alisms extends Model
 {
     use  \app\common\controller\Jump;

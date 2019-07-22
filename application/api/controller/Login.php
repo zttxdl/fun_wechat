@@ -112,7 +112,7 @@ class Login extends ApiBase
         if (!$res) {
             $this->error('登录或注册失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy')->find();
+        $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy,status')->find();
 
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($user_info,2592000);
@@ -154,7 +154,7 @@ class Login extends ApiBase
         if (!$res) {
             $this->error('快捷登录失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy')->find();
+        $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy,status')->find();
 
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($user_info,2592000);
