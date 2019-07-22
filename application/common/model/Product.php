@@ -3,6 +3,7 @@
 namespace app\common\model;
 
 use think\Model;
+use think\Db;
 
 class Product extends Model
 {
@@ -19,7 +20,8 @@ class Product extends Model
      * @param $id
      * @return mixed
      */
-    public function getNameById($id){
+    public function getNameById($id)
+    {
         return $this->where('id',$id)->limit(1)->value('name');
     }
 
@@ -27,7 +29,31 @@ class Product extends Model
      *获取商品图片
      *
      */
-    public function getImgById($id){
+    public function getImgById($id)
+    {
         return $this->where('id',$id)->value('thumb');
     }
-}
+
+    /**
+     *获取商品月销量
+     */
+    public function getMonthSales($id)
+    {
+        
+        $num = Db::name('product_sales')
+                ->where('product_id',$id)
+                ->whereTime('create_time', 'month')
+                ->sum('num');
+
+        return $num;
+    }
+}   
+
+
+
+
+
+
+
+
+

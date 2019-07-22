@@ -34,7 +34,7 @@ class Merchants extends Validate
         'licence'    => 'require',
         'branch_back'    => 'require',
         'back_hand_name'    => 'require',
-        'back_card_num'    => 'require|max:19|min:16',
+        'back_card_num'    => 'require',
         'account_type'    => 'require',
         'address'    => 'require',
     ];
@@ -66,8 +66,6 @@ class Merchants extends Validate
         'branch_back.require'    => '开户银行不能为空',
         'back_hand_name.require'    => '开户人不能为空',
         'back_card_num.require'    => '银行卡号不能为空',
-        'back_card_num.max'    => '银行卡号最小16位',
-        'back_card_num.min'    => '银行卡号最大19位',
         'account_type.require'    => '账号类型不能为空',
         'address.require'    => '地址不能为空',
     ];

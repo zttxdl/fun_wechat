@@ -1,43 +1,22 @@
 <?php 
 namespace app\Index\Controller;
 
-use think\Request;
 use think\Controller;
+
 use Predis\Client;
 use app\common\service\PushEvent;
 use think\facade\Cache;
 
 
-class Index extends Controller{
+class Index extends Controller
+{
 
 
-	/**
-	 *  
-	 * 
-	 */
+
+    //推送连接
 	public function index($id)
 	{
 		return view('index/index',['uid'=>$id]);
-
-	}
-	 
-	/****** Redis 实例单元测试 ******/
-	public function test(){
-		$shop_id = 1;
-
-		//ttl测试
-		redis()->set('zhangtaotao',$hop_id);
-		// redis()->expire('zhangtaotao',600);
-		dump(redis()->ttl('zhangtaotao'));
-		dump(redis()->ttl('name'));
-		
-		redis()->hSet('shop_uv_conut',$shop_id,'1');
-		dump(redis()->hGet('shop_uv_conut',$shop_id));
-		echo redis()->hLen('shop_uv_conut',$shop_id);
-
-		
-
-		
 
 	}
 
@@ -78,13 +57,30 @@ class Index extends Controller{
 	}
 
 	public function test3()
+    {
+        $key = 'user_list';
+        $redis = Cache::store('redis');
+    }
+
+
+
+    //测试推送
+	public function test($sid)
 	{
-		$key = 'user_list';
-		$redis = Cache::store('redis');
+
+		$socket = model('PushEvent','service');
+		$socket->setUser($sid)->setContent('新订单来了')->push();
 
 
 	}
 
-}
 
- ?>
+	// 查看PHPinfo
+	public function phpinfo()
+	{
+		phpinfo();
+	}
+	 
+
+
+}

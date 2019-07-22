@@ -23,7 +23,7 @@ return [
     // 应用地址
     'app_host'               => '',
     // 应用调试模式
-    'app_debug'              => true,
+    'app_debug'              => false,
     // 应用Trace
     'app_trace'              => false,
     // 是否支持多模块
@@ -146,7 +146,7 @@ return [
     'show_error_msg'         => false,
     // 异常处理handle类 留空使用 \think\exception\Handle
 
-//     'exception_handle'       => '\app\common\exception\Http',
+    // 'exception_handle'       => '\app\common\exception\Http',
     //'exception_handle'       => '',
     //jwt定义的key
     'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
@@ -199,8 +199,8 @@ return [
         'mch_id'             => '1531654461',
         'key'                => 'iew0a4ek2d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
         // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
-        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
-        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
+        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert_1.pem', // XXX: 绝对路径！！！！
+        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key_1.pem',      // XXX: 绝对路径！！！！
         'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
         'sandbox' => false,
     ],

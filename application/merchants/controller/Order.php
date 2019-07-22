@@ -19,7 +19,7 @@ use think\Db;
 class Order extends MerchantsBase
 {
 
-    protected $noNeedLogin = ['*'];
+    protected $noNeedLogin = [];
 
     /**
      * 订单管理
@@ -37,11 +37,14 @@ class Order extends MerchantsBase
             $map[] = ['status','=',$status];
         }
 
-        if($shop_id) {
-            $map[] = ['shop_id','=',$this->shop_id];
+        if(!$shop_id) {
+            $this->error('缺少必要参数');
         }
 
         $orders = Orders::where($map)->order('add_time DESC')->paginate($page_size)->toArray();
+
+        $map[] = ['shop_id','=',$shop_id];
+
 
         if(!$orders) {
             $this->error('暂无订单');
@@ -308,6 +311,19 @@ class Order extends MerchantsBase
             $this->error($e->getMessage());
         }
 
+        //实例化socket
+        $socket = model('PushEvent','service');
+        $school_id = model('ShopInfo')->where('id',$this->shop_id)->value('school_id');
+        $where[] = ['school_id','=',$school_id];
+        $where[] = ['open_status','=',1];
+        $where[] = ['status','=',3];
+        $r_list = model('RiderInfo')->where($where)->select();
+
+        foreach ($r_list as $item) {
+            $rid = 'r'.$item->id;
+            $socket->setUser($rid)->setContent('带个饭来新订单啦！')->push();
+        }
+
         $this->success('success');
     }
 
@@ -353,7 +369,7 @@ class Order extends MerchantsBase
                     throw new Exception('拒单失败');
                 }
             }else{
-                throw new Exception('拒单失败');
+                throw new Exception($res['return_msg']);
             }
 
         }catch (\Exception $e) {
@@ -380,9 +396,9 @@ class Order extends MerchantsBase
         if (!$find){
             $this->error('商户订单号错误');
         }
-        $totalFee = intval(round($find->money * 100));
-        $request['totalFee'] = $totalFee;
-        $request['refundFee'] = $totalFee;
+        $money = intval((string)($find->money * 100));
+        $request['totalFee'] = $money;
+        $request['refundFee'] = $money;
 
         $request['refundNumber'] = build_order_no('T');
 

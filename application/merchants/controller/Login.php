@@ -15,7 +15,7 @@ class Login extends MerchantsBase
     protected $noNeedLogin = ['*'];
 
 	/**
-	 * 商家登录
+	 * 商家登录 【账号登录】
 	 * @param  \think\Request  $request
      * @return \think\Response
      */
@@ -51,13 +51,14 @@ class Login extends MerchantsBase
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($user,2592000);
         $this->success('success',[
-            'token' => $token
+            'token' => $token,
+            'sid'   =>  's_'.$user->id
         ]);
 	}
 
 
     /**
-     * 商家登录  验证码登录
+     * 商家登录  【验证码登录】
      * @param  \think\Request  $request
      * @return \think\Response
      */
@@ -94,7 +95,8 @@ class Login extends MerchantsBase
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($user,2592000);
         $this->success('success',[
-            'token' => $token
+            'token' => $token,
+            'sid'   =>  's_'.$user->id
         ]);
     }
 

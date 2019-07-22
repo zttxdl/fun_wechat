@@ -10,4 +10,3 @@
 /public/log/*
 /composer.lock
 /config/database.php
-/application/index/*

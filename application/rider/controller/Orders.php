@@ -128,7 +128,7 @@ class Orders extends RiderBase
                 'add_time' => time()
             ];
 
-            Db::name('fun_withdraw')->insert($data);
+            Db::name('withdraw')->insert($data);
 
 
         }elseif ($type ==3){//确认送达
@@ -148,15 +148,18 @@ class Orders extends RiderBase
                 'add_time' => time(),
             ];
             Db::name('rider_income_expend')->insert($data);
-            $user = model('User')->field('phone,new_buy,invitation_id')->where('id',$Order->user_id)->find();
-            if ($user->new_buy == 1 && $user->invitation_id){
+            $user = model('User')->field('phone,invitation_id')->where('id',$Order->user_id)->find();
+            // 判断当前用户的订单数量【只要付款之后都算数量】
+            $count = model('Orders')->where([['user_id','=',$Order->user_id],['status','notin',1]])->count('id');
+            if ($count == 1 && $user->invitation_id){
+                // 调用邀请红包
                 $this->inviteGiving($Order->user_id,$user->invitation_id);
             }
-
+            
+            // 调用消费赠送红包
             $this->consumptionGiving($Order->user_id,$Takeout->school_id,$Order->money,$user->phone);
-
-            $user->new_buy =2;
-            $user->save();
+            // 调用添加商品销量
+            $this->addProductSales($orderId,$Order->shop_id);
         }
 
         $Takeout->save();
@@ -273,6 +276,27 @@ class Orders extends RiderBase
 
         return true;
     }
+
+    /**
+     * 商品售量
+     */
+    public function addProductSales($orderId,$shopId)
+    {
+        $list = model('OrdersInfo')->field('product_id,num')->where('orders_id',$orderId)->select();
+        $data = [];
+        foreach ($list as $key => $value) {
+            $data[$key]['product_id'] = $value->product_id;
+            $data[$key]['num'] = $value->num;
+            $data[$key]['shop_id'] = $shopId;
+            $data[$key]['create_time'] = time();
+        }
+
+        
+        Db::name('product_sales')->insertAll($data);
+
+        return true;
+    }
+    
 }
 
 

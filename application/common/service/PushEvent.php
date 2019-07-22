@@ -9,6 +9,8 @@
 namespace app\common\service;
 
 
+use think\Model;
+
 /**
  * 推送事件
  * 典型调用方式：
@@ -17,7 +19,7 @@ namespace app\common\service;
  *
  * Class PushEvent
  */
-class PushEvent
+class PushEvent extends Model
 {
 
 
@@ -87,6 +89,7 @@ class PushEvent
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
         $res = curl_exec($ch);
         curl_close($ch);
+        dump($res);  // 先保留，当测试功能完整时，会删掉
     }
 
 }
