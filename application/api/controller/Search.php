@@ -53,7 +53,7 @@ class Search extends ApiBase
         //搜索周边
         $list = Db::name('shop_info a')
             ->distinct(true)
-            ->join('product b','a.id = b.shop_id')
+            ->leftjoin('product b','a.id = b.shop_id')
             ->field("a.id,a.shop_name,a.marks,a.sales,a.logo_img,a.up_to_send_money,a.run_time,
             a.address,a.manage_category_id,a.ping_fee")
             ->where('a.shop_name|b.name','like','%'.$keywords.'%')

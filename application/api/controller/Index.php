@@ -206,6 +206,7 @@ class Index extends ApiBase
         /********* 搜索条件 ***************************************************************/
         $where[] = ['school_id','=',$school_id];
         $where[] = ['manage_category_id','in',$class_ids];
+        $where[] = ['status','=',3];
         $pagesize = $request->param('pagesize',10);
 
         /********* 依据商家排序、搜索条件，获取二级经营品类的商家信息 ********************************/
