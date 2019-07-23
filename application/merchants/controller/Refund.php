@@ -38,6 +38,7 @@ class Refund extends MerchantsBase
             $row['refund_time'] = date('m-d H:i',$row['refund_time']);//退款完成时间
             $detail = $this->detail($row['id']);
             $row['box_money'] = $detail['box_money'];
+            $row['phone'] = $detail['phone'];
             $row['detail'] = $detail['detail'];
         }
 
@@ -56,6 +57,8 @@ class Refund extends MerchantsBase
             ->where('orders_id','=',$id)
             ->select();
 
+        $data = model('Orders')->field('address')->where('id',$id)->find();
+
         foreach ($detail as &$row)
         {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
@@ -63,7 +66,7 @@ class Refund extends MerchantsBase
             $box_money += $row['num'] * $row['box_money'];
         }
 
-        return ['detail'=>$detail,'box_money'=>$box_money];
+        return ['detail'=>$detail,'box_money'=>$box_money,'phone'=>$data['address']->phone];
     }
 
     /**
