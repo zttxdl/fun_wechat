@@ -78,22 +78,23 @@ class Refund extends MerchantsBase
             if(empty($orders_sn) && !isset($orders_sn)) {
                 throw new \Exception('订单号不能为空!');
             }
-            $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
+            $data = model('Refund')->where('out_refund_no',$orders_sn)->find();
 
-            if($find['status'] == 2) {
+            if($data['status'] == 2) {
                 throw new \Exception('商家已退款!');
             }
 
-            if($find['status'] == 3) {
+            if($data['status'] == 3) {
                 throw new \Exception('商家已拒绝退款');
             }
 
-            $res = $this->wxRefund($orders_sn);
+            $res = $this->wxRefund($data['out_trade_no']);
 
             if('SUCCESS' == $res['return_code'] && 'SUCCESS' == $res['result_code']) {
-
-                model('Refund')->where('out_trade_no',$orders_sn)->setField('status',2);
-                model('Orders')->where('orders_sn',$orders_sn)->setField('status',13);
+                //更新退单状态 add by ztt 20190722
+                model('Refund')->where('out_refund_no',$orders_sn)->setField('status',2);
+                //回写订单主表订单状态
+                model('Orders')->where('orders_sn',$data['out_trade_no'])->setField('status',13);
 
                 return json_success('退款成功');
             }else{
@@ -120,20 +121,20 @@ class Refund extends MerchantsBase
             throw new \Exception('订单号不能为空!');
         }
 
-        $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
+        $data = model('Refund')->where('out_refund_no',$orders_sn)->find();
 
-        if($find['status'] == 2) {
+        if($data['status'] == 2) {
             $this->error('商家已退款!');
         }
 
-        if($find['status'] == 3) {
+        if($data['status'] == 3) {
             $this->error('商家已拒绝退款!');
         }
 
-        //外卖表添取消原因,取消时间
-
-        model('Refund')->where('out_trade_no',$orders_sn)->setField('status',3);
-        model('Orders')->where('orders_sn',$orders_sn)->setField('status',12);
+        //更新退单状态 add by ztt 20190722
+        model('Refund')->where('out_refund_no',$orders_sn)->setField('status',3);
+        //回写订单主表订单状态
+        model('Orders')->where('orders_sn',$data['out_trade_no'])->setField('status',12);
 
         $this->success('拒绝退款成功');
 
