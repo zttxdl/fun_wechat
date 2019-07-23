@@ -176,11 +176,12 @@ class Order extends ApiBase
 
         $result['detail'] = $data;
 
-        foreach ($result['detail'] as $row) {
+        foreach ($result['detail'] as &$row) {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
             $row['name'] = Model('Product')->getNameById($row['product_id']);
             $row['goods_img'] = Model('Product')->getImgById($row['product_id']);
             $row['id'] = $row['product_id'];
+            $row['old_price'] = Model('Product')->getGoodsOldPrice($row['id']); 
             $result['platform_discount']['id'] = $row['platform_coupon_id'];
             $result['platform_discount']['face_value'] = (int)$row['platform_coupon_money'];
             $result['shop_discount']['id'] = $row['shop_discounts_id'];
@@ -570,6 +571,7 @@ class Order extends ApiBase
                     'total_money' => $row['total_money'],
                     'money' => $product_money,//商品结算金额
                     'old_money' => $old_money,//商品原价
+                    'price' => isset($row['price']) ? $row['price'] : 0.00,//商品单价
                     'box_money' => isset($row['box_money']) ? $row['box_money'] : 0.00,
                     'platform_coupon_id' => isset($platform_discount['id']) ? $platform_discount['id'] : 0,
                     'platform_coupon_money' => isset($platform_discount['face_value']) ? (float)$platform_discount['face_value'] : 0.00,
