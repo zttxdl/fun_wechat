@@ -160,7 +160,7 @@ class Shop extends Model
     public function getDayCancelNum($shop_id)
     {
         $data = Db::name('orders')
-            ->where('status','notin',[4])
+            ->where('status','=',9)
             ->where('shop_id',$shop_id)
             ->whereTime('add_time', 'today')
 //            ->fetchSql('true')
