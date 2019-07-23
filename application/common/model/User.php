@@ -88,5 +88,14 @@ class User extends Model
         return $type[$data['type']];
     }
 
+    /**
+     * 获取会员手机号
+     * 
+     */
+    public function getPhoneById($user_id) 
+    {
+        
+    }
+
 
 }
