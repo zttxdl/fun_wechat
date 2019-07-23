@@ -12,7 +12,7 @@ class ReceivingAddr extends Model
      */
     public function getReceivingAddrList($uid)
     {
-        $list = $this->where('user_id',$uid)->order('add_time asc')->select()->toArray();
+        $list = $this->where('user_id',$uid)->order('add_time desc')->select()->toArray();
         
         return $list;
     }
