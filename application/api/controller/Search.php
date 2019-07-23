@@ -17,7 +17,7 @@ class Search extends ApiBase
         $data['hot'] = model('HotSearch')
             ->distinct(true)
             ->field('keywords')
-            ->order('add_time','desc')
+            ->order('sort')
             ->limit(8)
             ->select();
         $data['history'] = model('Search')

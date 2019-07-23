@@ -21,7 +21,7 @@ class IncomeExpend extends RiderBase
         // 已结算收入
         $already_money = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($this->auth->id);
 
-        // 提现金额【包括 申请提现、申请提现】
+        // 提现金额【包括 已提现、申请提现】
         $tx_money = (string)model('RiderIncomeExpend')->getTxMoney($this->auth->id);
         
         // 可提现金额
@@ -103,7 +103,7 @@ class IncomeExpend extends RiderBase
         if (!$can_money) {
             // 已结算收入
             $already_money = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($this->auth->id);
-            // 提现金额【包括 申请提现、申请提现】
+            // 提现金额【包括 已提现、申请提现】
             $tx_money = (string)model('RiderIncomeExpend')->getTxMoney($this->auth->id);
             // 可提现金额
             $can_money = $already_money - $tx_money;
