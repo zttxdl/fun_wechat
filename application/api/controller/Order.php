@@ -757,7 +757,8 @@ class Order extends ApiBase
     public function checkUserDisabled()
     {
         // 判断当前用户是否是禁用用户，如果是禁用用户，则不可以下单【提示，因为您的个人原因， 您已被禁止下单啦】
-        if ($this->auth->status == 2) {
+        $status = model('User')->where('id','=',$this->auth->id)->fetchSql()->value('status');
+        if ($status == 2) {
             $this->error('因为您的个人原因， 您已被禁止下单啦',202);
         }
 
