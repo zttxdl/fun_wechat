@@ -274,7 +274,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $shop_id = $request->param('shop_id',1);
         $openid = $request->param('openid',1);
 
-        if(empty($shop_id) || empty($user_id)) {
+        if(empty($shop_id) || empty($openid)) {
             $this->error("必传参数不能为空!");
         }
 
