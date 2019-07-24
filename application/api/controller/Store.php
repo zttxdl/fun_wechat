@@ -281,7 +281,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $user_id = model('User')->getUidByOpenId($openid);
 
         $redis = Cache::store('redis');
-        $key = "shop_uv_conut";
+        $key = "shop_uv_count";
 
         if($redis->hExists($key,$shop_id)) {
             //获取店铺访客

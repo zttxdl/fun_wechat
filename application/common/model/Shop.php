@@ -369,7 +369,7 @@ class Shop extends Model
     public function getShopVistor($shop_id)
     {
         $redis = Cache::store('redis');
-        $day_uv = $redis->hGet('shop_uv_conut',$shop_id);
+        $day_uv = $redis->hGet('shop_uv_count',$shop_id);
 
         if(empty($day_uv)) {
            return  0;
