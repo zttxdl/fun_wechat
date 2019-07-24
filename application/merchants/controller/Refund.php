@@ -97,7 +97,7 @@ class Refund extends MerchantsBase
                 //更新退单状态 add by ztt 20190722
                 model('Refund')->where('out_refund_no',$orders_sn)->setField('status',2);
                 //回写订单主表订单状态
-                model('Orders')->where('orders_sn',$data['out_trade_no'])->setField('status',13);
+                model('Orders')->where('orders_sn',$data['out_trade_no'])->setField('status',11);
 
                 return json_success('退款成功');
             }else{
