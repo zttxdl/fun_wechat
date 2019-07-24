@@ -148,12 +148,15 @@ class MyCoupon extends ApiBase
             // 判断用户是否已领取
             $check_get = Db::name('my_coupon')->where([['platform_coupon_id','=',$v['id']],['user_id','=',$user_id]])->count('id');
 
+            // 判断当前用户是否已领取过首单红包，如果已领取过，就不再给该用户继续发放
+            $first_coupon = Db::name('my_coupon')->where([['user_id','=',$user_id],['first_coupon','=',1]])->count('id');
+ 
             // 老用户 去掉首单立减  || 用户已领取，则直接返回，进入下一次循环
-            if (($new_buy == 2 && $v['coupon_type'] == 2) || $check_get) { 
+            if (($new_buy == 2 && $v['coupon_type'] == 2) || $check_get || $first_coupon) { 
                 array_splice($list,$k,1); // 删除数组元素后，新数组会自动重新建立索引
                 continue;
             }
-            
+
             // 当红包类型为平台发放时， type =2 时， 自动领取到我的红包表中
             if ($v['type'] == 2) {
                 $data['user_id'] = $user_id;
@@ -161,6 +164,9 @@ class MyCoupon extends ApiBase
                 $data['indate'] = date('Y.m.d',$v['start_time']).'-'.date('Y.m.d',$v['end_time']);
                 $data['add_time'] = time();
                 $data['phone'] = $this->auth->phone;
+                if ($v['coupon_type'] == 2) {   // 如果首单红包
+                    $data['first_coupon'] = 1;
+                }
                 Db::name('my_coupon')->insert($data);
                 Db::name('platform_coupon')->where('id',$v['id'])->setDec('surplus_num');
                 $v['indate'] = '有效期限至'.date('Y.m.d',$v['end_time']);
