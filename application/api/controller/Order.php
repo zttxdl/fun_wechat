@@ -419,7 +419,7 @@ class Order extends ApiBase
             'orders_info_ids' => $orders_info_ids,
             'content' => $content,
             'imgs' => $imgs,
-            'refund_fee' => $orders['money'] - $orders['ping_fee'],//退单
+            'refund_fee' => $orders['money'],//退单
             'total_fee' => $orders['money'],
             'ping_fee' => $orders['ping_fee'],//配送费
             'num' => $orders['num'],
