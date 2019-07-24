@@ -77,7 +77,7 @@ class Search extends ApiBase
                 ->field('face_value,threshold')
                 ->where('shop_id',$value['id'])
                 ->where('delete',0)
-                ->order('id desc')
+                ->order('threshold','asc')
                 ->select();
             foreach ($value['disc'] as &$vv) {
                 $value['discounts'][] = $vv['threshold'].'减'. $vv['face_value'];

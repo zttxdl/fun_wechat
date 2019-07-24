@@ -131,7 +131,7 @@ class Index extends ApiBase
             }
 
             // 获取优惠券信息
-            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('id desc')->select();
+            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('threshold','asc')->select();
             // 获取月销售额
             $item->sales = model('Shop')->getMonthNum($item->id);
         });
@@ -219,7 +219,7 @@ class Index extends ApiBase
             }
 
             // 获取优惠券信息
-            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('id desc')->select();
+            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('threshold','asc')->select();
             // 获取月销售额
             $item->sales = model('Shop')->getMonthNum($item->id);
         });
