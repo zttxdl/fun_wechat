@@ -15,7 +15,7 @@ use think\Request;
 class Store extends ApiBase
 {
     protected $noNeedLogin = [];
-    //获取商家详情-菜单
+    //获取商家菜单
     public function index(Request $request)
     {
         $shop_id = $request->param('shop_id');
@@ -180,6 +180,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             ->field('id,face_value,threshold')
             ->where('shop_id',$shop_id)
             ->where('delete',0)
+            ->order('threshold','asc')
             ->select();
         //判断是否存在首单减
         $new_buy = model('User')->where('id',$this->auth->id)->value('new_buy');
@@ -281,7 +282,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $user_id = model('User')->getUidByOpenId($openid);
 
         $redis = Cache::store('redis');
-        $key = "shop_uv_conut";
+        $key = "shop_uv_count";
 
         if($redis->hExists($key,$shop_id)) {
             //获取店铺访客

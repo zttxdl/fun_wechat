@@ -47,6 +47,14 @@ class Product extends Model
 
         return $num;
     }
+
+    /**
+     *获取商品原价
+     */
+    public function getGoodsOldPrice($id)
+    {
+        return $this->where('id',$id)->value('old_price');
+    }
 }   
 
 

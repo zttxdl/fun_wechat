@@ -28,7 +28,8 @@ class TodaySpecial extends MerchantsBase
             ->order('create_time desc')
             ->find();
         if ($result) {
-            $result->res_time = $result->end_time - time();
+            $result->res_time = $result->end_time - $result->start_time;
+            $result->the_time = $result->start_time - time();
             $result->length = 1;
         }else {
             $result['length'] = 0;

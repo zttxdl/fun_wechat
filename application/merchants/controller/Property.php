@@ -139,7 +139,7 @@ class Property extends MerchantsBase
         $txsq = [
             'shop_id' => $shop_id,
             'withdraw_sn' => $withdraw_sn,
-            'money' => -$money,
+            'money' => $money,
             'status' => 1,
             'type' => 2,
             'add_time'=>time(),
