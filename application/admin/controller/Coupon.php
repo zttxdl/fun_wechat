@@ -132,6 +132,20 @@ class Coupon extends Base
         $mg_model = new ManageCategory();
         $manage_category_list = $mg_model->getManageCategoryList();
 
+        // 限品类拼接中文数据
+        $coupon_info['mb_limit_uses'] = !empty($coupon_info['limit_use']) ? implode(',',Db::name('manage_category')->where('id','in',$coupon_info['limit_use'])->column('name')) : '全部';
+        
+        // 覆盖学校拼接中文数据 && 商家拼接中文数据
+        $coupon_info['mb_school_name'] = '';
+        $coupon_info['mb_shop_names'] = '';
+        if ($coupon_info['school_id']) {
+            $school_arr = Db::name('school')->where('id','=',$coupon_info['school_id'])->field('fid,name')->find();
+            $area_name = Db::name('school')->where('id','=',$school_arr['fid'])->value('name');
+            $coupon_info['mb_school_name'] = $area_name.'/'.$school_arr['name'];
+
+            $coupon_info['mb_shop_names'] = !empty($coupon_info['shop_ids']) ? implode(',',Db::name('shop_info')->where('id','in',$coupon_info['shop_ids'])->column('shop_name')) : '全部';
+        }
+
         // 优惠券的覆盖范围 [学校]
         $sc_model = new School();
         $school_list = $sc_model->getSchoolList();
