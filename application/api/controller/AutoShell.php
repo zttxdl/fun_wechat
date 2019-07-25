@@ -48,10 +48,10 @@ class AutoShell extends Controller
         Cache::store('redis')->clear('active_coupon');
 
         /***************** 清除用户每天商户今日访客量  ******************************************************************/
-        Cache::store('redis')->clear('shop_uv_conut');
+        Cache::store('redis')->rm('shop_uv_count');
 
         /***************** 清除用户每天商户的取餐单号  ******************************************************************/
-        Cache::store('redis')->clear('shop_meal_sn');
+        Cache::store('redis')->rm('shop_meal_sn');
 
 
         /***************** 待更新  ******************************************************************/
