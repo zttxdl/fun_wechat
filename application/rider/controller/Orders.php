@@ -216,9 +216,10 @@ class Orders extends RiderBase
 
        foreach ($list as $item) {
             if ($fee > $item->threshold && $item->surplus_num > 0){
-                $num = $item->indate;
+                $num = $item->other_time;
+                $date = strtotime("+$num day");
                 //执行逻辑
-                $indate = date('Y-m-d',time()).'-'.date('Y-m-d',strtotime("$num + day"));
+                $indate = date('Y.m.d',time()).'-'.date('Y.m.d',$date);
                 $data = [
                     'user_id'=>$user_id,
                     'phone'=>$phone,
@@ -253,9 +254,10 @@ class Orders extends RiderBase
             ->where($where)
             ->find();
         if ($data->surplus_num >0 ){
-            $num = $data->indate;
+            $num = $item->other_time;
+            $date = strtotime("+$num day");
             //执行逻辑
-            $indate = date('Y-m-d',time()).'-'.date('Y-m-d',strtotime("$num + day"));
+            $indate = date('Y.m.d',time()).'-'.date('Y.m.d',$date);
             $phone = model('User')->where('id',$invitation_id)->value('phone');
 
             $datas = [

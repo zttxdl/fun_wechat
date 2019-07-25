@@ -286,11 +286,6 @@ class Order extends MerchantsBase
                 throw new Exception('主表取餐号更新失败');
             }
 
-            $check = cache::store('redis')->get('fun_takeout_'.$order_info['id']);
-
-            if($check) {
-                throw new Exception('订单ID重复');
-            }
             //外卖数据入库
             $ret = Db::name('takeout')->insert($takeout_info);
 

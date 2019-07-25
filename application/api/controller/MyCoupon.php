@@ -44,6 +44,7 @@ class MyCoupon extends ApiBase
     {
         $shop_id = $request->param('shop_id');//店铺ID
         $category_id = $request->param('category_id');//品类ID
+        $money = $request->param('money');//订单结算金额
 
         $where = [['m.user_id','=',$this->auth->id],['m.status','=',1]];
 
@@ -53,6 +54,7 @@ class MyCoupon extends ApiBase
         // 当前用户的手机号
         $phone = $this->auth->phone;
 
+
         // 需进一步思考。。。。。。。
         foreach ($list as &$row) {
             $row['is_use'] = 1;
@@ -60,26 +62,34 @@ class MyCoupon extends ApiBase
             $shop_ids = explode(',',$row['shop_ids']); // 
             unset($row['limit_use']);
             unset($row['shop_ids']);
+
+            /*********红包使用逻辑判断 start**********/
+            // $remark = [];//红包不可用原因数组
+            // 使用门槛条件判断
+            if($money < $row['threshold']) {
+                $row['is_use'] = 0;
+                $row['remark'][] = '商品现价+包装费需满'.$row['threshold'].'元';
+            }
+
             // 手机使用条件判断
             if($row['phone'] != $phone) {
                 $row['is_use'] = 0;
-                $row['remark'] = '仅限手机号'.$row['phone'].'使用';
-                continue;
+                $row['remark'][] = '仅限手机号'.$row['phone'].'使用';
             }
             // 店铺使用条件判断
             if (!in_array($shop_id,$shop_ids) && $row['type'] != 4) {
                 $row['is_use'] = 0;
-                $row['remark'] = '仅限部分商家使用';
-                continue;
+                $row['remark'][] = '仅限部分商家使用';
             }
             // 品类使用条件判断
             if (($limit_use != 0) && !in_array($category_id,$limit_use)) {
                 $row['is_use'] = 0;
                 // 通过 $limit_use 去获取品类名称，并展示
                 $category_names = model('ManageCategory')->getNames($limit_use);
-                $row['remark'] = '仅限'.$category_names.'品类使用';
-                continue;
+                $row['remark'][] = '仅限'.$category_names.'品类使用';
             }
+
+            /*********红包使用逻辑判断 end**********/
         }
 
         $this->success('获取红包列表成功',['list'=>$list]);
