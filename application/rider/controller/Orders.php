@@ -273,7 +273,7 @@ class Orders extends RiderBase
             model('PlatformCoupon')->where('id',$data->id)->setDec('surplus_num');
 
             //添加邀请人
-            model('Invitation')->insert(['referee_user_id'=>$user_id,'lucky_money'=>$data->face_value]);
+            model('Invitation')->insert(['referee_user_id'=>$invitation_id,'lucky_money'=>$data->face_value]);
         }
 
         return true;
