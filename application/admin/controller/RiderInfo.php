@@ -63,7 +63,8 @@ class RiderInfo extends Base
     public function checkShow($id)
     {
         // 骑手的基本信息
-        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status')->find($id);
+        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status,school_id')->find($id);
+        $info['school_name'] = model('School')->getNameById($info['school_id']);
 
         $info['mb_status'] = config('rider_check_status')[$info['status']];
 
@@ -78,7 +79,8 @@ class RiderInfo extends Base
     public function show($id)
     {
         // 骑手的基本信息
-        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status,pass_time')->find($id);
+        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status,pass_time,school_id')->find($id);
+        $info['school_name'] = model('School')->getNameById($info['school_id']);
 
         /** 结算信息 */
         // 已结算收入【骑手除去当天未结算的所有金额】

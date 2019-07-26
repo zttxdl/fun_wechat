@@ -71,7 +71,7 @@ class Property extends MerchantsBase
 
         $szmx = [];//收支明细
 
-        $res = Db::name('withdraw')->where($map)->select();
+        $res = Db::name('withdraw')->where($map)->order('add_time DESC')->select();
 
         if(!$res) {
             $this->error('暂时没有提现记录');
@@ -121,7 +121,7 @@ class Property extends MerchantsBase
         $key = 'shop_tx_'.$shop_id;
 
         //提现次数
-        $check = Cache::store('redis')->tag('rider_tx')->get($key); 
+        $check = Cache::store('redis')->tag('shop_tx')->get($key); 
 
         if($check){
             $this->error('一天只能提现一次哦!');
@@ -139,7 +139,7 @@ class Property extends MerchantsBase
         $txsq = [
             'shop_id' => $shop_id,
             'withdraw_sn' => $withdraw_sn,
-            'money' => -$money,
+            'money' => $money,
             'status' => 1,
             'type' => 2,
             'add_time'=>time(),
@@ -149,7 +149,7 @@ class Property extends MerchantsBase
         $res = DB::name('withdraw')->insert($txsq);
 
         if($res) {
-            Cache::store('redis')->tag('rider_tx')->set($key,1,3600*24);
+            Cache::store('redis')->tag('shop_tx')->set($key,1,3600*24);
             $this->success('申请成功');
         }
         $this->error('申请失败');

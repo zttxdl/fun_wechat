@@ -28,7 +28,9 @@ class Order extends ApiBase
         '7'     =>  '订单已送达 ',
         '8'     =>  '订单已完成',
         '9'     =>  '订单已取消',
-        '10'     =>  '骑手待取餐',
+        '10'    =>  '退款中',
+        '11'    =>   '退款成功',
+        '12'    =>   '退款失败',
     ];
 
 
@@ -174,11 +176,12 @@ class Order extends ApiBase
 
         $result['detail'] = $data;
 
-        foreach ($result['detail'] as $row) {
+        foreach ($result['detail'] as &$row) {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
             $row['name'] = Model('Product')->getNameById($row['product_id']);
             $row['goods_img'] = Model('Product')->getImgById($row['product_id']);
             $row['id'] = $row['product_id'];
+            $row['old_price'] = Model('Product')->getGoodsOldPrice($row['id']); 
             $result['platform_discount']['id'] = $row['platform_coupon_id'];
             $result['platform_discount']['face_value'] = (int)$row['platform_coupon_money'];
             $result['shop_discount']['id'] = $row['shop_discounts_id'];
@@ -416,7 +419,7 @@ class Order extends ApiBase
             'orders_info_ids' => $orders_info_ids,
             'content' => $content,
             'imgs' => $imgs,
-            'refund_fee' => $orders['money'] - $orders['ping_fee'],//退单
+            'refund_fee' => $orders['money'],//退单
             'total_fee' => $orders['money'],
             'ping_fee' => $orders['ping_fee'],//配送费
             'num' => $orders['num'],
@@ -431,7 +434,7 @@ class Order extends ApiBase
 
         if($res) {
             //更新一下主表订单状态为退款中
-            Model('Orders')->updateStatus($orders['orders_sn'],11);
+            Model('Orders')->updateStatus($orders['orders_sn'],10);
             $this->success('售后申请已提交成功,等待商家处理');
         }
     }
@@ -568,6 +571,7 @@ class Order extends ApiBase
                     'total_money' => $row['total_money'],
                     'money' => $product_money,//商品结算金额
                     'old_money' => $old_money,//商品原价
+                    'price' => isset($row['price']) ? $row['price'] : 0.00,//商品单价
                     'box_money' => isset($row['box_money']) ? $row['box_money'] : 0.00,
                     'platform_coupon_id' => isset($platform_discount['id']) ? $platform_discount['id'] : 0,
                     'platform_coupon_money' => isset($platform_discount['face_value']) ? (float)$platform_discount['face_value'] : 0.00,
@@ -608,7 +612,7 @@ class Order extends ApiBase
         $hongbao_status = 1;//未使用
 
         if(isset($order_sn)) {
-           $orders_sn = trim($order_sn);
+            $order_sn = trim($order_sn);
         }
 
         $order_info = Model('Orders')->getOrder($order_sn);
@@ -728,9 +732,9 @@ class Order extends ApiBase
         if (!$find){
             $this->error('商户订单号错误');
         }
-
-        $totalFee = $find->money * 100; //订单金额
-        $refundFee =  $find->money * 100;//退款金额
+        $money = intval((string)($find->money * 100));
+        $totalFee = $money; //订单金额
+        $refundFee =  $money;//退款金额
         $refundNumber = build_order_no('T');//商户退款单号
 
         $pay_config = config('wx_pay');
@@ -740,7 +744,7 @@ class Order extends ApiBase
         $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
             // 可在此处传入其他参数，详细参数见微信支付文档
             'refund_desc' => '取消订单退款',
-//            'notify_url'    => 'http' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+            'notify_url'    => 'http' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
         ]);
 
 
@@ -755,7 +759,8 @@ class Order extends ApiBase
     public function checkUserDisabled()
     {
         // 判断当前用户是否是禁用用户，如果是禁用用户，则不可以下单【提示，因为您的个人原因， 您已被禁止下单啦】
-        if ($this->auth->status == 2) {
+        $status = model('User')->where('id','=',$this->auth->id)->value('status');
+        if ($status == 2) {
             $this->error('因为您的个人原因， 您已被禁止下单啦',202);
         }
 

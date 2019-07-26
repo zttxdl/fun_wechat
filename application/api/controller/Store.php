@@ -9,15 +9,17 @@ namespace app\api\controller;
 
 use app\common\controller\ApiBase;
 use think\Db;
+use think\facade\Cache;
 use think\Request;
 
 class Store extends ApiBase
 {
     protected $noNeedLogin = [];
-    //获取商家详情-菜单
+    //获取商家菜单
     public function index(Request $request)
     {
         $shop_id = $request->param('shop_id');
+
 
         $where = ['shop_id'=>$shop_id];
         //获取商品
@@ -27,6 +29,7 @@ class Store extends ApiBase
             ->where('status',1)
             ->select()
             ->toArray();
+
         //获取今日特价
         $today = date('Y-m-d',time());
         $toWhere[] = ['a.today','=',$today];
@@ -44,23 +47,23 @@ class Store extends ApiBase
             $list[] = $days;
         }
         foreach ($list as &$item) {
-
-            if ($item['attr_ids']) {
+            if (isset($item['attr_ids'])) {
                 $attr_list = model('ProductAttrClassify')
                     ->field('id,name')
                     ->where('id','in',$item['attr_ids'])
                     ->select();
+
                 foreach ($attr_list as  $v) {
                     $v->son = model('ProductAttrClassify')
                         ->field('id,name')
                         ->where('pid', '=', $v->id)
                         ->select();
                 }
-
                 $item['attr'] = $attr_list;
             }else{
                 $item['attr'] = '';
             }
+            $item['sales'] = model('Product')->getMonthSales($item['id']);
 
         }
 
@@ -163,6 +166,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $data['marks'] = (float)$data['marks'];
         $data['up_to_send_money'] = (float)$data['up_to_send_money'];
         $data['categoryName'] = model('ManageCategory')->where('id',$data['manage_category_id'])->value('name');
+        $data['sales'] = model('Shop')->getMonthNum($shop_id);
         //判断店铺是否营业
         if (! empty($data['run_time'])){
             $open_status = model('ShopInfo')->getBusiness($data['run_time']);
@@ -176,6 +180,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             ->field('id,face_value,threshold')
             ->where('shop_id',$shop_id)
             ->where('delete',0)
+            ->order('threshold','asc')
             ->select();
         //判断是否存在首单减
         $new_buy = model('User')->where('id',$this->auth->id)->value('new_buy');
@@ -216,14 +221,14 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $product = model('Product')
             ->field('name,box_money,sales,price,old_price,thumb,info,type,attr_ids,status,shop_id')
             ->where($where)
-            ->find()
-            ->toArray();
+            ->find();
 
         $data = model('TodayDeals')->where('product_id',$product_id)->find();
 
         if (! $product){
             $this->error('商品已下架');
         }else{
+            $product = $product->toArray();
             if ($data){
                 $product['old_price'] = $data->old_price;
                 $product['price'] = $data->price;
@@ -261,4 +266,41 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
     }
 
+    /**
+     * 统计店铺当天的访客量
+     */
+    public function countUserVistor(Request $request)
+    {
+
+        $shop_id = $request->param('shop_id',1);
+        $openid = $request->param('openid',1);
+
+        if(empty($shop_id) || empty($openid)) {
+            $this->error("必传参数不能为空!");
+        }
+
+        $user_id = model('User')->getUidByOpenId($openid);
+
+        $redis = Cache::store('redis');
+        $key = "shop_uv_count";
+
+        if($redis->hExists($key,$shop_id)) {
+            //获取店铺访客
+            $user_vistor = json_decode($redis->hGet($key,$shop_id));
+            if(!in_array($user_id, $user_vistor)){
+                array_push($user_vistor,$user_id);
+            }else{//如果用户已经访问 直接return
+                return true;
+            }
+        }else{
+            $user_vistor[] = $user_id;
+        }
+
+        $user_vistor = json_encode($user_vistor);
+
+        $redis->hSet($key,$shop_id,$user_vistor);
+
+
+
+    }
 }

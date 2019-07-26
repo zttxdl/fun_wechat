@@ -15,17 +15,10 @@ class Orders extends Model
      */
     public function getUserConsume($uid)
     {
-        $data = model('Orders')->where('user_id','=',$uid)->field('SUM(money) as total_money,count(id) as count_num')->find();
+        $data = model('Orders')->where([['user_id','=',$uid],['status','notin','1']])->field('SUM(money) as total_money,count(id) as count_num')->find();
         return $data;
     }
 
-    /**
-     * 获取唯一订单号
-     */
-    public function getOrderSn()
-    {
-        return date('YmdHis') . substr(implode(null, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
-    }
 
     /**
      * 新增订单

@@ -69,7 +69,7 @@ class Coupon extends Base
 
         // 设置当前的红包批次ID
         $sum = Db::name('platform_coupon')->where('batch_id','like',date('ymd').'%')->count('id');
-        $bacth_id = date('ymdHis').'_No'.sprintf('%04d',$sum+1);
+        $bacth_id = date('ymdH').'_No'.sprintf('%04d',$sum+1);
 
         $this->success('ok',['school_list'=>$school_list,'manage_category_list'=>$manage_category_list,'bacth_id'=>$bacth_id]);
 
@@ -132,6 +132,20 @@ class Coupon extends Base
         $mg_model = new ManageCategory();
         $manage_category_list = $mg_model->getManageCategoryList();
 
+        // 限品类拼接中文数据
+        $coupon_info['mb_limit_uses'] = !empty($coupon_info['limit_use']) ? implode(',',Db::name('manage_category')->where('id','in',$coupon_info['limit_use'])->column('name')) : '全部';
+        
+        // 覆盖学校拼接中文数据 && 商家拼接中文数据
+        $coupon_info['mb_school_name'] = '';
+        $coupon_info['mb_shop_names'] = '';
+        if ($coupon_info['school_id']) {
+            $school_arr = Db::name('school')->where('id','=',$coupon_info['school_id'])->field('fid,name')->find();
+            $area_name = Db::name('school')->where('id','=',$school_arr['fid'])->value('name');
+            $coupon_info['mb_school_name'] = $area_name.'/'.$school_arr['name'];
+
+            $coupon_info['mb_shop_names'] = !empty($coupon_info['shop_ids']) ? implode(',',Db::name('shop_info')->where('id','in',$coupon_info['shop_ids'])->column('shop_name')) : '全部';
+        }
+
         // 优惠券的覆盖范围 [学校]
         $sc_model = new School();
         $school_list = $sc_model->getSchoolList();
@@ -155,26 +169,28 @@ class Coupon extends Base
             $this->error('非法参数',201);
         }
         
+        if ($data['type'] == 2) {   // 平台发放
+            $data['start_time'] = strtotime($data['start_time']);
+            $data['end_time'] = strtotime($data['end_time']);
+            $data['other_time'] = 0;
+        } else {    // 自主领取、消费赠送、邀请赠送
+            $data['start_time'] = 0;
+            $data['end_time'] = 0;
+        }
+
+        // 验证表单数据
+        $check = $this->validate($data, 'Coupon');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+
         $info = Db::name('platform_coupon')->where('id',$data['id'])->field('num,surplus_num,status')->find();
         /*********** $info['status']【此处可由前端传过来 `status` 的状态值进行判断，目前以后端查表获取】************************/
-        // 当优惠券未发放时，可修改所以 
+        // 当优惠券未发放时
         if ($info['status'] == 1) {
             $data['surplus_num'] = $data['num'];
-            if ($data['type'] == 2) {   // 平台发放
-                $data['start_time'] = strtotime($data['start_time']);
-                $data['end_time'] = strtotime($data['end_time']);
-                $data['other_time'] = 0;
-            } else {    // 自主领取、消费赠送、邀请赠送
-                $data['start_time'] = 0;
-                $data['end_time'] = 0;
-            }
-            // 验证表单数据
-            $check = $this->validate($data, 'Coupon');
-            if ($check !== true) {
-                $this->error($check,201);
-            }
         }
-        // 当优惠券已发放时，仅可修改发放量 
+        // 当优惠券已发放时
         if ($info['status'] == 2) {
             // 已领取数量
             $temp = $info['num'] - $info['surplus_num'];
@@ -184,7 +200,6 @@ class Coupon extends Base
                 $this->error('发行量不能小于已领取的优惠券数量');
             }
         }
-        
         // 提交表单
         $result = Db::name('platform_coupon')->update($data);
         if (!$result) {

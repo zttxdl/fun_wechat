@@ -22,12 +22,13 @@ class Orders extends RiderBase
 	{
 		$type = $request->param('type',0);
 
-		if ($this->auth->status == 4) {
-			$this->error('你账号已被禁用，无法接单');
-		}
+        $status_arr = model('rider')->where('id','=',$this->auth->id)->field('status,open_status')->find();
+        if ($status_arr['status'] == 2) {
+            $this->error('你账号已被禁用，无法接单',202);
+        }
 
-		if ($this->auth->open_status == 2) {
-			$this->error('你还没开工，无法接单');
+		if ($status_arr['open_status'] == 2) {
+			$this->error('你还没开工，无法接单',204);
 		}
 
         $where = [];
@@ -117,6 +118,20 @@ class Orders extends RiderBase
             $Order->status = 6;
             $Takeout->status = 5;
             $Order->send_time = time();
+
+            //取餐离店 计算商家收入
+            $data = [
+                'withdraw_sn' => $Order->orders_sn,
+                'shop_id' => $Order->shop_id,
+                'money' => $Order->money,
+                'type' => 1,
+                'title' => date('m-d').'账单',
+                'add_time' => time()
+            ];
+
+            Db::name('withdraw')->insert($data);
+
+
         }elseif ($type ==3){//确认送达
             $Order->arrive_time = time();
             $Order->status = 7;
@@ -134,15 +149,18 @@ class Orders extends RiderBase
                 'add_time' => time(),
             ];
             Db::name('rider_income_expend')->insert($data);
-            $user = model('User')->field('phone,new_buy,invitation_id')->where('id',$Order->user_id)->find();
-            if ($user->new_buy == 1 && $user->invitation_id){
+            $user = model('User')->field('phone,invitation_id')->where('id',$Order->user_id)->find();
+            // 判断当前用户的订单数量【只要付款之后都算数量】
+            $count = model('Orders')->where([['user_id','=',$Order->user_id],['status','notin',1]])->count('id');
+            if ($count == 1 && $user->invitation_id){
+                // 调用邀请红包
                 $this->inviteGiving($Order->user_id,$user->invitation_id);
             }
-
+            
+            // 调用消费赠送红包
             $this->consumptionGiving($Order->user_id,$Takeout->school_id,$Order->money,$user->phone);
-
-            $user->new_buy =2;
-            $user->save();
+            // 调用添加商品销量
+            $this->addProductSales($orderId,$Order->shop_id);
         }
 
         $Takeout->save();
@@ -199,9 +217,10 @@ class Orders extends RiderBase
 
        foreach ($list as $item) {
             if ($fee > $item->threshold && $item->surplus_num > 0){
-                $num = $item->indate;
+                $num = $item->other_time;
+                $date = strtotime("+$num day");
                 //执行逻辑
-                $indate = date('Y-m-d',time()).'-'.date('Y-m-d',strtotime("$num + day"));
+                $indate = date('Y.m.d',time()).'-'.date('Y.m.d',$date);
                 $data = [
                     'user_id'=>$user_id,
                     'phone'=>$phone,
@@ -236,9 +255,10 @@ class Orders extends RiderBase
             ->where($where)
             ->find();
         if ($data->surplus_num >0 ){
-            $num = $data->indate;
+            $num = $item->other_time;
+            $date = strtotime("+$num day");
             //执行逻辑
-            $indate = date('Y-m-d',time()).'-'.date('Y-m-d',strtotime("$num + day"));
+            $indate = date('Y.m.d',time()).'-'.date('Y.m.d',$date);
             $phone = model('User')->where('id',$invitation_id)->value('phone');
 
             $datas = [
@@ -254,11 +274,32 @@ class Orders extends RiderBase
             model('PlatformCoupon')->where('id',$data->id)->setDec('surplus_num');
 
             //添加邀请人
-            model('Invitation')->insert(['referee_user_id'=>$user_id,'lucky_money'=>$data->face_value]);
+            model('Invitation')->insert(['referee_user_id'=>$invitation_id,'lucky_money'=>$data->face_value]);
         }
 
         return true;
     }
+
+    /**
+     * 商品售量
+     */
+    public function addProductSales($orderId,$shopId)
+    {
+        $list = model('OrdersInfo')->field('product_id,num')->where('orders_id',$orderId)->select();
+        $data = [];
+        foreach ($list as $key => $value) {
+            $data[$key]['product_id'] = $value->product_id;
+            $data[$key]['num'] = $value->num;
+            $data[$key]['shop_id'] = $shopId;
+            $data[$key]['create_time'] = time();
+        }
+
+        
+        Db::name('product_sales')->insertAll($data);
+
+        return true;
+    }
+    
 }
 
 

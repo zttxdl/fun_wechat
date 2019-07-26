@@ -9,6 +9,8 @@
 namespace app\common\service;
 
 
+use think\Model;
+
 /**
  * 推送事件
  * 典型调用方式：
@@ -17,7 +19,8 @@ namespace app\common\service;
  *
  * Class PushEvent
  */
-class PushEvent
+// 这里继承model的意义是，方便在控制器端，通过model('PushEvent','service') 的方式进行调用， 其实完全可不继承model ，直接在控制器端通过 new PushEvent() 的方式进行调用
+class PushEvent extends Model
 {
 
 
@@ -87,6 +90,7 @@ class PushEvent
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
         $res = curl_exec($ch);
         curl_close($ch);
+        // dump($res);  // 先保留，当测试功能完整时，会删掉
     }
 
 }

@@ -4,6 +4,7 @@ namespace app\api\controller;
 
 use app\common\controller\ApiBase;
 use think\Request;
+use think\Db;
 
 class Index extends ApiBase
 {
@@ -33,7 +34,7 @@ class Index extends ApiBase
     {
         $lat = $request->param('latitude','');
         $lng = $request->param('longitude','');
-        $school_id = $request->param('school_id',0);
+        $school_id = $request->param('school_id')? $request->param('school_id') : 43;
 
         // 调用轮播图
         $data['slide'] = $this->getSlide();
@@ -130,7 +131,7 @@ class Index extends ApiBase
             }
 
             // 获取优惠券信息
-            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('id desc')->select();
+            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('threshold','asc')->select();
             // 获取月销售额
             $item->sales = model('Shop')->getMonthNum($item->id);
         });
@@ -144,21 +145,30 @@ class Index extends ApiBase
             $v['marks'] = (float)$v['marks'];
         }
 
+        $pt_coupon = [];
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id],['surplus_num','>',0]];
+            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id]];
             // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
-            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
-            // 组装首单立减信息
-            if ($pt_coupon) {
-                foreach ($shop_list['data'] as $k => &$v) {
-                    foreach ($pt_coupon as $ko => $vo) {
-                        $shopids = explode(',',$vo['shop_ids']);
-                        if (in_array($v['id'],$shopids)) {
-                            $v['discounts'][] = '首单减'.$vo['face_value'];
+            $pt_coupon_ids = model('PlatformCoupon')->where($pt_where)->column('id');
+            
+            // 获取当前用户的首单红包
+            if ($pt_coupon_ids) {
+                $pt_coupon = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')
+                                ->where([['m.platform_coupon_id','in',$pt_coupon_ids],['m.user_id','=',$uid]])
+                                ->field('p.face_value,p.threshold,p.shop_ids')->select();
+            }
+        }
 
-                            continue;
-                        }
+        // 组装首单立减信息
+        if ($pt_coupon) {
+            foreach ($shop_list['data'] as $k => &$v) {
+                foreach ($pt_coupon as $ko => $vo) {
+                    $shopids = explode(',',$vo['shop_ids']);
+                    if (in_array($v['id'],$shopids)) {
+                        $v['discounts'][] = '首单减'.$vo['face_value'];
+
+                        continue;
                     }
                 }
             }
@@ -196,6 +206,7 @@ class Index extends ApiBase
         /********* 搜索条件 ***************************************************************/
         $where[] = ['school_id','=',$school_id];
         $where[] = ['manage_category_id','in',$class_ids];
+        $where[] = ['status','=',3];
         $pagesize = $request->param('pagesize',10);
 
         /********* 依据商家排序、搜索条件，获取二级经营品类的商家信息 ********************************/
@@ -208,7 +219,7 @@ class Index extends ApiBase
             }
 
             // 获取优惠券信息
-            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('id desc')->select();
+            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('threshold','asc')->select();
             // 获取月销售额
             $item->sales = model('Shop')->getMonthNum($item->id);
         });
@@ -223,15 +234,21 @@ class Index extends ApiBase
             $v['marks'] = (float)$v['marks'];
         }
 
-        $pt_coupon = '';
-
+        $pt_coupon = [];
         if ($uid) {
             // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
-            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id],['surplus_num','>',0]];
+            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id]];
             // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
-            $pt_coupon = model('PlatformCoupon')->where($pt_where)->field('face_value,threshold,shop_ids')->select()->toArray();
-
+            $pt_coupon_ids = model('PlatformCoupon')->where($pt_where)->column('id');
+            
+            // 获取当前用户的首单红包
+            if ($pt_coupon_ids) {
+                $pt_coupon = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')
+                                ->where([['m.platform_coupon_id','in',$pt_coupon_ids],['m.user_id','=',$uid]])
+                                ->field('p.face_value,p.threshold,p.shop_ids')->select();
+            }
         }
+
         // 组装首单立减信息
         if ($pt_coupon) {
             foreach ($shop_list['data'] as $k => &$v) {

@@ -44,6 +44,7 @@ class MyCoupon extends ApiBase
     {
         $shop_id = $request->param('shop_id');//店铺ID
         $category_id = $request->param('category_id');//品类ID
+        $money = $request->param('money');//订单结算金额
 
         $where = [['m.user_id','=',$this->auth->id],['m.status','=',1]];
 
@@ -53,6 +54,7 @@ class MyCoupon extends ApiBase
         // 当前用户的手机号
         $phone = $this->auth->phone;
 
+
         // 需进一步思考。。。。。。。
         foreach ($list as &$row) {
             $row['is_use'] = 1;
@@ -60,26 +62,34 @@ class MyCoupon extends ApiBase
             $shop_ids = explode(',',$row['shop_ids']); // 
             unset($row['limit_use']);
             unset($row['shop_ids']);
+
+            /*********红包使用逻辑判断 start**********/
+            // $remark = [];//红包不可用原因数组
+            // 使用门槛条件判断
+            if($money < $row['threshold']) {
+                $row['is_use'] = 0;
+                $row['remark'][] = '商品现价+包装费需满'.$row['threshold'].'元';
+            }
+
             // 手机使用条件判断
             if($row['phone'] != $phone) {
                 $row['is_use'] = 0;
-                $row['remark'] = '仅限手机号'.$row['phone'].'使用';
-                continue;
+                $row['remark'][] = '仅限手机号'.$row['phone'].'使用';
             }
             // 店铺使用条件判断
             if (!in_array($shop_id,$shop_ids) && $row['type'] != 4) {
                 $row['is_use'] = 0;
-                $row['remark'] = '仅限部分商家使用';
-                continue;
+                $row['remark'][] = '仅限部分商家使用';
             }
             // 品类使用条件判断
             if (($limit_use != 0) && !in_array($category_id,$limit_use)) {
                 $row['is_use'] = 0;
                 // 通过 $limit_use 去获取品类名称，并展示
                 $category_names = model('ManageCategory')->getNames($limit_use);
-                $row['remark'] = '仅限'.$category_names.'品类使用';
-                continue;
+                $row['remark'][] = '仅限'.$category_names.'品类使用';
             }
+
+            /*********红包使用逻辑判断 end**********/
         }
 
         $this->success('获取红包列表成功',['list'=>$list]);
@@ -137,23 +147,29 @@ class MyCoupon extends ApiBase
     {
         $school_id = $request->param('school_id');
         $user_id = $this->auth->id;
-
+        if (!$school_id) {
+            $this->error('缺少参数');            
+        }
         // 查询当前学校下，已发放的平台发放或自主领取的红包列表
         $list = model('PlatformCoupon')->getSchoolCouponList($school_id);
 
         // 这里需注意：针对首单减红包， 仅限新注册用户，如若是老用户，则不展示
         $new_buy = model('user')->getNewBuy($user_id);
+
+        
         
         foreach ($list as $k => &$v) {
+            // 判断当前用户是否已领取过首单红包，如果已领取过，就不再给该用户继续发放【此处不可放在循环外面，防止这一批次红包存在多个首单红包】
+            $first_coupon = Db::name('my_coupon')->where([['user_id','=',$user_id],['first_coupon','=',1]])->count('id');
             // 判断用户是否已领取
             $check_get = Db::name('my_coupon')->where([['platform_coupon_id','=',$v['id']],['user_id','=',$user_id]])->count('id');
-
             // 老用户 去掉首单立减  || 用户已领取，则直接返回，进入下一次循环
-            if (($new_buy == 2 && $v['coupon_type'] == 2) || $check_get) { 
-                array_splice($list,$k,1); // 删除数组元素后，新数组会自动重新建立索引
+            if ((($first_coupon > 0 || $new_buy == 2) && $v['coupon_type'] == 2) || $check_get) { 
+                unset($list[$k]);
+                // array_splice($list,$k,1); // 删除数组元素后，新数组会自动重新建立索引。此功能在这块有问题，会多一次循环
                 continue;
             }
-            
+
             // 当红包类型为平台发放时， type =2 时， 自动领取到我的红包表中
             if ($v['type'] == 2) {
                 $data['user_id'] = $user_id;
@@ -161,8 +177,14 @@ class MyCoupon extends ApiBase
                 $data['indate'] = date('Y.m.d',$v['start_time']).'-'.date('Y.m.d',$v['end_time']);
                 $data['add_time'] = time();
                 $data['phone'] = $this->auth->phone;
+                if ($v['coupon_type'] == 2) {   // 如果首单红包
+                    $data['first_coupon'] = 1;
+                } else {
+                    $data['first_coupon'] = 0;
+                }
                 Db::name('my_coupon')->insert($data);
-                $v['indate'] = '有效期限至'.date('Y.m.d',$v['end_time']);
+                Db::name('platform_coupon')->where('id',$v['id'])->setDec('surplus_num');
+                $v['indate'] = '有限期至'.date('Y.m.d',$v['end_time']);
                 $v['tips'] = '立即使用';
             } else {
                 $v['indate'] = '领取日起'.$v['other_time'].'日有效';
@@ -181,14 +203,14 @@ class MyCoupon extends ApiBase
      */
     public function judgeActiveCoupon()
     {
-        // 从缓存中判断， 当前用户当天是否已登录，如果已登录，直接返回 `false`  
-        $key = 'active_coupon_'.$this->auth->id;
-        $check = Cache::store('redis')->tag('active_coupon')->get($key);  
+        $user_id = $this->auth->id;
+        $redis = Cache::store('redis');
+        $key = "homepage_active_coupon";
 
-        if($check){  
-            $this->error('每天只能弹 1 次红包的机会 ！');
-        } else {
-            Cache::store('redis')->tag('active_coupon')->set($key,1,3600*24);
+        if($redis->hExists($key,$user_id)) {
+            $this->error('每天只能弹 1 次红包的机会 ！');      
+        }else{
+            $redis->hSet($key,$user_id,1);
             $this->success('今天第一次进入小程序，有弹红包的机会哦');
         }
     }

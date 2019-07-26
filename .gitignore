@@ -1,8 +1,6 @@
 /.idea
 /.vscode
-/vendor
 *.log
-/thinkphp
 .env
 .DS_Store
 /runtime/*
@@ -10,4 +8,3 @@
 /public/log/*
 /composer.lock
 /config/database.php
-/application/index/*

@@ -43,6 +43,12 @@ class Promotion extends MerchantsBase
         $face_value = $request->param('face_value');
         $threshold = $request->param('threshold');
 
+        if (!$face_value || !$threshold) {
+            $this->error('非法参数');
+        }
+        if ($face_value > $threshold) {
+            $this->error('劵值不能大于门槛');
+        }
         $data = [
             'face_value'=>$face_value,
             'threshold'=>$threshold,

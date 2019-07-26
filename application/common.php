@@ -13,6 +13,7 @@
 
 use \Firebase\JWT\JWT;
 use think\facade\Cache; //导入JWT
+use app\common\Libs\Redis;
 
  /**
  * 返回封装后的API成功方法
@@ -282,6 +283,31 @@ if (!function_exists('createOrderSn')) {
         }
         Cache::store('redis')->set($key,$sn);//redis写入，替换一下
         return $snNo;
+
+
+    }
+}
+
+if (!function_exists('getMealSn')) {
+    /**
+     * 获取商家取餐号
+     * @param $shop_id
+     * @param int $back
+     */
+    function getMealSn($shop_id) {
+        $redis = Cache::store('redis');
+        $key = 'shop_meal_sn';
+
+        if($redis->hExists($key,$shop_id)){
+            $redis->hIncrby($key,$shop_id,1);
+        }else{
+            $redis->hSet($key, $shop_id, 1);
+        }
+
+        $sn = $redis->hGet($key,$shop_id);
+
+        return $sn;
+
     }
 }
 
@@ -325,6 +351,19 @@ if (!function_exists('Convert_BD09_To_GCJ02')) {
         $lng = $z * cos($theta);
         $lat = $z * sin($theta);
         return array('lng'=>$lng,'lat'=>$lat);
+    }
+
+}
+
+
+/**
+ * 获取Redis的静态实例
+ */
+if (!function_exists('redis')) {
+    function redis(){
+        $config = config('cache.redis');
+        $redis = Redis::getInstance($config);
+        return $redis;
     }
 
 }

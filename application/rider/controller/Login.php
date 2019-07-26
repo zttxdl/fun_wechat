@@ -25,7 +25,10 @@ class Login extends RiderBase
         $app = Factory::miniProgram($config);
         $code = $request->param('code');
         $result = $app->auth->session($code);
-
+        //判断返回的结果中是否有错误码
+        if (isset($result['errcode'])) {
+            $this->error($result['errmsg'],$result['errcode']);
+        }
         $this->success('获取 openid 成功',['auth_result'=>$result]);
     }
 
@@ -117,7 +120,8 @@ class Login extends RiderBase
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
-            'token' => $token
+            'token' => $token,
+            'uuid' => 'r'.$rid,
         ]);
 
         
@@ -160,7 +164,8 @@ class Login extends RiderBase
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
-            'token' => $token
+            'token' => $token,
+            'uuid' => 'r'.$rid,
         ]);
 
     }

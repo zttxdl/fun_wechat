@@ -26,7 +26,10 @@ class Login extends ApiBase
         $app = Factory::miniProgram($config);
         $code = $request->param('code');
         $result = $app->auth->session($code);
-
+        //判断返回的结果中是否有错误码
+        if (isset($result['errcode'])) {
+            $this->error($result['errmsg'],$result['errcode']);
+        }
         $this->success('获取 openid 成功',['auth_result'=>$result]);
     }
 
@@ -112,7 +115,7 @@ class Login extends ApiBase
         if (!$res) {
             $this->error('登录或注册失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy')->find();
+        $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy,status')->find();
 
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($user_info,2592000);
@@ -154,7 +157,7 @@ class Login extends ApiBase
         if (!$res) {
             $this->error('快捷登录失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy')->find();
+        $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy,status')->find();
 
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($user_info,2592000);

@@ -16,6 +16,13 @@ class PlatformCoupon extends Model
                 ->field('id,face_value,threshold,start_time,end_time,other_time,type,name,coupon_type')
                 ->select()->toArray();
 
+        // 当红包时间暂未开始时，不需发放
+        foreach ($list as $k => &$v) {
+            if ($v['type'] == 2 && $v['start_time'] > time()) {
+                // array_splice($list,$k,1); // 删除数组元素后，新数组会自动重新建立索引
+                unset($list[$k]);
+            }
+        }
         return $list;
     }
      
