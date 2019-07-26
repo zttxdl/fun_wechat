@@ -65,9 +65,9 @@ class Index extends Controller
 
 
     //测试推送
-	public function test($sid)
+	public function test()
 	{
-
+        $sid = request()->param('sid');
 		$socket = model('PushEvent','service');
 		$socket->setUser($sid)->setContent('新订单来了')->push();
 
@@ -78,7 +78,7 @@ class Index extends Controller
 	// 查看PHPinfo
 	public function phpinfo()
 	{
-		phpinfo();
+	    phpinfo();
 	}
 	 
 
