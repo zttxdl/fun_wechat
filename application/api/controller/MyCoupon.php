@@ -184,7 +184,7 @@ class MyCoupon extends ApiBase
                 }
                 Db::name('my_coupon')->insert($data);
                 Db::name('platform_coupon')->where('id',$v['id'])->setDec('surplus_num');
-                $v['indate'] = '有效期限至'.date('Y.m.d',$v['end_time']);
+                $v['indate'] = '有限期至'.date('Y.m.d',$v['end_time']);
                 $v['tips'] = '立即使用';
             } else {
                 $v['indate'] = '领取日起'.$v['other_time'].'日有效';
