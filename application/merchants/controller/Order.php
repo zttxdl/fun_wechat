@@ -318,7 +318,7 @@ class Order extends MerchantsBase
             $socket->setUser($rid)->setContent('带个饭来新订单啦！')->push();
         }
 
-        $this->success('success');
+        $this->success('接单成功');
     }
 
     /**
