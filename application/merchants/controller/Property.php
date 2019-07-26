@@ -71,7 +71,7 @@ class Property extends MerchantsBase
 
         $szmx = [];//收支明细
 
-        $res = Db::name('withdraw')->where($map)->select();
+        $res = Db::name('withdraw')->where($map)->order('add_time DESC')->select();
 
         if(!$res) {
             $this->error('暂时没有提现记录');
