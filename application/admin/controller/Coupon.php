@@ -91,7 +91,6 @@ class Coupon extends Base
             $data['start_time'] = 0;
             $data['end_time'] = 0;
         }
-        dump($data);die;
         $data['surplus_num'] = $data['num'];
 
         // 验证表单数据
@@ -174,6 +173,7 @@ class Coupon extends Base
         /*********** $info['status']【此处可由前端传过来 `status` 的状态值进行判断，目前以后端查表获取】************************/
         // 当优惠券未发放时，可修改所以 
         if ($info['status'] == 1) {
+            echo '1'.'<br>';
             $data['surplus_num'] = $data['num'];
             if ($data['type'] == 2) {   // 平台发放
                 $data['start_time'] = strtotime($data['start_time']);
@@ -191,6 +191,7 @@ class Coupon extends Base
         }
         // 当优惠券已发放时，仅可修改发放量 
         if ($info['status'] == 2) {
+            echo '2'.'<br>';
             // 已领取数量
             $temp = $info['num'] - $info['surplus_num'];
             if ($data['num'] >= $temp) {
@@ -199,7 +200,7 @@ class Coupon extends Base
                 $this->error('发行量不能小于已领取的优惠券数量');
             }
         }
-        
+        dump($data);die;
         // 提交表单
         $result = Db::name('platform_coupon')->update($data);
         if (!$result) {
