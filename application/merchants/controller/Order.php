@@ -325,7 +325,7 @@ class Order extends MerchantsBase
 
         //去微信查一下订单是否退款,没有退款在走下面的退款接口
         $res = $this->refundQuery($orders_sn);
-        set_log('query==',$res,'refuse');
+
 //        dump($res);
 
         if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
@@ -334,8 +334,6 @@ class Order extends MerchantsBase
 
         try{
             $res = $this->wxRefund($orders_sn);//商家拒绝接单把钱退给用户
-
-            set_log('result==',$res,'refuse');
 
 //            dump($res);
             if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
