@@ -22,12 +22,13 @@ class Orders extends RiderBase
 	{
 		$type = $request->param('type',0);
 
-		if ($this->auth->status == 4) {
-			$this->error('你账号已被禁用，无法接单');
-		}
+        $status_arr = model('rider')->where('id','=',$this->auth->id)->field('status,open_status')->find();
+        if ($status_arr['status'] == 2) {
+            $this->error('你账号已被禁用，无法接单',202);
+        }
 
-		if ($this->auth->open_status == 2) {
-			$this->error('你还没开工，无法接单');
+		if ($status_arr['open_status'] == 2) {
+			$this->error('你还没开工，无法接单',204);
 		}
 
         $where = [];
