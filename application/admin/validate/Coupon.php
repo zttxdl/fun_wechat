@@ -18,7 +18,6 @@ class Coupon extends Validate
         'face_value'    => 'require|number',
         'threshold'     => 'require|number',
         'num'           => 'require|number',
-        'assume_ratio'  => 'require|number', 
     ];
     
     /**
@@ -37,8 +36,6 @@ class Coupon extends Validate
         'threshold.number'      => '使用门槛格式不正确',
         'num.require'            => '发行量不能为空',
         'num.number'            => '发行量必须为正整数',
-        'assume_ratio.require'   => '商家承担比例不能为空',
-        'assume_ratio.number'   => '商家承担比例必须为正整数',
     ];
 
 }

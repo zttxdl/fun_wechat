@@ -254,9 +254,10 @@ class Orders extends RiderBase
             ->where($where)
             ->find();
         if ($data->surplus_num >0 ){
-            $num = $data->indate;
+            $num = $item->other_time;
+            $date = strtotime("+$num day");
             //执行逻辑
-            $indate = date('Y-m-d',time()).'-'.date('Y-m-d',strtotime("$num + day"));
+            $indate = date('Y.m.d',time()).'-'.date('Y.m.d',$date);
             $phone = model('User')->where('id',$invitation_id)->value('phone');
 
             $datas = [
@@ -272,7 +273,7 @@ class Orders extends RiderBase
             model('PlatformCoupon')->where('id',$data->id)->setDec('surplus_num');
 
             //添加邀请人
-            model('Invitation')->insert(['referee_user_id'=>$user_id,'lucky_money'=>$data->face_value]);
+            model('Invitation')->insert(['referee_user_id'=>$invitation_id,'lucky_money'=>$data->face_value]);
         }
 
         return true;

@@ -91,20 +91,20 @@ class IncomeExpend extends RiderBase
         }
 
         // 计入缓存，每天只能提现一次  # 这块可写一脚本：每天凌晨清除当前缓存【在存缓冲的时候，设置缓存标签，即可指向性的清楚某一标签下的缓存Cache::clear('rider_tx');】
-        $key = 'rider_tx_'.$this->auth->id;
-        $check = Cache::store('redis')->tag('rider_tx')->get($key);  
-
-        if($check){  
-            $this->error('每天只能提现 1 次！',202);
+        $rider_id = $this->auth->id;
+        $redis = Cache::store('redis');
+        $key = "rider_tx_num";
+        if ($redis->hExists($key,$rider_id)) {
+            $this->error('每天只能提现 1 次！',202); 
         }
 
         // 优先读取缓存，当缓存过期时， 从数据库进行读取
-        $can_money = Cache::store('redis')->get('rider_can_tx_money'.$this->auth->id);  
+        $can_money = Cache::store('redis')->get('rider_can_tx_money'.$rider_id);  
         if (!$can_money) {
             // 已结算收入
-            $already_money = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($this->auth->id);
+            $already_money = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($rider_id);
             // 提现金额【包括 已提现、申请提现】
-            $tx_money = (string)model('RiderIncomeExpend')->getTxMoney($this->auth->id);
+            $tx_money = (string)model('RiderIncomeExpend')->getTxMoney($rider_id);
             // 可提现金额
             $can_money = $already_money - $tx_money;
         }
@@ -116,7 +116,7 @@ class IncomeExpend extends RiderBase
 
         // 组装数据
         $data['current_money'] = $request->param('money');
-        $data['rider_id'] = $this->auth->id;
+        $data['rider_id'] = $rider_id;
         $data['type'] = 2;
         $data['name'] = '提现';
         $data['serial_number'] = build_order_no('TX');
@@ -129,7 +129,7 @@ class IncomeExpend extends RiderBase
         if (!$res) {
             $this->error('您的提现申请失败');
         } else {
-            Cache::store('redis')->tag('rider_tx')->set($key,1,3600*24);
+            $redis->hSet($key,$rider_id,1);
             $this->success('您的提现申请已提交');
         }
         
