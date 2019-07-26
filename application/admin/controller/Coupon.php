@@ -169,26 +169,28 @@ class Coupon extends Base
             $this->error('非法参数',201);
         }
         
+        if ($data['type'] == 2) {   // 平台发放
+            $data['start_time'] = strtotime($data['start_time']);
+            $data['end_time'] = strtotime($data['end_time']);
+            $data['other_time'] = 0;
+        } else {    // 自主领取、消费赠送、邀请赠送
+            $data['start_time'] = 0;
+            $data['end_time'] = 0;
+        }
+
+        // 验证表单数据
+        $check = $this->validate($data, 'Coupon');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+
         $info = Db::name('platform_coupon')->where('id',$data['id'])->field('num,surplus_num,status')->find();
         /*********** $info['status']【此处可由前端传过来 `status` 的状态值进行判断，目前以后端查表获取】************************/
-        // 当优惠券未发放时，可修改所以 
+        // 当优惠券未发放时
         if ($info['status'] == 1) {
             $data['surplus_num'] = $data['num'];
-            if ($data['type'] == 2) {   // 平台发放
-                $data['start_time'] = strtotime($data['start_time']);
-                $data['end_time'] = strtotime($data['end_time']);
-                $data['other_time'] = 0;
-            } else {    // 自主领取、消费赠送、邀请赠送
-                $data['start_time'] = 0;
-                $data['end_time'] = 0;
-            }
-            // 验证表单数据
-            $check = $this->validate($data, 'Coupon');
-            if ($check !== true) {
-                $this->error($check,201);
-            }
         }
-        // 当优惠券已发放时，仅可修改发放量 
+        // 当优惠券已发放时
         if ($info['status'] == 2) {
             // 已领取数量
             $temp = $info['num'] - $info['surplus_num'];
@@ -198,7 +200,6 @@ class Coupon extends Base
                 $this->error('发行量不能小于已领取的优惠券数量');
             }
         }
-        
         // 提交表单
         $result = Db::name('platform_coupon')->update($data);
         if (!$result) {
