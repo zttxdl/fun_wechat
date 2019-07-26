@@ -91,6 +91,7 @@ class Coupon extends Base
             $data['start_time'] = 0;
             $data['end_time'] = 0;
         }
+        dump($data);die;
         $data['surplus_num'] = $data['num'];
 
         // 验证表单数据
