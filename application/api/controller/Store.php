@@ -169,8 +169,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $data['sales'] = model('Shop')->getMonthNum($shop_id);
         //判断店铺是否营业
         if (! empty($data['run_time']) && $data['open_status'] == 1){
-            $open_status = model('ShopInfo')->getBusiness($data['run_time']);
-            $data['open_status'] = isset($open_status) ? $data['open_status'] : $open_status;
+            $data['open_status'] = model('ShopInfo')->getBusiness($data['run_time']);
         }else{
             $data['open_status'] = 0;
         }
