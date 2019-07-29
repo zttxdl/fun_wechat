@@ -8,7 +8,7 @@ use app\common\controller\Base;
 
 
 /**
- * 商品规格属性模块控制器
+ * 用户端基类控制器
  */
 class ApiBase extends Base
 {
@@ -53,4 +53,18 @@ class ApiBase extends Base
         return false;
     }
 
+    /**
+     * 是否禁用
+     * [isDisable description]
+     * @param  [type]  $id [description]
+     * @return boolean     [description]
+     */
+    protected function isDisable($id){
+        $status = model('ShopInfo')->where('id',$tid)->value('status');
+        if ($status == 4) {
+            $this->error('该商家已下线',401);
+        }
+
+        return true;
+    }
 }
