@@ -48,6 +48,14 @@ class RiderInfo extends Base
      */
     public function status($id,$status)
     {
+        if ($status == 4) { // 当禁用店铺时，需判断该店铺是否存在未完结的订单往来
+            // 获取未完结的订单
+            $count = model('Takeout')->where([['rider_id','=',$id],['status','in',[3,4,5]]])->count();
+            if ($count) {
+                $this->error('该骑手还存在未处理的订单，暂时不可禁用此骑手',202);
+            }
+        }
+
         $result = Db::name('rider_info')->where('id','=',$id)->setField('status',$status);
         if (!$result) {
             $this->error('设置失败');

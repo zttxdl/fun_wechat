@@ -181,7 +181,7 @@ class Orders extends RiderBase
             $count = model('Orders')->where([['user_id','=',$Order->user_id],['status','notin',1]])->count('id');
             if ($count == 1 && $user->invitation_id){
                 // 调用邀请红包
-                $this->inviteGiving($Order->user_id,$user->invitation_id);
+                $this->inviteGiving($user->invitation_id);
             }
             
             // 调用消费赠送红包
@@ -269,7 +269,7 @@ class Orders extends RiderBase
     /**
      * 邀请赠送红包
      */
-    protected function inviteGiving($user_id,$invitation_id)
+    protected function inviteGiving($invitation_id)
     {
         $where[] = [
             'type','=',4
@@ -282,7 +282,7 @@ class Orders extends RiderBase
             ->where($where)
             ->find();
         if ($data->surplus_num >0 ){
-            $num = $item->other_time;
+            $num = $data->other_time;
             $date = strtotime("+$num day");
             //执行逻辑
             $indate = date('Y.m.d',time()).'-'.date('Y.m.d',$date);
