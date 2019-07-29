@@ -22,7 +22,7 @@ class Orders extends RiderBase
 	{
 		$type = $request->param('type',0);
 
-        $status_arr = model('rider')->where('id','=',$this->auth->id)->field('status,open_status')->find();
+        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
         if ($status_arr['status'] == 4) {
             $this->error('你账号已被禁用，无法接单',202);
         }
