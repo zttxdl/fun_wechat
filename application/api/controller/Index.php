@@ -280,6 +280,7 @@ class Index extends ApiBase
         $day = date('Y-m-d',time());
         $where[] = ['t.today','=',$day];
         $where[] = ['t.status','=',1];
+        $where[] = ['s.status','=',3];
         $where[] = ['t.school_id','=',$school_id];
         $pagesize = $request->param('pagesize',10);
 

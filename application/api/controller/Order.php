@@ -256,9 +256,10 @@ class Order extends ApiBase
     public function orderPayment(Request $request)
     {
         $orders_sn = $request->param('orders_sn');
+        $shop_id = $request->param('shop_id');
         $openid = $this->auth->openid;
         $user_id = $this->auth->id;
-
+        $this->isDisable($shop_id);
         
         if(!$orders_sn){
 
@@ -448,13 +449,14 @@ class Order extends ApiBase
     public function sureOrder(Request $request)
     {
         $order = $request->param('order');//主表
+        $this->isDisable($order['shop_id']);
         $detail = $request->param('detail');//明细
         $platform_discount = $request->param('platform_discount');//平台活动
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
 
-        set_log('order=',$order,'sureOrder');
-        set_log('detail=',$detail,'sureOrder');
+        // set_log('order=',$order,'sureOrder');
+        // set_log('detail=',$detail,'sureOrder');
 
         $orders_sn = build_order_no('D');//生成唯一订单号
         $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
