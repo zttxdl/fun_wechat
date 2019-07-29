@@ -38,11 +38,13 @@ class Property extends MerchantsBase
 
         $totalMoney = model('Shop')->getCountSales($shop_id);
         $monthMoney = model("Shop")->getMonthSales($shop_id);
+        $card = model('Shop')->getAccount($shop_id);
 
         $data = [
             'balanceMoney' => !empty($acount_money) ? $acount_money : 0,//可提现余额
             'totalMoney' => !empty($totalMoney) ? $totalMoney: 0,//总收入
-            'monthMoney' => !empty($monthMoney) ? $totalMoney: 0//本月收入
+            'monthMoney' => !empty($monthMoney) ? $totalMoney: 0,//本月收入
+            'card' => $card['back_card_num']
         ];
 
         $this->success('获取成功',$data);
@@ -109,6 +111,7 @@ class Property extends MerchantsBase
         $shop_id = $this->shop_id;
         $withdraw_sn = build_order_no('TXBH');
         $money = $request->param('money');//提现金额
+        $card = $request->param('card');//提现卡号
 
         if($money < 1) {
             $this->error('提现金额不能少于1元');
@@ -139,6 +142,7 @@ class Property extends MerchantsBase
         $txsq = [
             'shop_id' => $shop_id,
             'withdraw_sn' => $withdraw_sn,
+            'card' => $card,
             'money' => $money,
             'status' => 1,
             'type' => 2,
