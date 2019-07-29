@@ -168,12 +168,13 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $data['categoryName'] = model('ManageCategory')->where('id',$data['manage_category_id'])->value('name');
         $data['sales'] = model('Shop')->getMonthNum($shop_id);
         //判断店铺是否营业
-        if (! empty($data['run_time'])){
+        if (! empty($data['run_time']) && $data['open_status'] == 1){
             $open_status = model('ShopInfo')->getBusiness($data['run_time']);
             $data['open_status'] = isset($open_status) ? $data['open_status'] : $open_status;
         }else{
             $data['open_status'] = 0;
         }
+        
 
         //判断是否存在优惠
         $data['disc'] = model('ShopDiscounts')
@@ -275,7 +276,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $shop_id = $request->param('shop_id',1);
         $openid = $request->param('openid',1);
         $this->isDisable($shop_id);
-        
+
         if(empty($shop_id) || empty($openid)) {
             $this->error("必传参数不能为空!");
         }
