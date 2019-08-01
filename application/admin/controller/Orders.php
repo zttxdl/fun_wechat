@@ -36,27 +36,31 @@ class Orders extends Base
 
 //        dump($order_list);
 
-        if(!$order_list['data']) {
+/*        if(!$order_list['data']) {
             $this->error('暂无数据');
-        }
+        }*/
 
         $result = [];
 
-        foreach ($order_list['data'] as $row)
-        {
-            $result['info'][] = [
-                'id' => $row['id'],
-                'orders_sn' => $row['orders_sn'],
-                'user_name' => $row['nickname'],
-                'phone' => $row['phone'],
-                'shop_name' => $row['shop_name'],
-                'money' => $row['money'],
-                'add_time' => date('Y-m-d H:i:s',$row['add_time']),
-                'status' => $this->getOrdertStatus($row['status']),
-                'pay_mode' => $row['pay_mode']==1 ? '微信支付' : '支付宝支付',
-                'source' => $row['source']==1 ? '小程序' : 'H5',
-            ];
+        if($order_list) {
+            foreach ($order_list['data'] as $row)
+            {
+                $result['info'][] = [
+                    'id' => $row['id'],
+                    'orders_sn' => $row['orders_sn'],
+                    'user_name' => $row['nickname'],
+                    'phone' => $row['phone'],
+                    'shop_name' => $row['shop_name'],
+                    'money' => $row['money'],
+                    'add_time' => date('Y-m-d H:i:s',$row['add_time']),
+                    'status' => $this->getOrdertStatus($row['status']),
+                    'pay_mode' => $row['pay_mode']==1 ? '微信支付' : '支付宝支付',
+                    'source' => $row['source']==1 ? '小程序' : 'H5',
+                ];
+            }
         }
+
+
 
         $result['count'] = $order_list['total'];
         $result['page'] = $order_list['current_page'];
