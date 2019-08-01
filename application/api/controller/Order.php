@@ -679,6 +679,11 @@ class Order extends ApiBase
         {
             $product_info = Model('Product')->where('id',$row['product_id'])->find();
 
+            //如果商品下架 则不返回
+            if($product_info['status'] == 2) {
+                continue;
+            }
+
 
             $result[] = [
                 'orders_id' => $row['orders_id'],
