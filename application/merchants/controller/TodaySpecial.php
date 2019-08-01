@@ -17,6 +17,7 @@ class TodaySpecial extends MerchantsBase
 
     public function __construct()
     {
+        parent::__construct();
         $this->redis = Cache::store('redis');
         $this->redisKey = 'TodayDeals';
     }
@@ -58,10 +59,6 @@ class TodaySpecial extends MerchantsBase
         $data   = $request->param();
         $data['shop_id'] = $this->shop_id;
 
-        if($this->getData($data['shop_id'])) {
-            $this->error('店铺已经存在特价商品,活动到期在设置哦');
-        }
-
         $data['start_time'] = strtotime($request->param('start_time'));
         $data['end_time'] = strtotime($request->param('end_time'));
         $data['today'] = date('Y-m-d',$data['start_time']);
@@ -77,26 +74,10 @@ class TodaySpecial extends MerchantsBase
 
         $result = TodayDeals::create($data);
 
-        //数据存入缓存并设置生存周期
-        $expire = $data['end_time'] - $data['start_time'];
-        $this->setData($data['shop_id'],$data,$expire);
-
         $this->success('success',$result);
     }
 
-    public function setData($shop_id,$data,$expire)
-    {
 
-        $this->redis->hSet($this->redisKey,$shop_id,json_encode($data,JSON_UNESCAPED_UNICODE));
-        $this->redis->expire($this->redisKey,$expire);
-
-        return true;
-    }
-
-    public function getData($shop_id)
-    {
-        return $this->redis->hGet($this->redisKey,$shop_id);
-    }
 
 
 }
