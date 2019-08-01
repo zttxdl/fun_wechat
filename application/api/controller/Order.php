@@ -457,8 +457,8 @@ class Order extends ApiBase
 
        set_log('order=',$order,'sureOrder');
        set_log('detail=',$detail,'sureOrder');
-       set_log('platform_discount=',$detail,'sureOrder');
-       set_log('shop_discount=',$detail,'sureOrder');
+       set_log('platform_discount=',$platform_discount,'sureOrder');
+       set_log('shop_discount=',$shop_discount,'sureOrder');
 
         $orders_sn = build_order_no('D');//生成唯一订单号
         $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
