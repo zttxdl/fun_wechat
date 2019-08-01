@@ -48,29 +48,32 @@ class Shop extends Base
             ->paginate($page_size)
             ->toArray();
 
-        if(!$list['data']) {
-            $this->error('暂无数据');
-        }
+//        if(!$list['data']) {
+//            $this->error('暂无数据',201,[]);
+//        }
 
         $result = [];
-        foreach ($list['data'] as $row)
-        {
-            if($row['id']) {
-                $result['data'][] = [
-                    'id' => $row['id'],
-                    'shop_name' => $row['shop_name'],
-                    'logo_img' => $row['logo_img'],
-                    'link_name' => $row['link_name'],
-                    'link_tel' => $row['link_tel'],
-                    'add_time' => date('Y-m-d',$row['add_time']),
-                    'school_name' =>  Model('School')->getNameById($row['school_id']),
-                    'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
-                    'status' => config('shop_check_status')[$row['status']],
-                    'month_sales' => model('Shop')->getMonthSales($row['id']),
-                    'count_sales' => model('Shop')->getCountSales($row['id']),
-                ];
+        if($list) {
+            foreach ($list['data'] as $row)
+            {
+                if($row['id']) {
+                    $result['data'][] = [
+                        'id' => $row['id'],
+                        'shop_name' => $row['shop_name'],
+                        'logo_img' => $row['logo_img'],
+                        'link_name' => $row['link_name'],
+                        'link_tel' => $row['link_tel'],
+                        'add_time' => date('Y-m-d',$row['add_time']),
+                        'school_name' =>  Model('School')->getNameById($row['school_id']),
+                        'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
+                        'status' => config('shop_check_status')[$row['status']],
+                        'month_sales' => model('Shop')->getMonthSales($row['id']),
+                        'count_sales' => model('Shop')->getCountSales($row['id']),
+                    ];
+                }
             }
         }
+
 
         $result['count'] = $list['total'];
         $result['page'] = $list['current_page'];
@@ -223,26 +226,30 @@ class Shop extends Base
 //                            ->fetchSql()
                             ->paginate($page_size)->toArray();
 
-        if(!$data['data']) {
+        /*if(!$data['data']) {
             $this->error('暂无数据');
-        }
+        }*/
 
         $result = [];
 
-        foreach ($data['data'] as $row){
-            $result['info'][] = [
-                'id' => $row['id'],
-                'logo_img' => $row['logo_img'],
-                'shop_name' => $row['shop_name'],
-                'link_name' => $row['link_name'],
-                'link_tel' => $row['link_tel'],
-                'manage_category_name' => $row['manage_category_name'],
-                'school_name' => $row['school_name'],
-                'status' => $row['status'],
-                'mb_status' => config('shop_check_status')[$row['status']]
+        if($data) {
+            foreach ($data['data'] as $row){
+                $result['info'][] = [
+                    'id' => $row['id'],
+                    'logo_img' => $row['logo_img'],
+                    'shop_name' => $row['shop_name'],
+                    'link_name' => $row['link_name'],
+                    'link_tel' => $row['link_tel'],
+                    'manage_category_name' => $row['manage_category_name'],
+                    'school_name' => $row['school_name'],
+                    'status' => $row['status'],
+                    'mb_status' => config('shop_check_status')[$row['status']]
 
-            ];
+                ];
+            }
         }
+
+
         $result['count'] = $data['total'];
         $result['page'] = $data['current_page'];
         $result['pageSize'] = $data['per_page'];
