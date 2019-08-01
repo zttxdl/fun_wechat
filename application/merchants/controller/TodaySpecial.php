@@ -13,14 +13,6 @@ use think\facade\Cache;
 class TodaySpecial extends MerchantsBase
 {
     protected $noNeedLogin = [];
-    protected $redisKey;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->redis = Cache::store('redis');
-        $this->redisKey = 'TodayDeals';
-    }
 
     /**
      * 显示资源列表
