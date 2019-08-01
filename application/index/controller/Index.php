@@ -3,9 +3,11 @@ namespace app\Index\Controller;
 
 use think\Controller;
 
-use Predis\Client;
+use GuzzleHttp\Client;
 use app\common\service\PushEvent;
 use think\facade\Cache;
+use think\Request;
+
 
 
 class Index extends Controller
@@ -80,6 +82,33 @@ class Index extends Controller
 	{
 	    phpinfo();
 	}
+
+
+    public function http(Request $request)
+    {
+        $params = [
+            'key' => 'b6a629321ab344778a7f1b896113a57d',
+            'userid' => 'yemwishu'
+        ];
+
+        $params['info'] = $request->param('info');
+
+        $client = new client();
+
+        $options = json_encode($params, JSON_UNESCAPED_UNICODE);
+        $data = [
+            'body' => $options,
+            'headers' => ['content-type' => 'application/json'],
+        ];
+        
+        
+        //发送post数据
+        $response = $client->post('http://www.tuling123.com/openapi/api', $data);
+
+        $callback = json_decode($response->getBody()->getContents());
+
+        return $this->success('200','测试返回结果',$callback);
+    }
 	 
 
 

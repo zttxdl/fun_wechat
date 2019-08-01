@@ -455,8 +455,10 @@ class Order extends ApiBase
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
 
-        // set_log('order=',$order,'sureOrder');
-        // set_log('detail=',$detail,'sureOrder');
+       set_log('order=',$order,'sureOrder');
+       set_log('detail=',$detail,'sureOrder');
+       set_log('platform_discount=',$detail,'sureOrder');
+       set_log('shop_discount=',$detail,'sureOrder');
 
         $orders_sn = build_order_no('D');//生成唯一订单号
         $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
@@ -524,26 +526,18 @@ class Order extends ApiBase
             }
 
 
-            if($money != ($total_money - $order_discount)) {
+            /*if($money != ($total_money - $order_discount)) {
                 throw new \Exception('订单结算金额不正确');
-            }
+            }*/
 
+
+            //今日特价商品逻辑 start
+
+            Model('TodayDeals')->updateTodayProductNum($orderData['shop_id'],'dec');
+            //今日特价商品逻辑 end
 
             foreach ($detail as $row) {
 
-                //今日特价商品逻辑 start
-                $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
-
-                $today = date('Y-m-d',time());
-
-                if($todaty_goods && $todaty_goods['today'] == $today) {
-                    //加库存
-                    Db::name('today_deals')
-                        ->where('product_id',$row['product_id'])
-                        ->where('today',$today)
-                        ->setDec('num',$row['num']);
-                }
-                //今日特价商品逻辑 end
 
                 //商品均摊金额和商品原价初始化
                 $product_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
@@ -647,21 +641,9 @@ class Order extends ApiBase
         }
 
         //今日特价商品逻辑 start
-        foreach ($order_detail as $row)
-        {
-            $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
 
-            $today = date('Y-m-d',time());
+        Model('TodayDeals')->updateTodayProductNum($order_info['shop_id'],'inc');
 
-            if($todaty_goods && $todaty_goods['today'] == $today) {
-                //加库存
-                Db::name('today_deals')
-                    ->where('product_id',$row['product_id'])
-                    ->where('today',$today)
-                    ->setInc('num',$row['num']);
-            }
-
-        }
         //今日特价商品逻辑 end
 
         $res = Model('Orders')->cancelOrder($order_sn,$order_status);
