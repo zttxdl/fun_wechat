@@ -672,6 +672,7 @@ class Order extends ApiBase
         $order_detail = model('Orders')->getOrderDetail($order_id);
 
 
+
         //dump($order_detail);
         $result = [];
 
@@ -715,7 +716,7 @@ class Order extends ApiBase
                 'box_money' => $product_info['box_money'],
                 'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
                 'attr_ids' => $row['attr_ids'],
-                'limit_buy_num' => $row['limit_buy_num']
+                'limit_buy_num' => isset($row['limit_buy_num']) ? $row['limit_buy_num'] : ''
             ];
         }
 
