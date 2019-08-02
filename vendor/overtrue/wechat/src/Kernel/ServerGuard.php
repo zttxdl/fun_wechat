@@ -34,8 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ServerGuard
 {
-    use Observable;
-    use ResponseCastable;
+    use Observable, ResponseCastable;
 
     /**
      * @var bool
@@ -62,7 +61,6 @@ class ServerGuard
         'device_text' => Message::DEVICE_TEXT,
         'event' => Message::EVENT,
         'file' => Message::FILE,
-        'miniprogrampage' => Message::MINIPROGRAM_PAGE,
     ];
 
     /**
@@ -118,7 +116,7 @@ class ServerGuard
      */
     public function validate()
     {
-        if (!$this->alwaysValidate && !$this->isSafeMode()) {
+        if (!$this->isSafeMode()) {
             return $this;
         }
 
@@ -129,18 +127,6 @@ class ServerGuard
             ])) {
             throw new BadRequestException('Invalid request signature.', 400);
         }
-
-        return $this;
-    }
-
-    /**
-     * Force validate request.
-     *
-     * @return $this
-     */
-    public function forceValidate()
-    {
-        $this->alwaysValidate = true;
 
         return $this;
     }
@@ -163,7 +149,12 @@ class ServerGuard
         }
 
         if ($this->isSafeMode() && !empty($message['Encrypt'])) {
-            $message = $this->decryptMessage($message);
+            $message = $this->app['encryptor']->decrypt(
+                $message['Encrypt'],
+                $this->app['request']->get('msg_signature'),
+                $this->app['request']->get('nonce'),
+                $this->app['request']->get('timestamp')
+            );
 
             // Handle JSON format.
             $dataSet = json_decode($message, true);
@@ -343,6 +334,10 @@ class ServerGuard
      */
     protected function isSafeMode(): bool
     {
+        if ($this->alwaysValidate) {
+            return true;
+        }
+
         return $this->app['request']->get('signature') && 'aes' === $this->app['request']->get('encrypt_type');
     }
 
@@ -352,20 +347,5 @@ class ServerGuard
     protected function shouldReturnRawResponse(): bool
     {
         return false;
-    }
-
-    /**
-     * @param array $message
-     *
-     * @return mixed
-     */
-    protected function decryptMessage(array $message)
-    {
-        return $message = $this->app['encryptor']->decrypt(
-            $message['Encrypt'],
-            $this->app['request']->get('msg_signature'),
-            $this->app['request']->get('nonce'),
-            $this->app['request']->get('timestamp')
-        );
     }
 }

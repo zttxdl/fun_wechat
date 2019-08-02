@@ -1,5 +1,7 @@
 preset: symfony
 
+linting: true
+
 enabled:
   - strict
   - strict_param
