@@ -5,6 +5,7 @@ namespace app\admin\controller;
 use app\common\controller\Base;
 use think\Request;
 use think\Db;
+use app\common\service\SendMsg;
 
 class RiderInfo extends Base
 {
@@ -164,6 +165,10 @@ class RiderInfo extends Base
         if (!$result) {
             $this->error('设置失败');
         }
+
+        // 推送微信模板消息
+        $sendMsg = new sendMsg();
+        $sendMsg->passCheckSend($data['id']);
 
         $this->success('设置成功');
     }

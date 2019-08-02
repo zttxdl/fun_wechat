@@ -112,6 +112,28 @@ class Member extends RiderBase
 
 
     /**
+     * 欢迎加入 
+     * 
+     */
+    public function toJoin(Request $request)
+    {
+        $data = $request->post();
+        // 验证表单数据
+        $check = $this->validate($data, 'RiderInfo.join');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+
+        // 更新数据
+        $result = RiderInfo::where('id','=',$this->auth->id)->update($data);
+        if (!$result) {
+            $this->error('加入失败',201);
+        }
+        $this->success('加入成功');
+    }
+     
+
+    /**
      * 申请入驻【成为骑手】 
      * 
      */
@@ -122,7 +144,7 @@ class Member extends RiderBase
         $data['add_time'] = time();
 
         // 验证表单数据
-        $check = $this->validate($data, 'RiderInfo');
+        $check = $this->validate($data, 'RiderInfo.apply');
         if ($check !== true) {
             $this->error($check,201);
         }
@@ -130,9 +152,9 @@ class Member extends RiderBase
         // 更新数据
         $result = RiderInfo::where('id','=',$this->auth->id)->update($data);
         if (!$result) {
-            $this->error('更新失败',201);
+            $this->error('申请失败',201);
         }
-        $this->success('更新成功');
+        $this->success('申请成功');
     }
 
 
