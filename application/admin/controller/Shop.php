@@ -360,7 +360,7 @@ class Shop extends Base
      */
     public function checkShow()
     {
-        $data = config('check_status')['shop'];
+        $data = Db::name('check_status')->where('type','=',1)->column('name','id');
         $this->success('获取成功',$data);
     }
 

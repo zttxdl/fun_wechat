@@ -179,7 +179,7 @@ class RiderInfo extends Base
      */
     public function checkStatusList()
     {
-        $data = config('check_status')['rider'];
+        $data = Db::name('check_status')->where('type','=',2)->column('name','id');
         $this->success('获取成功',$data);
     }
 
