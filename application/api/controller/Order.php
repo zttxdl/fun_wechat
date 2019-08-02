@@ -681,7 +681,20 @@ class Order extends ApiBase
 
             //如果商品下架 则不返回
             if($product_info['status'] == 2) {
-                continue;
+                $today_goods = Model('todayDeals')->where('product_id',$row['product_id'])->find();
+
+                if($today_goods) {
+                    //今日特价过期
+                    if(time() > $today_goods['end_time']) {
+                        continue;
+                    }
+
+                    $row['limit_buy_num'] = $today_goods['limit_buy_num'];//限购次数
+
+                }else{
+                    continue;
+                }
+
             }
 
 
@@ -696,7 +709,8 @@ class Order extends ApiBase
                 'old_price' => $product_info['old_price'],
                 'box_money' => $product_info['box_money'],
                 'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
-                'attr_ids' => $row['attr_ids']
+                'attr_ids' => $row['attr_ids'],
+                'limit_buy_num' => $row['limit_buy_num']
             ];
         }
 
