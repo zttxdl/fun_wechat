@@ -142,6 +142,7 @@ class Member extends RiderBase
         $data = $request->post();
         $data['status'] = 1;
         $data['add_time'] = time();
+        $data['overtime'] = time() + 24*7*3600;
 
         // 验证表单数据
         $check = $this->validate($data, 'RiderInfo.apply');
