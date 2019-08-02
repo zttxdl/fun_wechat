@@ -5,6 +5,7 @@ namespace app\merchants\controller;
 use app\common\controller\MerchantsBase;
 use think\Request;
 use app\common\model\TodayDeals;
+use think\facade\Cache;
 
 /**
  * 商品今天特价模块控制器
@@ -49,6 +50,7 @@ class TodaySpecial extends MerchantsBase
     {
         $data   = $request->param();
         $data['shop_id'] = $this->shop_id;
+
         $data['start_time'] = strtotime($request->param('start_time'));
         $data['end_time'] = strtotime($request->param('end_time'));
         $data['today'] = date('Y-m-d',$data['start_time']);
@@ -66,6 +68,8 @@ class TodaySpecial extends MerchantsBase
 
         $this->success('success',$result);
     }
+
+
 
 
 }

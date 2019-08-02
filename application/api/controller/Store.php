@@ -19,7 +19,7 @@ class Store extends ApiBase
     public function index(Request $request)
     {
         $shop_id = $request->param('shop_id');
-
+        $this->isDisable($shop_id);
 
         $where = ['shop_id'=>$shop_id];
         //获取商品
@@ -100,7 +100,7 @@ class Store extends ApiBase
         $tips_id = $request->param('tips_id');
 
         $where[] = ['shop_id','=',$shop_id];
-
+        $this->isDisable($shop_id);
         //获取商家评论评分
         $data['star'] = (float)model('ShopInfo')->where('id',$shop_id)->value( 'marks');
         //获取商家配送评分
@@ -155,7 +155,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
     public function getDetail(Request $request)
     {
         $shop_id = $request->param('shop_id');
-
+        $this->isDisable($shop_id);
         $data = model('ShopInfo')
             ->field('shop_name,logo_img,ping_fee,info,up_to_send_money,run_time,address,marks,sales,notice,manage_category_id,school_id,open_status')
             ->where('id',$shop_id)
@@ -168,12 +168,12 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $data['categoryName'] = model('ManageCategory')->where('id',$data['manage_category_id'])->value('name');
         $data['sales'] = model('Shop')->getMonthNum($shop_id);
         //判断店铺是否营业
-        if (! empty($data['run_time'])){
-            $open_status = model('ShopInfo')->getBusiness($data['run_time']);
-            $data['open_status'] = isset($open_status) ? $data['open_status'] : $open_status;
+        if (! empty($data['run_time']) && $data['open_status'] == 1){
+            $data['open_status'] = model('ShopInfo')->getBusiness($data['run_time']);
         }else{
             $data['open_status'] = 0;
         }
+        
 
         //判断是否存在优惠
         $data['disc'] = model('ShopDiscounts')
@@ -274,6 +274,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
         $shop_id = $request->param('shop_id',1);
         $openid = $request->param('openid',1);
+        $this->isDisable($shop_id);
 
         if(empty($shop_id) || empty($openid)) {
             $this->error("必传参数不能为空!");

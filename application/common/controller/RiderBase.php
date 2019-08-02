@@ -9,7 +9,7 @@ use app\common\Auth\JwtAuth;
 
 
 /**
- * 商品规格属性模块控制器
+ * 骑手端基类控制器
  */
 class RiderBase extends Base
 {

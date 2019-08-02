@@ -188,13 +188,13 @@ return [
         // 'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
         
         /** 暂时还未替换，后续替换。。。。 */
-        'app_id'        => 'wx51ecddea44f0ffed',
-        'secret'        =>  '90a92131b5844dc7498d28b510386d97',
-        'mch_id'             => '1538416851',
-        'key'                => 'iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
+        'app_id'        => 'wxe29a77d8961dd1d9',
+        'secret'        =>  '705fb98fb3a0dd7ee80195e0c740de18',
+        'mch_id'             => '1531654461',
+        'key'                => 'iew0a4ek2d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
         // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
-        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
-        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
+        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert_1.pem', // XXX: 绝对路径！！！！
+        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key_1.pem',      // XXX: 绝对路径！！！！
         'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
         'sandbox' => false
     ],

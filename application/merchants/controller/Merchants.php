@@ -46,7 +46,8 @@ class Merchants extends MerchantsBase
         $data['manage_category_id'] = $request->param('manage_category_id');
         $data['link_name'] = $request->param('link_name');
         $data['link_tel'] = $request->param('link_tel');
-        $data['address'] = $request->param('address');
+        $area_detail = $request->param('area_detail');
+        $data['address'] = $request->param('address').$area_detail;
         //明细
         $data2['shop_id'] = $this->shop_id;
         $data2['business_license'] = $request->param('business_license');

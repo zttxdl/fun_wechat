@@ -68,7 +68,7 @@ class MyCoupon extends ApiBase
             // 使用门槛条件判断
             if($money < $row['threshold']) {
                 $row['is_use'] = 0;
-                $row['remark'][] = '商品现价+包装费需满'.$row['threshold'].'元';
+                $row['remark'][] = '满'.$row['threshold'].'元可用';
             }
 
             // 手机使用条件判断

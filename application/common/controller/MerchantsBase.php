@@ -7,7 +7,7 @@ use app\common\controller\Base;
 use app\common\Auth\JwtAuth;
 
 /**
- * 商品规格属性模块控制器
+ * 商家端基类控制器
  */
 class MerchantsBase extends Base
 {
@@ -23,6 +23,7 @@ class MerchantsBase extends Base
         //判断是否要登录验证
         if (! $this->match($action)){
             $this->valid_token();
+            $this->isDisable();
         }
     }
 
@@ -71,6 +72,19 @@ class MerchantsBase extends Base
             }
         }
         return $arr;
+    }
+
+    /**
+     * 是否禁用
+     * @return boolean [description]
+     */
+    protected function isDisable(){
+        $status = model('ShopInfo')->where('id',$this->shop_id)->value('status');
+        if ($status == 4) {
+            $this->error('您已被禁用，请联系客服',401);
+        }
+
+        return true;
     }
 
 }

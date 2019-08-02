@@ -22,8 +22,8 @@ class Orders extends RiderBase
 	{
 		$type = $request->param('type',0);
 
-        $status_arr = model('rider')->where('id','=',$this->auth->id)->field('status,open_status')->find();
-        if ($status_arr['status'] == 2) {
+        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
+        if ($status_arr['status'] == 4) {
             $this->error('你账号已被禁用，无法接单',202);
         }
 
@@ -67,23 +67,23 @@ class Orders extends RiderBase
 		}
 
 		$this->success('success',$data);
-	}
+    }
+    
 
 	/**
 	 * 抢单
 	 */
-	
 	public function grabSingle(Request $request)
 	{
         $orderId = $request->param('order_id');
 
-        $status = model('Takeout')->where('order_id',$orderId)->value('status');
+        $result = model('Takeout')->where('order_id',$orderId)->field('school_id,status')->find();
 
-        if ($status == 2){
+        if ($result['status'] == 2){
             $this->error('该订单已取消');
         }
 
-        if ($status !== 1){
+        if (in_array($result['status'],[3,4,5,6])){
             $this->error('手慢了，被人抢走了');
         }
         $data = [
@@ -92,11 +92,38 @@ class Orders extends RiderBase
             'single_time'=>time(),
             'update_time'=>time(),
         ];
-        model('Takeout')->where('order_id',$orderId)->update($data);
+        Db::startTrans();
+        try {
+            $res = model('Takeout')->where('order_id',$orderId)->update($data);
 
-        model('Orders')->where('id',$orderId)->update(['status'=>5,'rider_id'=>$this->auth->id,'rider_receive_time'=>time()]);
+            $res1 = model('Orders')->where('id',$orderId)->update(['status'=>5,'rider_id'=>$this->auth->id,'rider_receive_time'=>time()]);
+            // 提交事务
+            Db::commit();
+        } catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
+        }
+       
+        if ($res && $res1) {
+            // 抢单成功后，该学校的学生不应再看到该订单
+            //实例化socket
+            $socket = model('PushEvent','service');
+            $where[] = ['school_id','=',$result['school_id']];
+            $where[] = ['open_status','=',1];
+            $where[] = ['status','=',3];
+            $r_list = model('RiderInfo')->where($where)->select();
 
-        $this->success('success');
+            foreach ($r_list as $item) {
+                $rid = 'r'.$item->id;
+                $socket->setUser($rid)->setContent('订单已被抢')->push();
+            }
+
+            $this->success('success');
+        } else {
+            $this->error('抢单失败');
+        }
+
+
 
 	}
 
@@ -154,7 +181,7 @@ class Orders extends RiderBase
             $count = model('Orders')->where([['user_id','=',$Order->user_id],['status','notin',1]])->count('id');
             if ($count == 1 && $user->invitation_id){
                 // 调用邀请红包
-                $this->inviteGiving($Order->user_id,$user->invitation_id);
+                $this->inviteGiving($user->invitation_id);
             }
             
             // 调用消费赠送红包
@@ -242,7 +269,7 @@ class Orders extends RiderBase
     /**
      * 邀请赠送红包
      */
-    protected function inviteGiving($user_id,$invitation_id)
+    protected function inviteGiving($invitation_id)
     {
         $where[] = [
             'type','=',4
@@ -255,7 +282,7 @@ class Orders extends RiderBase
             ->where($where)
             ->find();
         if ($data->surplus_num >0 ){
-            $num = $item->other_time;
+            $num = $data->other_time;
             $date = strtotime("+$num day");
             //执行逻辑
             $indate = date('Y.m.d',time()).'-'.date('Y.m.d',$date);
