@@ -21,6 +21,7 @@ class RiderInfo extends Validate
         'hand_card_img'  => 'require'
     ];
     
+
     /**
      * 定义错误信息
      * 格式：'字段名.规则名'	=>	'错误信息'
@@ -36,4 +37,14 @@ class RiderInfo extends Validate
         'back_img.require'              => '请上传身份证照反面',
         'hand_card_img.require'         => '请上传手持身份证照'
     ];
+
+
+    // 验证场景
+    protected $scene = [	
+        'join'       =>  ['name', 'school_id'],
+        'apply'    =>  ['name', 'identity_num', 'card_img','back_img','hand_card_img','school_id']
+    ];
+
+
+
 }
