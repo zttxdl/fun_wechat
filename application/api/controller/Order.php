@@ -681,7 +681,12 @@ class Order extends ApiBase
 
             //如果商品下架 则不返回
             if($product_info['status'] == 2) {
-                $today_goods = Model('todayDeals')->where('product_id',$row['product_id'])->find();
+                $today = date('Y-m-d',time());
+                $today_goods = Model('todayDeals')
+                    ->where('product_id',$row['product_id'])
+                    ->where('today',$today)
+                    ->where('shop_id',$order_info['shop_id'])
+                    ->find();
 
                 if($today_goods) {
                     //今日特价过期
