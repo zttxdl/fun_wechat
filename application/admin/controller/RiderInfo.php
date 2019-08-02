@@ -17,7 +17,7 @@ class RiderInfo extends Base
     {
         // 搜索条件
         $where= [];
-        !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
+        !empty($request->get('name/s')) ? $where[] = ['name|link_tel','like',$request->get('name/s').'%'] : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
         $where[] = ['status','in','3,4'];
 
