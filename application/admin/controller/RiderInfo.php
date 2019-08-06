@@ -17,7 +17,7 @@ class RiderInfo extends Base
     {
         // 搜索条件
         $where= [];
-        !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
+        !empty($request->get('name/s')) ? $where[] = ['name|link_tel','like',$request->get('name/s').'%'] : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
         $where[] = ['status','in','3,4'];
 
@@ -179,7 +179,7 @@ class RiderInfo extends Base
      */
     public function checkStatusList()
     {
-        $data = config('check_status')['rider'];
+        $data = Db::name('check_status')->where('type','=',2)->column('name','id');
         $this->success('获取成功',$data);
     }
 

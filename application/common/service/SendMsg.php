@@ -22,7 +22,7 @@ class SendMsg
         $wx_rider = config('wx_rider');
         // 获取信息
         $riderInfo = Db::name('rider_info r')->join('school s','r.school_id = s.id')->where('r.id','=',$id)
-                    ->field('r.name,r.openid,r.formid,r.overdue_time,r.status,s.name as school_name')->find();
+                    ->field('r.name,r.openid,r.formid,r.overtime,r.status,s.name as school_name')->find();
 
         if ($riderInfo['status'] == 2) {
             $check = '您的申请未通过';
@@ -32,7 +32,7 @@ class SendMsg
         }
 
         // 判断form_id是否失效,当不失效的时候,去获取并推送
-        if ($riderInfo['overdue_time'] > time()) {
+        if ($riderInfo['overtime'] > time()) {
             // 这是获取的小程序accessToken方法
             $accessToken = self::getWxAccessToken($wx_rider['app_id'], $wx_rider['secret']); 
             // 组装模板消息数据

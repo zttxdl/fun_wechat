@@ -32,7 +32,7 @@ class Member extends RiderBase
 
 
     /**
-     * 设置骑手已审核通过状态【前端单独用】
+     * 设置骑手已审核通过状态【前端单独用】 【 二期后将屏蔽此功能 】
      */
     public function setCheckStatus()
     {
@@ -41,6 +41,18 @@ class Member extends RiderBase
             $this->error('设置失败');
         }
         $this->success('设置成功');
+    }
+
+
+    /**
+     * 判断当前身份绑定的状态 
+     * 
+     */
+    public function checkIdentityStatus()
+    {
+        $status = Db::name('rider_info')->where('id',$this->auth->id)->value('status');
+        
+        $this->success('获取当前身份绑定状态成功',['status'=>$status]);
     }
 
 
@@ -142,6 +154,7 @@ class Member extends RiderBase
         $data = $request->post();
         $data['status'] = 1;
         $data['add_time'] = time();
+        $data['overtime'] = time() + 24*7*3600;
 
         // 验证表单数据
         $check = $this->validate($data, 'RiderInfo.apply');

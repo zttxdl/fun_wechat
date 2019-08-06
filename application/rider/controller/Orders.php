@@ -77,10 +77,16 @@ class Orders extends RiderBase
 	{
         $orderId = $request->param('order_id');
 
-        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
+        $status = model('RiderInfo')->where('id','=',$this->auth->id)->value('status');
 
-        if ($status_arr['status'] == 0) {
-            $this->error('您还未成为我们的骑手，请先申请入驻哦！',203);
+        if ($status == 0) {
+            $this->error('您还未进行身份绑定，暂时不能抢单哦~',203);
+        }
+        if ($status == 1) {
+            $this->error('身份绑定还在审核中，暂时不能抢单哦~',204);
+        }
+        if ($status == 2) {
+            $this->error('身份绑定审核失败，暂时不能抢单哦~',205);
         }
 
         $result = model('Takeout')->where('order_id',$orderId)->field('school_id,status')->find();
