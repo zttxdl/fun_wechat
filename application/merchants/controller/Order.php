@@ -367,7 +367,7 @@ class Order extends MerchantsBase
             }
 
             //今日特价商品逻辑
-            $id = mode('TodayDeals')->getTodayProduct($this->shop_id);
+            $id = model('TodayDeals')->getTodayProduct($this->shop_id);
             if ($id){
                 $order_detail =  model('Orders')->getOrderDetail($order_info['id']);
                 $product  = array_column($order_detail,'product_id');

@@ -530,7 +530,7 @@ class Order extends ApiBase
 
 
             //今日特价商品逻辑
-            $id = mode('TodayDeals')->getTodayProduct($orderData['shop_id']);
+            $id = model('TodayDeals')->getTodayProduct($orderData['shop_id']);
             if ($id){
                 $product  = array_column($detail,'product_id');
                 if (in_array($id,$product)){
@@ -615,7 +615,7 @@ class Order extends ApiBase
             $order_sn = trim($order_sn);
         }
 
-        $order_info = Model('Orders')->getOrder($order_sn);
+        $order_info = model('Orders')->getOrder($order_sn);
 
         $order_detail =  model('Orders')->getOrderDetail($order_info['id']);
 
@@ -641,11 +641,11 @@ class Order extends ApiBase
         //如果使用红包 状态回滚
         if($order_info['platform_coupon_money'] > 0){
             $data['status'] = $hongbao_status;
-            Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
+            model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
         }
 
         //今日特价商品逻辑
-        $id = mode('TodayDeals')->getTodayProduct($order_info['shop_id']);
+        $id = model('TodayDeals')->getTodayProduct($order_info['shop_id']);
         if ($id){
             $product  = array_column($order_detail,'product_id');
             if (in_array($id,$product)){
@@ -655,7 +655,7 @@ class Order extends ApiBase
 
         //今日特价商品逻辑 end
 
-        $res = Model('Orders')->cancelOrder($order_sn,$order_status);
+        $res = model('Orders')->cancelOrder($order_sn,$order_status);
 
         if($res) {
             $this->success('订单取消成功');
