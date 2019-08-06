@@ -21,7 +21,7 @@ class ManageCategory extends Model
      */
     public function getManageCategoryList()
     {
-        $list = $this->where('level',2)->field('id,name')->select();
+        $list = $this->field('id,name')->select();
         return $list;
     }
 
