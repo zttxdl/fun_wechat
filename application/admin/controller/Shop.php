@@ -6,6 +6,7 @@ namespace app\admin\controller;
 use app\common\controller\Base;
 use think\Request;
 use app\common\model\Shop as ShopInfoModel;
+use think\Db;
 
 class Shop extends Base
 {

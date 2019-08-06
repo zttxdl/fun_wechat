@@ -396,3 +396,12 @@ Route::group('auto', function () {
     Route::rule('/zero_execute', 'zeroExecute');
     Route::rule('/cancel_orders', 'cancelOrders');
 })->prefix('api/AutoShell/');
+
+
+// 测试
+//Route::group('test', function () {
+    Route::rule('add', 'index/Test/add');
+    Route::rule('get', 'index/Test/get');
+    Route::rule('del', 'index/Test/del');
+    Route::rule('edit', 'index/Test/edit');
+//});

@@ -22,7 +22,7 @@ class Orders extends Base
 
         $map = [];
         if($search) {
-            $map[] = ['a.orders_sn|b.nickname|b.phone|c.shop_name','like',$search.'%'];
+            $map[] = ['a.orders_sn|b.nickname|b.phone|c.shop_name','like','%'.$search.'%'];
         }
 
         $order_list = Db::name('orders')->alias('a')

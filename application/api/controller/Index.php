@@ -70,10 +70,7 @@ class Index extends ApiBase
      */
     public function getChannel()
     {
-        $where[] = ['status','=',1];
-        $where[] = ['level','=',1];
-
-        $data = model('ManageCategory') ->field('id,name,img')->where($where)->order('sort','asc')->limit(4)->select();
+        $data = model('ManageCategory')->field('id,name,img')->order('sort','asc')->limit(4)->select();
         return $data;
     }
 
@@ -200,12 +197,9 @@ class Index extends ApiBase
             $this->error('非法参数');
         }
 
-        // 获取当前一级经营品类下的所有二级经营品类
-        $class_ids = model('ManageCategory')->where('fid','=',$class_id)->column('id');
-
         /********* 搜索条件 ***************************************************************/
         $where[] = ['school_id','=',$school_id];
-        $where[] = ['manage_category_id','in',$class_ids];
+        $where[] = ['manage_category_id','=',$class_id];
         $where[] = ['status','=',3];
         $pagesize = $request->param('pagesize',10);
 
