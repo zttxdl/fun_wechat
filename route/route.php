@@ -18,14 +18,9 @@ if(request()->isOptions()){
 }
 
 /*************** 管理平台端 *********************************************************************************************/
-// 广告组
-Route::group('a-advers', function () {
-    Route::get('/index', 'index');
-    Route::get('/edit/:id', 'edit');
-    Route::post('/update', 'update');
-    Route::get('/del/:id', 'delete');
-})->prefix('admin/advers/')->middleware('IsLogin');
-
+// 广告位组
+Route::resource('advert_position','admin/advert_position');
+Route::resource('advert','admin/advert');
 
 // 优惠券组
 Route::group('a-coupon', function () {
