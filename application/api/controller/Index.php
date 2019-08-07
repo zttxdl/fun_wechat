@@ -70,10 +70,7 @@ class Index extends ApiBase
      */
     public function getChannel()
     {
-        $where[] = ['status','=',1];
-        $where[] = ['level','=',1];
-
-        $data = model('ManageCategory') ->field('id,name,img')->where($where)->order('sort','asc')->limit(4)->select();
+        $data = model('ManageCategory')->field('id,name,img')->order('sort','asc')->limit(8)->select();
         return $data;
     }
 
@@ -94,9 +91,15 @@ class Index extends ApiBase
         $where[] = ['status','=',1];
         $where[] = ['school_id','=',$school_id];
         $where[] = ['end_time', '>=',time()];
-        $today_sale = model('TodayDeals')->field('name,shop_id,product_id,old_price,price,num,limit_buy_num,thumb')
+        $today_sale = model('TodayDeals')
+            ->field('id,name,product_id,old_price,price,num,limit_buy_num,thumb,start_time,end_time')
             ->where($where)->limit(4)->select();
+        if ($today_sale){
+            foreach ($today_sale as $item) {
+                $item->res_time = $item->end_time - time();
+            }
 
+        }
         $this->success('success',$today_sale);
     }
 
@@ -200,12 +203,9 @@ class Index extends ApiBase
             $this->error('非法参数');
         }
 
-        // 获取当前一级经营品类下的所有二级经营品类
-        $class_ids = model('ManageCategory')->where('fid','=',$class_id)->column('id');
-
         /********* 搜索条件 ***************************************************************/
         $where[] = ['school_id','=',$school_id];
-        $where[] = ['manage_category_id','in',$class_ids];
+        $where[] = ['manage_category_id','=',$class_id];
         $where[] = ['status','=',3];
         $pagesize = $request->param('pagesize',10);
 
@@ -284,9 +284,14 @@ class Index extends ApiBase
         $where[] = ['t.school_id','=',$school_id];
         $pagesize = $request->param('pagesize',10);
 
-        $today_sale = model('TodayDeals')->alias('t')->join('shop_info s','t.shop_id = s.id')->field('t.name,t.shop_id,t.product_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,s.shop_name,s.up_to_send_money,s.ping_fee')
+        $today_sale = model('TodayDeals')->alias('t')->join('shop_info s','t.shop_id = s.id')->field('t.name,t.shop_id,t.product_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,t.start_time,t.end_time,s.shop_name,s.up_to_send_money,s.ping_fee')
             ->where($where)->whereTime('t.end_time', '>=', time())->paginate($pagesize);
 
+        if ($today_sale){
+            foreach ($today_sale as $item) {
+                $item->res_time = $item->end_time - time();
+            }
+        }
         $this->success('success',$today_sale);
     }
 }

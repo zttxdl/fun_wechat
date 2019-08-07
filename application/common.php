@@ -14,6 +14,9 @@
 use \Firebase\JWT\JWT;
 use think\facade\Cache; //导入JWT
 use app\common\Libs\Redis;
+use Qiniu\Auth;
+use Qiniu\Config;
+use Qiniu\Storage\BucketManager;
 
  /**
  * 返回封装后的API成功方法
@@ -364,6 +367,40 @@ if (!function_exists('redis')) {
         $config = config('cache.redis');
         $redis = Redis::getInstance($config);
         return $redis;
+    }
+
+}
+
+
+/**
+ * 删除七牛云上的物理图片
+ */
+if (!function_exists('qiniu_img_del')) {
+    function qiniu_img_del($imgurl){
+        // 构建鉴权对象
+        $accessKey = config('qiniu')['accesskey'];
+        $secretKey = config('qiniu')['secretkey'];
+        $bucket = config('qiniu')['bucket'];
+        $auth = new Auth($accessKey, $secretKey);
+
+        // 配置
+        $config = new Config();
+
+        // 管理资源
+        $bucketManager = new BucketManager($auth, $config);
+
+        // 要删除的图片文件，与七牛云空间存在的文件名称相同， 即不能存在域名， 也不存在压缩的后缀
+        // 数据库存储的图片路径为：http://picture.daigefan.com/6cfe8201907051641019024.png?imageView2/0/format/jpg/interlace/1/q/75|imageslim， 实际传到七牛云删除的路径为：6cfe8201907051641019024.png
+        $imgstr = reset(explode('?',$imgurl));
+        $img_url = substr($imgstr,29);
+
+        // 删除文件操作
+        $res = $bucketManager->delete($bucket, $img_url);
+        if (is_null($res)) {
+            return true;
+        }else{
+            return false;
+        }
     }
 
 }

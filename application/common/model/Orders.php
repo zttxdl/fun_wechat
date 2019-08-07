@@ -49,7 +49,7 @@ class Orders extends Model
      */
     public function getOrderDetail($order_id)
     {
-        $data = $this->name('orders_info')->where('orders_id',$order_id)->select();
+        $data = $this->name('orders_info')->where('orders_id',$order_id)->select()->toArray();
         return $data;
     }
 

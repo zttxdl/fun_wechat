@@ -22,7 +22,7 @@ class Coupon extends Base
     public function index(Request $request)
     {
         // 经营品类列表
-        $category_list = Db::name('manage_category')->where('level',2)->field('id,name')->select();
+        $category_list = Db::name('manage_category')->field('id,name')->select();
 
         // 搜索条件
         $where = [];

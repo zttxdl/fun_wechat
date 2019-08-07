@@ -18,14 +18,9 @@ if(request()->isOptions()){
 }
 
 /*************** 管理平台端 *********************************************************************************************/
-// 广告组
-Route::group('a-advers', function () {
-    Route::get('/index', 'index');
-    Route::get('/edit/:id', 'edit');
-    Route::post('/update', 'update');
-    Route::get('/del/:id', 'delete');
-})->prefix('admin/advers/')->middleware('IsLogin');
-
+// 广告位组
+Route::resource('advert_position','admin/advert_position');
+Route::resource('advert','admin/advert');
 
 // 优惠券组
 Route::group('a-coupon', function () {
@@ -142,10 +137,24 @@ Route::group('admin',function (){
     Route::rule('orderDetail','admin/Orders/getDetail');//退单详情
 });
 
-// 图片上传接口
-Route::group('a-upload', function () {
-    Route::post('/upload', 'upload');
-})->prefix('admin/upload/');
+
+// 经营品类管理模块
+Route::group('a-managecate', function () {
+    Route::get('/index', 'index');
+    Route::post('/insert', 'insert');
+    Route::get('/edit/:id', 'edit');
+    Route::post('/update', 'update');
+    Route::get('/del/:id', 'delete');
+})->prefix('admin/ManageCategory/');
+
+
+// 学校管理模块
+Route::group('a-school', function () {
+    Route::get('/index', 'index');
+})->prefix('admin/school/');
+
+
+
 
 
 
