@@ -455,10 +455,10 @@ class Order extends ApiBase
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
 
-       set_log('order=',$order,'sureOrder');
-       set_log('detail=',$detail,'sureOrder');
-       set_log('platform_discount=',$platform_discount,'sureOrder');
-       set_log('shop_discount=',$shop_discount,'sureOrder');
+//       set_log('order=',$order,'sureOrder');
+//       set_log('detail=',$detail,'sureOrder');
+//       set_log('platform_discount=',$platform_discount,'sureOrder');
+//       set_log('shop_discount=',$shop_discount,'sureOrder');
 
         $orders_sn = build_order_no('D');//生成唯一订单号
         $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
@@ -512,10 +512,8 @@ class Order extends ApiBase
             $detailData = [];
             $total_money = $order['total_money'];//订单总价
             $money = $order['money'];//订单结算金额
-            $order_discount = $orderData['shop_discounts_money'] + $orderData['platform_coupon_money'];//订单优惠金额
+//            $order_discount = $orderData['shop_discounts_money'] + $orderData['platform_coupon_money'];//订单优惠金额
             $product_total_money = '0.00';//商品总价和
-            $product_money = '0.00';//商品结算金额(如果有优惠会把运费和包装费去除计算)
-            $old_money = '0.00';//商品原价 如果有优惠商品记录商品原价
 
             foreach ($detail as $row) {
                 $product_total_money += $row['total_money'];
@@ -531,13 +529,19 @@ class Order extends ApiBase
             }*/
 
 
-            //今日特价商品逻辑 start
+            //今日特价商品逻辑
+            $id = model('TodayDeals')->getTodayProduct($orderData['shop_id']);
+            if ($id){
+                $product  = array_column($detail,'product_id');
+                if (in_array($id,$product)){
+                    model('TodayDeals')->updateTodayProductNum($orderData['shop_id'],'dec',$id);
+                }
+            }
 
-            Model('TodayDeals')->updateTodayProductNum($orderData['shop_id'],'dec');
+
             //今日特价商品逻辑 end
 
             foreach ($detail as $row) {
-
 
                 //商品均摊金额和商品原价初始化
                 $product_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
@@ -611,7 +615,7 @@ class Order extends ApiBase
             $order_sn = trim($order_sn);
         }
 
-        $order_info = Model('Orders')->getOrder($order_sn);
+        $order_info = model('Orders')->getOrder($order_sn);
 
         $order_detail =  model('Orders')->getOrderDetail($order_info['id']);
 
@@ -637,16 +641,21 @@ class Order extends ApiBase
         //如果使用红包 状态回滚
         if($order_info['platform_coupon_money'] > 0){
             $data['status'] = $hongbao_status;
-            Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
+            model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
         }
 
-        //今日特价商品逻辑 start
-
-        Model('TodayDeals')->updateTodayProductNum($order_info['shop_id'],'inc');
+        //今日特价商品逻辑
+        $id = model('TodayDeals')->getTodayProduct($order_info['shop_id']);
+        if ($id){
+            $product  = array_column($order_detail,'product_id');
+            if (in_array($id,$product)){
+                model('TodayDeals')->updateTodayProductNum($order_info['shop_id'],'inc',$id);
+            }
+        }
 
         //今日特价商品逻辑 end
 
-        $res = Model('Orders')->cancelOrder($order_sn,$order_status);
+        $res = model('Orders')->cancelOrder($order_sn,$order_status);
 
         if($res) {
             $this->success('订单取消成功');
@@ -672,6 +681,7 @@ class Order extends ApiBase
         $order_detail = model('Orders')->getOrderDetail($order_id);
 
 
+
         //dump($order_detail);
         $result = [];
 
@@ -681,7 +691,25 @@ class Order extends ApiBase
 
             //如果商品下架 则不返回
             if($product_info['status'] == 2) {
-                continue;
+                $today = date('Y-m-d',time());
+                $today_goods = Model('todayDeals')
+                    ->where('product_id',$row['product_id'])
+                    ->where('today',$today)
+                    ->where('shop_id',$order_info['shop_id'])
+                    ->find();
+
+                if($today_goods) {
+                    //今日特价过期
+                    if(time() > $today_goods['end_time']) {
+                        continue;
+                    }
+
+                    $row['limit_buy_num'] = $today_goods['limit_buy_num'];//限购次数
+
+                }else{
+                    continue;
+                }
+
             }
 
 
@@ -696,7 +724,8 @@ class Order extends ApiBase
                 'old_price' => $product_info['old_price'],
                 'box_money' => $product_info['box_money'],
                 'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
-                'attr_ids' => $row['attr_ids']
+                'attr_ids' => $row['attr_ids'],
+                'limit_buy_num' => isset($row['limit_buy_num']) ? $row['limit_buy_num'] : ''
             ];
         }
 

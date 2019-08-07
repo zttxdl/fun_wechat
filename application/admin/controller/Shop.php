@@ -6,6 +6,7 @@ namespace app\admin\controller;
 use app\common\controller\Base;
 use think\Request;
 use app\common\model\Shop as ShopInfoModel;
+use think\Db;
 
 class Shop extends Base
 {
@@ -360,7 +361,7 @@ class Shop extends Base
      */
     public function checkShow()
     {
-        $data = config('check_status')['shop'];
+        $data = Db::name('check_status')->where('type','=',1)->column('name','id');
         $this->success('获取成功',$data);
     }
 

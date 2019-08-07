@@ -18,14 +18,9 @@ if(request()->isOptions()){
 }
 
 /*************** 管理平台端 *********************************************************************************************/
-// 广告组
-Route::group('a-advers', function () {
-    Route::get('/index', 'index');
-    Route::get('/edit/:id', 'edit');
-    Route::post('/update', 'update');
-    Route::get('/del/:id', 'delete');
-})->prefix('admin/advers/')->middleware('IsLogin');
-
+// 广告位组
+Route::resource('advert_position','admin/advert_position');
+Route::resource('advert','admin/advert');
 
 // 优惠券组
 Route::group('a-coupon', function () {
@@ -359,6 +354,8 @@ Route::group('r-member', function () {
     Route::post('/update', 'update');
     Route::post('/bind-tel', 'BindRiderPhone');
     Route::get('/status', 'openStatus');
+    Route::get('/check_identity_status', 'checkIdentityStatus');
+    Route::post('/tojoin', 'toJoin');
     Route::rule('/getEvaluation', 'getEvaluation');
 })->prefix('rider/Member/');
 
@@ -394,3 +391,12 @@ Route::group('auto', function () {
     Route::rule('/zero_execute', 'zeroExecute');
     Route::rule('/cancel_orders', 'cancelOrders');
 })->prefix('api/AutoShell/');
+
+
+// 测试
+//Route::group('test', function () {
+    Route::rule('add', 'index/Test/add');
+    Route::rule('get', 'index/Test/get');
+    Route::rule('del', 'index/Test/del');
+    Route::rule('edit', 'index/Test/edit');
+//});

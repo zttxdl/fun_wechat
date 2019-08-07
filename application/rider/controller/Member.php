@@ -32,7 +32,7 @@ class Member extends RiderBase
 
 
     /**
-     * 设置骑手已审核通过状态【前端单独用】
+     * 设置骑手已审核通过状态【前端单独用】 【 二期后将屏蔽此功能 】
      */
     public function setCheckStatus()
     {
@@ -41,6 +41,18 @@ class Member extends RiderBase
             $this->error('设置失败');
         }
         $this->success('设置成功');
+    }
+
+
+    /**
+     * 判断当前身份绑定的状态 
+     * 
+     */
+    public function checkIdentityStatus()
+    {
+        $status = Db::name('rider_info')->where('id',$this->auth->id)->value('status');
+        
+        $this->success('获取当前身份绑定状态成功',['status'=>$status]);
     }
 
 
@@ -112,6 +124,28 @@ class Member extends RiderBase
 
 
     /**
+     * 欢迎加入 
+     * 
+     */
+    public function toJoin(Request $request)
+    {
+        $data = $request->post();
+        // 验证表单数据
+        $check = $this->validate($data, 'RiderInfo.join');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+
+        // 更新数据
+        $result = RiderInfo::where('id','=',$this->auth->id)->update($data);
+        if (!$result) {
+            $this->error('加入失败',201);
+        }
+        $this->success('加入成功');
+    }
+     
+
+    /**
      * 申请入驻【成为骑手】 
      * 
      */
@@ -120,9 +154,10 @@ class Member extends RiderBase
         $data = $request->post();
         $data['status'] = 1;
         $data['add_time'] = time();
+        $data['overtime'] = time() + 24*7*3600;
 
         // 验证表单数据
-        $check = $this->validate($data, 'RiderInfo');
+        $check = $this->validate($data, 'RiderInfo.apply');
         if ($check !== true) {
             $this->error($check,201);
         }
@@ -130,9 +165,9 @@ class Member extends RiderBase
         // 更新数据
         $result = RiderInfo::where('id','=',$this->auth->id)->update($data);
         if (!$result) {
-            $this->error('更新失败',201);
+            $this->error('申请失败',201);
         }
-        $this->success('更新成功');
+        $this->success('申请成功');
     }
 
 

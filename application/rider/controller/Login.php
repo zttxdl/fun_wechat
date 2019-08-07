@@ -115,13 +115,15 @@ class Login extends RiderBase
         if (!$res) {
             $this->error('登录或注册失败');
         }
-        $rider_info = RiderInfo::where('id','=',$rid)->field('id,school_id,status,open_status')->find();
+        $rider_info = RiderInfo::where('id','=',$rid)->field('id,school_id,status,open_status,name')->find();
 
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
             'token' => $token,
             'uuid' => 'r'.$rid,
+            'name'  => $rider_info['name'],
+            'phone' =>  $phone
         ]);
 
         
@@ -159,13 +161,15 @@ class Login extends RiderBase
         if (!$res) {
             $this->error('快捷登录失败');
         }
-        $rider_info = RiderInfo::where('id','=',$rid)->field('id,school_id,status,open_status')->find();
+        $rider_info = RiderInfo::where('id','=',$rid)->field('id,school_id,status,open_status,name')->find();
 
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
             'token' => $token,
             'uuid' => 'r'.$rid,
+            'name'  => $rider_info['name'],
+            'phone' =>  $data['phone']
         ]);
 
     }
