@@ -392,7 +392,7 @@ if (!function_exists('qiniu_img_del')) {
         // 要删除的图片文件，与七牛云空间存在的文件名称相同， 即不能存在域名， 也不存在压缩的后缀
         // 数据库存储的图片路径为：http://picture.daigefan.com/6cfe8201907051641019024.png?imageView2/0/format/jpg/interlace/1/q/75|imageslim， 实际传到七牛云删除的路径为：6cfe8201907051641019024.png
         $imgstr = reset(explode('?',$imgurl));
-        $img_url = substr($imgstr,29);
+        $img_url = substr($imgstr,28);
 
         // 删除文件操作
         $res = $bucketManager->delete($bucket, $img_url);
