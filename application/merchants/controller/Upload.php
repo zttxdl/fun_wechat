@@ -75,6 +75,7 @@ class Upload extends MerchantsBase
         $bucketManager = new BucketManager($auth, $config);
         $imgstr = reset(explode('?',$delFileName));
         $img_url = substr($imgstr,29);
+        dump($img_url);die;
         // 删除文件操作
         $res = $bucketManager->delete($bucket, $img_url);
 
