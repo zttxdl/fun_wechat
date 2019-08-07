@@ -138,6 +138,8 @@ Route::group('admin',function (){
 Route::group('admin',function (){
     Route::rule('orderList','admin/Orders/getList');//订单列表
     Route::rule('orderDetail','admin/Orders/getDetail');//订单详情
+    Route::rule('orderDetail','admin/Orders/getList');//退单列表
+    Route::rule('orderDetail','admin/Orders/getDetail');//退单详情
 });
 
 // 图片上传接口

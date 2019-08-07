@@ -428,6 +428,7 @@ class Order extends ApiBase
             'add_time' => time(),
             'out_refund_no' => build_order_no('T'),
             'out_trade_no' => $orders['orders_sn'],
+            'user_id' => $this->auth->id
         ];
 
 
