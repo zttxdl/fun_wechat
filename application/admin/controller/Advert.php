@@ -23,9 +23,16 @@ class Advert extends Base
             $list = model('Advert')->order('id', 'desc')->select();
         }else{
             $list = model('Advert')
-                ->where('title','like','%'.$name.'%')
+                ->where('title|advert_name','like','%'.$name.'%')
                 ->order('id', 'desc')
                 ->select();
+        }
+        if ($list){
+            foreach ($list as $val){
+                $val->start_time = date('Y/m/d',$val->start_time);
+                $val->end_time = date('Y/m/d',$val->end_time);
+
+            }
         }
 
         $this->success('success',$list);
@@ -39,7 +46,28 @@ class Advert extends Base
     public function save(Request $request)
     {
         $data = $request->param();
+        $advert_id = $request->param('advert_id');
+        $coverage = $request->param('coverage');
+        $start_time = $request->param('start_time');
+        $end_time = $request->param('end_time');
+        //获取该广告位已增加数量
+        if ($coverage !== 0){
+            $where[] = ['coverage','in',['0',$coverage]];
+        }
+
+        $where[] = ['advert_id','=',$advert_id];
+        $count = model('Advert')->where($where)->count();
+        $num = model('AdvertPosition')->where('id',$advert_id)->value('num');
+
+        if ($count >= $num){
+            $this->error('超出广告位限制',202);
+        }
+
+        $data['start_time'] = strtotime($start_time);
+        $data['end_time'] = strtotime($end_time);
+        $data['add_time'] = time();
         $ret = model('Advert')->save($data);
+
         if (!$ret){
             $this->error('添加失败');
         }
@@ -56,6 +84,9 @@ class Advert extends Base
         }
 
         $data = model('Advert')->where('id',$id)->find();
+        $data->start_time = date('Y/m/d',$data->start_time);
+        $data->end_time = date('Y/m/d',$data->end_time);
+
         $this->success('success',$data);
     }
 
@@ -74,6 +105,16 @@ class Advert extends Base
         }
 
         $data = $request->param();
+        $start_time = $request->param('start_time');
+        $end_time = $request->param('end_time');
+        if ($start_time){
+            $data['start_time'] = strtotime($start_time);
+        }
+
+        if ($end_time){
+            $data['end_time'] = strtotime($end_time);
+        }
+
         $where = ['id','=',$id];
         $ret = model('Advert')->save($data,$where);
         if (!$ret){

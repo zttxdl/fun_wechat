@@ -13,10 +13,13 @@ use think\Request;
 
 class AdvertPosition extends Base
 {
+    protected  $status = [
+                            '1'=>'是',
+                            '2'=>'否'
+                         ];
     /**
      * 显示资源列表
      */
-
     public function index()
     {
         $name = input('name','');
@@ -27,6 +30,13 @@ class AdvertPosition extends Base
                 ->where('name','like','%'.$name.'%')
                 ->order('id', 'desc')
                 ->select();
+        }
+
+        if ($list){
+            foreach ($list as $val){
+                $val->bool = $this->status[$val->status];
+
+            }
         }
 
         $this->success('success',$list);
@@ -57,6 +67,10 @@ class AdvertPosition extends Base
         }
 
         $data = model('AdvertPosition')->where('id',$id)->find();
+        if ($data){
+            $data->bool = $this->status[$data->status];
+        }
+
         $this->success('success',$data);
     }
 
@@ -90,6 +104,10 @@ class AdvertPosition extends Base
 
         if (!$id){
             $this->error('非法参数');
+        }
+        $data = model('Advert')->get(['advert_id'=>$id]);
+        if ($data){
+            $this->error('禁止删除，该广告位下有广告');
         }
 
         $ret = model('AdvertPosition')->destroy($id);
