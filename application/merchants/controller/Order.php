@@ -122,7 +122,7 @@ class Order extends MerchantsBase
         }
 
         //$result = [];
-        $type = '';
+        $data = [];
         foreach ($orders['data'] as $row)
         {
             $type = $this->getShopType($row['status']);
@@ -364,6 +364,16 @@ class Order extends MerchantsBase
                 }
             }else{
                 throw new Exception($res['return_msg']);
+            }
+
+            //今日特价商品逻辑
+            $id = model('TodayDeals')->getTodayProduct($this->shop_id);
+            if ($id){
+                $order_detail =  model('Orders')->getOrderDetail($order_info['id']);
+                $product  = array_column($order_detail,'product_id');
+                if (in_array($id,$product)){
+                    model('TodayDeals')->updateTodayProductNum($order_info['shop_id'],'inc',$id);
+                }
             }
 
         }catch (\Exception $e) {
