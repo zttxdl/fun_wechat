@@ -19,12 +19,18 @@ class Advert extends Base
     public function index()
     {
         $name = input('name','');
+        $page = input('page','');
+        $pagesize = input('pagesize',20);
         if ($name == ''){
-            $list = model('Advert')->order('id', 'desc')->select();
+            $list = model('Advert')
+                ->order('id', 'desc')
+                ->page($page,$pagesize)
+                ->select();
         }else{
             $list = model('Advert')
                 ->where('title|advert_name','like','%'.$name.'%')
                 ->order('id', 'desc')
+                ->page($page,$pagesize)
                 ->select();
         }
         if ($list){

@@ -14,21 +14,29 @@ use think\Request;
 class AdvertPosition extends Base
 {
     protected  $status = [
-                            '1'=>'是',
-                            '2'=>'否'
-                         ];
+        '1'=>'是',
+        '2'=>'否'
+     ];
+
     /**
      * 显示资源列表
      */
     public function index()
     {
         $name = input('name','');
+        $page = input('page','');
+        $pagesize = input('pagesize',20);
+
         if ($name == ''){
-            $list = model('AdvertPosition')->order('id', 'desc')->select();
+            $list = model('AdvertPosition')
+                ->order('id', 'desc')
+                ->page($page,$pagesize)
+                ->select();
         }else{
             $list = model('AdvertPosition')
                 ->where('name','like','%'.$name.'%')
                 ->order('id', 'desc')
+                ->page($page,$pagesize)
                 ->select();
         }
 
