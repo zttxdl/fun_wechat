@@ -37,7 +37,7 @@ class Index extends ApiBase
         $school_id = $request->param('school_id')? $request->param('school_id') : 43;
 
         // 调用轮播图
-        $data['slide'] = $this->getSlide();
+        $data['slide'] = $this->getSlide($school_id);
         // 调用分类导航
         $data['channel'] = $this->getChannel();
 
@@ -55,13 +55,23 @@ class Index extends ApiBase
     /**
      * 获取轮播图
      */
-    protected function getSlide()
+    public function getSlide($school_id)
     {
+        // 搜索条件
+        $where[] = ['start_time','<=',time()];
+        $where[] = ['end_time','>=',time()];
         $where[] = ['status','=',1];
-        $where[] = ['platfrom','=',1];
+        $where[] = ['advert_id','=',1];
+        $where[] = ['coverage','in',['0',$school_id]];
 
-        $data = model('Advers')->field('id,name,img,link_url')->where($where)->order('sort','asc')->select();
-        return $data;
+
+        $list = model('Advert')
+            ->field('id,title,imgurl,link_url,type')
+            ->where($where)
+            ->order('sort', 'asc')
+            ->select();
+
+        return $list;
     }
 
 
@@ -361,20 +371,17 @@ class Index extends ApiBase
             ->order('a.sort','asc')
             ->paginate($pagesize)->each(function ($item) {
 
-            // 判断是否休息中
-            if ($item['business'] == 1 && !empty($item['run_time'])) {
-                $item['business'] = model('ShopInfo')->getBusiness($item->run_time);
-            } else {
-                $item->business = 0;
-            }
+                // 判断是否休息中
+                if ($item->business == 1 && !empty($item->run_time)) {
+                    $item->business = model('ShopInfo')->getBusiness($item->run_time);
+                } else {
+                    $item->business = 0;
+                }
 
-            // 获取优惠券信息
-            $item['disc'] = model('ShopDiscounts')
-                ->field('face_value,threshold')
-                ->where('shop_id',$item['id'])->where('delete',0)
-                ->order('threshold','asc')->select();
-            // 获取月销售额
-            $item['sales'] = model('Shop')->getMonthNum($item['id']);
+                // 获取优惠券信息
+                $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('threshold','asc')->select();
+                // 获取月销售额
+                $item->sales = model('Shop')->getMonthNum($item->id);
         });
         // 组装店铺满减信息
         $shop_list = $shop_list->toArray();
