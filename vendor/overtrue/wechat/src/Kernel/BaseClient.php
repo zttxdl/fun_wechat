@@ -14,7 +14,6 @@ namespace EasyWeChat\Kernel;
 use EasyWeChat\Kernel\Contracts\AccessTokenInterface;
 use EasyWeChat\Kernel\Http\Response;
 use EasyWeChat\Kernel\Traits\HasHttpRequests;
-use GuzzleHttp\Client;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use Monolog\Logger;
@@ -130,7 +129,7 @@ class BaseClient
             $multipart[] = compact('name', 'contents');
         }
 
-        return $this->request($url, 'POST', ['query' => $query, 'multipart' => $multipart]);
+        return $this->request($url, 'POST', ['query' => $query, 'multipart' => $multipart, 'connect_timeout' => 30, 'timeout' => 30, 'read_timeout' => 30]);
     }
 
     /**
@@ -189,20 +188,6 @@ class BaseClient
     }
 
     /**
-     * Return GuzzleHttp\Client instance.
-     *
-     * @return \GuzzleHttp\Client
-     */
-    public function getHttpClient(): Client
-    {
-        if (!($this->httpClient instanceof Client)) {
-            $this->httpClient = $this->app['http_client'] ?? new Client();
-        }
-
-        return $this->httpClient;
-    }
-
-    /**
      * Register Guzzle middlewares.
      */
     protected function registerHttpMiddlewares()
@@ -242,7 +227,7 @@ class BaseClient
     {
         $formatter = new MessageFormatter($this->app['config']['http.log_template'] ?? MessageFormatter::DEBUG);
 
-        return Middleware::log($this->app['logger'], $formatter);
+        return Middleware::log($this->app['logger'], $formatter, Logger::DEBUG);
     }
 
     /**
@@ -258,11 +243,11 @@ class BaseClient
             ResponseInterface $response = null
         ) {
             // Limit the number of retries to 2
-            if ($retries < $this->app->config->get('http.retries', 1) && $response && $body = $response->getBody()) {
+            if ($retries < $this->app->config->get('http.max_retries', 1) && $response && $body = $response->getBody()) {
                 // Retry on server errors
                 $response = json_decode($body, true);
 
-                if (!empty($response['errcode']) && in_array(abs($response['errcode']), [40001, 42001], true)) {
+                if (!empty($response['errcode']) && in_array(abs($response['errcode']), [40001, 40014, 42001], true)) {
                     $this->accessToken->refresh();
                     $this->app['logger']->debug('Retrying with refreshed access token.');
 
