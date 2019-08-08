@@ -133,12 +133,28 @@ Route::group('admin',function (){
 Route::group('admin',function (){
     Route::rule('orderList','admin/Orders/getList');//订单列表
     Route::rule('orderDetail','admin/Orders/getDetail');//订单详情
+    Route::rule('orderDetail','admin/Orders/getList');//退单列表
+    Route::rule('orderDetail','admin/Orders/getDetail');//退单详情
 });
 
-// 图片上传接口
-Route::group('a-upload', function () {
-    Route::post('/upload', 'upload');
-})->prefix('admin/upload/');
+
+// 经营品类管理模块
+Route::group('a-managecate', function () {
+    Route::get('/index', 'index');
+    Route::post('/insert', 'insert');
+    Route::get('/edit/:id', 'edit');
+    Route::post('/update', 'update');
+    Route::get('/del/:id', 'delete');
+})->prefix('admin/ManageCategory/');
+
+
+// 学校管理模块
+Route::group('a-school', function () {
+    Route::get('/index', 'index');
+})->prefix('admin/school/');
+
+
+
 
 
 

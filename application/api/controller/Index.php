@@ -70,7 +70,7 @@ class Index extends ApiBase
      */
     public function getChannel()
     {
-        $data = model('ManageCategory')->field('id,name,img')->order('sort','asc')->limit(4)->select();
+        $data = model('ManageCategory')->field('id,name,img')->order('sort','asc')->limit(8)->select();
         return $data;
     }
 
