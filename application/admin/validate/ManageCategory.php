@@ -15,7 +15,7 @@ class ManageCategory extends Validate
 	protected $rule = [
         'name'      => 'require|max:10',
         'sort'    => 'require|number',
-        // 'img'          => 'require',
+        'img'          => 'require',
     ];
     
     /**
@@ -29,6 +29,6 @@ class ManageCategory extends Validate
         'name.max'              => '品类名称不能超过10位',
         'sort.require'     => '品类排序不能为空',
         'sort.number'     => '品类排序为正整数',
-        // 'img.require'      => '请上传品类图标',
+        'img.require'      => '请上传品类图标',
     ];
 }

@@ -19,7 +19,7 @@ class Advert extends Base
     public function index()
     {
         $name = input('name','');
-        $page = input('page','');
+        $page = input('page',1);
         $pagesize = input('pagesize',20);
         if ($name == ''){
             $list = model('Advert')
@@ -90,8 +90,10 @@ class Advert extends Base
         }
 
         $data = model('Advert')->where('id',$id)->find();
-        $data->start_time = date('Y/m/d',$data->start_time);
-        $data->end_time = date('Y/m/d',$data->end_time);
+        if ($data){
+            $data->start_time = date('Y/m/d',$data->start_time);
+            $data->end_time = date('Y/m/d',$data->end_time);
+        }
 
         $this->success('success',$data);
     }
@@ -121,8 +123,8 @@ class Advert extends Base
             $data['end_time'] = strtotime($end_time);
         }
 
-        $where = ['id','=',$id];
-        $ret = model('Advert')->save($data,$where);
+        $ret = model('Advert')->where('id',$id)->update($data);
+
         if (!$ret){
             $this->error('修改失败');
         }

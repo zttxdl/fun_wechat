@@ -24,16 +24,18 @@ class AdvertPosition extends Base
     public function index()
     {
         $name = input('name','');
-        $page = input('page','');
+        $page = input('page',1);
         $pagesize = input('pagesize',20);
 
         if ($name == ''){
             $list = model('AdvertPosition')
+                ->field('id,name,num,status')
                 ->order('id', 'desc')
                 ->page($page,$pagesize)
                 ->select();
         }else{
             $list = model('AdvertPosition')
+                ->field('id,name,num,status')
                 ->where('name','like','%'.$name.'%')
                 ->order('id', 'desc')
                 ->page($page,$pagesize)
@@ -95,8 +97,8 @@ class AdvertPosition extends Base
         }
 
         $data = $request->param();
-        $where = ['id','=',$id];
-        $ret = model('AdvertPosition')->save($data,$where);
+        $ret = model('AdvertPosition')->where('id',$id)->update($data);
+
         if (!$ret){
             $this->error('修改失败');
         }
@@ -123,5 +125,19 @@ class AdvertPosition extends Base
             $this->error('删除失败');
         }
         $this->success('success');
+    }
+
+    /**
+     * 广告位名称
+     */
+    public function getAdvertList()
+    {
+        $list = model('AdvertPosition')
+            ->field('id,name')
+            ->where('status',1)
+            ->order('id', 'desc')
+            ->select();
+
+        $this->success('success',$list);
     }
 }
