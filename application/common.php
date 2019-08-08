@@ -166,7 +166,7 @@ if (!function_exists('get_location')) {
     function get_location($address){
         $make_key = '5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T';
         // 仅学校地址信息，无法解析经纬度，目前需加上当前城市
-        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=南京市".$address."&key=".$make_key;
+        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$make_key;
         $jsondata=json_decode(file_get_contents($url),true);
         $data = [];
         if ($jsondata['message'] == '查询无结果') {
@@ -355,7 +355,6 @@ if (!function_exists('Convert_BD09_To_GCJ02')) {
         $lat = $z * sin($theta);
         return array('lng'=>$lng,'lat'=>$lat);
     }
-
 }
 
 
@@ -390,7 +389,8 @@ if (!function_exists('qiniu_img_del')) {
         $bucketManager = new BucketManager($auth, $config);
 
         // 要删除的图片文件，与七牛云空间存在的文件名称相同， 即不能存在域名， 也不存在压缩的后缀
-        // 数据库存储的图片路径为：http://picture.daigefan.com/6cfe8201907051641019024.png?imageView2/0/format/jpg/interlace/1/q/75|imageslim， 实际传到七牛云删除的路径为：6cfe8201907051641019024.png
+        // 数据库存储的图片路径为：http://picture.daigefan.com/6cfe8201907051641019024.png?imageView2/0/format/jpg/interlace/1/q/75|imageslim， 
+        // 实际传到七牛云删除的路径为：6cfe8201907051641019024.png
         $imgstr = reset(explode('?',$imgurl));
         $img_url = substr($imgstr,28);
 

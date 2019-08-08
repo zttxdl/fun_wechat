@@ -151,7 +151,19 @@ Route::group('a-managecate', function () {
 // 学校管理模块
 Route::group('a-school', function () {
     Route::get('/index', 'index');
+    Route::get('/add', 'add');
+    Route::post('/insert', 'insert');
+    Route::get('/edit/:id', 'edit');
+    Route::get('/show/:id', 'show');
+    Route::post('/update', 'update');
+    Route::get('/del/:id', 'delete');
 })->prefix('admin/school/');
+
+// 食堂管理模块
+Route::group('a-canteen', function () {
+    Route::post('/insert', 'insert');
+    Route::get('/del/:id', 'delete');
+})->prefix('admin/canteen/');
 
 
 
