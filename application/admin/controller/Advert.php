@@ -44,7 +44,6 @@ class Advert extends Base
         $this->success('success',$list);
     }
 
-
     /**
      * 保存新建的资源
      * @param  \think\Request  $request
