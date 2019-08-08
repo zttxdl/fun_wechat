@@ -24,28 +24,12 @@ class AdvertPosition extends Base
     public function index()
     {
         $name = input('name','');
-        $page = input('page',1);
-        $pagesize = input('pagesize',20);
-
-        if ($name == ''){
-            $list = model('AdvertPosition')
-                ->field('id,name,num,status')
-                ->order('id', 'desc')
-                ->page($page,$pagesize)
-                ->select();
-        }else{
-            $list = model('AdvertPosition')
-                ->field('id,name,num,status')
-                ->where('name','like','%'.$name.'%')
-                ->order('id', 'desc')
-                ->page($page,$pagesize)
-                ->select();
-        }
+        !empty($name) ? $where[] = ['name','like','%'.$name.'%'] : null;
+        $list = model('AdvertPosition')->where($where)->order('id', 'desc')->select();
 
         if ($list){
             foreach ($list as $val){
                 $val->bool = $this->status[$val->status];
-
             }
         }
 
@@ -60,6 +44,13 @@ class AdvertPosition extends Base
     public function save(Request $request)
     {
         $data = $request->param();
+
+        // 验证表单数据
+        $check = $this->validate($data, 'AdvertPosition');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+
         $ret = model('AdvertPosition')->save($data);
         if (!$ret){
             $this->error('添加失败');
@@ -97,6 +88,12 @@ class AdvertPosition extends Base
         }
 
         $data = $request->param();
+        // 验证表单数据
+        $check = $this->validate($data, 'AdvertPosition');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+                
         $ret = model('AdvertPosition')->where('id',$id)->update($data);
 
         if (!$ret){

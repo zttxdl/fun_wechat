@@ -36,7 +36,7 @@ class LogServiceProvider implements ServiceProviderInterface
             $config = $this->formatLogConfig($app);
 
             if (!empty($config)) {
-                $app->rebind('config', $app['config']->merge($config));
+                $app['config']->merge($config);
             }
 
             return new LogManager($app);
@@ -45,10 +45,6 @@ class LogServiceProvider implements ServiceProviderInterface
 
     public function formatLogConfig($app)
     {
-        if (!empty($app['config']->get('log.channels'))) {
-            return $app['config']->get('log');
-        }
-
         if (empty($app['config']->get('log'))) {
             return [
                 'log' => [
@@ -63,15 +59,29 @@ class LogServiceProvider implements ServiceProviderInterface
             ];
         }
 
+        // 4.0 version
+        if (empty($app['config']->get('log.driver'))) {
+            return [
+                'log' => [
+                    'default' => 'single',
+                    'channels' => [
+                        'single' => [
+                            'driver' => 'single',
+                            'path' => $app['config']->get('log.file') ?: \sys_get_temp_dir().'/logs/easywechat.log',
+                            'level' => $app['config']->get('log.level', 'debug'),
+                        ],
+                    ],
+                ],
+            ];
+        }
+
+        $name = $app['config']->get('log.driver');
+
         return [
             'log' => [
-                'default' => 'single',
+                'default' => $name,
                 'channels' => [
-                    'single' => [
-                        'driver' => 'single',
-                        'path' => $app['config']->get('log.file') ?: \sys_get_temp_dir().'/logs/easywechat.log',
-                        'level' => $app['config']->get('log.level', 'debug'),
-                    ],
+                    $name => $app['config']->get('log'),
                 ],
             ],
         ];

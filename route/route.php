@@ -134,8 +134,8 @@ Route::group('admin',function (){
 Route::group('admin',function (){
     Route::rule('orderList','admin/Orders/getList');//订单列表
     Route::rule('orderDetail','admin/Orders/getDetail');//订单详情
-    Route::rule('orderDetail','admin/Orders/getList');//退单列表
-    Route::rule('orderDetail','admin/Orders/getDetail');//退单详情
+    Route::rule('refundList','admin/Refund/getList');//退单列表
+    Route::rule('refundDetail','admin/Refund/getDetail');//退单详情
 });
 
 
@@ -152,7 +152,19 @@ Route::group('a-managecate', function () {
 // 学校管理模块
 Route::group('a-school', function () {
     Route::get('/index', 'index');
+    Route::get('/add', 'add');
+    Route::post('/insert', 'insert');
+    Route::get('/edit/:id', 'edit');
+    Route::get('/show/:id', 'show');
+    Route::post('/update', 'update');
+    Route::get('/del/:id', 'delete');
 })->prefix('admin/school/');
+
+// 食堂管理模块
+Route::group('a-canteen', function () {
+    Route::post('/insert', 'insert');
+    Route::get('/del/:id', 'delete');
+})->prefix('admin/canteen/');
 
 
 
