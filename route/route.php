@@ -20,6 +20,7 @@ if(request()->isOptions()){
 /*************** 管理平台端 *********************************************************************************************/
 // 广告位组
 Route::resource('advert_position','admin/advert_position');
+Route::get('advert_position/getAdvertList','admin/advert_position/getAdvertList');
 Route::resource('advert','admin/advert');
 
 // 优惠券组
