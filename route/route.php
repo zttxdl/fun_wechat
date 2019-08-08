@@ -250,6 +250,8 @@ Route::group('u-index', function () {
     Route::rule('/recommend', 'getRecommendList');
     Route::rule('/navigation', 'getNavigation');
     Route::rule('/special-list', 'getSpecialList');
+    Route::rule('/exclusive', 'getExclusive');
+    Route::rule('/more_exclusive', 'getMoreExclusive');
 })->prefix('api/Index/');
 
 // 红包组
