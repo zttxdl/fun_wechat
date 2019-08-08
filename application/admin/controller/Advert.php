@@ -32,7 +32,7 @@ class Advert extends Base
                 ->order('id', 'desc')
                 ->paginate($pagesize)->each(function ($val) {
                     $val->time =  date('Y/m/d',$val->start_time).'-'.date('Y/m/d',$val->end_time);
-
+                    $val->bool = $val->status == 1 ? '是':'否';
                 });
         }else{
             $list = model('Advert')
@@ -40,6 +40,8 @@ class Advert extends Base
                 ->order('id', 'desc')
                 ->paginate($pagesize)->each(function ($val) {
                     $val->time =  date('Y/m/d',$val->start_time).'-'.date('Y/m/d',$val->end_time);
+                    $val->bool = $val->status == 1 ? '是':'否';
+
                 });
         }
 
