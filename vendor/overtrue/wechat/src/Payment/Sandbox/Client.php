@@ -30,6 +30,7 @@ class Client extends BaseClient
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      * @throws \EasyWeChat\Payment\Kernel\Exceptions\SandboxException
      * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
      */
     public function getKey(): string
     {
@@ -45,7 +46,7 @@ class Client extends BaseClient
             return $key;
         }
 
-        throw new SandboxException($response['return_msg']);
+        throw new SandboxException($response['retmsg'] ?? $response['return_msg']);
     }
 
     /**
