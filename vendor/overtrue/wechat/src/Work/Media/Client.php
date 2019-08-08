@@ -12,7 +12,6 @@
 namespace EasyWeChat\Work\Media;
 
 use EasyWeChat\Kernel\BaseClient;
-use EasyWeChat\Kernel\Http\StreamResponse;
 
 /**
  * Class Client.
@@ -30,17 +29,7 @@ class Client extends BaseClient
      */
     public function get(string $mediaId)
     {
-        $response = $this->requestRaw('cgi-bin/media/get', 'GET', [
-            'query' => [
-                'media_id' => $mediaId,
-            ],
-        ]);
-
-        if (false !== stripos($response->getHeaderLine('Content-Type'), 'text/plain')) {
-            return $this->castResponseToType($response, $this->app['config']->get('response_type'));
-        }
-
-        return StreamResponse::buildFromPsrResponse($response);
+        return $this->httpGet('cgi-bin/media/get', ['media_id' => $mediaId]);
     }
 
     /**

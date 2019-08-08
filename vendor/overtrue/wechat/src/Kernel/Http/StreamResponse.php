@@ -12,7 +12,6 @@
 namespace EasyWeChat\Kernel\Http;
 
 use EasyWeChat\Kernel\Exceptions\InvalidArgumentException;
-use EasyWeChat\Kernel\Exceptions\RuntimeException;
 use EasyWeChat\Kernel\Support\File;
 
 /**
@@ -25,14 +24,10 @@ class StreamResponse extends Response
     /**
      * @param string $directory
      * @param string $filename
-     * @param bool   $appendSuffix
      *
      * @return bool|int
-     *
-     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
-     * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
      */
-    public function save(string $directory, string $filename = '', bool $appendSuffix = true)
+    public function save(string $directory, string $filename = '')
     {
         $this->getBody()->rewind();
 
@@ -48,10 +43,6 @@ class StreamResponse extends Response
 
         $contents = $this->getBody()->getContents();
 
-        if (empty($contents) || '{' === $contents[0]) {
-            throw new RuntimeException('Invalid media response content.');
-        }
-
         if (empty($filename)) {
             if (preg_match('/filename="(?<filename>.*?)"/', $this->getHeaderLine('Content-Disposition'), $match)) {
                 $filename = $match['filename'];
@@ -60,7 +51,7 @@ class StreamResponse extends Response
             }
         }
 
-        if ($appendSuffix && empty(pathinfo($filename, PATHINFO_EXTENSION))) {
+        if (empty(pathinfo($filename, PATHINFO_EXTENSION))) {
             $filename .= File::getStreamExt($contents);
         }
 
@@ -72,15 +63,11 @@ class StreamResponse extends Response
     /**
      * @param string $directory
      * @param string $filename
-     * @param bool   $appendSuffix
      *
      * @return bool|int
-     *
-     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
-     * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
      */
-    public function saveAs(string $directory, string $filename, bool $appendSuffix = true)
+    public function saveAs(string $directory, string $filename)
     {
-        return $this->save($directory, $filename, $appendSuffix);
+        return $this->save($directory, $filename);
     }
 }

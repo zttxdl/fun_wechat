@@ -11,6 +11,7 @@
 
 namespace EasyWeChat\OfficialAccount\CustomerService;
 
+use EasyWeChat\Kernel\Exceptions\InvalidArgumentException;
 use EasyWeChat\Kernel\Exceptions\RuntimeException;
 use EasyWeChat\Kernel\Messages\Message;
 use EasyWeChat\Kernel\Messages\Raw as RawMessage;
@@ -67,6 +68,8 @@ class Messenger
      * @param string|Message $message
      *
      * @return Messenger
+     *
+     * @throws InvalidArgumentException
      */
     public function message($message)
     {

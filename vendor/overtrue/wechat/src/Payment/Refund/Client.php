@@ -128,9 +128,7 @@ class Client extends BaseClient
             'appid' => $this->app['config']->app_id,
         ], $optional);
 
-        return $this->safeRequest($this->wrap(
-            $this->app->inSandbox() ? 'pay/refund' : 'secapi/pay/refund'
-        ), $params);
+        return $this->safeRequest($this->wrap('secapi/pay/refund'), $params);
     }
 
     /**

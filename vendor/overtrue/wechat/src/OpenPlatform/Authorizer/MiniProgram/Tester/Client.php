@@ -26,8 +26,6 @@ class Client extends BaseClient
      * @param string $wechatId
      *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
-     *
-     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      */
     public function bind(string $wechatId)
     {
@@ -42,28 +40,11 @@ class Client extends BaseClient
      * @param string $wechatId
      *
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
-     *
-     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      */
     public function unbind(string $wechatId)
     {
         return $this->httpPostJson('wxa/unbind_tester', [
             'wechatid' => $wechatId,
-        ]);
-    }
-
-    /**
-     * 获取体验者列表.
-     *
-     *
-     * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
-     *
-     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
-     */
-    public function list()
-    {
-        return $this->httpPostJson('wxa/memberauth', [
-            'action' => 'get_experiencer',
         ]);
     }
 }
