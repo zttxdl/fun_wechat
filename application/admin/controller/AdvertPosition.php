@@ -126,4 +126,18 @@ class AdvertPosition extends Base
         }
         $this->success('success');
     }
+
+    /**
+     * 广告位名称
+     */
+    public function getAdvertList()
+    {
+        $list = model('AdvertPosition')
+            ->field('id,name')
+            ->where('status',1)
+            ->order('id', 'desc')
+            ->select();
+
+        $this->success('success',$list);
+    }
 }
