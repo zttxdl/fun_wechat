@@ -29,23 +29,31 @@ class Advert extends Base
             ->select()
             ->toArray();
 
-        $arr_Array = array_reduce($school,function(&$arr_Array,$v){
-            $arr_Array[$v['id']] = $v['name'];
-            return $arr_Array;
+        $schoolName = array_reduce($school,function(&$schoolName,$v){
+            $schoolName[$v['id']] = $v['name'];
+            return $schoolName;
         });
 
+        $statusName = [
+            '1'=>'投放中',
+            '2'=>'禁止投放',
+            '3'=>'已过期',
+        ];
         $list = model('Advert')
             ->where($where)
             ->order('id', 'desc')
-            ->paginate($pagesize)->each(function ($val) {
-                $val->time =  date('Y/m/d',$val->start_time).'-'.date('Y/m/d',$val->end_time);
-                $val->bool = $val->status == 1 ? '是':'否';
-
-            });
+            ->paginate($pagesize);
 
         if ($list){
             foreach ($list as $val) {
-                $val->coverage = $val->coverage == 0 ? '全部' : $arr_Array[$val->coverage];
+                $val->time =  date('Y/m/d',$val->start_time).'-'.date('Y/m/d',$val->end_time);
+                $val->coverage = $val->coverage == 0 ? '全部' : $schoolName[$val->coverage];
+                $val->bool = $statusName[$val->status];
+                if ($val->status !== 3){
+                    $val->rest = ceil(($val->end_time - time()) / 86400);
+                }else{
+                    $val->rest = 0 ;
+                }
             }
         }
 

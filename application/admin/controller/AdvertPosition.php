@@ -26,7 +26,7 @@ class AdvertPosition extends Base
 
         if ($list){
             foreach ($list as $val){
-                $val->bool = $this->status == 1 ? '是' : '否';
+                $val->widehigh = $val->white.'*'.$val->height;
             }
         }
 
