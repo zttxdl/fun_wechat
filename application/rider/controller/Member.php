@@ -18,29 +18,12 @@ class Member extends RiderBase
 
     
     /**
-     * 骑手审核状态
+     * 骑手加入表单状态【前端用】
      */
-    public function checkStatus()
+    public function checkJoin()
     {
-        $check_info = model('RiderInfo')->where('id',$this->auth->id)->field('remark,status,check_status')->find();
-        if ($check_info['status'] == 2) { // 审核未通过
-            $check_info['mb_remark'] = Db::name('check_status')->where('type','=',2)->where('id','in',$check_info['remark'])->column('name');
-        }
-        unset($check_info['remark']);
-        return json_success('获取审核状态成功',['check_info'=>$check_info]);
-    }
-
-
-    /**
-     * 设置骑手已审核通过状态【前端单独用】 【 二期后将屏蔽此功能 】
-     */
-    public function setCheckStatus()
-    {
-        $res = Db::name('rider_info')->where('id',$this->auth->id)->setField('check_status',1);
-        if (!$res) {
-            $this->error('设置失败');
-        }
-        $this->success('设置成功');
+        $check_join = model('RiderInfo')->where('id',$this->auth->id)->value('check_join');
+        return json_success('获取加入状态成功',['check_join'=>$check_join]);
     }
 
 
@@ -50,9 +33,13 @@ class Member extends RiderBase
      */
     public function checkIdentityStatus()
     {
-        $status = Db::name('rider_info')->where('id',$this->auth->id)->value('status');
+        $info = Db::name('rider_info r')->join('school s','r.school_id = s.id')->where('r.id',$this->auth->id)->field('r.name,r.identity_num,r.card_img,r.back_img,r.hand_card_img,s.name as school_name,r.phone,r.remark,r.status')->find();
+        if ($info['status'] == 2) {
+            $info['mb_remark'] = Db::name('check_status')->where('type','=',2)->where('id','in',$info['remark'])->column('name');
+            unset($info['remark']);
+        }
         
-        $this->success('获取当前身份绑定状态成功',['status'=>$status]);
+        $this->success('获取当前身份绑定状态成功',['info'=>$info]);
     }
 
 
@@ -146,15 +133,26 @@ class Member extends RiderBase
      
 
     /**
-     * 申请入驻【成为骑手】 
+     * 申请入驻【成为骑手】 【第一次添加或重新编辑】
      * 
      */
     public function applyRider(Request $request)
     {
-        $data = $request->post();
+        $data = $request->param();
         $data['status'] = 1;
         $data['add_time'] = time();
         $data['overtime'] = time() + 24*7*3600;
+        
+        // 校验手机号
+        $phone = $request->param('phone');
+        $code  = $request->param('code');
+        $type  = $request->param('type');
+
+        // 校验验证码
+        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
+        if (!$result) {
+            return json_error(model('Alisms', 'service')->getError());
+        }
 
         // 验证表单数据
         $check = $this->validate($data, 'RiderInfo.apply');

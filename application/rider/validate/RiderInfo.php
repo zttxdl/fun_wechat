@@ -18,7 +18,8 @@ class RiderInfo extends Validate
         'school_id'      => 'require',
         'card_img'       => 'require',
         'back_img'       => 'require',
-        'hand_card_img'  => 'require'
+        'hand_card_img'  => 'require',
+        'phone' =>'require|/^1[3456789]{1}\d{9}$/'
     ];
     
 
@@ -35,14 +36,17 @@ class RiderInfo extends Validate
         'school_id.require'             => '请选择配送所在学校',
         'card_img.require'              => '请上传身份证照正面',
         'back_img.require'              => '请上传身份证照反面',
-        'hand_card_img.require'         => '请上传手持身份证照'
+        'hand_card_img.require'         => '请上传手持身份证照',
+        'phone.require'                 => '请填写手机号',
+        'phone./^1[3456789]{1}\d{9}$/'  => '手机格式错误',
+
     ];
 
 
     // 验证场景
     protected $scene = [	
         'join'       =>  ['name', 'school_id'],
-        'apply'    =>  ['name', 'identity_num', 'card_img','back_img','hand_card_img','school_id']
+        'apply'    =>  ['name', 'identity_num', 'card_img','back_img','hand_card_img','school_id','phone']
     ];
 
 
