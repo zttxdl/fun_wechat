@@ -114,10 +114,11 @@ class Test extends Controller
 
                 if(is_null($v[1])) {
                     $v[1] = 'User'.sprintf('%03d',$key + 1);
+                    list($a[],$b[]) = $v;
+                    $v = array_combine($a,$b);
                 }
 //                dump($v) ;
-                list($a[],$b[]) = $v;
-                $v = array_combine($a,$b);
+                
 
                 //销毁变量
                 unset($a);
