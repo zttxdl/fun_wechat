@@ -5,7 +5,6 @@ namespace app\admin\controller;
 use app\common\controller\Base;
 use think\Request;
 use think\Db;
-use think\facade\Debug;
 
 class School extends Base
 {
