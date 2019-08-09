@@ -37,7 +37,7 @@ class Index extends ApiBase
         $school_id = $request->param('school_id')? $request->param('school_id') : 13;
 
         // 调用轮播图
-        $data['slide'] = $this->getSlide();
+        $data['slide'] = $this->getSlide($school_id);
         // 调用分类导航
         $data['channel'] = $this->getChannel();
 
@@ -55,13 +55,23 @@ class Index extends ApiBase
     /**
      * 获取轮播图
      */
-    protected function getSlide()
+    public function getSlide($school_id)
     {
+        // 搜索条件
+        $where[] = ['start_time','<=',time()];
+        $where[] = ['end_time','>=',time()];
         $where[] = ['status','=',1];
-        $where[] = ['platfrom','=',1];
+        $where[] = ['advert_id','=',1];
+        $where[] = ['coverage','in',['0',$school_id]];
 
-        $data = model('Advers')->field('id,name,img,link_url')->where($where)->order('sort','asc')->select();
-        return $data;
+
+        $list = model('Advert')
+            ->field('id,title,imgurl,link_url,type')
+            ->where($where)
+            ->order('sort', 'asc')
+            ->select();
+
+        return $list;
     }
 
 
@@ -293,5 +303,126 @@ class Index extends ApiBase
             }
         }
         $this->success('success',$today_sale);
+    }
+
+    /**
+     * 专属推荐
+     * @param Request $request
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getExclusive(Request $request)
+    {
+        // 学校主键值
+        $school_id = $request->param('school_id');
+        if (!$school_id){
+            $this->error('非法传参');
+        }
+        $where[] = ['a.start_time','<=',time()];
+        $where[] = ['a.end_time','>=',time()];
+        $where[] = ['a.status','=',1];
+        $where[] = ['a.advert_id','=',2];
+        $where[] = ['s.status','=',3];
+        $where[] = ['a.coverage','=',$school_id];
+        $list = model('Advert')->alias('a')
+            ->Join('shop_info s','a.shop_id = s.id')
+            ->field('a.shop_id,a.imgurl,s.shop_name,s.logo_img')
+            ->where($where)
+            ->order('a.sort','asc')
+            ->limit(6)
+            ->select();
+
+        $this->success('success',$list);
+    }
+
+    /**
+     * 专属推荐
+     * @param Request $request
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function getMoreExclusive( Request $request)
+    {
+        // 学校主键值
+        $school_id = $request->param('school_id');
+        if (!$school_id){
+            $this->error('非法传参');
+        }
+
+        $openid = $request->param('openid','0');
+        $uid = model('User')->where([['openid','=',$openid],['new_buy','=',1]])->value('id');
+
+        // 搜索条件
+        $where[] = ['a.start_time','<=',time()];
+        $where[] = ['a.end_time','>=',time()];
+        $where[] = ['a.status','=',1];
+        $where[] = ['a.advert_id','=',2];
+        $where[] = ['s.status','=',3];
+        $where[] = ['a.coverage','=',$school_id];
+        $pagesize = $request->param('pagesize',20);
+
+
+        $shop_list =  model('Advert')->alias('a')
+            ->Join('shop_info s','a.shop_id = s.id')
+            ->field('s.id,s.shop_name,s.logo_img,s.marks,s.ping_fee,s.up_to_send_money,s.open_status as business,s.run_time')
+            ->where($where)
+            ->order('a.sort','asc')
+            ->paginate($pagesize)->each(function ($item) {
+
+                // 判断是否休息中
+                if ($item->business == 1 && !empty($item->run_time)) {
+                    $item->business = model('ShopInfo')->getBusiness($item->run_time);
+                } else {
+                    $item->business = 0;
+                }
+
+                // 获取优惠券信息
+                $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('threshold','asc')->select();
+                // 获取月销售额
+                $item->sales = model('Shop')->getMonthNum($item->id);
+        });
+        // 组装店铺满减信息
+        $shop_list = $shop_list->toArray();
+        foreach ($shop_list['data'] as &$v) {
+            foreach ($v['disc'] as &$vv) {
+                $v['discounts'][] = $vv['threshold'].'减'. $vv['face_value'];
+                unset($v['disc']);
+            }
+            $v['marks'] = (float)$v['marks'];
+        }
+
+        $pt_coupon = [];
+        if ($uid) {
+            // 首单立减红包仅 平台发放这种形式  ，搜索条件如下
+            $pt_where = [['status','=',2],['type','=',2],['coupon_type','=',2],['school_id','=',$school_id]];
+            // 这里需约束下，在红包的有效期内，每个店铺只能参与一种首单立减规格
+            $pt_coupon_ids = model('PlatformCoupon')->where($pt_where)->column('id');
+
+            // 获取当前用户的首单红包
+            if ($pt_coupon_ids) {
+                $pt_coupon = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')
+                    ->where([['m.platform_coupon_id','in',$pt_coupon_ids],['m.user_id','=',$uid]])
+                    ->field('p.face_value,p.threshold,p.shop_ids')->select();
+            }
+        }
+
+        // 组装首单立减信息
+        if ($pt_coupon) {
+            foreach ($shop_list['data'] as $k => &$v) {
+                foreach ($pt_coupon as $ko => $vo) {
+                    $shopids = explode(',',$vo['shop_ids']);
+                    if (in_array($v['id'],$shopids)) {
+                        $v['discounts'][] = '首单减'.$vo['face_value'];
+
+                        continue;
+                    }
+                }
+            }
+        }
+
+        $this->success('success',$shop_list);
+
     }
 }

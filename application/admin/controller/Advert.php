@@ -19,31 +19,40 @@ class Advert extends Base
     public function index()
     {
         $name = input('name','');
-        $page = input('page',1);
         $pagesize = input('pagesize',20);
+        $school = model('School')->field('id,name')->where('level',2)->select()->toArray();
+
+        $arr_Array = array_reduce($school,function(&$arr_Array,$v){
+            $arr_Array[$v['id']] = $v['name'];
+            return $arr_Array;
+        });
+
         if ($name == ''){
             $list = model('Advert')
                 ->order('id', 'desc')
-                ->page($page,$pagesize)
-                ->select();
+                ->paginate($pagesize)->each(function ($val) {
+                    $val->time =  date('Y/m/d',$val->start_time).'-'.date('Y/m/d',$val->end_time);
+                    $val->bool = $val->status == 1 ? '是':'否';
+                });
         }else{
             $list = model('Advert')
                 ->where('title|advert_name','like','%'.$name.'%')
                 ->order('id', 'desc')
-                ->page($page,$pagesize)
-                ->select();
-        }
-        if ($list){
-            foreach ($list as $val){
-                $val->start_time = date('Y/m/d',$val->start_time);
-                $val->end_time = date('Y/m/d',$val->end_time);
+                ->paginate($pagesize)->each(function ($val) {
+                    $val->time =  date('Y/m/d',$val->start_time).'-'.date('Y/m/d',$val->end_time);
+                    $val->bool = $val->status == 1 ? '是':'否';
 
+                });
+        }
+
+        if ($list){
+            foreach ($list as $val) {
+                $val->coverage = $val->coverage == 0 ? '全部' : $arr_Array[$val->coverage];
             }
         }
 
         $this->success('success',$list);
     }
-
 
     /**
      * 保存新建的资源
