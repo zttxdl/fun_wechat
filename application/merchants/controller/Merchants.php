@@ -14,7 +14,7 @@ use think\Request;
 class Merchants extends MerchantsBase
 {
 
-    protected $noNeedLogin = ['getSchool','getBack','getCategory'];
+    protected $noNeedLogin = ['getschool','getback','getcategory'];
     //protected $noNeedLogin = ['*'];
 
     /**
