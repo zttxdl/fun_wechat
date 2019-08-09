@@ -4,7 +4,6 @@ namespace app\common\controller;
 
 use think\App;
 use app\common\Auth\JwtAuth;
-use app\common\controller\Base;
 
 
 /**

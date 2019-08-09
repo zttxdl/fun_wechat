@@ -326,8 +326,8 @@ class Index extends ApiBase
         $where[] = ['s.status','=',3];
         $where[] = ['a.coverage','=',$school_id];
         $list = model('Advert')->alias('a')
-            ->Join('shop_info s','a.shop_id = s.id')
-            ->field('a.shop_id,a.imgurl,s.shop_name,s.logo_img')
+            ->Join('shop_info s','a.link_url = s.id')
+            ->field('s.id,a.imgurl,s.shop_name,s.logo_img')
             ->where($where)
             ->order('a.sort','asc')
             ->limit(6)
@@ -337,7 +337,7 @@ class Index extends ApiBase
     }
 
     /**
-     * 专属推荐
+     * 更多专属推荐
      * @param Request $request
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
@@ -365,7 +365,7 @@ class Index extends ApiBase
 
 
         $shop_list =  model('Advert')->alias('a')
-            ->Join('shop_info s','a.shop_id = s.id')
+            ->Join('shop_info s','a.link_url = s.id')
             ->field('s.id,s.shop_name,s.logo_img,s.marks,s.ping_fee,s.up_to_send_money,s.open_status as business,s.run_time')
             ->where($where)
             ->order('a.sort','asc')
