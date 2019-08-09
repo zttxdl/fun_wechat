@@ -122,6 +122,7 @@ class Member extends RiderBase
         if ($check !== true) {
             $this->error($check,201);
         }
+        $data['check_join'] = 1;
 
         // 更新数据
         $result = RiderInfo::where('id','=',$this->auth->id)->update($data);
