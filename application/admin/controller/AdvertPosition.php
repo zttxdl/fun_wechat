@@ -13,10 +13,6 @@ use think\Request;
 
 class AdvertPosition extends Base
 {
-    protected  $status = [
-        '1'=>'是',
-        '2'=>'否'
-     ];
 
     /**
      * 显示资源列表
@@ -24,12 +20,13 @@ class AdvertPosition extends Base
     public function index()
     {
         $name = input('name','');
-        !empty($name) ? $where[] = ['name','like','%'.$name.'%'] : null;
+        $where = [];
+        !empty($name) ?  $where[] = ['name','like','%'.$name.'%'] : null;
         $list = model('AdvertPosition')->where($where)->order('id', 'desc')->select();
 
         if ($list){
             foreach ($list as $val){
-                $val->bool = $this->status[$val->status];
+                $val->bool = $this->status == 1 ? '是' : '否';
             }
         }
 
