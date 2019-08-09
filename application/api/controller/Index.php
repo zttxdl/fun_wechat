@@ -34,7 +34,7 @@ class Index extends ApiBase
     {
         $lat = $request->param('latitude','');
         $lng = $request->param('longitude','');
-        $school_id = $request->param('school_id')? $request->param('school_id') : 43;
+        $school_id = $request->param('school_id')? $request->param('school_id') : 13;
 
         // 调用轮播图
         $data['slide'] = $this->getSlide();

@@ -18,10 +18,15 @@ class School extends Model
         $school_list = $this->field('id,fid,name as label,name as value')->where('level',2)->select()->toArray();
         // 组装三维数组
         foreach ($school_district_list as $k => &$v) {
+            $v['children'] = [];
             foreach ($school_list as $ko => $vo) {
                 if ($v['id'] == $vo['fid']) {
                     $v['children'][] = $vo;
                 }
+            }
+            if (empty($v['children'])) {
+                // unset($v)  无效，使用的是引用传值，有些纳闷了
+                unset($school_district_list[$k]);
             }
         }
 
