@@ -14,7 +14,7 @@ class Canteen extends Validate
      */	
     protected $rule = [
         'name'      => 'require|max:30',
-        'cut_proportion'    => 'require|number',
+        'cut_proportion'    => 'require',
     ];
     
     /**
@@ -27,6 +27,5 @@ class Canteen extends Validate
         'name.require'      => '食堂名称不能为空',
         'name.max'              => '食堂名称不能超过30位',
         'cut_proportion.require'     => '食堂抽成不能为空',
-        'cut_proportion.number'     => '食堂抽成为正整数',
     ];
 }

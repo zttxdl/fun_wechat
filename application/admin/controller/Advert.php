@@ -19,25 +19,41 @@ class Advert extends Base
     public function index()
     {
         $name = input('name','');
-        $page = input('page',1);
         $pagesize = input('pagesize',20);
-        if ($name == ''){
-            $list = model('Advert')
-                ->order('id', 'desc')
-                ->page($page,$pagesize)
-                ->select();
-        }else{
-            $list = model('Advert')
-                ->where('title|advert_name','like','%'.$name.'%')
-                ->order('id', 'desc')
-                ->page($page,$pagesize)
-                ->select();
-        }
-        if ($list){
-            foreach ($list as $val){
-                $val->start_time = date('Y/m/d',$val->start_time);
-                $val->end_time = date('Y/m/d',$val->end_time);
+        $where = [];
+        !empty($name) ?  $where[] = ['title|advert_name','like','%'.$name.'%'] : null;
 
+        $school = model('School')
+            ->field('id,name')
+            ->where('level',2)
+            ->select()
+            ->toArray();
+
+        $schoolName = array_reduce($school,function(&$schoolName,$v){
+            $schoolName[$v['id']] = $v['name'];
+            return $schoolName;
+        });
+
+        $statusName = [
+            '1'=>'投放中',
+            '2'=>'禁止投放',
+            '3'=>'已过期',
+        ];
+        $list = model('Advert')
+            ->where($where)
+            ->order('id', 'desc')
+            ->paginate($pagesize);
+
+        if ($list){
+            foreach ($list as $val) {
+                $val->time =  date('Y/m/d',$val->start_time).'-'.date('Y/m/d',$val->end_time);
+                $val->coverage = $val->coverage == 0 ? '全部' : $schoolName[$val->coverage];
+                $val->bool = $statusName[$val->status];
+                if ($val->status !== 3){
+                    $val->rest = ceil(($val->end_time - time()) / 86400);
+                }else{
+                    $val->rest = 0 ;
+                }
             }
         }
 

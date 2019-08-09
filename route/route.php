@@ -136,7 +136,7 @@ Route::group('admin',function (){
     Route::rule('orderDetail','admin/Orders/getDetail');//订单详情
     Route::rule('refundList','admin/Refund/getList');//退单列表
     Route::rule('refundDetail','admin/Refund/getDetail');//退单详情
-});
+})->middleware('IsLogin');;
 
 
 // 经营品类管理模块
@@ -146,7 +146,7 @@ Route::group('a-managecate', function () {
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');
     Route::get('/del/:id', 'delete');
-})->prefix('admin/ManageCategory/');
+})->prefix('admin/ManageCategory/')->middleware('IsLogin');
 
 
 // 学校管理模块
@@ -158,13 +158,13 @@ Route::group('a-school', function () {
     Route::get('/show/:id', 'show');
     Route::post('/update', 'update');
     Route::get('/del/:id', 'delete');
-})->prefix('admin/school/');
+})->prefix('admin/school/')->middleware('IsLogin');
 
 // 食堂管理模块
 Route::group('a-canteen', function () {
     Route::post('/insert', 'insert');
     Route::get('/del/:id', 'delete');
-})->prefix('admin/canteen/');
+})->prefix('admin/canteen/')->middleware('IsLogin');
 
 
 
@@ -377,8 +377,7 @@ Route::group('r-login', function () {
 // 骑手中心组
 Route::group('r-member', function () {
     Route::get('/index', 'index');
-    Route::get('/check_status', 'checkStatus');
-    Route::get('/set_status', 'setCheckStatus');
+    Route::get('/check_join', 'checkJoin');
     Route::post('/update-tel', 'setRiderPhone');
     Route::post('/apply', 'applyRider');
     Route::get('/edit', 'edit');
@@ -403,8 +402,7 @@ Route::group('r-orders', function () {
 Route::group('r-inc-exp', function () {
     Route::get('/mywallet', 'myWallet');
     Route::get('/detail', 'detail');
-    Route::post('/withdraw', 'withdraw'); // 因前期每天都可提现， 所以暂不走中间件（每周二提现）
-    // Route::post('/withdraw', 'withdraw')->middleware('WithdrawalAuth'); 
+    Route::post('/withdraw', 'withdraw');
 })->prefix('rider/IncomeExpend/');
 
 
