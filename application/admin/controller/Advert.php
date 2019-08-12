@@ -109,10 +109,22 @@ class Advert extends Base
             $this->error('非法参数');
         }
 
+        $school = model('School')
+            ->field('id,name')
+            ->where('level',2)
+            ->select()
+            ->toArray();
+
+        $schoolName = array_reduce($school,function(&$schoolName,$v){
+            $schoolName[$v['id']] = $v['name'];
+            return $schoolName;
+        });
+
         $data = model('Advert')->where('id',$id)->find();
         if ($data){
-            $data->start_time = date('Y/m/d',$data->start_time);
-            $data->end_time = date('Y/m/d',$data->end_time);
+            $data->start_time = date('Y-m-d',$data->start_time);
+            $data->end_time = date('Y-m-d',$data->end_time);
+            $data->coverage = $data->coverage == 0 ? '全部' : $schoolName[$data->coverage];
         }
 
         $this->success('success',$data);
