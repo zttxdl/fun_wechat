@@ -75,6 +75,11 @@ class Goods extends MerchantsBase
     public function save(Request $request)
     {
         $data   = $request->param();
+        $type   = $request->param('type');
+        $price   = $request->param('price');
+        if ($type !== 3 ){
+            $data['old_price'] = $price;
+        }
         $data['shop_id'] = $this->shop_id;
         $data['create_time'] = time();
         Product::create($data);
