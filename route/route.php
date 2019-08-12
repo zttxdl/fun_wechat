@@ -22,6 +22,7 @@ if(request()->isOptions()){
 Route::resource('advert_position','admin/advert_position');
 Route::get('advert_position/getAdvertList','admin/advert_position/getAdvertList');
 Route::resource('advert','admin/advert');
+Route::get('advert/school','admin/advert/getSchool');
 
 // 优惠券组
 Route::group('a-coupon', function () {
@@ -419,6 +420,7 @@ Route::group('r-upload', function () {
 Route::group('auto', function () {
     Route::rule('/zero_execute', 'zeroExecute');
     Route::rule('/cancel_orders', 'cancelOrders');
+    Route::rule('/update_advert', 'updateAdvert');
 })->prefix('api/AutoShell/');
 
 
