@@ -179,15 +179,9 @@ class Advert extends Base
         // 学校列表
         $school_list = model('school')->getSchoolList();
         $all = [
-            'id'=> -1,
+            'id'=> 0,
             'label'=>'全部',
-            'value'=>'全部',
-            'children'=>[
-                'id'=> 0,
-                'fid'=> -1,
-                'label'=> '全部',
-                'value'=> '全部',
-            ],
+            'value'=>'全部'
         ];
         array_unshift($school_list,$all);
 
