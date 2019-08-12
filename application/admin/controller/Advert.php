@@ -50,7 +50,7 @@ class Advert extends Base
                 $val->time =  date('Y/m/d',$val->start_time).'-'.date('Y/m/d',$val->end_time);
                 $val->coverage = $val->coverage == 0 ? '全部' : $schoolName[$val->coverage];
                 $val->bool = $statusName[$val->status];
-                if ($val->status !== 3){
+                if ($val->status != 3){
                     $val->rest = ceil(($val->end_time - time()) / 86400);
                 }else{
                     $val->rest = 0 ;
@@ -73,7 +73,7 @@ class Advert extends Base
         $start_time = $request->param('start_time');
         $end_time = $request->param('end_time');
         //获取该广告位已增加数量
-        if ($coverage !== 0){
+        if ($coverage != 0){
             $where[] = ['coverage','in',['0',$coverage]];
         }
 
@@ -109,10 +109,22 @@ class Advert extends Base
             $this->error('非法参数');
         }
 
+        $school = model('School')
+            ->field('id,name')
+            ->where('level',2)
+            ->select()
+            ->toArray();
+
+        $schoolName = array_reduce($school,function(&$schoolName,$v){
+            $schoolName[$v['id']] = $v['name'];
+            return $schoolName;
+        });
+
         $data = model('Advert')->where('id',$id)->find();
         if ($data){
-            $data->start_time = date('Y/m/d',$data->start_time);
-            $data->end_time = date('Y/m/d',$data->end_time);
+            $data->start_time = date('Y-m-d',$data->start_time);
+            $data->end_time = date('Y-m-d',$data->end_time);
+            $data->coverage = $data->coverage == 0 ? '全部' : $schoolName[$data->coverage];
         }
 
         $this->success('success',$data);
