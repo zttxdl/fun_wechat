@@ -16,7 +16,7 @@ class Index extends Controller
 
 
     //推送连接
-	public function index($id)
+	public function index()
 	{
 		return view('index/index',['uid'=>$id]);
 
