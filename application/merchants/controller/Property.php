@@ -113,8 +113,12 @@ class Property extends MerchantsBase
         $money = $request->param('money');//提现金额
         $card = $request->param('card');//提现卡号
 
-        if($money < 1) {
-            $this->error('提现金额不能少于1元');
+        if($money < 0.3) {
+            $this->error('提现金额不能少于0.3元');
+        }
+
+        if($money > 5000) {
+            $this->error('提现金额不能大于5000元');
         }
 
 
