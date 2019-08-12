@@ -21,7 +21,7 @@ class ManageCategory extends Model
      */
     public function getManageCategoryList()
     {
-        $list = $this->field('id,name')->order('sort','asc')->select();
+        $list = $this->field('id,name')->order('sort','asc')->select()->toArray();
         return $list;
     }
 

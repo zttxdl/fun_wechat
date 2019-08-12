@@ -66,6 +66,7 @@ class Coupon extends Base
         // 经营品类列表
         $mg_model = new ManageCategory();
         $manage_category_list = $mg_model->getManageCategoryList();
+        array_unshift($manage_category_list,['id'=>0,'name'=>'全部']);
 
         // 设置当前的红包批次ID
         $sum = Db::name('platform_coupon')->where('batch_id','like',date('ymd').'%')->count('id');
@@ -131,6 +132,7 @@ class Coupon extends Base
         // 经营品类列表
         $mg_model = new ManageCategory();
         $manage_category_list = $mg_model->getManageCategoryList();
+        array_unshift($manage_category_list,['id'=>0,'name'=>'全部']);
 
         // 限品类拼接中文数据
         $coupon_info['mb_limit_uses'] = !empty($coupon_info['limit_use']) ? implode(',',Db::name('manage_category')->where('id','in',$coupon_info['limit_use'])->column('name')) : '全部';
@@ -222,6 +224,7 @@ class Coupon extends Base
         }
         //获取店铺列表
         $shop_list = Db::name('shop_info')->where('school_id',$id)->where('status','=',3)->field('id,shop_name')->select();
+        array_unshift($shop_list,['id'=>0,'shop_name'=>'全部']);
         
         $this->success('获取当前学校的店铺列表成功',['shop_list'=>$shop_list]);
     }
