@@ -224,7 +224,7 @@ class Coupon extends Base
         }
         //获取店铺列表
         $shop_list = Db::name('shop_info')->where('school_id',$id)->where('status','=',3)->field('id,shop_name')->select();
-        array_unshift($shop_list,['id'=>0,'name'=>'全部']);
+        array_unshift($shop_list,['id'=>0,'shop_name'=>'全部']);
         
         $this->success('获取当前学校的店铺列表成功',['shop_list'=>$shop_list]);
     }
