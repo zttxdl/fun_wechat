@@ -97,16 +97,21 @@ class Index extends ApiBase
         }
         // 搜索条件
         $day = date('Y-m-d',time());
-        $where[] = ['today','=',$day];
-        $where[] = ['status','=',1];
-        $where[] = ['school_id','=',$school_id];
-        $where[] = ['end_time', '>=',time()];
-        $today_sale = model('TodayDeals')
-            ->field('id,name,product_id,old_price,price,num,limit_buy_num,thumb,start_time,end_time')
-            ->where($where)->limit(4)->select();
+        $where[] = ['t.today','=',$day];
+        $where[] = ['t.status','=',1];
+        $where[] = ['t.school_id','=',$school_id];
+        $where[] = ['t.end_time', '>=',time()];
+
+        $today_sale = model('TodayDeals')->alias('t')
+            ->join('shop_info s','t.shop_id = s.id')
+            ->field('t.id,t.name,t.product_id,t.shop_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,t.start_time,t.end_time,s.price_hike')
+            ->where($where)->limit(4)->select();;
+
         if ($today_sale){
             foreach ($today_sale as $item) {
                 $item->res_time = $item->end_time - time();
+                $item->old_price =$item->old_price + $item->price_hike;
+                $item->price = $item->price + $item->price_hike;
             }
 
         }
@@ -294,12 +299,14 @@ class Index extends ApiBase
         $where[] = ['t.school_id','=',$school_id];
         $pagesize = $request->param('pagesize',10);
 
-        $today_sale = model('TodayDeals')->alias('t')->join('shop_info s','t.shop_id = s.id')->field('t.name,t.shop_id,t.product_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,t.start_time,t.end_time,s.shop_name,s.up_to_send_money,s.ping_fee')
+        $today_sale = model('TodayDeals')->alias('t')->join('shop_info s','t.shop_id = s.id')->field('t.name,t.shop_id,t.product_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,t.start_time,t.end_time,s.shop_name,s.up_to_send_money,s.ping_fee,s.price_hike')
             ->where($where)->whereTime('t.end_time', '>=', time())->paginate($pagesize);
 
         if ($today_sale){
             foreach ($today_sale as $item) {
                 $item->res_time = $item->end_time - time();
+                $item->old_price =$item->old_price + $item->price_hike;
+                $item->price = $item->price + $item->price_hike;
             }
         }
         $this->success('success',$today_sale);

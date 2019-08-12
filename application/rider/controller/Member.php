@@ -176,7 +176,7 @@ class Member extends RiderBase
      */
     public function edit()
     {
-        $info = model('RiderInfo')->where('id',$this->auth->id)->field('id,name,link_tel,identity_num,card_img,back_img,hand_card_img,school_id')->find();
+        $info = model('RiderInfo')->where('id',$this->auth->id)->field('id,name,link_tel,identity_num,card_img,back_img,hand_card_img,school_id,phone')->find();
         $info['school_name'] = model('school')->getNameById($info['school_id']);
         $this->success('获取成功',['info'=>$info]);        
     }

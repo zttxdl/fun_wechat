@@ -160,6 +160,9 @@ class RiderInfo extends Base
     {
         $data = $request->post();
         $data['pass_time'] = time();
+        if ($data['status'] == 3) {
+            $data['remark'] = 0;
+        }
 
         $result = Db::name('rider_info')->update($data);
         if (!$result) {

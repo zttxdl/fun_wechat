@@ -15,6 +15,7 @@ class Shop extends Base
     {
         $this->shopModel = Model('Shop');
         $this->SchoolModel = Model('School');
+        parent::__construct();
     }
 
     /**
@@ -417,5 +418,94 @@ class Shop extends Base
         }
         $this->success('设置成功');
     }
+
+
+    /**
+     * 展示编辑商家 
+     * 
+     */
+    public function edit($id)
+    {
+        if(empty((int)$id)) {
+            $this->error('非法请求','404');
+        }
+        $shop_info = $this->shopModel->getShopInfo($id);
+
+        if(!$shop_info) {
+            $this->error('店铺不存在');
+        }
+        $result = [];
+        foreach ($shop_info as $row)
+        {
+            //店铺信息
+            $result['shop_info']['shop_name'] = $row['shop_name'];
+            $result['shop_info']['logo_img'] = $row['logo_img'];
+            $result['shop_info']['link_name'] = $row['link_name'];
+            $result['shop_info']['link_tel'] = $row['link_tel'];
+            $result['shop_info']['status'] = config('shop_check_status')[$row['status']];
+            $result['shop_info']['manage_category_name'] = Model('ManageCategory')->getNameById($row['manage_category_id']);
+            $result['shop_info']['address'] = $row['address'];
+            $result['shop_info']['school'] = Model('School')->getNameById($row['school_id']);
+        }
+
+        $shop_more_info = $this->shopModel->getShopMoreInfo($id);
+
+        $shop_qualification = [];
+        $shop_account = [];
+
+        if($shop_more_info) {
+            foreach ($shop_more_info as $row)
+            {
+                //商家资质
+                $shop_qualification = [
+                    'business_license' => $row['business_license'],
+                    'proprietor' => $row['proprietor'],
+                    'hand_card_front' => $row['hand_card_front'],
+                    'hand_card_back' => $row['hand_card_back'],
+                    'user_name' => $row['user_name'],
+                    'identity_num' => $row['identity_num'],
+                    'sex' => config('sex')[$row['sex']],
+                    'licence' => $row['licence'],
+                ];
+                //收款信息
+                $shop_account = [
+                    'branch_back' => $row['branch_back'],
+                    'back_hand_name' => $row['back_hand_name'],
+                    'back_card_num' => $row['back_card_num'],
+                ];
+            }
+        }
+
+        $result['shop_qualification'] = $shop_qualification;
+        $result['shop_account'] = $shop_account;
+        //补充信息
+        $result['shop_information'] = $this->shopModel->getInformation($id);
+
+        $this->success('获取成功',$result);
+    }
+
+
+    /**
+     * 保存编辑商家 
+     * 
+     */
+    public function update(Request $request)
+    {
+        $data = $request->param();
+        // 验证表单
+        $check = $this->validate($data, 'ShopInfo');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+
+        // 更新至数据库
+        $res = Db::name('shop_info')->update($data);
+        if (!$res) {
+            $this->error('修改失败');
+        }
+        $this->success('修改成功');
+    }
+     
+     
 
 }
