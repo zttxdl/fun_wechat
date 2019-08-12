@@ -377,8 +377,7 @@ Route::group('r-login', function () {
 // 骑手中心组
 Route::group('r-member', function () {
     Route::get('/index', 'index');
-    Route::get('/check_status', 'checkStatus');
-    Route::get('/set_status', 'setCheckStatus');
+    Route::get('/check_join', 'checkJoin');
     Route::post('/update-tel', 'setRiderPhone');
     Route::post('/apply', 'applyRider');
     Route::get('/edit', 'edit');
