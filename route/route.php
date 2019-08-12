@@ -420,6 +420,7 @@ Route::group('r-upload', function () {
 Route::group('auto', function () {
     Route::rule('/zero_execute', 'zeroExecute');
     Route::rule('/cancel_orders', 'cancelOrders');
+    Route::rule('/update_advert', 'updateAdvert');
 })->prefix('api/AutoShell/');
 
 

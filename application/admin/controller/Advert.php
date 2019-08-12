@@ -35,8 +35,9 @@ class Advert extends Base
         });
 
         $statusName = [
+            '0'=>'暂未投放',
             '1'=>'投放中',
-            '2'=>'禁止投放',
+            '2'=>'暂停投放',
             '3'=>'已过期',
         ];
         $list = model('Advert')
@@ -87,6 +88,10 @@ class Advert extends Base
         $data['start_time'] = strtotime($start_time);
         $data['end_time'] = strtotime($end_time);
         $data['add_time'] = time();
+        if ($data['start_time'] <= time()){
+            $data['status'] = 1;
+        }
+
         $ret = model('Advert')->save($data);
 
         if (!$ret){

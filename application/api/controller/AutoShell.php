@@ -94,6 +94,25 @@ class AutoShell extends Controller
         echo $num;
     }
 
+    public function updateAdvert()
+    {
+        $list = Db::name('advert')
+            ->field('id,start_time,end_time,status')
+            ->where('status','<>',3)
+            ->select();
 
+        foreach ($list as $item) {
+            if ($item['start_time'] < time() && $item['status'] == 0){
+                //修改状态
+                Db::name('advert')->where('id',$item['id'])->update(['status'=>1]);
+            }elseif ($item['end_time'] < time() && $item['status'] !== 3){
+                Db::name('advert')->where('id',$item['id'])->update(['status'=>3]);
+
+            }
+
+        }
+
+        echo 'success';
+    }
     
 }
