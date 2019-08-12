@@ -170,4 +170,28 @@ class Advert extends Base
         }
         $this->success('success');
     }
+
+    /**
+     * 获取覆盖范围
+     */
+    public function getSchool()
+    {
+        // 学校列表
+        $school_list = model('school')->getSchoolList();
+        $all = [
+            'id'=> -1,
+            'label'=>'全部',
+            'value'=>'全部',
+            'children'=>[
+                'id'=> 0,
+                'fid'=> -1,
+                'label'=> '全部',
+                'value'=> '全部',
+            ],
+        ];
+        array_unshift($school_list,$all);
+
+        $this->success('success',$school_list);
+    }
+
 }

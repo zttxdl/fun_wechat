@@ -22,6 +22,7 @@ if(request()->isOptions()){
 Route::resource('advert_position','admin/advert_position');
 Route::get('advert_position/getAdvertList','admin/advert_position/getAdvertList');
 Route::resource('advert','admin/advert');
+Route::get('advert/school','admin/advert/getSchool');
 
 // 优惠券组
 Route::group('a-coupon', function () {
