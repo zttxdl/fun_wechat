@@ -27,6 +27,17 @@ class ManageCategory extends Model
 
 
     /**
+     * 获取经营品类列表【专门针对前端优惠券部分】
+     * 
+     */
+    public function getManageCategoryListForFront()
+    {
+        $list = $this->field('id as value,name as label')->order('sort','asc')->select()->toArray();
+        return $list;
+    }
+
+
+    /**
      * 获取经营品类名称集合
      * 
      */
