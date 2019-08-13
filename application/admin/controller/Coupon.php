@@ -65,8 +65,8 @@ class Coupon extends Base
 
         // 经营品类列表
         $mg_model = new ManageCategory();
-        $manage_category_list = $mg_model->getManageCategoryListForFront();
-        array_unshift($manage_category_list,['value'=>0,'label'=>'全部']);
+        $manage_category_list = $mg_model->getManageCategoryList();
+        array_unshift($manage_category_list,['id'=>0,'name'=>'全部']);
 
         // 设置当前的红包批次ID
         $sum = Db::name('platform_coupon')->where('batch_id','like',date('ymd').'%')->count('id');
@@ -138,8 +138,8 @@ class Coupon extends Base
 
         // 经营品类列表
         $mg_model = new ManageCategory();
-        $manage_category_list = $mg_model->getManageCategoryListForFront();
-        array_unshift($manage_category_list,['value'=>0,'label'=>'全部']);
+        $manage_category_list = $mg_model->getManageCategoryList();
+        array_unshift($manage_category_list,['id'=>0,'name'=>'全部']);
 
         // 限品类拼接中文数据
         $coupon_info['mb_limit_uses'] = !empty($coupon_info['limit_use']) ? implode(',',Db::name('manage_category')->where('id','in',$coupon_info['limit_use'])->column('name')) : '全部';
@@ -158,10 +158,8 @@ class Coupon extends Base
         // 优惠券的覆盖范围 [学校]
         $sc_model = new School();
         $school_list = $sc_model->getSchoolList();
-        // 优惠券的覆盖范围 [店铺]
-        $shop_list = Db::name('shop_info')->where('school_id',$coupon_info['school_id'])->where('status','=',3)->field('id,shop_name')->select();
 
-        $this->success('ok',['coupon_info'=>$coupon_info,'school_list'=>$school_list,'shop_list'=>$shop_list,'manage_category_list'=>$manage_category_list]);
+        $this->success('ok',['coupon_info'=>$coupon_info,'school_list'=>$school_list,'manage_category_list'=>$manage_category_list]);
 
     }
 
@@ -236,8 +234,8 @@ class Coupon extends Base
             $this->error('非法参数',201);
         }
         //获取店铺列表
-        $shop_list = Db::name('shop_info')->where('school_id',$id)->where('status','=',3)->field('id as value,shop_name as label')->select();
-        array_unshift($shop_list,['value'=>0,'label'=>'全部']);
+        $shop_list = Db::name('shop_info')->where('school_id',$id)->where('status','=',3)->field('id,shop_name')->select();
+        array_unshift($shop_list,['id'=>0,'shop_name'=>'全部']);
         
         $this->success('获取当前学校的店铺列表成功',['shop_list'=>$shop_list]);
     }
