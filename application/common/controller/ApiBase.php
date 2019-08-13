@@ -4,7 +4,6 @@ namespace app\common\controller;
 
 use think\App;
 use app\common\Auth\JwtAuth;
-use app\common\controller\Base;
 
 
 /**
@@ -60,7 +59,7 @@ class ApiBase extends Base
      * @return boolean     [description]
      */
     protected function isDisable($id){
-        $status = model('ShopInfo')->where('id',$tid)->value('status');
+        $status = model('ShopInfo')->where('id',$id)->value('status');
         if ($status == 4) {
             $this->error('该商家已下线',401);
         }

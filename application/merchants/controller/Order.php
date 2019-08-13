@@ -308,10 +308,20 @@ class Order extends MerchantsBase
         //实例化socket
         $socket = model('PushEvent','service');
         $school_id = model('ShopInfo')->where('id',$this->shop_id)->value('school_id');
-        $where[] = ['school_id','=',$school_id];
-        $where[] = ['open_status','=',1];
-        $where[] = ['status','=',3];
-        $r_list = model('RiderInfo')->where($where)->select();
+
+        // 已成为骑手的情况
+        $map1 = [
+            ['school_id', '=', $school_id],
+            ['open_status', '=', 1],
+            ['status', '=', 3]
+        ];
+        // 暂未成为骑手的情况
+        $map2 = [
+            ['school_id', '=', $school_id],
+            ['status', 'in', [0,1,2]]
+        ];  
+
+        $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
 
         foreach ($r_list as $item) {
             $rid = 'r'.$item->id;

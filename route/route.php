@@ -22,6 +22,7 @@ if(request()->isOptions()){
 Route::resource('advert_position','admin/advert_position');
 Route::get('advert_position/getAdvertList','admin/advert_position/getAdvertList');
 Route::resource('advert','admin/advert');
+Route::get('advert/school','admin/advert/getSchool');
 
 // 优惠券组
 Route::group('a-coupon', function () {
@@ -118,6 +119,8 @@ Route::group('admin',function (){
 Route::group('admin',function (){
     Route::rule('shopList','admin/Shop/getList');//商家列表
     Route::rule('shopDetail','admin/Shop/getDetail');//商家详情
+    Route::rule('shopEdit/:id','admin/Shop/edit');//展示编辑店铺
+    Route::rule('shopUpdate','admin/Shop/update');//保存编辑店铺
     Route::rule('shopAddShop','admin/Shop/addShop');//添加店铺
     Route::rule('shopAddQualification','admin/Shop/addQualification');//添加商家资质
     Route::rule('shopSetStatus','admin/Shop/setStatus');//启用禁用商家
@@ -136,7 +139,7 @@ Route::group('admin',function (){
     Route::rule('orderDetail','admin/Orders/getDetail');//订单详情
     Route::rule('refundList','admin/Refund/getList');//退单列表
     Route::rule('refundDetail','admin/Refund/getDetail');//退单详情
-});
+})->middleware('IsLogin');;
 
 
 // 经营品类管理模块
@@ -146,7 +149,7 @@ Route::group('a-managecate', function () {
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');
     Route::get('/del/:id', 'delete');
-})->prefix('admin/ManageCategory/');
+})->prefix('admin/ManageCategory/')->middleware('IsLogin');
 
 
 // 学校管理模块
@@ -158,13 +161,13 @@ Route::group('a-school', function () {
     Route::get('/show/:id', 'show');
     Route::post('/update', 'update');
     Route::get('/del/:id', 'delete');
-})->prefix('admin/school/');
+})->prefix('admin/school/')->middleware('IsLogin');
 
 // 食堂管理模块
 Route::group('a-canteen', function () {
     Route::post('/insert', 'insert');
     Route::get('/del/:id', 'delete');
-})->prefix('admin/canteen/');
+})->prefix('admin/canteen/')->middleware('IsLogin');
 
 
 
@@ -186,6 +189,7 @@ Route::group('merchants',function (){
 	Route::rule('getSchool','merchants/Merchants/getSchool');
 	Route::rule('getCategory','merchants/Merchants/getCategory');
     Route::rule('getBack','merchants/Merchants/getBack');
+    Route::rule('getCanteen','merchants/Merchants/getCanteen');
     Route::get('check_status', 'merchants/Merchants/checkStatus');
     Route::get('set_status', 'merchants/Merchants/setCheckStatus');
 	//文件上传
@@ -262,6 +266,8 @@ Route::group('u-index', function () {
     Route::rule('/recommend', 'getRecommendList');
     Route::rule('/navigation', 'getNavigation');
     Route::rule('/special-list', 'getSpecialList');
+    Route::rule('/exclusive', 'getExclusive');
+    Route::rule('/more_exclusive', 'getMoreExclusive');
 })->prefix('api/Index/');
 
 // 红包组
@@ -375,8 +381,7 @@ Route::group('r-login', function () {
 // 骑手中心组
 Route::group('r-member', function () {
     Route::get('/index', 'index');
-    Route::get('/check_status', 'checkStatus');
-    Route::get('/set_status', 'setCheckStatus');
+    Route::get('/check_join', 'checkJoin');
     Route::post('/update-tel', 'setRiderPhone');
     Route::post('/apply', 'applyRider');
     Route::get('/edit', 'edit');
@@ -401,8 +406,7 @@ Route::group('r-orders', function () {
 Route::group('r-inc-exp', function () {
     Route::get('/mywallet', 'myWallet');
     Route::get('/detail', 'detail');
-    Route::post('/withdraw', 'withdraw'); // 因前期每天都可提现， 所以暂不走中间件（每周二提现）
-    // Route::post('/withdraw', 'withdraw')->middleware('WithdrawalAuth'); 
+    Route::post('/withdraw', 'withdraw');
 })->prefix('rider/IncomeExpend/');
 
 
@@ -419,6 +423,7 @@ Route::group('r-upload', function () {
 Route::group('auto', function () {
     Route::rule('/zero_execute', 'zeroExecute');
     Route::rule('/cancel_orders', 'cancelOrders');
+    Route::rule('/update_advert', 'updateAdvert');
 })->prefix('api/AutoShell/');
 
 

@@ -66,6 +66,7 @@ class Coupon extends Base
         // 经营品类列表
         $mg_model = new ManageCategory();
         $manage_category_list = $mg_model->getManageCategoryList();
+        array_unshift($manage_category_list,['id'=>0,'name'=>'全部']);
 
         // 设置当前的红包批次ID
         $sum = Db::name('platform_coupon')->where('batch_id','like',date('ymd').'%')->count('id');
@@ -92,6 +93,13 @@ class Coupon extends Base
             $data['end_time'] = 0;
         }
         $data['surplus_num'] = $data['num'];
+        
+        if (in_array('0',explode(',',$data['limmit_use']))) {   // 如果限制的品类存在 0 这个元素值，代表限制品类全选【因前端技术不好实现全选相关问题，即目前由后端处理】
+            $data['limit_use'] = '0';
+        }
+        if (in_array('0',explode(',',$data['shop_ids']))) {   // 如果覆盖范围的商家存在 0 这个元素值，代表覆盖商家全选【因前端技术不好实现全选相关问题，即目前由后端处理】
+            $data['shop_ids'] = '0';
+        }
 
         // 验证表单数据
         $check = $this->validate($data, 'Coupon');
@@ -131,6 +139,7 @@ class Coupon extends Base
         // 经营品类列表
         $mg_model = new ManageCategory();
         $manage_category_list = $mg_model->getManageCategoryList();
+        array_unshift($manage_category_list,['id'=>0,'name'=>'全部']);
 
         // 限品类拼接中文数据
         $coupon_info['mb_limit_uses'] = !empty($coupon_info['limit_use']) ? implode(',',Db::name('manage_category')->where('id','in',$coupon_info['limit_use'])->column('name')) : '全部';
@@ -149,10 +158,8 @@ class Coupon extends Base
         // 优惠券的覆盖范围 [学校]
         $sc_model = new School();
         $school_list = $sc_model->getSchoolList();
-        // 优惠券的覆盖范围 [店铺]
-        $shop_list = Db::name('shop_info')->where('school_id',$coupon_info['school_id'])->where('status','=',3)->field('id,shop_name')->select();
 
-        $this->success('ok',['coupon_info'=>$coupon_info,'school_list'=>$school_list,'shop_list'=>$shop_list,'manage_category_list'=>$manage_category_list]);
+        $this->success('ok',['coupon_info'=>$coupon_info,'school_list'=>$school_list,'manage_category_list'=>$manage_category_list]);
 
     }
 
@@ -185,9 +192,15 @@ class Coupon extends Base
         }
 
         $info = Db::name('platform_coupon')->where('id',$data['id'])->field('num,surplus_num,status')->find();
-        /*********** $info['status']【此处可由前端传过来 `status` 的状态值进行判断，目前以后端查表获取】************************/
+        /*********** $info['status']【此处可由前端传过来 `status` 的状态值进行判断，目前由后端查表获取】************************/
         // 当优惠券未发放时
         if ($info['status'] == 1) {
+            if (in_array('0',explode(',',$data['limmit_use']))) {   // 如果限制的品类存在 0 这个元素值，代表限制品类全选【因前端技术不好实现全选相关问题，即目前由后端处理】
+                $data['limit_use'] = '0';
+            }
+            if (in_array('0',explode(',',$data['shop_ids']))) {   // 如果覆盖范围的商家存在 0 这个元素值，代表覆盖商家全选【因前端技术不好实现全选相关问题，即目前由后端处理】
+                $data['shop_ids'] = '0';
+            }
             $data['surplus_num'] = $data['num'];
         }
         // 当优惠券已发放时
@@ -222,6 +235,7 @@ class Coupon extends Base
         }
         //获取店铺列表
         $shop_list = Db::name('shop_info')->where('school_id',$id)->where('status','=',3)->field('id,shop_name')->select();
+        array_unshift($shop_list,['id'=>0,'shop_name'=>'全部']);
         
         $this->success('获取当前学校的店铺列表成功',['shop_list'=>$shop_list]);
     }

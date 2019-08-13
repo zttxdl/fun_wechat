@@ -77,17 +77,9 @@ class IncomeExpend extends RiderBase
      */
     public function withdraw(Request $request)
     {
-        // 判断当前骑手的所在学校的提现周期
-        $info = Db::name('rider_withdraw_period')->where('school_id','=',$this->auth->school_id)->field('type,days')->find();
-        if ($info['type'] == 2) {   // 当设定为每周的某一天提现时
-            if (date('w') != $info['days']) {
-                $this->error('每周'.config('rider_withdraw_period')[$info['days']].'为提现日！今天不可提现', 205);
-            }
-        }
-
-        // 判断提现金额【不能少于1元】
-        if ($request->param('money') < 1) {
-            $this->error('提现金额不能少于1元');            
+        // 判断提现金额【不能少于0.3元】
+        if ($request->param('money') < 0.3) {
+            $this->error('提现金额不能少于0.3元');            
         }
 
         // 计入缓存，每天只能提现一次  # 这块可写一脚本：每天凌晨清除当前缓存【在存缓冲的时候，设置缓存标签，即可指向性的清楚某一标签下的缓存Cache::clear('rider_tx');】
@@ -112,6 +104,11 @@ class IncomeExpend extends RiderBase
         // 判断当前的提现金额是否大于实际可提现的金额
         if($can_money < $request->param('money')){  
             $this->error('您的提现金额大于可提现金额！');
+        }
+
+        // 提现金额不得大于5000
+        if($request->param('money') > 5000){  
+            $this->error('提现金额不能大于5000元');
         }
 
         // 组装数据

@@ -239,7 +239,7 @@ class Shop extends Model
      */
     public function getInformation($shop_id)
     {
-        $data = $this->field('sort,segmentation')->where('id',$shop_id)->find();
+        $data = $this->field('sort,segmentation,price_hike')->where('id',$shop_id)->find();
         return $data;
 
     }

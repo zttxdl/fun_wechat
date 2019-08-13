@@ -19,31 +19,47 @@ class Advert extends Base
     public function index()
     {
         $name = input('name','');
-        $page = input('page',1);
         $pagesize = input('pagesize',20);
-        if ($name == ''){
-            $list = model('Advert')
-                ->order('id', 'desc')
-                ->page($page,$pagesize)
-                ->select();
-        }else{
-            $list = model('Advert')
-                ->where('title|advert_name','like','%'.$name.'%')
-                ->order('id', 'desc')
-                ->page($page,$pagesize)
-                ->select();
-        }
-        if ($list){
-            foreach ($list as $val){
-                $val->start_time = date('Y/m/d',$val->start_time);
-                $val->end_time = date('Y/m/d',$val->end_time);
+        $where = [];
+        !empty($name) ?  $where[] = ['title|advert_name','like','%'.$name.'%'] : null;
 
+        $school = model('School')
+            ->field('id,name')
+            ->where('level',2)
+            ->select()
+            ->toArray();
+
+        $schoolName = array_reduce($school,function(&$schoolName,$v){
+            $schoolName[$v['id']] = $v['name'];
+            return $schoolName;
+        });
+
+        $statusName = [
+            '0'=>'暂未投放',
+            '1'=>'投放中',
+            '2'=>'暂停投放',
+            '3'=>'已过期',
+        ];
+        $list = model('Advert')
+            ->where($where)
+            ->order('id', 'desc')
+            ->paginate($pagesize);
+
+        if ($list){
+            foreach ($list as $val) {
+                $val->time =  date('Y/m/d',$val->start_time).'-'.date('Y/m/d',$val->end_time);
+                $val->coverage = $val->coverage == 0 ? '全部' : $schoolName[$val->coverage];
+                $val->bool = $statusName[$val->status];
+                if ($val->status != 3){
+                    $val->rest = ceil(($val->end_time - time()) / 86400);
+                }else{
+                    $val->rest = 0 ;
+                }
             }
         }
 
         $this->success('success',$list);
     }
-
 
     /**
      * 保存新建的资源
@@ -57,7 +73,7 @@ class Advert extends Base
         $start_time = $request->param('start_time');
         $end_time = $request->param('end_time');
         //获取该广告位已增加数量
-        if ($coverage !== 0){
+        if ($coverage != 0){
             $where[] = ['coverage','in',['0',$coverage]];
         }
 
@@ -72,6 +88,10 @@ class Advert extends Base
         $data['start_time'] = strtotime($start_time);
         $data['end_time'] = strtotime($end_time);
         $data['add_time'] = time();
+        if ($data['start_time'] <= time()){
+            $data['status'] = 1;
+        }
+
         $ret = model('Advert')->save($data);
 
         if (!$ret){
@@ -89,10 +109,22 @@ class Advert extends Base
             $this->error('非法参数');
         }
 
+        $school = model('School')
+            ->field('id,name')
+            ->where('level',2)
+            ->select()
+            ->toArray();
+
+        $schoolName = array_reduce($school,function(&$schoolName,$v){
+            $schoolName[$v['id']] = $v['name'];
+            return $schoolName;
+        });
+
         $data = model('Advert')->where('id',$id)->find();
         if ($data){
-            $data->start_time = date('Y/m/d',$data->start_time);
-            $data->end_time = date('Y/m/d',$data->end_time);
+            $data->start_time = date('Y-m-d',$data->start_time);
+            $data->end_time = date('Y-m-d',$data->end_time);
+            $data->coverage = $data->coverage == 0 ? '全部' : $schoolName[$data->coverage];
         }
 
         $this->success('success',$data);
@@ -150,4 +182,22 @@ class Advert extends Base
         }
         $this->success('success');
     }
+
+    /**
+     * 获取覆盖范围
+     */
+    public function getSchool()
+    {
+        // 学校列表
+        $school_list = model('school')->getSchoolList();
+        $all = [
+            'id'=> 0,
+            'label'=>'全部',
+            'value'=>'全部'
+        ];
+        array_unshift($school_list,$all);
+
+        $this->success('success',$school_list);
+    }
+
 }

@@ -5,7 +5,6 @@ namespace app\admin\controller;
 use app\common\controller\Base;
 use think\Request;
 use think\Db;
-use function GuzzleHttp\json_encode;
 
 class School extends Base
 {
@@ -19,6 +18,7 @@ class School extends Base
         // 搜索条件
         $where[] = ['level','=',2];
         !empty($request->param('name')) ? $where[] = ['name','like',"%".$request->param('name')."%"] : null;
+        !empty($request->param('fid')) ? $where[] = ['fid','=',$request->param('fid')] : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
 
         $list = Db::name('school')->where($where)->order('id','asc')->field('id,name,fid')->paginate($pagesize)->each(function ($item, $key) {
@@ -104,7 +104,7 @@ class School extends Base
      */
     public function edit($id)
     {
-        $info = Db::name('school')->where('id','=',$id)->find();
+        $info = Db::name('school')->where('id','=',$id)->field('id,name,fid')->find();
         $area_list = Db::name('school')->where('level','=',1)->field('id,name')->select();
         $canteen_list = Db::name('canteen')->where('school_id','=',$id)->select();
 

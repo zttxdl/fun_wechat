@@ -14,13 +14,12 @@ use think\Request;
 class Merchants extends MerchantsBase
 {
 
-    protected $noNeedLogin = ['getSchool','getBack','getCategory'];
+    protected $noNeedLogin = ['getschool','getback','getcategory','getcanteen'];
     //protected $noNeedLogin = ['*'];
 
     /**
      * 新建商家
      * @param  \think\Request  $request
-     * @return \think\Response
      */
 
     public function createShop(Request $request)
@@ -40,6 +39,7 @@ class Merchants extends MerchantsBase
         $data['shop_id'] = $this->shop_id;
         $data['status'] = 1;
         $data['update_time'] = time();
+        $data['canteen_id'] = $request->param('canteen_id');
         $data['shop_name'] = $request->param('shop_name');
         $data['logo_img'] = $request->param('logo_img');
         $data['school_id'] = $request->param('school_id');
@@ -138,8 +138,6 @@ class Merchants extends MerchantsBase
 
     /**
      * 获取学校
-     * @param  \think\Request  $request
-     * @return \think\Response
      */
     public function getSchool()
     {
@@ -161,8 +159,6 @@ class Merchants extends MerchantsBase
 
     /**
      * 获取经营品类
-     * @param  \think\Request  $request
-     * @return \think\Response
      */
     public function getCategory()
     {
@@ -173,8 +169,6 @@ class Merchants extends MerchantsBase
 
     /**
      * 获取银行
-     * @param  \think\Request  $request
-     * @return \think\Response
      */
     public function getBack()
     {
@@ -185,8 +179,6 @@ class Merchants extends MerchantsBase
 
     /**
      * 修改密码
-     * @param  \think\Request  $request
-     * @return \think\Response
      */
     public function updatePwd(Request $request)
     {
@@ -212,8 +204,6 @@ class Merchants extends MerchantsBase
 
     /**
      * 评价管理
-     * @param Request $request
-     * @return \think\response\Json
      */
 
     public function getEvaluation(Request $request)
@@ -267,6 +257,22 @@ class Merchants extends MerchantsBase
 
     }
 
+    /**
+     * 获取食堂
+     */
+    public function getCanteen(Request $request)
+    {
+        $id = $request->param('school_id');
 
+        $list = model('Canteen')
+            ->field('id,name')
+            ->where('school_id',$id)
+            ->select()
+            ->toArray();
+
+        array_push($list,['id'=>0,'name'=>'其他']);
+
+        $this->success('success',$list);
+    }
 
 }

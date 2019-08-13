@@ -87,4 +87,13 @@ class ShopInfo extends Model
         return $data;
 
     }
+
+    /**
+     * 获取平台提价
+     */
+    public function getPriceHike($id)
+    {
+        $price_hike = $this->where('id',$id)->value('price_hike');
+        return $price_hike;
+    }
 }

@@ -21,7 +21,11 @@ class Store extends ApiBase
         $shop_id = $request->param('shop_id');
         $this->isDisable($shop_id);
 
-        $where = ['shop_id'=>$shop_id];
+        $where[] = ['shop_id','=',$shop_id];
+        $where[] = ['status','=',1];
+        //获取商家提价
+        $price_hike = model('ShopInfo')->getPriceHike($shop_id);
+
         //获取商品
         $list = model('Product')
             ->field('id,name,box_money,price,info,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
@@ -42,10 +46,11 @@ class Store extends ApiBase
             ->find();
 
         if ($days){
-            $days['price'] = (float)$days['price'];
-            $days['old_price'] = (float)$days['old_price'];
+            $days['price'] = $days['price'] + $price_hike;
+            $days['old_price'] = $days['old_price'] + $price_hike;
             $list[] = $days;
         }
+
         foreach ($list as &$item) {
             if (isset($item['attr_ids'])) {
                 $attr_list = model('ProductAttrClassify')
@@ -63,7 +68,10 @@ class Store extends ApiBase
             }else{
                 $item['attr'] = '';
             }
+
             $item['sales'] = model('Product')->getMonthSales($item['id']);
+            $item['price'] = $price_hike + $item['price'];
+            $item['old_price'] = $price_hike + $item['old_price'];
 
         }
 
@@ -219,7 +227,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         $where[] = ['status', '=', 1];
 
         $product = model('Product')
-            ->field('name,box_money,sales,price,old_price,thumb,info,type,attr_ids,status,shop_id')
+            ->field('name,shop_id,box_money,sales,price,old_price,thumb,info,type,attr_ids,status,shop_id')
             ->where($where)
             ->find();
 
@@ -229,9 +237,15 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             $this->error('商品已下架');
         }else{
             $product = $product->toArray();
+
+            //获取商家提价
+            $price_hike = model('ShopInfo')->getPriceHike($product['shop_id']);
             if ($data){
-                $product['old_price'] = $data->old_price;
-                $product['price'] = $data->price;
+                $product['old_price'] = $data->old_price + $price_hike;
+                $product['price'] = $data->price + $price_hike;
+            }else{
+                $product['old_price'] = $product['old_price'] + $price_hike;
+                $product['price'] = $product['price'] + $price_hike;
             }
         }
 

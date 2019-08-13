@@ -56,6 +56,6 @@ class RiderInfo extends Model
      */
     public function getPhoneById($id)
     {
-        return $this->where('id',$id)->value('link_tel');
+        return $this->where('id',$id)->value('phone');
     }
 }

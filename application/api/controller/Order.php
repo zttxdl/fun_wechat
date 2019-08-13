@@ -11,7 +11,6 @@ use app\common\controller\ApiBase;
 use EasyWeChat\Factory;
 use think\Db;
 use think\Request;
-use think\facade\Env;
 
 
 class Order extends ApiBase
@@ -103,7 +102,7 @@ class Order extends ApiBase
                 $rider_link_tel = Db::name('takeout')->alias('a')
                     ->leftJoin('rider_info b','a.rider_id = b.id')
                     ->where('a.order_id',$row['id'])
-                    ->value('b.link_tel');
+                    ->value('b.phone');
 
                 $result[$key]['rider_link_tel'] = $rider_link_tel;
 
@@ -138,7 +137,7 @@ class Order extends ApiBase
 
         $rider_info = Db::name('takeout')->alias('a')
             ->join('rider_info b','a.rider_id = b.id')
-            ->field('a.single_time,a.accomplish_time,a.single_time,a.accomplish_time,b.id,b.name,b.headimgurl,b.sex,b.link_tel')
+            ->field('a.single_time,a.accomplish_time,a.single_time,a.accomplish_time,b.id,b.name,b.headimgurl,b.sex,b.phone')
             ->where('a.order_id',$orders_id)
             ->find();
 
@@ -221,8 +220,9 @@ class Order extends ApiBase
             $rider_info = Db::name('takeout')->alias('a')
                 ->leftJoin('rider_info b','a.rider_id = b.id')
                 ->where('a.order_id',$orders_id)
-                ->field('b.*')
+                ->field('b.phone,b.link_tel')
                 ->find();
+            $rider_info['link_tel'] = $rider_info['phone'];
             $result['ping_info']['rider_info'] = isset($rider_info) ? $rider_info : '';//骑手信息
 
         }
