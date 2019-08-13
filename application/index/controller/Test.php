@@ -106,27 +106,33 @@ class Test extends Controller
             $pageData[] = array_slice($userInfo,$start,$pageSize);
         }
 
-//        dump($data);
-
+//        return $pageData;
+        $userData = [];
         foreach ($pageData as $key => &$val){
             foreach ($val as $k => &$v){
-                $v = explode('=',$v);
+                $a = [];
+                $b = [];
+                $vv = explode('=',$v);
 
-                if(is_null($v[1])) {
-                    $v[1] = 'User'.sprintf('%03d',$key + 1);
-                    list($a[],$b[]) = $v;
-                    $v = array_combine($a,$b);
+                if(!isset($vv[1]) && empty($vv[1])) {
+                    $vv[0] = 'UserCode';
+                    $vv[1] = 'User'.sprintf('%03d',$key + 1);
                 }
 //                dump($v) ;
-                
+                if(isset($v) && !empty($v)){
+                    list($a[],$b[]) = $vv;
+                    $new_data = array_combine($a,$b);
+                    foreach ($new_data as $k2 => $v2){
+                        $k2 = ltrim($k2,'["');
+                        $k2 = rtrim($k2,']"');
+                        $userData[$key][$k2] = $v2;
+                    }
+                }
 
-                //销毁变量
-                unset($a);
-                unset($b);
             }
         }
 
-        return json(['msg'=>'获取成功','code'=>200,'data'=>$pageData]);
+        return json(['msg'=>'获取成功','code'=>200,'data'=>$userData]);
 
     }
 
@@ -254,7 +260,7 @@ class Test extends Controller
             "EnableLeftTime=".$data['EnableLeftTime']. "\r\n" .
             "EnableBandwidthQuota=".$data['EnableBandwidthQuota']. "\r\n" .
             "BandwidthQuota=".$data['BandwidthQuota']. "\r\n" .
-            "BandwidthQuotaPeriod=".$data['BandwidthQuotaPeriod'];
+            "BandwidthQuotaPeriod=".$data['BandwidthQuotaPeriod']."\r\n";
         return $temp;
     }
 
