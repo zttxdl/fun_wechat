@@ -433,4 +433,5 @@ Route::group('auto', function () {
     Route::rule('get', 'index/Test/get');
     Route::rule('del', 'index/Test/del');
     Route::rule('edit', 'index/Test/edit');
+    Route::rule('addAll', 'index/Test/addAll');
 //});
