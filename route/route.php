@@ -119,6 +119,8 @@ Route::group('admin',function (){
 Route::group('admin',function (){
     Route::rule('shopList','admin/Shop/getList');//商家列表
     Route::rule('shopDetail','admin/Shop/getDetail');//商家详情
+    Route::rule('shopEdit/:id','admin/Shop/edit');//展示编辑店铺
+    Route::rule('shopUpdate','admin/Shop/update');//保存编辑店铺
     Route::rule('shopAddShop','admin/Shop/addShop');//添加店铺
     Route::rule('shopAddQualification','admin/Shop/addQualification');//添加商家资质
     Route::rule('shopSetStatus','admin/Shop/setStatus');//启用禁用商家

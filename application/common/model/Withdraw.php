@@ -29,4 +29,12 @@ class Withdraw extends Model
         return sprintf("%.2f",$acount_money);
     }
 
+    /**
+     * 提现规则
+     */
+    public function getWithdrawRule($shop_id)
+    {
+        
+    }
+
 }
