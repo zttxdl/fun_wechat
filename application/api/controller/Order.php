@@ -11,7 +11,6 @@ use app\common\controller\ApiBase;
 use EasyWeChat\Factory;
 use think\Db;
 use think\Request;
-use think\facade\Env;
 
 
 class Order extends ApiBase
