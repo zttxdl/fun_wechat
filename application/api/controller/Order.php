@@ -38,7 +38,7 @@ class Order extends ApiBase
      * @param Request $request
      * @return \think\response\Json
      * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\db\exception\modelNotFoundException
      * @throws \think\exception\DbException
      */
     public function getList(Request $request)
@@ -177,10 +177,10 @@ class Order extends ApiBase
 
         foreach ($result['detail'] as &$row) {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
-            $row['name'] = Model('Product')->getNameById($row['product_id']);
-            $row['goods_img'] = Model('Product')->getImgById($row['product_id']);
+            $row['name'] = model('Product')->getNameById($row['product_id']);
+            $row['goods_img'] = model('Product')->getImgById($row['product_id']);
             $row['id'] = $row['product_id'];
-            $row['old_price'] = Model('Product')->getGoodsOldPrice($row['id']); 
+            $row['old_price'] = model('Product')->getGoodsOldPrice($row['id']); 
             $result['platform_discount']['id'] = $row['platform_coupon_id'];
             $result['platform_discount']['face_value'] = (int)$row['platform_coupon_money'];
             $result['shop_discount']['id'] = $row['shop_discounts_id'];
@@ -189,7 +189,7 @@ class Order extends ApiBase
             //unset($row['id']);
         }
 
-        $orders = Model('Orders')->getOrderById($orders_id);
+        $orders = model('Orders')->getOrderById($orders_id);
 
         $result['orders'] = [
             'orders_sn' => $orders['orders_sn'],
@@ -203,7 +203,7 @@ class Order extends ApiBase
             'status_name' => $this->order_status[$orders['status']]
         ];
 
-        $shop_info = Model('ShopInfo')->where('id',$orders['shop_id'])->field('id,shop_name,logo_img,run_type')->find();
+        $shop_info = model('ShopInfo')->where('id',$orders['shop_id'])->field('id,shop_name,logo_img,run_type')->find();
 
         $result['shop_info'] = [
             'id' => $shop_info['id'],
@@ -412,7 +412,7 @@ class Order extends ApiBase
             $this->error('退单已提交申请,请耐心等待');
         }
 
-        $orders = Model('Orders')->getOrderById($orders_id);
+        $orders = model('Orders')->getOrderById($orders_id);
 
         $data = [
             'orders_id' => $orders_id,
@@ -436,7 +436,7 @@ class Order extends ApiBase
 
         if($res) {
             //更新一下主表订单状态为退款中
-            Model('Orders')->updateStatus($orders['orders_sn'],10);
+            model('Orders')->updateStatus($orders['orders_sn'],10);
             $this->success('售后申请已提交成功,等待商家处理');
         }
     }
@@ -503,7 +503,7 @@ class Order extends ApiBase
                     'order_sn' => $orders_sn,
                 ];
 
-                $res = Model('MyCoupon')->updateStatus($orderData['platform_coupon_id'],$data);
+                $res = model('MyCoupon')->updateStatus($orderData['platform_coupon_id'],$data);
                 if(!$res) {
                     throw new \Exception('红包使用失败');
                 }
@@ -666,7 +666,7 @@ class Order extends ApiBase
     }
 
     /**
-     * 在来一单
+     * 再来一单
      */
     public function agianOrder(Request $request)
     {
@@ -680,20 +680,17 @@ class Order extends ApiBase
         }
 
         $order_detail = model('Orders')->getOrderDetail($order_id);
-
-
-
-        //dump($order_detail);
         $result = [];
-
+        //获取商家提价
+        $price_hike = model('ShopInfo')->getPriceHike($order_info['shop_id']);
         foreach ($order_detail  as $row)
         {
-            $product_info = Model('Product')->where('id',$row['product_id'])->find();
+            $product_info = model('Product')->where('id',$row['product_id'])->find();
 
             //如果商品下架 则不返回
             if($product_info['status'] == 2) {
                 $today = date('Y-m-d',time());
-                $today_goods = Model('todayDeals')
+                $today_goods = model('todayDeals')
                     ->where('product_id',$row['product_id'])
                     ->where('today',$today)
                     ->where('shop_id',$order_info['shop_id'])
@@ -721,8 +718,8 @@ class Order extends ApiBase
                 'thumb' => $product_info['thumb'],
                 'name' => $product_info['name'],
                 'num' => $row['num'],
-                'price' => $product_info['price'],
-                'old_price' => $product_info['old_price'],
+                'price' => $product_info['price'] + $price_hike,
+                'old_price' => $product_info['old_price'] + $price_hike,
                 'box_money' => $product_info['box_money'],
                 'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
                 'attr_ids' => $row['attr_ids'],
