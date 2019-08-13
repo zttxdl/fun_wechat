@@ -728,6 +728,10 @@ class Order extends ApiBase
             ];
         }
 
+        if (count($result) < 1) {
+            $this->error('该商品已下架');
+        }
+
         $this->success('获取成功',$result);
 
     }
