@@ -703,7 +703,8 @@ class Order extends ApiBase
                     }
 
                     $row['limit_buy_num'] = $today_goods['limit_buy_num'];//限购次数
-
+                    $product_info['old_price'] = $today_goods['old_price'];
+                    $product_info['price'] = $today_goods['price'];
                 }else{
                     continue;
                 }
