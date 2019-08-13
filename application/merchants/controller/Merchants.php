@@ -147,10 +147,14 @@ class Merchants extends MerchantsBase
         $school_list = model('School')->field('id,fid,name,longitude,latitude')->where('level',2)->select()->toArray();
         // 组装三维数组
         foreach ($school_district_list as $k => &$v) {
+            $v['children'] = [];
             foreach ($school_list as $ko => $vo) {
                 if ($v['id'] == $vo['fid']) {
                     $v['children'][] = $vo;
                 }
+            }
+            if (empty($v['children'])) {
+                unset($school_district_list[$k]);
             }
         }
 

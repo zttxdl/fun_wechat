@@ -39,14 +39,14 @@ class SendMsg
             $postData = array(
                 "touser" => $riderInfo['openid'],                            // 用户openid
                 "template_id" => '42ftJgSgo5fXw7B22_EmXaTScUKCIKk6EdwH3tauo0w',      // 模板消息ID
-                "page" => 'pages/index/index',                  // 跳转的页面
+                "page" => 'pages/my/my',                  // 跳转的页面
                 "form_id" => $riderInfo['formid'],
                 "data" => array(
                     'keyword1' => array('value' => $check),
                     'keyword2' => array('value' => '申请成为骑手'),
                     'keyword3' => array('value' => $riderInfo['name']),
                     'keyword4' => array('value' => $riderInfo['school_name']),
-                    'keyword4' => array('value' => '南京食聚荟信息科技有限公司'),
+                    'keyword5' => array('value' => '南京食聚荟信息科技有限公司'),
                 ),
                 'emphasis_keyword' => 'keyword1'                // 选择要放大字体的键值
             );
