@@ -46,8 +46,7 @@ class Store extends ApiBase
             ->find();
 
         if ($days){
-            $days['price'] = $days['price'] + $price_hike;
-            $days['old_price'] = $days['old_price'] + $price_hike;
+
             $list[] = $days;
         }
 
