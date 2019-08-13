@@ -96,7 +96,7 @@ class Goods extends MerchantsBase
      * @param  int  $id
      * @return \think\Response
      */
-    public function update(Request $request)
+    public function modify(Request $request)
     {
         $id   = $request->param('id');
         if (!$id){
