@@ -203,10 +203,10 @@ class Merchants extends MerchantsBase
         }
         $shopInfo = model('ShopInfo')->where('id',$this->shop_id)->find();
 
-        if ($phone != $shopInfo->phone){
+        if ($phone != $shopInfo->account){
             $this->error('请输入正确的绑定号码');
         }
-        
+
         $shopInfo->password = md5($new_password);
 
         if (!$shopInfo->save()){
