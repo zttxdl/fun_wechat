@@ -101,6 +101,8 @@ class Index extends ApiBase
         $where[] = ['t.status','=',1];
         $where[] = ['t.school_id','=',$school_id];
         $where[] = ['t.end_time', '>=',time()];
+        $where[] = ['s.status', '=',3];
+        $where[] = ['s.open_status', '=',1];
 
         $today_sale = model('TodayDeals')->alias('t')
             ->join('shop_info s','t.shop_id = s.id')
@@ -297,6 +299,7 @@ class Index extends ApiBase
         $where[] = ['t.status','=',1];
         $where[] = ['s.status','=',3];
         $where[] = ['t.school_id','=',$school_id];
+        $where[] = ['s.open_status', '=',1];
         $pagesize = $request->param('pagesize',10);
 
         $today_sale = model('TodayDeals')->alias('t')->join('shop_info s','t.shop_id = s.id')->field('t.name,t.shop_id,t.product_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,t.start_time,t.end_time,s.shop_name,s.up_to_send_money,s.ping_fee,s.price_hike')
