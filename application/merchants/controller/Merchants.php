@@ -201,9 +201,15 @@ class Merchants extends MerchantsBase
         if ($new_password != $sure_password){
             $this->error('两次密码不一致');
         }
+        $shopInfo = model('ShopInfo')->where('id',$this->shop_id)->find();
 
-        $ret = model('ShopInfo')->where('id',$this->shop_id)->update(['password'=>md5($new_password)]);
-        if (!$ret){
+        if ($phone != $shopInfo->phone){
+            $this->error('请输入正确的绑定号码');
+        }
+        
+        $shopInfo->password = md5($new_password);
+
+        if (!$shopInfo->save()){
             $this->error('修改失败');
         }
         $this->success('success');
