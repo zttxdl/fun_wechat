@@ -121,10 +121,16 @@ class Advert extends Base
         });
 
         $data = model('Advert')->where('id',$id)->find();
+        $typeName = [
+            '1'=>'商家广告',
+            '2'=>'外链广告',
+            '3'=>'静态图'
+        ];
         if ($data){
             $data->start_time = date('Y-m-d',$data->start_time);
             $data->end_time = date('Y-m-d',$data->end_time);
             $data->coverage = $data->coverage == 0 ? '全部' : $schoolName[$data->coverage];
+            $data->type_name = $typeName[$data->type];
         }
 
         $this->success('success',$data);

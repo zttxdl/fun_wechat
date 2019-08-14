@@ -7,13 +7,22 @@ use GuzzleHttp\Client;
 use app\common\service\PushEvent;
 use think\facade\Cache;
 use think\Request;
+use think\Db;
 
 
 
 class Index extends Controller
 {
 
+    //提现时间规则当天可提现七天之前的结算金额
+    protected $startTime;
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
+    }
 
     //推送连接
 	public function index()
@@ -69,11 +78,23 @@ class Index extends Controller
     //测试推送
 	public function test()
 	{
-        $sid = request()->param('sid');
-		$socket = model('PushEvent','service');
-		$socket->setUser($sid)->setContent('新订单来了')->push();
+	    $time = '2019-09';
 
+	    dump(strtotime($time));
 
+        $start_time = date('Y-m-01',strtotime($time)).' 00:00:00';
+        $end_time = date('Y-m-30',strtotime($time)).' 23:59:59';
+
+        dump($start_time);
+        dump($end_time);
+        $data = model('withdraw')
+            ->where('shop_id','=',23)
+            ->whereBetweenTime('add_time',$start_time,$end_time)
+            ->order('add_time DESC')
+            ->fetchSql()
+            ->select();
+
+        dump($data);
 	}
 
 
@@ -87,8 +108,8 @@ class Index extends Controller
     public function http(Request $request)
     {
         $params = [
-            'key' => 'b6a629321ab344778a7f1b896113a57d',
-            'userid' => 'yemwishu'
+            'UserName' => 'ztt2',
+            'Password' => '123456'
         ];
 
         $params['info'] = $request->param('info');
@@ -103,7 +124,7 @@ class Index extends Controller
         
         
         //发送post数据
-        $response = $client->post('http://www.tuling123.com/openapi/api', $data);
+        $response = $client->post('http://api.daigefan.io:8889/add', $data);
 
         $callback = json_decode($response->getBody()->getContents());
 

@@ -703,7 +703,8 @@ class Order extends ApiBase
                     }
 
                     $row['limit_buy_num'] = $today_goods['limit_buy_num'];//限购次数
-
+                    $product_info['old_price'] = $today_goods['old_price'];
+                    $product_info['price'] = $today_goods['price'];
                 }else{
                     continue;
                 }
@@ -725,6 +726,10 @@ class Order extends ApiBase
                 'attr_ids' => $row['attr_ids'],
                 'limit_buy_num' => isset($row['limit_buy_num']) ? $row['limit_buy_num'] : ''
             ];
+        }
+
+        if (count($result) < 1) {
+            $this->error('该商品已下架');
         }
 
         $this->success('获取成功',$result);

@@ -22,14 +22,83 @@ class Test extends Controller
         $this->path = Env::get('ROOT_PATH')."AccInfo.ini";
     }
 
+
+    /**
+     * @param Request $request
+     * 批量添加用户
+     */
+    public function  addAll(Request $request)
+    {
+        $num = $request->param('num');
+
+        for($i = 1;$i <= $num; $i++){
+            $data['UserName'] = $request->param('UserName').$i;
+            $data['Password'] = $request->param('Password');
+            $res = $this->addData($data);
+            if(is_array($res)) {
+                return json($res);
+            }
+        }
+
+        return $res;
+
+    }
+
     /**
      * @param Request $request
      * 新增用户
      */
     public function add(Request $request)
     {
-        $userInfo = $request->post();
+        $data = $request->param();
+        $res = $this->addData($data);
+        if(is_array($res)) {
+            return json($res);
+        }
+        return $res;
+    }
 
+    /**
+     * @param Request $request
+     * 新增用户
+     */
+    public function addData($data)
+    {
+        $userInfo = [
+            'UserName' => isset($data['UserName']) ? trim($data['UserName']) : '',
+            'Password' => isset($data['Password']) ? trim($data['Password']) : '',
+            'MACAddress' => isset($data['MACAddress']) ? $data['MACAddress'] : '',
+            'IPAddressLow' => isset($data['IPAddressLow']) ? $data['IPAddressLow'] : '',
+            'IPAddressHigh' => isset($data['IPAddressHigh']) ? $data['IPAddressHigh'] : '',
+            'ServiceMask' => isset($data['ServiceMask']) ? $data['ServiceMask'] : '254',
+            'MaxConn' => isset($data['MaxConn']) ? $data['MaxConn'] : '',
+            'BandWidth' => isset($data['BandWidth']) ? $data['BandWidth'] : '',
+            'BandWidth2' => isset($data['BandWidth2']) ? $data['BandWidth2'] : '',
+            'WebFilter' => isset($data['WebFilter']) ? $data['WebFilter'] : '',
+            'TimeSchedule' => isset($data['TimeSchedule']) ? $data['TimeSchedule'] : '',
+            'EnableUserPassword' => isset($data['EnableUserPassword']) ? $data['EnableUserPassword'] : '1',
+            'EnableIPAddress' => isset($data['EnableIPAddress']) ? $data['EnableIPAddress'] : '',
+            'EnableMACAddress' => isset($data['EnableMACAddress']) ? $data['EnableMACAddress'] : '',
+            'Enable' => isset($data['Enable']) ? $data['Enable'] : '',
+            'BelongsGroup' => isset($data['BelongsGroup']) ? $data['BelongsGroup'] : '',
+            'BelongsGroupName' => isset($data['BelongsGroupName']) ? $data['BelongsGroupName'] : '',
+            'IsGroup' => isset($data['IsGroup']) ? $data['IsGroup'] : '',
+            'AutoDisable' => isset($data['AutoDisable']) ? $data['AutoDisable'] : '',
+            'DisableDateTime' => isset($data['DisableDateTime']) ? $data['DisableDateTime'] : '',
+            'EnableLeftTime' => isset($data['EnableLeftTime']) ? $data['EnableLeftTime'] : '',
+            'EnableBandwidthQuota' => isset($data['EnableBandwidthQuota']) ? $data['EnableBandwidthQuota'] : '',
+            'BandwidthQuota' => isset($data['BandwidthQuota']) ? $data['BandwidthQuota'] : '',
+            'BandwidthQuotaPeriod' => isset($data['BandwidthQuotaPeriod']) ? $data['BandwidthQuotaPeriod'] : '',
+        ];
+
+        $userInfo2 = explode("\r\n",file_get_contents($this->path));
+
+        //先获取健名
+        $keys = array_search('UserName='.$userInfo['UserName'],$userInfo2);
+
+        if($keys) {
+            return ['msg'=>'用户已经存在!','code'=>201,'data'=>[]];
+        }
 
         $check = $this->validate($userInfo,'Test');
 
