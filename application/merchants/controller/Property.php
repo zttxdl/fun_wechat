@@ -65,7 +65,7 @@ class Property extends MerchantsBase
      */
     public function receiptPay(Request $request)
     {
-        $shop_id = 23;
+        $shop_id = $this->shop_id;
         $time = $request->param('time',0);//1 收入;2 支出; 0 默认全部
 
         isset($shop_id) ? $shop_id : $request->param('shop_id');
