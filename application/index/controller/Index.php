@@ -78,11 +78,15 @@ class Index extends Controller
     //测试推送
 	public function test()
 	{
-	    $time = date('Y-m');
+	    $time = '2019-09';
 
-	    $time = date('Y-m',strtotime($time));
-        $start_time = date('Y-m-01').'00:00:00';
-        $end_time = date('Y-m-30').'23:59:59';
+	    dump(strtotime($time));
+
+        $start_time = date('Y-m-01',strtotime($time)).' 00:00:00';
+        $end_time = date('Y-m-30',strtotime($time)).' 23:59:59';
+
+        dump($start_time);
+        dump($end_time);
         $data = model('withdraw')
             ->where('shop_id','=',23)
             ->whereBetweenTime('add_time',$start_time,$end_time)

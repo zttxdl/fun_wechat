@@ -50,7 +50,7 @@ class Test extends Controller
      */
     public function add(Request $request)
     {
-        $data = $request->post();
+        $data = $request->param();
         $res = $this->addData($data);
         if(is_array($res)) {
             return json($res);

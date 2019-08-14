@@ -28,6 +28,7 @@ class Property extends MerchantsBase
         parent::__construct();
 
         $this->startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
+        $this->key = 'shop_tx';
     }
 
 
@@ -65,14 +66,13 @@ class Property extends MerchantsBase
      */
     public function receiptPay(Request $request)
     {
-        $shop_id = 23;
-        $time = $request->param('time',0);//1 收入;2 支出; 0 默认全部
+        $shop_id = $this->shop_id;
+        $time = $request->param('time',0);
 
         isset($shop_id) ? $shop_id : $request->param('shop_id');
 
-        $time = date('Y-m',strtotime($time));
-        $start_time = date('Y-m-01').'00:00:00';
-        $end_time = date('Y-m-30').'23:59:59';
+        $start_time = date('Y-m-01',strtotime($time)).' 00:00:00';
+        $end_time = date('Y-m-30',strtotime($time)).' 23:59:59';
 
 
         $szmx['income'] = model('withdraw')->getIncome($shop_id,$this->startTime);//收入
@@ -95,7 +95,7 @@ class Property extends MerchantsBase
             $szmx['info'][] = [
                 'title' => $row['title'],
                 'add_time' => date('Y-m-d H:i:s',$row['add_time']),
-                'money' => $row['type'] == 1 ? $row['money'] : sprintf('%.2f',-1 * $row['money']),
+                'money' => $row['type'] == 1 ? '+'.$row['money'] : sprintf('%.2f',-1 * $row['money']),
             ];
         }
 
@@ -122,10 +122,8 @@ class Property extends MerchantsBase
             $this->error('提现金额不能大于5000元');
         }
 
-        $key = 'shop_tx_'.$shop_id;
-
         //提现次数
-        $check = Cache::store('redis')->tag('shop_tx')->get($key); 
+        $check = Cache::store('redis')->hSet($this->key,$shop_id);
 
         if($check){
             $this->error('一天只能提现一次哦!');
@@ -154,7 +152,7 @@ class Property extends MerchantsBase
         $res = DB::name('withdraw')->insert($txsq);
 
         if($res) {
-            Cache::store('redis')->tag('shop_tx')->set($key,1,3600*24);
+            Cache::store('redis')->hSet($this->key,$shop_id,1);
             $this->success('申请成功');
         }
         $this->error('申请失败');

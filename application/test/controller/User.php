@@ -30,4 +30,28 @@ class User extends Controller
         }
     }
 
+
+
+    /**
+     * 测试骑手新订单提醒 
+     * 
+     */
+    public function riderOrder($school_id)
+    {
+        $map1 = [
+            ['school_id', '=', $school_id],
+            ['open_status', '=', 1],
+            ['status', '=', 3]
+        ];
+        // 暂未成为骑手的情况
+        $map2 = [
+            ['school_id', '=', $school_id],
+            ['status', 'in', [0,1,2]]
+        ];  
+
+        $r_list = model('RiderInfo')->whereOr([$map1, $map2])->fetchSql()->select();
+        dump($r_list);
+    }
+     
+
 }
