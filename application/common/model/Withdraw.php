@@ -37,17 +37,35 @@ class Withdraw extends Model
     /**
      * 获取支出
      */
-    public function getExpenditure($shop_id,$startTime)
+    public function getExpenditure($shop_id,$startTime,$endTime = '')
     {
         //提现过程中的金额【包括 `已提现`，`申请提现`】
-        $tx_money = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']])
-            ->whereTime('add_time', '<',$startTime)
-            ->sum('money');
+        $db = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']]);
 
-        //总支出
-        $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2']])
-            ->whereTime('add_time', '<',$startTime)
-            ->sum('money');
+        if(empty($endTime)) {
+            //提现过程中的金额【包括 `已提现`，`申请提现`】
+            $tx_money = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']])
+                ->whereTime('add_time', '<',$startTime)
+                ->sum('money');;
+
+            //总支出
+            $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2']])
+                ->whereTime('add_time', '<',$startTime)
+                ->sum('money');
+
+        }else{
+            //提现过程中的金额【包括 `已提现`，`申请提现`】
+            $tx_money = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']])
+                ->whereBetweenTime('add_time',$startTime,$endTime)
+                ->sum('money');;
+
+            //总支出
+            $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2']])
+                ->whereBetweenTime('add_time',$startTime,$endTime)
+                ->sum('money');
+        }
+
+
 
         return sprintf("%.2f",$tx_money + $zc_money);
     }
@@ -57,11 +75,19 @@ class Withdraw extends Model
     /**
      * 获取收入
      */
-    public function getIncome($shop_id,$startTime)
+    public function getIncome($shop_id,$startTime,$endTime='')
     {
-        $shouru_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])
-            ->whereTime('add_time', '<',$startTime)
-            ->sum('money');
+        if(empty($endTime)) {
+            $shouru_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])
+                ->whereTime('add_time', '<',$startTime)
+                ->sum('money');
+        }else{
+            $shouru_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])
+                ->whereBetweenTime('add_time',$startTime,$endTime)
+                ->sum('money');
+        }
+
+
 
         return sprintf("%.2f",$shouru_money);
     }
