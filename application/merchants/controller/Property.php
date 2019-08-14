@@ -66,7 +66,7 @@ class Property extends MerchantsBase
      */
     public function receiptPay(Request $request)
     {
-        $shop_id = 28;
+        $shop_id = $this->shop_id;
         $time = $request->param('time',0);
 
         isset($shop_id) ? $shop_id : $request->param('shop_id');
@@ -83,12 +83,7 @@ class Property extends MerchantsBase
             ->where('shop_id','=',$shop_id)
             ->whereBetweenTime('add_time',$start_time,$end_time)
             ->order('add_time DESC')
-            ->fetchSql()
             ->select();
-
-            dump($res);exit;
-
-
 
 
         if(empty($res)) {
