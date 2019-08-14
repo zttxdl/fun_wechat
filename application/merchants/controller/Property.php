@@ -92,6 +92,9 @@ class Property extends MerchantsBase
 
         foreach ($res as $row)
         {
+            if($row['money'] == 0) {
+                continue;
+            }
             $szmx['info'][] = [
                 'title' => $row['title'],
                 'add_time' => date('Y-m-d H:i:s',$row['add_time']),
