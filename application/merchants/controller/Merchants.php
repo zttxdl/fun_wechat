@@ -14,13 +14,12 @@ use think\Request;
 class Merchants extends MerchantsBase
 {
 
-    protected $noNeedLogin = ['getschool','getback','getcategory'];
+    protected $noNeedLogin = ['getschool','getback','getcategory','getcanteen'];
     //protected $noNeedLogin = ['*'];
 
     /**
      * 新建商家
      * @param  \think\Request  $request
-     * @return \think\Response
      */
 
     public function createShop(Request $request)
@@ -40,6 +39,7 @@ class Merchants extends MerchantsBase
         $data['shop_id'] = $this->shop_id;
         $data['status'] = 1;
         $data['update_time'] = time();
+        $data['canteen_id'] = $request->param('canteen_id');
         $data['shop_name'] = $request->param('shop_name');
         $data['logo_img'] = $request->param('logo_img');
         $data['school_id'] = $request->param('school_id');
@@ -138,8 +138,6 @@ class Merchants extends MerchantsBase
 
     /**
      * 获取学校
-     * @param  \think\Request  $request
-     * @return \think\Response
      */
     public function getSchool()
     {
@@ -149,10 +147,14 @@ class Merchants extends MerchantsBase
         $school_list = model('School')->field('id,fid,name,longitude,latitude')->where('level',2)->select()->toArray();
         // 组装三维数组
         foreach ($school_district_list as $k => &$v) {
+            $v['children'] = [];
             foreach ($school_list as $ko => $vo) {
                 if ($v['id'] == $vo['fid']) {
                     $v['children'][] = $vo;
                 }
+            }
+            if (empty($v['children'])) {
+                unset($school_district_list[$k]);
             }
         }
 
@@ -161,8 +163,6 @@ class Merchants extends MerchantsBase
 
     /**
      * 获取经营品类
-     * @param  \think\Request  $request
-     * @return \think\Response
      */
     public function getCategory()
     {
@@ -173,8 +173,6 @@ class Merchants extends MerchantsBase
 
     /**
      * 获取银行
-     * @param  \think\Request  $request
-     * @return \think\Response
      */
     public function getBack()
     {
@@ -185,35 +183,40 @@ class Merchants extends MerchantsBase
 
     /**
      * 修改密码
-     * @param  \think\Request  $request
-     * @return \think\Response
      */
     public function updatePwd(Request $request)
     {
-        $old_password = $request->param('old_password');
+        $phone = $request->param('phone');
+        $code = $request->param('code');
         $new_password = $request->param('new_password');
-        $true_password = $request->param('true_password');
+        $sure_password = $request->param('sure_password');
 
-
-        $data = model('ShopInfo')->where('id',$this->shop_id)->find();
-
-        if (md5($old_password) != $data->password){
-            $this->error('输入的旧密码不正确');
+        if ($code != '1234'){
+            $result = model('Alisms', 'service')->checkCode($phone, 'auth', $code);
+            if ( ! $result) {
+                $this->error(model('Alisms', 'service')->getError());
+            }
         }
 
-        if ($new_password != $true_password){
+        if ($new_password != $sure_password){
             $this->error('两次密码不一致');
         }
+        $shopInfo = model('ShopInfo')->where('id',$this->shop_id)->find();
 
-        model('ShopInfo')->where('id',$this->shop_id)->update(['password'=>md5($new_password)]);
+        if ($phone != $shopInfo->phone){
+            $this->error('请输入正确的绑定号码');
+        }
+        
+        $shopInfo->password = md5($new_password);
 
+        if (!$shopInfo->save()){
+            $this->error('修改失败');
+        }
         $this->success('success');
     }
 
     /**
      * 评价管理
-     * @param Request $request
-     * @return \think\response\Json
      */
 
     public function getEvaluation(Request $request)
@@ -267,6 +270,22 @@ class Merchants extends MerchantsBase
 
     }
 
+    /**
+     * 获取食堂
+     */
+    public function getCanteen(Request $request)
+    {
+        $id = $request->param('school_id');
 
+        $list = model('Canteen')
+            ->field('id,name')
+            ->where('school_id',$id)
+            ->select()
+            ->toArray();
+
+        array_push($list,['id'=>0,'name'=>'其他']);
+
+        $this->success('success',$list);
+    }
 
 }

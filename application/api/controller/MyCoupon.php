@@ -58,8 +58,8 @@ class MyCoupon extends ApiBase
         // 需进一步思考。。。。。。。
         foreach ($list as &$row) {
             $row['is_use'] = 1;
-            $limit_use =  explode(',',$row['limit_use']);  // limit_use = 0 ，表示全部【不限品类】，当limit = 1,2,...n,表示限部分品类
-            $shop_ids = explode(',',$row['shop_ids']); // 
+            $limit_use = $row['limit_use'] != '0' ? explode(',',$row['limit_use']) : 0;  // limit_use = 0 ，表示全部【不限品类】，当limit = 1,2,...n,表示限部分品类
+            $shop_ids = $row['shop_ids'] != '0' ? explode(',',$row['shop_ids']) : 0; // 
             unset($row['limit_use']);
             unset($row['shop_ids']);
 
@@ -77,12 +77,12 @@ class MyCoupon extends ApiBase
                 $row['remark'][] = '仅限手机号'.$row['phone'].'使用';
             }
             // 店铺使用条件判断
-            if (!in_array($shop_id,$shop_ids) && $row['type'] != 4) {
+            if ($shop_ids != 0 && !in_array($shop_id,$shop_ids)) {
                 $row['is_use'] = 0;
                 $row['remark'][] = '仅限部分商家使用';
             }
             // 品类使用条件判断
-            if (($limit_use != 0) && !in_array($category_id,$limit_use)) {
+            if ($limit_use != 0 &&!in_array($category_id,$limit_use)) {
                 $row['is_use'] = 0;
                 // 通过 $limit_use 去获取品类名称，并展示
                 $category_names = model('ManageCategory')->getNames($limit_use);

@@ -22,14 +22,83 @@ class Test extends Controller
         $this->path = Env::get('ROOT_PATH')."AccInfo.ini";
     }
 
+
+    /**
+     * @param Request $request
+     * 批量添加用户
+     */
+    public function  addAll(Request $request)
+    {
+        $num = $request->param('num');
+
+        for($i = 1;$i <= $num; $i++){
+            $data['UserName'] = $request->param('UserName').$i;
+            $data['Password'] = $request->param('Password');
+            $res = $this->addData($data);
+            if(is_array($res)) {
+                return json($res);
+            }
+        }
+
+        return $res;
+
+    }
+
     /**
      * @param Request $request
      * 新增用户
      */
     public function add(Request $request)
     {
-        $userInfo = $request->post();
+        $data = $request->post();
+        $res = $this->addData($data);
+        if(is_array($res)) {
+            return json($res);
+        }
+        return $res;
+    }
 
+    /**
+     * @param Request $request
+     * 新增用户
+     */
+    public function addData($data)
+    {
+        $userInfo = [
+            'UserName' => isset($data['UserName']) ? trim($data['UserName']) : '',
+            'Password' => isset($data['Password']) ? trim($data['Password']) : '',
+            'MACAddress' => isset($data['MACAddress']) ? $data['MACAddress'] : '',
+            'IPAddressLow' => isset($data['IPAddressLow']) ? $data['IPAddressLow'] : '',
+            'IPAddressHigh' => isset($data['IPAddressHigh']) ? $data['IPAddressHigh'] : '',
+            'ServiceMask' => isset($data['ServiceMask']) ? $data['ServiceMask'] : '254',
+            'MaxConn' => isset($data['MaxConn']) ? $data['MaxConn'] : '',
+            'BandWidth' => isset($data['BandWidth']) ? $data['BandWidth'] : '',
+            'BandWidth2' => isset($data['BandWidth2']) ? $data['BandWidth2'] : '',
+            'WebFilter' => isset($data['WebFilter']) ? $data['WebFilter'] : '',
+            'TimeSchedule' => isset($data['TimeSchedule']) ? $data['TimeSchedule'] : '',
+            'EnableUserPassword' => isset($data['EnableUserPassword']) ? $data['EnableUserPassword'] : '1',
+            'EnableIPAddress' => isset($data['EnableIPAddress']) ? $data['EnableIPAddress'] : '',
+            'EnableMACAddress' => isset($data['EnableMACAddress']) ? $data['EnableMACAddress'] : '',
+            'Enable' => isset($data['Enable']) ? $data['Enable'] : '',
+            'BelongsGroup' => isset($data['BelongsGroup']) ? $data['BelongsGroup'] : '',
+            'BelongsGroupName' => isset($data['BelongsGroupName']) ? $data['BelongsGroupName'] : '',
+            'IsGroup' => isset($data['IsGroup']) ? $data['IsGroup'] : '',
+            'AutoDisable' => isset($data['AutoDisable']) ? $data['AutoDisable'] : '',
+            'DisableDateTime' => isset($data['DisableDateTime']) ? $data['DisableDateTime'] : '',
+            'EnableLeftTime' => isset($data['EnableLeftTime']) ? $data['EnableLeftTime'] : '',
+            'EnableBandwidthQuota' => isset($data['EnableBandwidthQuota']) ? $data['EnableBandwidthQuota'] : '',
+            'BandwidthQuota' => isset($data['BandwidthQuota']) ? $data['BandwidthQuota'] : '',
+            'BandwidthQuotaPeriod' => isset($data['BandwidthQuotaPeriod']) ? $data['BandwidthQuotaPeriod'] : '',
+        ];
+
+        $userInfo2 = explode("\r\n",file_get_contents($this->path));
+
+        //先获取健名
+        $keys = array_search('UserName='.$userInfo['UserName'],$userInfo2);
+
+        if($keys) {
+            return ['msg'=>'用户已经存在!','code'=>201,'data'=>[]];
+        }
 
         $check = $this->validate($userInfo,'Test');
 
@@ -106,27 +175,33 @@ class Test extends Controller
             $pageData[] = array_slice($userInfo,$start,$pageSize);
         }
 
-//        dump($data);
-
+//        return $pageData;
+        $userData = [];
         foreach ($pageData as $key => &$val){
             foreach ($val as $k => &$v){
-                $v = explode('=',$v);
+                $a = [];
+                $b = [];
+                $vv = explode('=',$v);
 
-                if(is_null($v[1])) {
-                    $v[1] = 'User'.sprintf('%03d',$key + 1);
-                    list($a[],$b[]) = $v;
-                    $v = array_combine($a,$b);
+                if(!isset($vv[1]) && empty($vv[1])) {
+                    $vv[0] = 'UserCode';
+                    $vv[1] = 'User'.sprintf('%03d',$key + 1);
                 }
 //                dump($v) ;
-                
+                if(isset($v) && !empty($v)){
+                    list($a[],$b[]) = $vv;
+                    $new_data = array_combine($a,$b);
+                    foreach ($new_data as $k2 => $v2){
+                        $k2 = ltrim($k2,'["');
+                        $k2 = rtrim($k2,']"');
+                        $userData[$key][$k2] = $v2;
+                    }
+                }
 
-                //销毁变量
-                unset($a);
-                unset($b);
             }
         }
 
-        return json(['msg'=>'获取成功','code'=>200,'data'=>$pageData]);
+        return json(['msg'=>'获取成功','code'=>200,'data'=>$userData]);
 
     }
 
@@ -254,7 +329,7 @@ class Test extends Controller
             "EnableLeftTime=".$data['EnableLeftTime']. "\r\n" .
             "EnableBandwidthQuota=".$data['EnableBandwidthQuota']. "\r\n" .
             "BandwidthQuota=".$data['BandwidthQuota']. "\r\n" .
-            "BandwidthQuotaPeriod=".$data['BandwidthQuotaPeriod'];
+            "BandwidthQuotaPeriod=".$data['BandwidthQuotaPeriod']."\r\n";
         return $temp;
     }
 
