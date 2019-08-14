@@ -6,6 +6,7 @@ use app\common\controller\MerchantsBase;
 use EasyWeChat\Factory;
 use think\Request;
 use think\facade\Env;
+use think\Db;
 
 class Refund extends MerchantsBase
 {
@@ -77,7 +78,7 @@ class Refund extends MerchantsBase
         $orders_sn = $request->param('orders_sn');
 
         //error_log(print_r($orders_sn,1),3,Env::get('root_path')."./logs/refund.log");
-
+        Db::startTrans();
         try{
             if(empty($orders_sn) && !isset($orders_sn)) {
                 throw new \Exception('订单号不能为空!');
@@ -99,7 +100,11 @@ class Refund extends MerchantsBase
                 model('Refund')->where('out_refund_no',$orders_sn)->setField('status',2);
                 //回写订单主表订单状态
                 model('Orders')->where('orders_sn',$data['out_trade_no'])->setField('status',11);
+                //退款收支明细 add by ztt 20190814
+                model('Withdraw')->refund($orders_sn);
 
+                // 提交事务
+                Db::commit();
                 return json_success('退款成功');
             }else{
                 throw new \Exception($res['err_code_des']);
@@ -109,6 +114,8 @@ class Refund extends MerchantsBase
 
 
         }catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
             $this->error($e->getMessage());
         }
     }

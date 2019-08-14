@@ -186,23 +186,32 @@ class Merchants extends MerchantsBase
      */
     public function updatePwd(Request $request)
     {
-        $old_password = $request->param('old_password');
+        $phone = $request->param('phone');
+        $code = $request->param('code');
         $new_password = $request->param('new_password');
-        $true_password = $request->param('true_password');
+        $sure_password = $request->param('sure_password');
 
-
-        $data = model('ShopInfo')->where('id',$this->shop_id)->find();
-
-        if (md5($old_password) != $data->password){
-            $this->error('输入的旧密码不正确');
+        if ($code != '1234'){
+            $result = model('Alisms', 'service')->checkCode($phone, 'auth', $code);
+            if ( ! $result) {
+                $this->error(model('Alisms', 'service')->getError());
+            }
         }
 
-        if ($new_password != $true_password){
+        if ($new_password != $sure_password){
             $this->error('两次密码不一致');
         }
+        $shopInfo = model('ShopInfo')->where('id',$this->shop_id)->find();
 
-        model('ShopInfo')->where('id',$this->shop_id)->update(['password'=>md5($new_password)]);
+        if ($phone != $shopInfo->account){
+            $this->error('请输入正确的绑定号码');
+        }
 
+        $shopInfo->password = md5($new_password);
+
+        if (!$shopInfo->save()){
+            $this->error('修改失败');
+        }
         $this->success('success');
     }
 
