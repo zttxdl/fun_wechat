@@ -93,11 +93,17 @@ class Shop extends Base
         $status = $request->param('status');//3 启用 4 禁用
 
         if ($status == 4) { // 当禁用店铺时，需判断该店铺是否存在未完结的订单往来
-            // 获取未完结的订单
+            // 判断该商家是否还有未完结的订单
             $count = model('Orders')->where([['shop_id','=',$shop_id],['status','in',[2,3,5,6,10,12]]])->count();
             if ($count) {
                 $this->error('该商家还存在未处理的订单，暂时不可禁用此商家',202);
             }
+            // 如果该商家存在正在投放中广告，则将该广告暂停投放
+            $advert_ids = model('Advert')->where([['type','=',1],['status','=',1]])->column('id');
+            if ($advert_ids) {
+                model('Advert')->where('id','in',$advert_ids)->setField('status',2);
+            }
+
         }
         $res = Model('ShopInfo')->where('id',$shop_id)->setField('status',$status);
         if($res) {

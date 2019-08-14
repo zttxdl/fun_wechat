@@ -41,6 +41,15 @@ class AutoShell extends Controller
             }
         }
 
+        /***************** 更新广告的过期状态 ******************************************************************/
+        $advert_list = Db::name('advert')->where('status','in','1,2,0')->field('id,end_time,status')->select();
+        // 判断广告是否过期，并更新状态
+        foreach ($advert_list as $k => $v) {
+            if ($v['end_time'] < (time() - 10)) {  // 为防止网络延时，将时间延后10秒
+                Db::name('advert')->where('id',$v['id'])->setField('status',3);
+            }
+        }
+                
         /***************** 清除骑手提现申请的缓存记录  ******************************************************************/
         Cache::store('redis')->del('rider_tx_num');
 

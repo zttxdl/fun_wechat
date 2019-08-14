@@ -6,6 +6,8 @@ use think\Db;
 use think\Request;
 use app\common\model\RiderInfo;
 use app\common\controller\RiderBase;
+use app\common\Auth\JwtAuth;
+
 
 /**
  * 骑手个人中心控制器
@@ -129,7 +131,12 @@ class Member extends RiderBase
         if (!$result) {
             $this->error('加入失败',201);
         }
-        $this->success('加入成功');
+        $rider_info = RiderInfo::where('id','=',$this->auth->id)->field('id,school_id,status,open_status,name')->find();
+
+        $jwtAuth = new JwtAuth();
+        $token = $jwtAuth->createToken($rider_info,2592000);
+
+        $this->success('加入成功',['token'=>$token]);
     }
      
 
