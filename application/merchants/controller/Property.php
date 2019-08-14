@@ -75,9 +75,9 @@ class Property extends MerchantsBase
         $end_time = date('Y-m-30',strtotime($time)).' 23:59:59';
 
 
-        $szmx['income'] = model('withdraw')->getIncome($shop_id,$this->startTime);//收入
+        $szmx['income'] = model('withdraw')->getIncome($shop_id,$start_time,$end_time);//收入
 
-        $szmx['expenditure'] = model('withdraw')->getExpenditure($shop_id,$this->startTime);//支出
+        $szmx['expenditure'] = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);//支出
 
         $res = Db::name('withdraw')
             ->where('shop_id','=',$shop_id)
