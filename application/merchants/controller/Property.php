@@ -28,7 +28,8 @@ class Property extends MerchantsBase
         parent::__construct();
 
         $this->startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
-        $this->key = 'shop_tx';
+        $this->shop_tx_key = 'shop_tx_key';//店铺提现key
+        $this->shop_balance_key = 'shop_balance_key';//店铺余额key
     }
 
 
@@ -43,19 +44,41 @@ class Property extends MerchantsBase
             $this->error('shop_id 不能为空!');
         }
 
+        $data = Cache::store('redis')->hGet($this->shop_balance_key,$shop_id);
 
-        $acount_money = model('Withdraw')->getAcountMoney($shop_id,$this->startTime);
+        if($data) {
+            $data = json_decode($data,true);
+            $acount_money = $data['acount_money'];
+            $totalMoney = $data['totalMoney'];
+            $monthMoney = $data['monthMoney'];
+            $card = $data['card'];
 
-        $totalMoney = model('Shop')->getCountSales($shop_id);
-        $monthMoney = model("Shop")->getMonthSales($shop_id);
-        $card = model('Shop')->getAccount($shop_id);
+        }else{
+            $acount_money = model('Withdraw')->getAcountMoney($shop_id,$this->startTime);
+            $totalMoney = model('Shop')->getCountSales($shop_id);
+            $monthMoney = model("Shop")->getMonthSales($shop_id);
+            $card = model('Shop')->where('shop_id',$shop_id)->value('back_card_num');
+
+            $cache_data = [
+                'acount_money' => $acount_money,
+                'totalMoney' => $totalMoney,
+                'monthMoney' => $monthMoney,
+                'card' => $card,
+            ];
+
+            Cache::store('redis')->hSet($this->shop_balance_key,$shop_id,json_encode($cache_data,JSON_UNESCAPED_UNICODE));
+        }
+
+
 
         $data = [
             'balanceMoney' => !empty($acount_money) ? $acount_money : 0,//可提现余额
             'totalMoney' => !empty($totalMoney) ? $totalMoney: 0,//总收入
             'monthMoney' => !empty($monthMoney) ? $totalMoney: 0,//本月收入
-            'card' => $card['back_card_num']
+            'card' => !empty($card) ? $card: '',//银行卡号
         ];
+
+
 
         $this->success('获取成功',$data);
 
@@ -126,7 +149,7 @@ class Property extends MerchantsBase
         }
 
         //提现次数
-        $check = Cache::store('redis')->hSet($this->key,$shop_id);
+        $check = Cache::store('redis')->hGet($this->shop_tx_key,$shop_id);
 
         if($check){
             $this->error('一天只能提现一次哦!');
@@ -155,7 +178,7 @@ class Property extends MerchantsBase
         $res = DB::name('withdraw')->insert($txsq);
 
         if($res) {
-            Cache::store('redis')->hSet($this->key,$shop_id,1);
+            Cache::store('redis')->hSet($this->shop_tx_key,$shop_id,1);
             $this->success('申请成功');
         }
         $this->error('申请失败');

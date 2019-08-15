@@ -39,17 +39,14 @@ class Withdraw extends Model
      */
     public function getExpenditure($shop_id,$startTime,$endTime = '')
     {
-        //提现过程中的金额【包括 `已提现`，`申请提现`】
-        $db = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']]);
-
         if(empty($endTime)) {
             //提现过程中的金额【包括 `已提现`，`申请提现`】
             $tx_money = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']])
                 ->whereTime('add_time', '<',$startTime)
                 ->sum('money');;
 
-            //总支出
-            $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2']])
+            //总支出 过滤提现 和活动支出
+            $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2,3']])
                 ->whereTime('add_time', '<',$startTime)
                 ->sum('money');
 
@@ -59,8 +56,8 @@ class Withdraw extends Model
                 ->whereBetweenTime('add_time',$startTime,$endTime)
                 ->sum('money');;
 
-            //总支出
-            $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2']])
+            //总支出 过滤提现 和活动支出
+            $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2,3']])
                 ->whereBetweenTime('add_time',$startTime,$endTime)
                 ->sum('money');
         }
@@ -140,15 +137,30 @@ class Withdraw extends Model
         $stExpenditure = ($Order->total_money - $Order->ping_fee - $Order->box_money) * ($cut_proportion / 100);
         $hbExpenditure = $Order->platform_coupon_money * ($assume_ratio / 100);
 
-        $data = [
-            'withdraw_sn' => $Order->orders_sn,
-            'shop_id' => $Order->shop_id,
-            'money' => round($ptExpenditure + $stExpenditure + $hbExpenditure,2),
-            'type' => 4,
-            'title' => '抽成支出',
-            'add_time' => time()
+        $total_expenditure = $ptExpenditure + $stExpenditure + $hbExpenditure;
+
+        //抽成支出不为0的时候记录
+        if($total_expenditure != 0) {
+            $data = [
+                'withdraw_sn' => $Order->orders_sn,
+                'shop_id' => $Order->shop_id,
+                'money' => round($ptExpenditure + $stExpenditure + $hbExpenditure,2),
+                'type' => 4,
+                'title' => '抽成支出',
+                'add_time' => time()
+            ];
+            Db::name('withdraw')->insert($data);
+        }
+
+        //抽成明细回写订单主表
+        $update_data = [
+            'platform_choucheng' => isset($ptExpenditure) ? $ptExpenditure : 0.00,
+            'shitang_choucheng' => isset($stExpenditure) ? $stExpenditure : 0.00,
+            'hongbao_choucheng' => isset($hbExpenditure) ? $hbExpenditure : 0.00
         ];
-        Db::name('withdraw')->insert($data);
+        Db::name('Orders')->where('id',$order_id)->update($update_data);
+
+
 
         return true;
     }
