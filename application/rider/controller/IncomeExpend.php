@@ -18,21 +18,23 @@ class IncomeExpend extends RiderBase
      */
     public function myWallet()
     {
+        $rider_id = $this->auth->id;
         // 已结算收入
-        $already_money = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($this->auth->id);
+        $already_money = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($rider_id);
 
         // 提现金额【包括 已提现、申请提现】
-        $tx_money = (string)model('RiderIncomeExpend')->getTxMoney($this->auth->id);
+        $tx_money = (string)model('RiderIncomeExpend')->getTxMoney($rider_id);
         
         // 可提现金额
         $can_tx_money = $already_money - $tx_money;
 
         // 将可提现金额写入缓存， 方便在提现过程中的判断可提现金额
-        $key = 'rider_can_tx_money'.$this->auth->id;
-        Cache::store('redis')->set($key,$can_tx_money,600);  
+        $key = "rider_can_tx_money"; 
+        $redis = Cache::store('redis');
+        $redis->hSet($key,$rider_id,$can_tx_money);
 
         // 未结算收入
-        $not_tx_money = model('RiderIncomeExpend')->getNotJsMoney($this->auth->id);
+        $not_tx_money = model('RiderIncomeExpend')->getNotJsMoney($rider_id);
 
         $this->success('获取我的钱包成功',['info'=>['already_tx_money'=>$already_money,'can_tx_money'=>$can_tx_money,'not_tx_money'=>$not_tx_money]]);
 
@@ -86,12 +88,13 @@ class IncomeExpend extends RiderBase
         $rider_id = $this->auth->id;
         $redis = Cache::store('redis');
         $key = "rider_tx_num";
+        $can_key = "rider_can_tx_money";
         if ($redis->hExists($key,$rider_id)) {
             $this->error('每天只能提现 1 次！',202); 
         }
 
         // 优先读取缓存，当缓存过期时， 从数据库进行读取
-        $can_money = Cache::store('redis')->get('rider_can_tx_money'.$rider_id);  
+        $can_money = $redis->hGet($can_key,$rider_id);  
         if (!$can_money) {
             // 已结算收入
             $already_money = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($rider_id);

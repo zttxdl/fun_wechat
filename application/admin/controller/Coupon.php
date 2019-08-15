@@ -272,7 +272,11 @@ class Coupon extends Base
         $coupon_info['type'] = config('coupon_type')[$coupon_info['type']];
         
         // 参与优惠券的店铺信息
-        $shop_info = Db::name('shop_info')->where('id','in',$coupon_info['shop_ids'])->field('id,logo_img,shop_name,link_tel')->select();
+        if ($coupon_info['shop_ids']) {
+            $shop_info = Db::name('shop_info')->where('id','in',$coupon_info['shop_ids'])->field('id,logo_img,shop_name,link_tel')->select();
+        } else {
+            $shop_info = Db::name('shop_info')->where('school_id','=',$coupon_info['school_id'])->field('id,logo_img,shop_name,link_tel')->select();
+        }
 
         // 当前优惠券使用列表
         $coupon_used_list = model('my_coupon')->alias('mc')
