@@ -46,6 +46,7 @@ class PrintReceipt extends MerchantsBase
 
         $result['ping_fee'] = $orderInfo['ping_fee'];
         $result['box_money'] = $orderInfo['box_money'];
+        $result['dis_money'] = $orderInfo['platform_coupon_money'] + $orderInfo['shop_discounts_money'];
 
         $orderDetail = Model('Orders')->getOrderDetail($orderInfo['id']);
 
@@ -57,7 +58,6 @@ class PrintReceipt extends MerchantsBase
             $data['num'] = $row['num'];
             $data['old_price'] = Model('Product')->getGoodsOldPrice('product_id');
             $data['price'] = $row['price'];
-            $data['dis_money'] = (int)$row['platform_coupon_money'] + (int)$row['shop_discounts_money'];
             $result['goods_detail'][] = $data;
         }
 
@@ -96,6 +96,7 @@ class PrintReceipt extends MerchantsBase
 
         $result['ping_fee'] = $orderInfo['ping_fee'];
         $result['box_money'] = $orderInfo['box_money'];
+        $result['dis_money'] = $orderInfo['platform_coupon_money'] + $orderInfo['shop_discounts_money'];
 
         $orderDetail = Model('Orders')->getOrderDetail($orderInfo['id']);
 
@@ -107,7 +108,6 @@ class PrintReceipt extends MerchantsBase
             $data['num'] = $row['num'];
             $data['old_price'] = Model('Product')->getGoodsOldPrice('product_id');
             $data['price'] = $row['price'];
-            $data['dis_money'] = (int)$row['platform_coupon_money'] + (int)$row['shop_discounts_money'];
 
             $result['goods_detail'][] = $data;
         }
