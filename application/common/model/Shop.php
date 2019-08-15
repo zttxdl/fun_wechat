@@ -94,12 +94,18 @@ class Shop extends Model
      */
     public function getDaySales($shop_id)
     {
-        $data = Db::name('orders')
+        $total_moeny = Db::name('orders')
             ->where('status','notin',[1,4,9,10,11])
             ->where('shop_id',$shop_id)
             ->whereTime('add_time', 'today')
             ->sum('money');
 
+        $total_ping = Db::name('orders')
+            ->where('status','notin',[1,4,9,10,11])
+            ->where('shop_id',$shop_id)
+            ->whereTime('add_time', 'today')
+            ->sum('ping_fee');
+        $data = $total_moeny - $total_ping;
         return sprintf("%.2f",$data);
 
     }

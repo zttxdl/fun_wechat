@@ -40,34 +40,24 @@ class Property extends MerchantsBase
     {
         $shop_id = $this->shop_id;//从Token中获取
 
+//        echo $shop_id;
+
         if(!isset($shop_id)) {
             $this->error('shop_id 不能为空!');
         }
 
-        $data = Cache::store('redis')->hGet($this->shop_balance_key,$shop_id);
+        $acount_money = Cache::store('redis')->hGet($this->shop_balance_key,$shop_id);
 
-        if($data) {
-            $data = json_decode($data,true);
-            $acount_money = $data['acount_money'];
-            $totalMoney = $data['totalMoney'];
-            $monthMoney = $data['monthMoney'];
-            $card = $data['card'];
-
+        if($acount_money) {
+            $acount_money = $acount_money;
         }else{
             $acount_money = model('Withdraw')->getAcountMoney($shop_id,$this->startTime);
-            $totalMoney = model('Shop')->getCountSales($shop_id);
-            $monthMoney = model("Shop")->getMonthSales($shop_id);
-            $card = model('shop_more_info')->where('shop_id',$shop_id)->value('back_card_num');
-
-            $cache_data = [
-                'acount_money' => $acount_money,
-                'totalMoney' => $totalMoney,
-                'monthMoney' => $monthMoney,
-                'card' => $card,
-            ];
-
-            Cache::store('redis')->hSet($this->shop_balance_key,$shop_id,json_encode($cache_data,JSON_UNESCAPED_UNICODE));
+            Cache::store('redis')->hSet($this->shop_balance_key,$shop_id,$acount_money);
         }
+
+        $totalMoney = model('Shop')->getCountSales($shop_id);
+        $monthMoney = model("Shop")->getMonthSales($shop_id);
+        $card = model('shop_more_info')->where('shop_id',$shop_id)->value('back_card_num');
 
 
 
