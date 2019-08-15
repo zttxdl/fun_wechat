@@ -57,7 +57,7 @@ class Property extends MerchantsBase
             $acount_money = model('Withdraw')->getAcountMoney($shop_id,$this->startTime);
             $totalMoney = model('Shop')->getCountSales($shop_id);
             $monthMoney = model("Shop")->getMonthSales($shop_id);
-            $card = model('Shop')->where('shop_id',$shop_id)->value('back_card_num');
+            $card = model('shop_more_info')->where('shop_id',$shop_id)->value('back_card_num');
 
             $cache_data = [
                 'acount_money' => $acount_money,
