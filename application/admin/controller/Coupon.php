@@ -263,14 +263,18 @@ class Coupon extends Base
         // 优惠券状态
         $coupon_info['mb_status'] = config('coupon_status')[$coupon_info['status']];
         // 用户类型
-        $coupon_info['user_type'] = config('coupon_status')[$coupon_info['user_type']];
+        $coupon_info['user_type'] = config('user_type')[$coupon_info['user_type']];
         // 限品类
-        $coupon_info['limit_use'] = Db::name('manage_category')->where('id','in',$coupon_info['limit_use'])->value('name');
+        if ($coupon_info['limit_use']) {
+            $coupon_info['limit_use'] = implode(',',Db::name('manage_category')->where('id','in',$coupon_info['limit_use'])->column('name'));
+        } else {
+            $coupon_info['limit_use'] = '全部';
+        }
         // 有效期
         $coupon_info['type'] == 2 ? $coupon_info['indate'] = date('Y-m-d',$coupon_info['start_time']).'-'.date('Y-m-d',$coupon_info['end_time']) : $coupon_info['indate'] = '领取日起'.$coupon_info['other_time'].'天';
         // 发放方式
         $coupon_info['type'] = config('coupon_type')[$coupon_info['type']];
-        
+
         // 参与优惠券的店铺信息
         if ($coupon_info['shop_ids']) {
             $shop_info = Db::name('shop_info')->where('id','in',$coupon_info['shop_ids'])->field('id,logo_img,shop_name,link_tel')->select();

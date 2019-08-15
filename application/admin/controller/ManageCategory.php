@@ -14,9 +14,11 @@ class ManageCategory extends Base
      * 获取经营品类列表 
      * 
      */
-    public function index()
+    public function index(Request $request)
     {
-        $list = model('ManageCategory')->field('id,name,img,sort')->order('sort','asc')->select();
+        !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
+
+        $list = model('ManageCategory')->where($where)->field('id,name,img,sort')->order('sort','asc')->select();
         $this->success('获取成功',['list'=>$list]);
 
     }
