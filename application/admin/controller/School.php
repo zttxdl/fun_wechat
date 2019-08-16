@@ -56,6 +56,11 @@ class School extends Base
         $data['name'] = $request->param('name');
         $canteen = $request->param('canteen');
 
+        $canteen_list = json_decode($canteen,true);
+
+        var_dump($canteen);
+        var_dump($canteen_list);die;
+
         // 验证表单数据
         $check = $this->validate($data, 'School');
         if ($check !== true) {
