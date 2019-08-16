@@ -181,9 +181,9 @@ class Withdraw extends Model
      */
     public function refund($order_sn)
     {
-        $refundData = model('Refund')->where('out_trade_no',$order_sn)->find();
+        $refundData = model('Refund')->where('out_refund_no',$order_sn)->find();
         $data = [
-            'withdraw_sn' => $order_sn,
+            'withdraw_sn' => $refundData->out_trade_no,
             'shop_id' => $refundData->shop_id,
             'money' => $refundData->refund_fee,
             'type' => 6,
@@ -191,8 +191,9 @@ class Withdraw extends Model
             'add_time' => time()
         ];
 
-        Db::name('withdraw')->insert($data);
-        return true;
+        $res = Db::name('withdraw')->insert($data);
+
+        return $res;
     }
 
 }
