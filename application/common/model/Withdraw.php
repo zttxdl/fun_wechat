@@ -181,7 +181,7 @@ class Withdraw extends Model
      */
     public function refund($order_sn)
     {
-        $refundData = model('Refund')->where('orders_sn',$order_sn)->find();
+        $refundData = model('Refund')->where('out_trade_no',$order_sn)->find();
         $data = [
             'withdraw_sn' => $order_sn,
             'shop_id' => $refundData->shop_id,
