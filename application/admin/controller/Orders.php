@@ -29,7 +29,7 @@ class Orders extends Base
             ->leftJoin('user b','a.user_id = b.id')
             ->leftJoin('shop_info c','a.shop_id = c.id')
             ->where($map)
-            ->field('a.id as id,a.orders_sn,b.nickname,b.phone,c.shop_name,a.money,a.add_time,a.status,a.pay_mode,a.source')
+            ->field('a.id as id,a.orders_sn,b.nickname,b.phone,c.shop_name,a.money,a.add_time,a.status,a.pay_mode,a.source,a.platform_choucheng')
             ->order('id','DESC')
             ->paginate($page_size)->toArray();
 
@@ -56,6 +56,7 @@ class Orders extends Base
                     'status' => $this->getOrdertStatus($row['status']),
                     'pay_mode' => $row['pay_mode']==1 ? '微信支付' : '支付宝支付',
                     'source' => $row['source']==1 ? '小程序' : 'H5',
+                    'platform_choucheng' => $row['platform_choucheng']
                 ];
             }
         }

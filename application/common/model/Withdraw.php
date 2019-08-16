@@ -137,14 +137,14 @@ class Withdraw extends Model
         $stExpenditure = ($Order->total_money - $Order->ping_fee - $Order->box_money) * ($cut_proportion / 100);
         $hbExpenditure = $Order->platform_coupon_money * ($assume_ratio / 100);
 
-        $total_expenditure = $ptExpenditure + $stExpenditure + $hbExpenditure;
+        $total_expenditure = round($ptExpenditure + $stExpenditure + $hbExpenditure,2);
 
         //抽成支出不为0的时候记录
         if($total_expenditure != 0) {
             $data = [
                 'withdraw_sn' => $Order->orders_sn,
                 'shop_id' => $Order->shop_id,
-                'money' => round($ptExpenditure + $stExpenditure + $hbExpenditure,2),
+                'money' => $total_expenditure,
                 'type' => 4,
                 'title' => '抽成支出',
                 'add_time' => time()
