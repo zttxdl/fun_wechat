@@ -127,6 +127,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
         }
 
         $list = Db::table('fun_shop_comments a ')
+            ->distinct(true)
             ->join('fun_user b','a.user_id = b.id ')
             ->join('fun_shop_comments_tips c','a.id = c.comments_id')
             ->field('a.id,a.star,a.add_time,a.content,b.headimgurl,b.nickname')
@@ -134,7 +135,6 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             ->order('add_time desc')
             ->page($page,$pagesize)
             ->select();
-
         foreach ($list as &$value){
             $value['add_time'] = date('Y-m-d',$value['add_time']);
             $value['topis'] = Db::table('fun_shop_comments_tips a')
