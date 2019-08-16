@@ -79,6 +79,7 @@ class Index extends Controller
 	public function push(PushEvent $push)
 	{
 	    $push->setUser(1)->setContent('你好啊1')->push();
+
 	}
 
 

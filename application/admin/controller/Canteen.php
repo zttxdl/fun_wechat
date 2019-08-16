@@ -23,12 +23,13 @@ class Canteen extends Base
             $this->error($check,201);
         }
         // 添加数据库
-        $res = Db::name('canteen')->insert($data);
-        if (!$res) {
+        $red_id = Db::name('canteen')->insertGetId($data);
+        if (!$red_id) {
             $this->error('添加失败');
         }
+        $data['id'] = $red_id;
 
-        $this->success('添加成功');
+        $this->success('添加成功',['canteen_info'=>$data]);
 
     }
 

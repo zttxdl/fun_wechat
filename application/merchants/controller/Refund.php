@@ -97,11 +97,21 @@ class Refund extends MerchantsBase
 
             if('SUCCESS' == $res['return_code'] && 'SUCCESS' == $res['result_code']) {
                 //更新退单状态 add by ztt 20190722
-                model('Refund')->where('out_refund_no',$orders_sn)->setField('status',2);
+                $res = model('Refund')->where('out_refund_no',$orders_sn)->setField('status',2);
+                if(!$res) {
+                    throw new \Exception('refundStatus update fail');
+                }
                 //回写订单主表订单状态
-                model('Orders')->where('orders_sn',$data['out_trade_no'])->setField('status',11);
+                $res = model('Orders')->where('orders_sn',$data['out_trade_no'])->setField('status',11);
+                if(!$res) {
+                    throw new \Exception('orderStatus update fail');
+                }
                 //退款收支明细 add by ztt 20190814
-                model('Withdraw')->refund($orders_sn);
+                $res = model('Withdraw')->refund($orders_sn);
+
+                if(!$res) {
+                    throw new \Exception('refund insert fail');
+                }
 
                 // 提交事务
                 Db::commit();
