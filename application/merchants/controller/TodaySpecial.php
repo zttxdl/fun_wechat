@@ -63,7 +63,7 @@ class TodaySpecial extends MerchantsBase
             ->find();
         $data['thumb'] = $product->thumb;
         $data['name'] = $product->name;
-        $count = model('TodayDeals')->where('today',$data['today'])->count();
+        $count = model('TodayDeals')->where('today',$data['today'])->where('shop_id',$this->shop_id)->count();
         if ($count >= 3){
             $this->error('一天最多设置3次');
         }
