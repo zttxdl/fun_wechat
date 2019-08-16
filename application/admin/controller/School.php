@@ -55,11 +55,11 @@ class School extends Base
         $data['fid'] = $request->param('fid');
         $data['name'] = $request->param('name');
         $canteen = $request->param('canteen');
-
+        var_dump($canteen);
+        die;
+        var_dump($canteen_list);
         $canteen_list = json_decode($canteen,true);
 
-        var_dump($canteen);
-        var_dump($canteen_list);die;
 
         // 验证表单数据
         $check = $this->validate($data, 'School');
