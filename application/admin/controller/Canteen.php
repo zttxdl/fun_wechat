@@ -48,4 +48,5 @@ class Canteen extends Base
 
         $this->success('删除成功');
     }
+
 }

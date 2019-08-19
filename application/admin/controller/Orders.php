@@ -126,6 +126,7 @@ class Orders extends Base
                             a.status,
                             a.num,
                             a.message,
+                            a.platform_choucheng,
                             b.headimgurl,
                             b.nickname,
                             b.type,
@@ -156,6 +157,7 @@ class Orders extends Base
             'status' => $this->getOrdertStatus($list['status']),
             'num' => $list['num'],
             'remark' => $list['message'],
+            'platform_choucheng' => $list['platform_choucheng']
         ];
 
         //会员信息

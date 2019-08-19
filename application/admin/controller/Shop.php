@@ -142,6 +142,7 @@ class Shop extends Base
             $result['shop_info']['manage_category_name'] = Model('ManageCategory')->getNameById($row['manage_category_id']);
             $result['shop_info']['address'] = $row['address'];
             $result['shop_info']['school'] = Model('School')->getNameById($row['school_id']);
+            $result['shop_info']['canteen_name'] = Model('Canteen')->getCanteenName($row['canteen_id']);
         }
 
         $shop_more_info = $this->shopModel->getShopMoreInfo($shop_id);
