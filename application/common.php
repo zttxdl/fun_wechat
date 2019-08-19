@@ -179,6 +179,28 @@ if (!function_exists('get_location')) {
     }
 }
 
+/**
+ * BD09 坐标转换GCJ02
+ * 百度地图BD09坐标---->中国正常GCJ02坐标
+ * 腾讯地图用的也是GCJ02坐标
+ * @param double $lat 纬度
+ * @param double $lng 经度
+ * @return array();
+ */
+if (!function_exists('Convert_BD09_To_GCJ02')) {
+    function Convert_BD09_To_GCJ02($lat,$lng){
+        $make_key = '5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T';
+        $url = "https://apis.map.qq.com/ws/coord/v1/translate?locations={$lat},{$lng}&type=3&key=".$make_key;
+        $jsondata=json_decode(file_get_contents($url),true);
+        if ($jsondata['status'] != 0) {
+            return false;
+        }
+        $data['lat'] = $jsondata['locations'][0]['lat'];
+        $data['lng'] = $jsondata['locations'][0]['lng'];
+        
+        return $data;
+    }
+}
 
 /**
  *  写日志
@@ -313,50 +335,6 @@ if (!function_exists('getMealSn')) {
 
     }
 }
-
-
-/**
- * GCJ02坐标转换BD09
- * 中国正常GCJ02坐标---->百度地图BD09坐标
- * 腾讯地图用的也是GCJ02坐标
- * @param double $lat 纬度
- * @param double $lng 经度
- */
-if (!function_exists('Convert_GCJ02_To_BD09')) {
-     function Convert_GCJ02_To_BD09($lat,$lng){
-         $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
-         $x = $lng;
-         $y = $lat;
-         $z =sqrt($x * $x + $y * $y) + 0.00002 * sin($y * $x_pi);
-         $theta = atan2($y, $x) + 0.000003 * cos($x * $x_pi);
-         $lng = $z * cos($theta) + 0.0065;
-         $lat = $z * sin($theta) + 0.006;
-         return array('lng'=>$lng,'lat'=>$lat);
-    }
-
-}
-
-/**
- * BD09 坐标转换GCJ02
- * 百度地图BD09坐标---->中国正常GCJ02坐标
- * 腾讯地图用的也是GCJ02坐标
- * @param double $lat 纬度
- * @param double $lng 经度
- * @return array();
- */
-if (!function_exists('Convert_BD09_To_GCJ02')) {
-    function Convert_BD09_To_GCJ02($lat,$lng){
-        $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
-        $x = $lng - 0.0065;
-        $y = $lat - 0.006;
-        $z = sqrt($x * $x + $y * $y) - 0.00002 * sin($y * $x_pi);
-        $theta = atan2($y, $x) - 0.000003 * cos($x * $x_pi);
-        $lng = $z * cos($theta);
-        $lat = $z * sin($theta);
-        return array('lng'=>$lng,'lat'=>$lat);
-    }
-}
-
 
 /**
  * 获取Redis的静态实例
