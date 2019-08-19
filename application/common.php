@@ -166,7 +166,7 @@ if (!function_exists('get_location')) {
     function get_location($address){
         $make_key = '5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T';
         // 仅学校地址信息，无法解析经纬度，目前需加上当前城市
-        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$make_key;
+        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$make_key."&region=南京";
         $jsondata=json_decode(file_get_contents($url),true);
         $data = [];
         if ($jsondata['message'] == '查询无结果') {
