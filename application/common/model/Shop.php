@@ -236,7 +236,7 @@ class Shop extends Model
      */
     public function getShopDetail($shop_id)
     {
-        $data = $this->field('shop_name,logo_img,link_name,link_tel,manage_category_id,school_id,address')
+        $data = $this->field('shop_name,logo_img,link_name,link_tel,manage_category_id,school_id,address,latitude,longitude')
             ->where('id',$shop_id)->find();
         return $data;
     }
