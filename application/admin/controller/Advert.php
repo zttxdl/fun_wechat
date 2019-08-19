@@ -129,7 +129,7 @@ class Advert extends Base
         if ($data){
             $data->start_time = date('Y-m-d',$data->start_time);
             $data->end_time = date('Y-m-d',$data->end_time);
-            $data->coverage = $data->coverage == 0 ? '全部' : $schoolName[$data->coverage];
+            $data->school_mame = $data->coverage == 0 ? '全部' : $schoolName[$data->coverage];
             $data->type_name = $typeName[$data->type];
         }
 
