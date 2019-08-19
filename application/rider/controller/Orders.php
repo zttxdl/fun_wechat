@@ -20,12 +20,15 @@ class Orders extends RiderBase
 	 */
 	public function index(Request $request)
 	{
+        $data = [];
 		$type = $request->param('type',0);
 
         $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
         if ($status_arr['status'] == 4) {
             $this->error('你账号已被禁用，无法接单',202);
         }
+        
+        $data['type'] = $status_arr['status'] == 0 ? 0 : 1;
 
 		if ($status_arr['open_status'] == 2) {
 			$this->error('你还没开工，无法接单',204);
