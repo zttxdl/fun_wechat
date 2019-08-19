@@ -108,7 +108,7 @@ class Login extends RiderBase
         }
         // 防止同一手机号，不同的微信openid 登录，必须唯一关系
         $result_openid = RiderInfo::where('link_tel',$phone)->value('openid');
-        if ($result_openid != $openid) {
+        if (!empty($result_openid) && ($result_openid != $openid)) {
             $this->error('该手机号已绑定');
         }
 
@@ -160,7 +160,7 @@ class Login extends RiderBase
         }
         // 防止同一手机号，不同的微信openid 登录，必须唯一关系
         $result_openid = RiderInfo::where('link_tel',$data['phone'])->value('openid');
-        if ($result_openid != $data['openid']) {
+        if (!empty($result_openid) && ($result_openid != $data['openid'])) {
             $this->error('该手机号已绑定');
         }
 
