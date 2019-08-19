@@ -161,11 +161,12 @@ return [
     ],
     // 微信小程序的用户端账号信息
     'wx_user'    =>  [
-        /** 此处注释的三个参数为校园外卖的参数，目前仅用于测试提交审核所需参数信息，测试完成后，需要换回来 */
-        // 'app_id'        => 'wx7e84dbf300d4764d',
-        // 'secret'        =>  '7c6bd82277d5b1d7f77c05d4cb1987b7',
-        'app_id'    => 'wxebeda6bc74b26648',
-        'secret'    => '789bd6a8f55f23fe03142ff7c71a3770',
+        /** 校园外卖 */
+        'app_id'        => 'wx7e84dbf300d4764d',
+        'secret'        =>  '7c6bd82277d5b1d7f77c05d4cb1987b7',
+        /** 妈宝专家 */
+        // 'app_id'    => 'wxebeda6bc74b26648',
+        // 'secret'    => '789bd6a8f55f23fe03142ff7c71a3770',
         // 下面为可选项
         // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
         'response_type' => 'array',
@@ -178,42 +179,44 @@ return [
 
     // 微信小程序的骑手端账号信息
     'wx_rider'  =>[
-        /** 此处注释的五个参数为校园外卖的参数，目前仅用于测试提交审核所需参数信息，测试完成后，需要换回来 */
-        // 'app_id'        => 'wx51ecddea44f0ffed',
-        // 'secret'        =>  '90a92131b5844dc7498d28b510386d97',
-        // 'mch_id'             => '1538416851',
-        // 'key'                => 'iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
-        // // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
-        // 'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
-        // 'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
-        
-        /** 暂时还未替换，后续替换。。。。 */
-        'app_id'        => 'wxe29a77d8961dd1d9',
-        'secret'        =>  '705fb98fb3a0dd7ee80195e0c740de18',
-        'mch_id'             => '1531654461',
-        'key'                => 'iew0a4ek2d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
+        /** 校园外卖 */
+        'app_id'        => 'wx51ecddea44f0ffed',
+        'secret'        =>  '90a92131b5844dc7498d28b510386d97',
+        'mch_id'             => '1538416851',
+        'key'                => 'iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
         // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
-        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert_1.pem', // XXX: 绝对路径！！！！
-        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key_1.pem',      // XXX: 绝对路径！！！！
+        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
+        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
+        
+        /** 妈宝专家。。。。 */
+        // 'app_id'        => 'wxe29a77d8961dd1d9',
+        // 'secret'        =>  '705fb98fb3a0dd7ee80195e0c740de18',
+        // 'mch_id'             => '1531654461',
+        // 'key'                => 'iew0a4ek2d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
+        // // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
+        // 'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert_1.pem', // XXX: 绝对路径！！！！
+        // 'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key_1.pem',      // XXX: 绝对路径！！！！
         'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
         'sandbox' => false
     ],
 
     'wx_pay'=>[
         // 必要配置
-        /** 此处注释的五个参数为校园外卖的参数，目前仅用于测试提交审核所需参数信息，测试完成后，需要换回来 */
-        // 'app_id'             => 'wx7e84dbf300d4764d',
-        // 'mch_id'             => '1538416851',
-        // 'key'                => 'iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
-        // // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
-        // 'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
-        // 'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
-        'app_id'             => 'wxebeda6bc74b26648',
-        'mch_id'             => '1531654461',
-        'key'                => 'iew0a4ek2d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
+        /** 校园外卖 */
+        'app_id'             => 'wx7e84dbf300d4764d',
+        'mch_id'             => '1538416851',
+        'key'                => 'iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
         // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
-        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert_1.pem', // XXX: 绝对路径！！！！
-        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key_1.pem',      // XXX: 绝对路径！！！！
+        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
+        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
+        
+        /** 妈宝专家。。。。 */
+        // 'app_id'             => 'wxebeda6bc74b26648',
+        // 'mch_id'             => '1531654461',
+        // 'key'                => 'iew0a4ek2d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
+        // // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
+        // 'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert_1.pem', // XXX: 绝对路径！！！！
+        // 'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key_1.pem',      // XXX: 绝对路径！！！！
         'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
         'sandbox' => false,
     ],
