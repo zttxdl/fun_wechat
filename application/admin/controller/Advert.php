@@ -160,6 +160,9 @@ class Advert extends Base
         if ($end_time){
             $data['end_time'] = strtotime($end_time);
         }
+        if ($data['end_time'] > time()) {
+            $data['status'] = 1;
+        }
 
         $ret = model('Advert')->where('id',$id)->update($data);
 
