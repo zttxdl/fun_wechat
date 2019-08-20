@@ -137,13 +137,13 @@ class FinanceManange extends Base
     {
     	if($status == 1){
     		Db::name('withdraw')->where('id',$id)->setField('status',3);
-        	$this->success('审核成功');
+        	$this->success('审核通过');
     	}else{
-    		Db::name('withdraw')->update([
-	                'status' => $status,
+    		Db::name('withdraw')->where('id',$id)->update([
+	                'status' => 2,
 	                'remark' => $remark
-		            ],['id' => $id]);;//更新审核失败状态
-		    $this->success('审核失败');
+		            ]);//更新审核失败状态
+		    $this->success('审核不通过');
     	}
     	
     }
@@ -171,11 +171,11 @@ class FinanceManange extends Base
 
 	    	//连接微信企业打款 end
     	}else{
-    		Db::name('rider_income_expend')->update([
-	                'status' => $status,
+    		Db::name('rider_income_expend')->where('id',$id)->update([
+	                'status' => 2,
 	                'remark' => $remark
-		            ],['id' => $id]);;//更新审核失败状态
-		    $this->success('审核失败');
+		            ]);;//更新审核失败状态
+		    $this->success('审核不通过');
     	}
     	
     }

@@ -333,7 +333,7 @@ class Test extends Controller
         return $temp;
     }
 
-    public function push()
+    public function count()
     {
 
     }
