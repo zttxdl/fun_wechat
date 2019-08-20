@@ -227,5 +227,9 @@ return [
         'domain'    =>  'http://picture.daigefan.com',
         'style'    =>  'imageView2/0/format/jpg/interlace/1/q/75|imageslim',
     ],
+    //腾讯地图key
+    'lbs_map'=> [
+        'key'=>'5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T'
+    ]
 
 ];

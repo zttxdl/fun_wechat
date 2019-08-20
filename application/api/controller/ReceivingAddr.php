@@ -56,7 +56,7 @@ class ReceivingAddr extends ApiBase
             $this->error($check,201);
         }
         //获取所在学校
-        $address = '南京市'.model('School')->getNameById($data['area_detail']).$data['area_detail'];
+        $address = '南京市'.model('School')->getNameById($data['school_id']).$data['area_detail'];
         //获取经纬度
         $location = get_location($address);
         if (!$location) {

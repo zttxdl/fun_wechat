@@ -164,9 +164,9 @@ if (!function_exists('pc_sphere_distance')) {
  */
 if (!function_exists('get_location')) {
     function get_location($address){
-        $make_key = '5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T';
+        $key = config('lbs_map')['key'];
         // 仅学校地址信息，无法解析经纬度，目前需加上当前城市
-        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$make_key."&region=南京";
+        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$key."&region=南京";
         $jsondata=json_decode(file_get_contents($url),true);
         $data = [];
         if ($jsondata['message'] == '查询无结果') {
@@ -189,8 +189,8 @@ if (!function_exists('get_location')) {
  */
 if (!function_exists('Convert_BD09_To_GCJ02')) {
     function Convert_BD09_To_GCJ02($lat,$lng){
-        $make_key = '5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T';
-        $url = "https://apis.map.qq.com/ws/coord/v1/translate?locations={$lat},{$lng}&type=3&key=".$make_key;
+        $key = config('lbs_map')['key'];
+        $url = "https://apis.map.qq.com/ws/coord/v1/translate?locations={$lat},{$lng}&type=3&key=".$key;
         $jsondata=json_decode(file_get_contents($url),true);
         if ($jsondata['status'] != 0) {
             return false;
@@ -198,6 +198,22 @@ if (!function_exists('Convert_BD09_To_GCJ02')) {
         $data['lat'] = $jsondata['locations'][0]['lat'];
         $data['lng'] = $jsondata['locations'][0]['lng'];
         
+        return $data;
+    }
+}
+
+/**
+ * 距离计算
+ * @param double $from 起点坐标
+ * @param double $lng 终点坐标
+ * @return array();
+ */
+if (!function_exists('parameters')) {
+    function parameters($from,$to){
+        $key = config('lbs_map')['key'];
+        $url="http://apis.map.qq.com/ws/distance/v1/matrix/?mode=bicycling&from={$from}&to={$to}&key=".$key;
+        $jsondata=json_decode(file_get_contents($url),true);
+        $data = $jsondata['result']['rows'];
         return $data;
     }
 }
