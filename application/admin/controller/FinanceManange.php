@@ -38,20 +38,26 @@ class FinanceManange extends Base
         		->order('a.id DESC')
         		->paginate($page_size)
         		->toArray();
-        foreach ($rider['data'] as $row)
-        {
-            $rider_result['info'][] = [
-                'id' => $row['id'],
-                'order_sn' => $row['serial_number'],
-                'name' => Db::name('rider_info')->where('id',$row['rider_id'])->value('name'),
-                'source' => isset($source) ? $this->source[$source] : '骑手端',
-                'to_mention ' => isset($source) ? $this->toMention[$source] : '微信',
-                'card' => '',
-                'money' => $row['current_money'],
-                'add_time' => $row['add_time'],
-                'status' => $this->status[$row['status']],
-            ];
+
+        if($rider['data']) {
+            foreach ($rider['data'] as $row)
+            {
+                $rider_result['info'][] = [
+                    'id' => $row['id'],
+                    'order_sn' => $row['serial_number'],
+                    'name' => Db::name('rider_info')->where('id',$row['rider_id'])->value('name'),
+                    'source' => isset($source) ? $this->source[$source] : '骑手端',
+                    'to_mention ' => isset($source) ? $this->toMention[$source] : '微信',
+                    'card' => '',
+                    'money' => $row['current_money'],
+                    'add_time' => $row['add_time'],
+                    'status' => $this->status[$row['status']],
+                ];
+            }
+        }else{
+            $rider_result['info'] = [];
         }
+
         $rider_result['count'] = $rider['total'];
         $rider_result['page'] = $rider['current_page'];
         $rider_result['pageSize'] = $rider['per_page'];
@@ -65,21 +71,25 @@ class FinanceManange extends Base
         			->order('a.id DESC')
         			->paginate($page_size)
         			->toArray();
-        // dump($shop);exit;
-        foreach ($shop['data'] as $row)
-        {
-            $shop_result['info'][] = [
-                'id' => $row['id'],
-                'order_sn' => $row['withdraw_sn'],
-                'name' => Db::name('shop_info')->where('id',$row['shop_id'])->value('shop_name'),
-                'source' => isset($source) ? $this->source[$source] : '商家端',
-                'to_mention ' => isset($source) ? $this->toMention[$source] : '银行卡',
-                'card' => $row['card'],
-                'money' => $row['money'],
-                'add_time' => $row['add_time'],
-                'status' => $this->status[$row['status']],
-            ];
+        if($shop['data']) {
+            foreach ($shop['data'] as $row)
+            {
+                $shop_result['info'][] = [
+                    'id' => $row['id'],
+                    'order_sn' => $row['withdraw_sn'],
+                    'name' => Db::name('shop_info')->where('id',$row['shop_id'])->value('shop_name'),
+                    'source' => isset($source) ? $this->source[$source] : '商家端',
+                    'to_mention ' => isset($source) ? $this->toMention[$source] : '银行卡',
+                    'card' => $row['card'],
+                    'money' => $row['money'],
+                    'add_time' => $row['add_time'],
+                    'status' => $this->status[$row['status']],
+                ];
+            }
+        }else{
+            $shop_result['info'] = [];
         }
+
 
         $shop_result['count'] = $shop['total'];
         $shop_result['page'] = $shop['current_page'];
@@ -91,7 +101,6 @@ class FinanceManange extends Base
             $this->success('获取成功',$shop_result);
         }
 
-        // dump($rider_result[]);exit;
 
         $data['info'] = array_merge($rider_result['info'],$shop_result['info']);
         $data['count'] = $rider_result['count'] + $shop_result['count'];

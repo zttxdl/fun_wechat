@@ -168,14 +168,13 @@ class Test extends Controller
         $countPage = ceil(count($userInfo) / 25);//总页数
         $pageData = [];//返回数据
 
-//        dump($count);exit;
+
 
         for($i=$page;$i<=$countPage;$i++){
             $start = (($i-1)*$pageSize)+6;//计算每次分页的开始位置
             $pageData[] = array_slice($userInfo,$start,$pageSize);
         }
-
-//        return $pageData;
+        dump($userInfo);exit;
         $userData = [];
         foreach ($pageData as $key => &$val){
             foreach ($val as $k => &$v){
