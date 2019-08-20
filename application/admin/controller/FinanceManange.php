@@ -139,9 +139,11 @@ class FinanceManange extends Base
 
 
     /**
-    *【商家提现 操作】
-    * remark 如果
-    */
+     * 【商家提现 操作】
+     * @param $status 审核状态  1:审核成功 2:审核不成功
+     * @param $id 提现ID
+     * @param string $remark 审核不通过原因ID的集合 [1,2,3]
+     */
     public function shop_tx($status,$id,$remark='')
     {
     	if($status == 1){
@@ -158,8 +160,11 @@ class FinanceManange extends Base
     }
 
     /**
-    *【骑手提现 操作】
-    */
+     * 【骑手提现 操作】
+     * @param $status 审核状态  1:审核成功 2:审核不成功
+     * @param $id 提现ID
+     * @param string $remark 审核不通过原因ID的集合 [1,2,3]
+     */
     public function rider_tx($status,$id,$remark='')
     {
     	if($status == 1) {//审核成功

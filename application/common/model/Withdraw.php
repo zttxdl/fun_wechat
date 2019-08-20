@@ -15,7 +15,9 @@ use think\Db;
 class Withdraw extends Model
 {
     /**
-     * 获取账户余额
+     * @param $shop_id 店铺ID
+     * @param string $startTime 多少天以前开始计算的时间
+     * @return string
      */
     public function getAcountMoney($shop_id,$startTime = '')
     {
@@ -29,23 +31,27 @@ class Withdraw extends Model
         //支出
         $zc_money = $this->getExpenditure($shop_id,$startTime);
 
+        //账户余额等于收入-支出
         $acount_money = $shouru_money - $zc_money;
 
         return sprintf("%.2f",$acount_money);
     }
 
     /**
-     * 获取支出
+     * 支出
+     * @param $shop_id
+     * @param $startTime 开始时间
+     * @param string $endTime 结束时间
+     * @return string
      */
     public function getExpenditure($shop_id,$startTime,$endTime = '')
     {
         if(empty($endTime)) {
-            //提现过程中的金额【包括 `已提现`，`申请提现`】
+            //提现过程中的金额【包括 `已提现`，`申请提现`】支出计算时间
             $tx_money = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']])
-                ->whereTime('add_time', '<',$startTime)
                 ->sum('money');
 
-            //总支出 过滤提现 和活动支出
+            //总支出 过滤提现 和商家活动支出(收入 = 商品总价 - 商家优惠 - 平台优惠) 所以这里活动支出就不计算了
             $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2,3']])
                 ->whereTime('add_time', '<',$startTime)
                 ->sum('money');
@@ -68,9 +74,12 @@ class Withdraw extends Model
     }
 
 
-
     /**
-     * 获取收入
+     * 收入
+     * @param $shop_id
+     * @param $startTime 开始时间
+     * @param string $endTime 结束时间
+     * @return string
      */
     public function getIncome($shop_id,$startTime,$endTime='')
     {
@@ -98,7 +107,10 @@ class Withdraw extends Model
     }
 
     /**
+     *
      * 计算商家收入和支出
+     * @param $order_id
+     * @return bool
      */
     public function income($order_id)
     {
@@ -132,15 +144,21 @@ class Withdraw extends Model
             Db::name('withdraw')->insert($data);
         }
 
-        //抽成支出 平台抽成 + 食堂抽成 + 红包抽成
+        //平台抽成 = （商品原价+餐盒费-优惠金额） * 平台抽成比列
         $ptExpenditure = ($Order->total_money - $Order->ping_fee) * ($shop_info['segmentation'] / 100);
+
         //如果商品提价不计算抽成
         if($shop_info['price_hike']) {
             $ptExpenditure = $ptExpenditure - $shop_info['price_hike'];
         }
+
+        //食堂抽成 = 商品总价 - 配送费 - 餐盒费 * 食堂抽成比例
         $stExpenditure = ($Order->total_money - $Order->ping_fee - $Order->box_money) * ($cut_proportion / 100);
+
+        //红包抽成 = 红包总金额 * 商家承担比列
         $hbExpenditure = $Order->platform_coupon_money * ($assume_ratio / 100);
 
+        //抽成总支出 平台抽成 + 食堂抽成 + 红包抽成
         $total_expenditure = round($ptExpenditure + $stExpenditure + $hbExpenditure,2);
 
         //抽成支出不为0的时候记录
