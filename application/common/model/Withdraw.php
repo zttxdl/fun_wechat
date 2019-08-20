@@ -134,6 +134,10 @@ class Withdraw extends Model
 
         //抽成支出 平台抽成 + 食堂抽成 + 红包抽成
         $ptExpenditure = ($Order->total_money - $Order->ping_fee) * ($shop_info['segmentation'] / 100);
+        //如果商品提价不计算抽成
+        if($shop_info['price_hike']) {
+            $ptExpenditure = $ptExpenditure - $shop_info['price_hike'];
+        }
         $stExpenditure = ($Order->total_money - $Order->ping_fee - $Order->box_money) * ($cut_proportion / 100);
         $hbExpenditure = $Order->platform_coupon_money * ($assume_ratio / 100);
 

@@ -170,7 +170,13 @@ Route::group('a-canteen', function () {
 })->prefix('admin/canteen/')->middleware('IsLogin');
 
 
-
+// 财务管理模块
+Route::group('financeManange', function () {
+    Route::rule('/get', 'getWithdraw');//获取提现
+    Route::rule('/action', 'action');//提现操作
+    Route::rule('/getCheck', 'getCheck');//查看不通过原因
+    Route::rule('/getRemark', 'getRemark');//获取原因
+})->prefix('admin/financeManange/')->middleware('IsLogin');
 
 
 

@@ -514,13 +514,13 @@ class Order extends ApiBase
             $total_money = $order['total_money'];//订单总价
             $money = $order['money'];//订单结算金额
 //            $order_discount = $orderData['shop_discounts_money'] + $orderData['platform_coupon_money'];//订单优惠金额
-            $product_total_money = '0.00';//商品总价和
+            /*$product_total_money = '0.00';//商品总价和
 
             foreach ($detail as $row) {
                 $product_total_money += $row['total_money'];
             }
 
-            if($total_money*100 != ($product_total_money*100 + $orderData['box_money']*100 + $orderData['ping_fee']*100)) {
+            if($total_money != ($product_total_money + $orderData['box_money'] + $orderData['ping_fee'])) {
                 throw new \Exception('订单总价不正确');
             }
 
