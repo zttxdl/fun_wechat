@@ -456,10 +456,10 @@ class Order extends ApiBase
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
 
-//       set_log('order=',$order,'sureOrder');
-//       set_log('detail=',$detail,'sureOrder');
-//       set_log('platform_discount=',$platform_discount,'sureOrder');
-//       set_log('shop_discount=',$shop_discount,'sureOrder');
+       set_log('order=',$order,'sureOrder');
+       set_log('detail=',$detail,'sureOrder');
+       set_log('platform_discount=',$platform_discount,'sureOrder');
+       set_log('shop_discount=',$shop_discount,'sureOrder');
 
         $orders_sn = build_order_no('D');//生成唯一订单号
         $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
@@ -520,7 +520,7 @@ class Order extends ApiBase
                 $product_total_money += $row['total_money'];
             }
 
-            if($total_money != ($product_total_money + $orderData['box_money'] + $orderData['ping_fee'])) {
+            if($total_money*100 != ($product_total_money*100 + $orderData['box_money']*100 + $orderData['ping_fee']*100)) {
                 throw new \Exception('订单总价不正确');
             }
 
