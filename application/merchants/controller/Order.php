@@ -263,6 +263,8 @@ class Order extends MerchantsBase
             'address_detail' => $shop_info['address'],
             'phone' => $shop_info['link_tel'],
             'name' => $shop_info['link_name'],
+            'longitude' => $shop_info['longitude'],
+            'latitude' => $shop_info['latitude'],
         ];
 
         //启动事务

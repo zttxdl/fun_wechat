@@ -43,7 +43,11 @@ class ReceivingAddr extends ApiBase
      */
     public function create(Request $request)
     {
-        $data = $request->param();
+        $data['school_id'] = $request->param('school_id');
+        $data['name'] = $request->param('name');
+        $data['phone'] = $request->param('phone');
+        $data['sex'] = $request->param('sex');
+        $data['area_detail'] = $request->param('area_detail');
         $data['user_id'] = $this->auth->id;
         $data['add_time'] = time();
         // 验证表单数据
@@ -51,7 +55,15 @@ class ReceivingAddr extends ApiBase
         if ($check !== true) {
             $this->error($check,201);
         }
-
+        //获取所在学校
+        $address = '南京市'.model('School')->getNameById($data['school_id']).$data['area_detail'];
+        //获取经纬度
+        $location = get_location($address);
+        if (!$location) {
+            $this->error('地址有误，请重新输入');
+        }
+        $data['longitude'] = $location['lng'];
+        $data['latitude'] = $location['lat'];
         // 提交新增表单
         $result = ReceiveAddr::create($data,true);
         if (!$result) {

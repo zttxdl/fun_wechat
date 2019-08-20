@@ -164,9 +164,9 @@ if (!function_exists('pc_sphere_distance')) {
  */
 if (!function_exists('get_location')) {
     function get_location($address){
-        $make_key = '5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T';
+        $key = config('lbs_map')['key'];
         // 仅学校地址信息，无法解析经纬度，目前需加上当前城市
-        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$make_key;
+        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$key."&region=南京";
         $jsondata=json_decode(file_get_contents($url),true);
         $data = [];
         if ($jsondata['message'] == '查询无结果') {
@@ -179,6 +179,44 @@ if (!function_exists('get_location')) {
     }
 }
 
+/**
+ * BD09 坐标转换GCJ02
+ * 百度地图BD09坐标---->中国正常GCJ02坐标
+ * 腾讯地图用的也是GCJ02坐标
+ * @param double $lat 纬度
+ * @param double $lng 经度
+ * @return array();
+ */
+if (!function_exists('Convert_BD09_To_GCJ02')) {
+    function Convert_BD09_To_GCJ02($lat,$lng){
+        $key = config('lbs_map')['key'];
+        $url = "https://apis.map.qq.com/ws/coord/v1/translate?locations={$lat},{$lng}&type=3&key=".$key;
+        $jsondata=json_decode(file_get_contents($url),true);
+        if ($jsondata['status'] != 0) {
+            return false;
+        }
+        $data['lat'] = $jsondata['locations'][0]['lat'];
+        $data['lng'] = $jsondata['locations'][0]['lng'];
+        
+        return $data;
+    }
+}
+
+/**
+ * 距离计算
+ * @param double $from 起点坐标
+ * @param double $lng 终点坐标
+ * @return array();
+ */
+if (!function_exists('parameters')) {
+    function parameters($from,$to){
+        $key = config('lbs_map')['key'];
+        $url="http://apis.map.qq.com/ws/distance/v1/matrix/?mode=bicycling&from={$from}&to={$to}&key=".$key;
+        $jsondata=json_decode(file_get_contents($url),true);
+        $data = $jsondata['result']['rows'];
+        return $data;
+    }
+}
 
 /**
  *  写日志
@@ -313,50 +351,6 @@ if (!function_exists('getMealSn')) {
 
     }
 }
-
-
-/**
- * GCJ02坐标转换BD09
- * 中国正常GCJ02坐标---->百度地图BD09坐标
- * 腾讯地图用的也是GCJ02坐标
- * @param double $lat 纬度
- * @param double $lng 经度
- */
-if (!function_exists('Convert_GCJ02_To_BD09')) {
-     function Convert_GCJ02_To_BD09($lat,$lng){
-         $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
-         $x = $lng;
-         $y = $lat;
-         $z =sqrt($x * $x + $y * $y) + 0.00002 * sin($y * $x_pi);
-         $theta = atan2($y, $x) + 0.000003 * cos($x * $x_pi);
-         $lng = $z * cos($theta) + 0.0065;
-         $lat = $z * sin($theta) + 0.006;
-         return array('lng'=>$lng,'lat'=>$lat);
-    }
-
-}
-
-/**
- * BD09 坐标转换GCJ02
- * 百度地图BD09坐标---->中国正常GCJ02坐标
- * 腾讯地图用的也是GCJ02坐标
- * @param double $lat 纬度
- * @param double $lng 经度
- * @return array();
- */
-if (!function_exists('Convert_BD09_To_GCJ02')) {
-    function Convert_BD09_To_GCJ02($lat,$lng){
-        $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
-        $x = $lng - 0.0065;
-        $y = $lat - 0.006;
-        $z = sqrt($x * $x + $y * $y) - 0.00002 * sin($y * $x_pi);
-        $theta = atan2($y, $x) - 0.000003 * cos($x * $x_pi);
-        $lng = $z * cos($theta);
-        $lat = $z * sin($theta);
-        return array('lng'=>$lng,'lat'=>$lat);
-    }
-}
-
 
 /**
  * 获取Redis的静态实例

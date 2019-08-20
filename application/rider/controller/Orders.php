@@ -20,20 +20,30 @@ class Orders extends RiderBase
 	 */
 	public function index(Request $request)
 	{
-		$type = $request->param('type',0);
-
+        $data = [];
+        $type = $request->param('type');
+        if (!$type) {
+            $this->error('非法参数');
+        }
         $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
         if ($status_arr['status'] == 4) {
             $this->error('你账号已被禁用，无法接单',202);
         }
+        
+        $data['type'] = $status_arr['status'] == 0 ? 0 : 1;
 
 		if ($status_arr['open_status'] == 2) {
 			$this->error('你还没开工，无法接单',204);
 		}
 
-        $where = [];
-		if ($type == 1) {
+        $latitude = $request->param('latitude');
+        $longitude = $request->param('longitude');
+        if (!$latitude || !$longitude) {
+            $this->error('坐标不能为空');
+        }
+        $location = $latitude.','.$longitude;
 
+		if ($type == 1) {
             $where[] = ['school_id','=',$this->auth->school_id];
 		    $where[] = ['status','=',1];
 
@@ -42,10 +52,6 @@ class Orders extends RiderBase
                 ->where($where)
                 ->order('create_time desc')
                 ->select();
-            foreach ($list as $item) {
-                $item->expected_time = date('H:i',$item->expected_time);
-            }
-            $data['list'] = $list;
 		}else{
 			//获取已接单
             $where[] = ['school_id','=',$this->auth->school_id];
@@ -61,11 +67,42 @@ class Orders extends RiderBase
 
             foreach ($list as $key => $item) {
                 $item->rest_time = round(($item->expected_time - time()) / 60);
-                $item->expected_time = date('H:i',$item->expected_time);
             }
-            $data['list'] = $list;
 		}
 
+        foreach ($list as $item) {
+            if ($item->status != 6) {
+                $shop_address = $item->shop_address->latitude.','.$item->shop_address->longitude;
+                $user_address = $item->user_address->latitude.','.$item->user_address->longitude;
+                $from = $location.';'.$shop_address;
+                $to = $shop_address.';'.$user_address;
+                $result = parameters($from,$to);
+                $s_distance = $result[0]['elements'][0]['distance'];
+                
+                if (in_array($item->status, [4,5])) {
+                    $u_distance = $result[0]['elements'][1]['distance'];
+                }else{
+                    $u_distance = $result[1]['elements'][1]['distance'];
+                }
+                
+                if ($s_distance >= 100) {
+                    $item->s_distance = round($s_distance / 1000,1).'km';
+                }else{
+                    $item->s_distance = $s_distance.'m';
+                }
+
+                if ($u_distance >= 100) {
+                    $item->u_distance = round($u_distance / 1000,1).'km';
+                }else{
+                    $item->u_distance = $u_distance.'m';
+                }
+            }
+
+            $item->expected_time = date('H:i',$item->expected_time);
+
+        }
+
+        $data['list'] = $list;
 		$this->success('success',$data);
     }
     
@@ -135,8 +172,6 @@ class Orders extends RiderBase
             $this->error('抢单失败');
         }
 
-
-
 	}
 
     /**
@@ -146,9 +181,24 @@ class Orders extends RiderBase
     {
         $type = $request->param('type');
         $orderId = $request->param('order_id');
+        $latitude = $request->param('latitude');
+        $longitude = $request->param('longitude');
+        if (!$latitude || !$longitude) {
+            $this->error('坐标不能为空');
+        }
+
         $Order = \app\common\model\Orders::get($orderId);
         $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
+        
+        $location = $latitude.','.$longitude;
+        $shop_address = $Takeout->shop_address->latitude.','.$Takeout->shop_address->longitude;
+        $user_address = $Takeout->user_address->latitude.','.$Takeout->user_address->longitude;
+        
         if ($type == 1){//我已到店
+            $result = parameters($location,$shop_address);
+            if ($result[0]['elements'][0]['distance'] > 300) {
+                $this->error('暂未到指定范围，还不可以点击哦');
+            }
             $Order->status = 5;
             $Takeout->status = 4;
             $Takeout->toda_time = time();
@@ -163,6 +213,11 @@ class Orders extends RiderBase
 
 
         }elseif ($type ==3){//确认送达
+            $result = parameters($location,$user_address);
+            if ($result[0]['elements'][0]['distance'] > 300) {
+                $this->error('暂未到指定范围，还不可以点击哦');
+            }
+
             $Order->arrive_time = time();
             $Order->status = 7;
             $Takeout->status = 6;
