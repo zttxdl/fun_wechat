@@ -43,7 +43,7 @@ class Withdraw extends Model
             //提现过程中的金额【包括 `已提现`，`申请提现`】
             $tx_money = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']])
                 ->whereTime('add_time', '<',$startTime)
-                ->sum('money');;
+                ->sum('money');
 
             //总支出 过滤提现 和活动支出
             $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2,3']])
@@ -54,7 +54,7 @@ class Withdraw extends Model
             //提现过程中的金额【包括 `已提现`，`申请提现`】
             $tx_money = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']])
                 ->whereBetweenTime('add_time',$startTime,$endTime)
-                ->sum('money');;
+                ->sum('money');
 
             //总支出 过滤提现 和活动支出
             $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2,3']])

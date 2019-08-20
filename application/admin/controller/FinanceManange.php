@@ -50,7 +50,7 @@ class FinanceManange extends Base
                     'to_mention ' => isset($source) ? $this->toMention[$source] : '微信',
                     'card' => '',
                     'money' => $row['current_money'],
-                    'add_time' => $row['add_time'],
+                    'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                     'status' => $this->status[$row['status']],
                 ];
             }
@@ -82,7 +82,7 @@ class FinanceManange extends Base
                     'to_mention ' => isset($source) ? $this->toMention[$source] : '银行卡',
                     'card' => $row['card'],
                     'money' => $row['money'],
-                    'add_time' => $row['add_time'],
+                    'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                     'status' => $this->status[$row['status']],
                 ];
             }
