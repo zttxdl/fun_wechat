@@ -20,14 +20,9 @@ class Property extends MerchantsBase
 
     protected $noNeedLogin = [];
 
-    //提现时间规则当天可提现七天之前的结算金额
-    protected $startTime;
-
     public function __construct()
     {
         parent::__construct();
-
-        $this->startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
         $this->shop_tx_key = 'shop_tx_key';//店铺提现key
         $this->shop_balance_key = 'shop_balance_key';//店铺余额key
     }
@@ -51,7 +46,7 @@ class Property extends MerchantsBase
         if($acount_money) {
             $acount_money = $acount_money;
         }else{
-            $acount_money = model('Withdraw')->getAcountMoney($shop_id,$this->startTime);
+            $acount_money = model('Withdraw')->getAcountMoney($shop_id);
             Cache::store('redis')->hSet($this->shop_balance_key,$shop_id,$acount_money);
         }
 
@@ -147,7 +142,7 @@ class Property extends MerchantsBase
         
 
         //账户余额
-        $balance_money = model('Withdraw')->getAcountMoney($shop_id,$this->startTime);
+        $balance_money = model('Withdraw')->getAcountMoney($shop_id);
 
         if($balance_money < $money) {
             $this->error('您的提现金额大于可提现金额！');

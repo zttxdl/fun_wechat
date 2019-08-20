@@ -15,14 +15,12 @@ use think\Db;
 class Withdraw extends Model
 {
     /**
-     * 获取账户余额
+     * 获取账户余额【可提现金额】
      */
-    public function getAcountMoney($shop_id,$startTime = '')
+    public function getAcountMoney($shop_id)
     {
-
-        if($startTime == '') {
-            $startTime = time();
-        }
+        // 提现规则 7天前
+        $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
         //收入
         $shouru_money = $this->getIncome($shop_id,$startTime);
 
@@ -34,6 +32,26 @@ class Withdraw extends Model
         return sprintf("%.2f",$acount_money);
     }
 
+
+    /**
+     * 未结算金额 
+     * 
+     */
+    public function getNotJsMoney($shop_id)
+    {
+        // 七天之内的总收入
+        $sr_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->whereTime('add_time', '>=',strtotime("-7 days").'23:59:59')->sum('money');
+
+        // 七天之内的总支出[抽成支出 + 退款 + 推广]
+        $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','4,5,6']])->whereTime('add_time', '>=',strtotime("-7 days").'23:59:59')->sum('money');
+
+        $not_js_money = $sr_money - $zc_money;
+
+        return sprintf("%.2f",$not_js_money);
+    }
+     
+
+
     /**
      * 获取支出
      */
@@ -43,7 +61,7 @@ class Withdraw extends Model
             //提现过程中的金额【包括 `已提现`，`申请提现`】
             $tx_money = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']])
                 ->whereTime('add_time', '<',$startTime)
-                ->sum('money');;
+                ->sum('money');
 
             //总支出 过滤提现 和活动支出
             $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2,3']])
