@@ -18,13 +18,12 @@ class Withdraw extends Model
      * @param $shop_id 店铺ID
      * @param string $startTime 多少天以前开始计算的时间
      * @return string
+     * 获取账户余额【可提现金额】
      */
-    public function getAcountMoney($shop_id,$startTime = '')
+    public function getAcountMoney($shop_id)
     {
-
-        if($startTime == '') {
-            $startTime = time();
-        }
+        // 提现规则 7天前
+        $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
         //收入
         $shouru_money = $this->getIncome($shop_id,$startTime);
 
@@ -39,8 +38,8 @@ class Withdraw extends Model
 
 
     /**
-     * 未结算金额 
-     * 
+     * 未结算金额
+     *
      */
     public function getNotJsMoney($shop_id)
     {
@@ -54,7 +53,7 @@ class Withdraw extends Model
 
         return sprintf("%.2f",$not_js_money);
     }
-     
+
 
 
     /**
