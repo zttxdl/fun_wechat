@@ -86,19 +86,7 @@ class Index extends Controller
 	// 查看PHPinfo
 	public function phpinfo()
 	{
-        $rider = Db::name('rider_income_expend')
-                ->alias('a')
-                ->leftJoin('rider_info b','a.rider_id = b.id')
-                ->field('a.current_money,a.serial_number,b.openid')
-                ->where('a.id',$id)
-                ->find();
-            //连接微信企业打款 start
-            $wx_tx = new Transfer();
-            $res = $wx_tx->sendMoney($rider['current_money'],$rider['openid'],$rider['serial_number']);
-            if ($res == '企业付款成功') {
-                $this->success($res);
-            }
-            $this->error($res);
+        phpinfo();
 	}
 
 
