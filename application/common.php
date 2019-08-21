@@ -386,6 +386,7 @@ if (!function_exists('qiniu_img_del')) {
         // 数据库存储的图片路径为：http://picture.daigefan.com/6cfe8201907051641019024.png?imageView2/0/format/jpg/interlace/1/q/75|imageslim， 
         // 实际传到七牛云删除的路径为：6cfe8201907051641019024.png
         $imgstr = reset(explode('?',$imgurl));
+        // 当图片域名换掉时，此处记得更改
         $img_url = substr($imgstr,28);
 
         // 删除文件操作

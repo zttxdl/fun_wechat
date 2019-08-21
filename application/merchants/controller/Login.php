@@ -71,11 +71,9 @@ class Login extends MerchantsBase
             $this->error('用户名和密码不能为空！');
         }
 
-        if ($vcode !=1234) {
-            $result = model('Alisms', 'service')->checkCode($account, 'login', $vcode);
-            if (!$result) {
-                $this->error(model('Alisms', 'service')->getError());
-            }
+        $result = model('Alisms', 'service')->checkCode($account, 'login', $vcode);
+        if (!$result) {
+            $this->error(model('Alisms', 'service')->getError());
         }
         
         $user  = ShopInfo::field('id,password,status')

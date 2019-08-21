@@ -92,15 +92,11 @@ class Login extends RiderBase
         $phone = $request->param('phone');
         $code  = $request->param('code');
         $type  = $request->param('type');
-
-        if ($code !=1234) {
-            // 校验验证码
-            $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
-            if (!$result) {
-                $this->error(model('Alisms', 'service')->getError());
-            }
-        }
-        
+        // 校验验证码
+        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
+        if (!$result) {
+            $this->error(model('Alisms', 'service')->getError());
+        }        
         // 判断openid是否存在
         $rid = RiderInfo::where('openid',$openid)->value('id');
         if (!$rid) {
