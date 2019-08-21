@@ -45,6 +45,19 @@ class School extends Model
        return  $this->where('id',$school_id)->value('name');
 
     }
+    
+
+    /**
+     * 根据id 获取学校区域名称
+     * @param $school_id
+     * @return mixed
+     */
+    public function getAreaNameById($school_id)
+    {
+        $fid = $this->where('id',$school_id)->value('fid');
+        $area_name = $this->where('id',$fid)->value('name');
+        return $area_name;
+    }
 
 
     /**
