@@ -2,7 +2,7 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 use think\Db;
 use think\facade\Cache;
@@ -12,7 +12,7 @@ use think\facade\Cache;
  * @author Mike
  * date 2019/5/27
  */
-class Agreement extends Controller
+class Agreement extends Base
 {
     /**
      * 图文协议列表
@@ -32,7 +32,7 @@ class Agreement extends Controller
             $vo['save_time'] = date('Y-m-d H:i',$vo['save_time']);
         }
 
-        return  json_success('ok',['list'=>$list]);
+        $this->success('ok',['list'=>$list]);
 
     }
 
@@ -46,10 +46,7 @@ class Agreement extends Controller
         if (empty((int)$id) ) {
             $this->error('非法参数',201);
         }
-
         $info = Db::name('agreement')->where('id',$id)->field('id,title,content')->find();
-        // 设置缓存
-        Cache::store('redis')->set('agreement_'.$id,$info,3600*24*7*30);
         $this->success('ok',['info'=>$info]);
     }
 
@@ -60,9 +57,11 @@ class Agreement extends Controller
      */
     public function update(Request $request)
     {
-        $data = $request->param();
+        $id = (int)$request->param('id');
+        $data['content'] = $request->param('content');
+        $data['save_time'] = time();
 
-        if (!isset($data['id']) || empty((int)$data['id'])) {
+        if (empty($id)) {
             $this->error('非法参数',201);
         }
 
@@ -73,10 +72,15 @@ class Agreement extends Controller
         }
 
         // 提交表单
-        $result = Db::name('agreement')->update($data);
+        $result = Db::name('agreement')->where('id','=',$id)->update($data);
         if (!$result) {
             $this->error('修改失败',201);
         }
+
+        // 获取当前协议
+        $info = Db::name('agreement')->where('id',$id)->field('id,title,content')->find();
+        // 设置缓存
+        Cache::store('redis')->set('agreement_'.$id,$info,3600*24*7*30);
         
         $this->success('修改成功');
     }

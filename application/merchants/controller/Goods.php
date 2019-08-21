@@ -15,7 +15,7 @@ class Goods extends MerchantsBase
     protected $noNeedLogin = [];
 
     /**
-     * 获取商家列表
+     * 获取商品列表
      */
     public function index()
     {
@@ -23,11 +23,12 @@ class Goods extends MerchantsBase
         $where = ['shop_id'=>$this->shop_id];
         //获取商品
         $list = model('Product')
-            ->field('id,name,price,old_price,attr_ids,thumb,sales,products_classify_id as classId,type')
+            ->field('id,name,price,old_price,attr_ids,thumb,sales,products_classify_id as classId,type,status')
             ->where($where)
-            ->where('status',1)
+            ->order('create_time desc')
             ->select()
             ->toArray();
+
         $cakes = [];
         $preferential = [];
         //获取热销商品
@@ -50,13 +51,14 @@ class Goods extends MerchantsBase
 
         foreach ($class as &$item) {
             $item['goods'] = [];
-
-            foreach ($list as $value) {
-                if ($item['classId'] == $value['classId']){
-                    $item['goods'][] = $value;
+            foreach ($list as &$v) {
+                if ($item['classId'] == $v['classId']){
+                    $item['goods'][] = $v;
                 }
+                $v['sales'] = model('Product')->getMonthSales($v['id']);
             }
         }
+        // dump($class);die;
         $data['class'] = $class;
 
 
@@ -73,10 +75,17 @@ class Goods extends MerchantsBase
     public function save(Request $request)
     {
         $data   = $request->param();
-        $data['shop_id'] = $this->shop_id;
-        $result = Product::create($data);
+        $type   = $request->param('type');
+        $price   = $request->param('price');
+        if ($type != 3 ){
+            $data['old_price'] = $price;
+        }
 
-        $this->success('success',$result);
+        $data['shop_id'] = $this->shop_id;
+        $data['create_time'] = time();
+        Product::create($data);
+
+        $this->success('success');
     }
 
 
@@ -87,10 +96,16 @@ class Goods extends MerchantsBase
      * @param  int  $id
      * @return \think\Response
      */
-    public function update(Request $request)
+    public function modify(Request $request)
     {
+        $id   = $request->param('id');
+        if (!$id){
+            $this->error('非法参数');
+        }
+
         $data   = $request->param();
-        $result = Product::update($data, ['id' => $request->param('id')]);
+
+        $result = Product::update($data, ['id' => $id]);
         $this->success('success',$result);
     }
 
@@ -102,14 +117,17 @@ class Goods extends MerchantsBase
      */
     public function delete($id)
     {
+        if (!$id){
+            $this->error('非法参数');
+        }
         $result = Product::get($id);
         
         if ($result->shop_id != $this->shop_id) {
             $this->error('没有权限删除');
         }
 
-        $result = Product::destroy($id);
-        $this->success('success',$result);
+        Product::destroy($id);
+        $this->success('success');
     }
 
     /**
@@ -120,7 +138,14 @@ class Goods extends MerchantsBase
      */
     public function detail($id)
     {
+        if (!$id){
+            $this->error('非法参数');
+        }
+
         $result = Product::get($id);
+        $result->class_name = model('ProductsClassify')->getNameById($result->products_classify_id);
+        $result->attr_name = model('ProductAttrClassify')->getNameByIds($result->attr_ids);
+
         $data = TodayDeals::get(['product_id'=>$id]);
         if ($data){
             $result->old_price = $data->old_price;

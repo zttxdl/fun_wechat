@@ -2,8 +2,6 @@
 
 namespace app\api\controller;
 
-use think\Controller;
-use think\Request;
 use app\common\model\ManageCategory as ManageCategoryModel;
 use app\common\controller\ApiBase;
 

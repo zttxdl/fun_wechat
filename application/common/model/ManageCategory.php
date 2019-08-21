@@ -16,14 +16,27 @@ class ManageCategory extends Model
     }
 
     /**
-     * 获取经营品类的二级列表
+     * 获取经营品类列表
      * 
      */
     public function getManageCategoryList()
     {
-        $list = $this->where('level',2)->field('id,name')->select();
+        $list = $this->field('id,name')->order('sort','asc')->select()->toArray();
         return $list;
     }
+
+
+    /**
+     * 获取经营品类名称集合
+     * 
+     */
+    public function getNames($ids)
+    {
+        $category_arrs = $this->where('id','in',$ids)->column('name');
+        $category_names = implode('、',$category_arrs);
+        return $category_names;
+    }
+    
      
 
 }

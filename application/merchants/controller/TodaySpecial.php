@@ -5,6 +5,7 @@ namespace app\merchants\controller;
 use app\common\controller\MerchantsBase;
 use think\Request;
 use app\common\model\TodayDeals;
+use think\facade\Cache;
 
 /**
  * 商品今天特价模块控制器
@@ -29,9 +30,10 @@ class TodaySpecial extends MerchantsBase
             ->find();
         if ($result) {
             $result->res_time = $result->end_time - time();
+            $result->the_time = $result->start_time - time();
             $result->length = 1;
         }else {
-            $result->length = 0;
+            $result['length'] = 0;
         }
 
         $this->success('success',$result);
@@ -48,6 +50,7 @@ class TodaySpecial extends MerchantsBase
     {
         $data   = $request->param();
         $data['shop_id'] = $this->shop_id;
+
         $data['start_time'] = strtotime($request->param('start_time'));
         $data['end_time'] = strtotime($request->param('end_time'));
         $data['today'] = date('Y-m-d',$data['start_time']);
@@ -60,11 +63,16 @@ class TodaySpecial extends MerchantsBase
             ->find();
         $data['thumb'] = $product->thumb;
         $data['name'] = $product->name;
-
+        $count = model('TodayDeals')->where('today',$data['today'])->where('shop_id',$this->shop_id)->count();
+        if ($count >= 3){
+            $this->error('一天最多设置3次');
+        }
         $result = TodayDeals::create($data);
 
         $this->success('success',$result);
     }
+
+
 
 
 }

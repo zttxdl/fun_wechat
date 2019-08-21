@@ -2,12 +2,12 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 use think\Db;
-use app\common\model\CheckStatus;
+use app\common\service\SendMsg;
 
-class RiderInfo extends Controller
+class RiderInfo extends Base
 {
     /**
      * 骑手列表 
@@ -17,7 +17,7 @@ class RiderInfo extends Controller
     {
         // 搜索条件
         $where= [];
-        !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
+        !empty($request->get('name/s')) ? $where[] = ['name|link_tel','like',$request->get('name/s').'%'] : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
         $where[] = ['status','in','3,4'];
 
@@ -49,6 +49,14 @@ class RiderInfo extends Controller
      */
     public function status($id,$status)
     {
+        if ($status == 4) { // 当禁用店铺时，需判断该店铺是否存在未完结的订单往来
+            // 获取未完结的订单
+            $count = model('Takeout')->where([['rider_id','=',$id],['status','in',[3,4,5]]])->count();
+            if ($count) {
+                $this->error('该骑手还存在未处理的订单，暂时不可禁用此骑手',202);
+            }
+        }
+
         $result = Db::name('rider_info')->where('id','=',$id)->setField('status',$status);
         if (!$result) {
             $this->error('设置失败');
@@ -64,7 +72,8 @@ class RiderInfo extends Controller
     public function checkShow($id)
     {
         // 骑手的基本信息
-        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status')->find($id);
+        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status,school_id')->find($id);
+        $info['school_name'] = model('School')->getNameById($info['school_id']);
 
         $info['mb_status'] = config('rider_check_status')[$info['status']];
 
@@ -79,7 +88,8 @@ class RiderInfo extends Controller
     public function show($id)
     {
         // 骑手的基本信息
-        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status,pass_time')->find($id);
+        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status,pass_time,school_id')->find($id);
+        $info['school_name'] = model('School')->getNameById($info['school_id']);
 
         /** 结算信息 */
         // 已结算收入【骑手除去当天未结算的所有金额】
@@ -150,11 +160,18 @@ class RiderInfo extends Controller
     {
         $data = $request->post();
         $data['pass_time'] = time();
+        if ($data['status'] == 3) {
+            $data['remark'] = 0;
+        }
 
         $result = Db::name('rider_info')->update($data);
         if (!$result) {
             $this->error('设置失败');
         }
+
+        // 推送微信模板消息
+        $sendMsg = new sendMsg();
+        $sendMsg->passCheckSend($data['id']);
 
         $this->success('设置成功');
     }
@@ -165,7 +182,7 @@ class RiderInfo extends Controller
      */
     public function checkStatusList()
     {
-        $data = config('check_status')['rider'];
+        $data = Db::name('check_status')->where('type','=',2)->column('name','id');
         $this->success('获取成功',$data);
     }
 

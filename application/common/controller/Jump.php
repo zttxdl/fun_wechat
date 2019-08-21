@@ -48,9 +48,9 @@ trait Jump
      * @param string $type   输出类型
      * @param array  $header 发送的 Header 信息
      */
-    protected function error($msg = '', $code = 201, $type = null, array $header = [])
+    protected function error($msg = '', $code = 201, $data = null, $type = null, array $header = [])
     {
-        $this->result($data = '', $code, $msg, $type, $header);
+        $this->result($data, $code, $msg, $type, $header);
     }
 
     /**

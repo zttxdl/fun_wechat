@@ -5,7 +5,6 @@ namespace app\api\controller;
 use app\common\Auth\JwtAuth;
 use app\common\controller\ApiBase;
 use think\Request;
-use think\captcha\Captcha;
 use app\common\model\User;
 use EasyWeChat\Factory;
 
@@ -25,9 +24,12 @@ class Login extends ApiBase
     {
         $config = config('wx_user');
         $app = Factory::miniProgram($config);
-        $code = request()->param('code');
+        $code = $request->param('code');
         $result = $app->auth->session($code);
-
+        //判断返回的结果中是否有错误码
+        if (isset($result['errcode'])) {
+            $this->error($result['errmsg'],$result['errcode']);
+        }
         $this->success('获取 openid 成功',['auth_result'=>$result]);
     }
 
@@ -97,7 +99,7 @@ class Login extends ApiBase
         if (!$result) {
             $this->error(model('Alisms', 'service')->getError());
         }
-
+        
         // 判断openid是否存在
         $uid = User::where('openid',$openid)->value('id');
         if (!$uid) {
@@ -112,10 +114,10 @@ class Login extends ApiBase
         if (!$res) {
             $this->error('登录或注册失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,openid,headimgurl,nickname,phone')->find();
+        $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy,status')->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($user_info,604800);
+        $token = $jwtAuth->createToken($user_info,2592000);
         $this->success('success',[
             'token' => $token
         ]);
@@ -154,10 +156,10 @@ class Login extends ApiBase
         if (!$res) {
             $this->error('快捷登录失败');
         }
-        $user_info = User::where('id','=',$uid)->field('id,openid,headimgurl,nickname,phone')->find();
+        $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy,status')->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($user_info,604800);
+        $token = $jwtAuth->createToken($user_info,2592000);
         $this->success('success',[
             'token' => $token
         ]);

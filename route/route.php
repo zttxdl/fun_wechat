@@ -18,14 +18,11 @@ if(request()->isOptions()){
 }
 
 /*************** 管理平台端 *********************************************************************************************/
-// 广告组
-Route::group('a-advers', function () {
-    Route::get('/index', 'index');
-    Route::get('/edit/:id', 'edit');
-    Route::post('/update', 'update');
-    Route::get('/del/:id', 'delete');
-})->prefix('admin/advers/')->middleware('IsLogin');
-
+// 广告位组
+Route::resource('advert_position','admin/advert_position');
+Route::get('advert_position/getAdvertList','admin/advert_position/getAdvertList');
+Route::resource('advert','admin/advert');
+Route::get('advert/school','admin/advert/getSchool');
 
 // 优惠券组
 Route::group('a-coupon', function () {
@@ -122,6 +119,8 @@ Route::group('admin',function (){
 Route::group('admin',function (){
     Route::rule('shopList','admin/Shop/getList');//商家列表
     Route::rule('shopDetail','admin/Shop/getDetail');//商家详情
+    Route::rule('shopEdit/:id','admin/Shop/edit');//展示编辑店铺
+    Route::rule('shopUpdate','admin/Shop/update');//保存编辑店铺
     Route::rule('shopAddShop','admin/Shop/addShop');//添加店铺
     Route::rule('shopAddQualification','admin/Shop/addQualification');//添加商家资质
     Route::rule('shopSetStatus','admin/Shop/setStatus');//启用禁用商家
@@ -138,12 +137,46 @@ Route::group('admin',function (){
 Route::group('admin',function (){
     Route::rule('orderList','admin/Orders/getList');//订单列表
     Route::rule('orderDetail','admin/Orders/getDetail');//订单详情
-});
+    Route::rule('refundList','admin/Refund/getList');//退单列表
+    Route::rule('refundDetail','admin/Refund/getDetail');//退单详情
+})->middleware('IsLogin');;
 
-// 图片上传接口
-Route::group('a-upload', function () {
-    Route::post('/upload', 'upload');
-})->prefix('admin/upload/');
+
+// 经营品类管理模块
+Route::group('a-managecate', function () {
+    Route::get('/index', 'index');
+    Route::post('/insert', 'insert');
+    Route::get('/edit/:id', 'edit');
+    Route::post('/update', 'update');
+    Route::get('/del/:id', 'delete');
+})->prefix('admin/ManageCategory/')->middleware('IsLogin');
+
+
+// 学校管理模块
+Route::group('a-school', function () {
+    Route::get('/index', 'index');
+    Route::get('/add', 'add');
+    Route::post('/insert', 'insert');
+    Route::get('/edit/:id', 'edit');
+    Route::get('/show/:id', 'show');
+    Route::post('/update', 'update');
+    Route::get('/del/:id', 'delete');
+})->prefix('admin/school/')->middleware('IsLogin');
+
+// 食堂管理模块
+Route::group('a-canteen', function () {
+    Route::post('/insert', 'insert');
+    Route::get('/del/:id', 'delete');
+})->prefix('admin/canteen/')->middleware('IsLogin');
+
+
+// 财务管理模块
+Route::group('financeManange', function () {
+    Route::rule('/get', 'getWithdraw');//获取提现
+    Route::rule('/action', 'action');//提现操作
+    Route::rule('/getCheck', 'getCheck');//查看不通过原因
+    Route::rule('/getRemark', 'getRemark');//获取原因
+})->prefix('admin/financeManange/')->middleware('IsLogin');
 
 
 
@@ -162,6 +195,7 @@ Route::group('merchants',function (){
 	Route::rule('getSchool','merchants/Merchants/getSchool');
 	Route::rule('getCategory','merchants/Merchants/getCategory');
     Route::rule('getBack','merchants/Merchants/getBack');
+    Route::rule('getCanteen','merchants/Merchants/getCanteen');
     Route::get('check_status', 'merchants/Merchants/checkStatus');
     Route::get('set_status', 'merchants/Merchants/setCheckStatus');
 	//文件上传
@@ -231,6 +265,17 @@ Route::group('u-member', function () {
     Route::post('/bind-tel', 'BindUserPhone');
 })->prefix('api/Member/');
 
+// 首页
+Route::group('u-index', function () {
+    Route::rule('/index', 'index');
+    Route::rule('/special', 'getSpecial');
+    Route::rule('/recommend', 'getRecommendList');
+    Route::rule('/navigation', 'getNavigation');
+    Route::rule('/special-list', 'getSpecialList');
+    Route::rule('/exclusive', 'getExclusive');
+    Route::rule('/more_exclusive', 'getMoreExclusive');
+})->prefix('api/Index/');
+
 // 红包组
 Route::group('u-coupon', function () {
     Route::get('/index', 'index');
@@ -256,6 +301,7 @@ Route::group('u-addr', function () {
 Route::group('u-school', function () {
     Route::get('/index', 'index');
     Route::get('/school-level2', 'schoolLevel2');
+    Route::get('/choose-school', 'chooseSchool');
 })->prefix('api/school/');
 
 // 经营品类组
@@ -318,6 +364,8 @@ Route::group('api',function () {
     Route::post('getRiderInfo','api/Order/getRiderInfo');
     //获取订单商家信息
     Route::post('getShopInfo','api/Order/getShopInfo');
+    // 判断用户是否是禁用状态
+    Route::get('checkUserStatus','api/Order/checkUserDisabled');
 });
 
 
@@ -339,14 +387,15 @@ Route::group('r-login', function () {
 // 骑手中心组
 Route::group('r-member', function () {
     Route::get('/index', 'index');
-    Route::get('/check_status', 'checkStatus');
-    Route::get('/set_status', 'setCheckStatus');
+    Route::get('/check_join', 'checkJoin');
     Route::post('/update-tel', 'setRiderPhone');
     Route::post('/apply', 'applyRider');
     Route::get('/edit', 'edit');
     Route::post('/update', 'update');
     Route::post('/bind-tel', 'BindRiderPhone');
     Route::get('/status', 'openStatus');
+    Route::get('/check_identity_status', 'checkIdentityStatus');
+    Route::post('/tojoin', 'toJoin');
     Route::rule('/getEvaluation', 'getEvaluation');
 })->prefix('rider/Member/');
 
@@ -363,7 +412,7 @@ Route::group('r-orders', function () {
 Route::group('r-inc-exp', function () {
     Route::get('/mywallet', 'myWallet');
     Route::get('/detail', 'detail');
-    Route::post('/withdraw', 'withdraw')->middleware('WithdrawalAuth');
+    Route::post('/withdraw', 'withdraw');
 })->prefix('rider/IncomeExpend/');
 
 
@@ -379,4 +428,16 @@ Route::group('r-upload', function () {
 // 用户端
 Route::group('auto', function () {
     Route::rule('/zero_execute', 'zeroExecute');
+    Route::rule('/cancel_orders', 'cancelOrders');
+    Route::rule('/update_advert', 'updateAdvert');
 })->prefix('api/AutoShell/');
+
+
+// 测试
+//Route::group('test', function () {
+    Route::rule('add', 'index/Test/add');
+    Route::rule('get', 'index/Test/get');
+    Route::rule('del', 'index/Test/del');
+    Route::rule('edit', 'index/Test/edit');
+    Route::rule('addAll', 'index/Test/addAll');
+//});

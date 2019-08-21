@@ -15,7 +15,7 @@ class Login extends MerchantsBase
     protected $noNeedLogin = ['*'];
 
 	/**
-	 * 商家登录
+	 * 商家登录 【账号登录】
 	 * @param  \think\Request  $request
      * @return \think\Response
      */
@@ -49,15 +49,16 @@ class Login extends MerchantsBase
         }
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken('merchants'.$user->id,604800);
+        $token = $jwtAuth->createToken($user,2592000);
         $this->success('success',[
-            'token' => $token
+            'token' => $token,
+            'sid'   =>  's_'.$user->id
         ]);
 	}
 
 
     /**
-     * 商家登录  验证码登录
+     * 商家登录  【验证码登录】
      * @param  \think\Request  $request
      * @return \think\Response
      */
@@ -70,11 +71,9 @@ class Login extends MerchantsBase
             $this->error('用户名和密码不能为空！');
         }
 
-        if ($vcode !=1234) {
-            $result = model('Alisms', 'service')->checkCode($account, 'login', $vcode);
-            if (!$result) {
-                $this->error(model('Alisms', 'service')->getError());
-            }
+        $result = model('Alisms', 'service')->checkCode($account, 'login', $vcode);
+        if (!$result) {
+            $this->error(model('Alisms', 'service')->getError());
         }
         
         $user  = ShopInfo::field('id,password,status')
@@ -92,9 +91,10 @@ class Login extends MerchantsBase
         }
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken('merchants'.$user->id,604800);
+        $token = $jwtAuth->createToken($user,2592000);
         $this->success('success',[
-            'token' => $token
+            'token' => $token,
+            'sid'   =>  's_'.$user->id
         ]);
     }
 
@@ -138,7 +138,7 @@ class Login extends MerchantsBase
 
 	        if ($result = ShopInfo::create($data)) {
                 $jwtAuth = new JwtAuth();
-                $token = $jwtAuth->createToken('merchants'.$result->id,604800);
+                $token = $jwtAuth->createToken($result,2592000);
                 $this->success('success',[
                     'token' => $token
                 ]);

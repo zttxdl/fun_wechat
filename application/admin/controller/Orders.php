@@ -4,11 +4,11 @@
 namespace app\admin\controller;
 
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Request;
 use think\Db;
 
-class Orders extends Controller
+class Orders extends Base
 {
     /**
      * 订单列表
@@ -22,41 +22,46 @@ class Orders extends Controller
 
         $map = [];
         if($search) {
-            $map[] = ['a.orders_sn|b.nickname|b.phone|c.shop_name','like',$search.'%'];
+            $map[] = ['a.orders_sn|b.nickname|b.phone|c.shop_name','like','%'.$search.'%'];
         }
 
         $order_list = Db::name('orders')->alias('a')
             ->leftJoin('user b','a.user_id = b.id')
             ->leftJoin('shop_info c','a.shop_id = c.id')
             ->where($map)
-            ->field('a.id as id,a.orders_sn,b.nickname,b.phone,c.shop_name,a.money,a.add_time,a.status,a.pay_mode,a.source')
+            ->field('a.id as id,a.orders_sn,b.nickname,b.phone,c.shop_name,a.money,a.add_time,a.status,a.pay_mode,a.source,a.platform_choucheng')
             ->order('id','DESC')
             ->paginate($page_size)->toArray();
 
 
 //        dump($order_list);
 
-        if(!$order_list['data']) {
+/*        if(!$order_list['data']) {
             $this->error('暂无数据');
-        }
+        }*/
 
         $result = [];
 
-        foreach ($order_list['data'] as $row)
-        {
-            $result['info'][] = [
-                'id' => $row['id'],
-                'orders_sn' => $row['orders_sn'],
-                'user_name' => $row['nickname'],
-                'phone' => $row['phone'],
-                'shop_name' => $row['shop_name'],
-                'money' => $row['money'],
-                'add_time' => date('Y-m-d H:i:s',$row['add_time']),
-                'status' => $this->getOrdertStatus($row['status']),
-                'pay_mode' => $row['pay_mode']==1 ? '微信支付' : '支付宝支付',
-                'source' => $row['source']==1 ? '小程序' : 'H5',
-            ];
+        if($order_list) {
+            foreach ($order_list['data'] as $row)
+            {
+                $result['info'][] = [
+                    'id' => $row['id'],
+                    'orders_sn' => $row['orders_sn'],
+                    'user_name' => $row['nickname'],
+                    'phone' => $row['phone'],
+                    'shop_name' => $row['shop_name'],
+                    'money' => $row['money'],
+                    'add_time' => date('Y-m-d H:i:s',$row['add_time']),
+                    'status' => $this->getOrdertStatus($row['status']),
+                    'pay_mode' => $row['pay_mode']==1 ? '微信支付' : '支付宝支付',
+                    'source' => $row['source']==1 ? '小程序' : 'H5',
+                    'platform_choucheng' => $row['platform_choucheng']
+                ];
+            }
         }
+
+
 
         $result['count'] = $order_list['total'];
         $result['page'] = $order_list['current_page'];
@@ -121,6 +126,7 @@ class Orders extends Controller
                             a.status,
                             a.num,
                             a.message,
+                            a.platform_choucheng,
                             b.headimgurl,
                             b.nickname,
                             b.type,
@@ -151,6 +157,7 @@ class Orders extends Controller
             'status' => $this->getOrdertStatus($list['status']),
             'num' => $list['num'],
             'remark' => $list['message'],
+            'platform_choucheng' => $list['platform_choucheng']
         ];
 
         //会员信息

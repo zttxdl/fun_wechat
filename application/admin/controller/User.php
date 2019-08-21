@@ -4,12 +4,11 @@
 namespace app\admin\controller;
 
 
-use think\Controller;
+use app\common\controller\Base;
 use think\Db;
 use think\Request;
-//use think\facade\Validate;
 
-class User extends Controller
+class User extends Base
 {
     /**
      * 会员列表
@@ -22,7 +21,7 @@ class User extends Controller
         }
         $where[] = ['status','=',$request->get('status/d')];
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
-        !empty($request->get('name/s')) ? $where[] = ['nickname','like',$request->get('name/s').'%'] : null;
+        !empty($request->get('name/s')) ? $where[] = ['nickname|phone','like','%'.$request->get('name/s').'%'] : null;
 
         $user_list = model('User')
                     ->field('id,nickname,phone,add_time,last_login_time,type,status')

@@ -10,6 +10,8 @@ namespace app\merchants\controller;
 
 
 use app\common\controller\MerchantsBase;
+use think\App;
+use think\facade\Cache;
 use think\Request;
 use think\Db;
 
@@ -18,7 +20,12 @@ class Property extends MerchantsBase
 
     protected $noNeedLogin = [];
 
-
+    public function __construct()
+    {
+        parent::__construct();
+        $this->shop_tx_key = 'shop_tx_key';//店铺提现key
+        $this->shop_balance_key = 'shop_balance_key';//店铺余额key
+    }
 
 
     /**
@@ -28,21 +35,35 @@ class Property extends MerchantsBase
     {
         $shop_id = $this->shop_id;//从Token中获取
 
+//        echo $shop_id;
+
         if(!isset($shop_id)) {
             $this->error('shop_id 不能为空!');
         }
 
+        $acount_money = Cache::store('redis')->hGet($this->shop_balance_key,$shop_id);
 
-        $acount_money = model('Withdraw')->getAcountMoney($shop_id);
+        if($acount_money) {
+            $acount_money = $acount_money;
+        }else{
+            $acount_money = model('Withdraw')->getAcountMoney($shop_id);
+            Cache::store('redis')->hSet($this->shop_balance_key,$shop_id,$acount_money);
+        }
 
         $totalMoney = model('Shop')->getCountSales($shop_id);
         $monthMoney = model("Shop")->getMonthSales($shop_id);
+        $card = model('shop_more_info')->where('shop_id',$shop_id)->value('back_card_num');
+
+
 
         $data = [
             'balanceMoney' => !empty($acount_money) ? $acount_money : 0,//可提现余额
             'totalMoney' => !empty($totalMoney) ? $totalMoney: 0,//总收入
-            'monthMoney' => !empty($monthMoney) ? $totalMoney: 0//本月收入
+            'monthMoney' => !empty($monthMoney) ? $totalMoney: 0,//本月收入
+            'card' => !empty($card) ? $card: '',//银行卡号
         ];
+
+
 
         $this->success('获取成功',$data);
 
@@ -54,45 +75,39 @@ class Property extends MerchantsBase
     public function receiptPay(Request $request)
     {
         $shop_id = $this->shop_id;
-        $type = $request->param('type',0);//1 收入;2 支出; 0 默认全部
+        $time = $request->param('time',0);
 
         isset($shop_id) ? $shop_id : $request->param('shop_id');
 
-        $map = [];
+        $start_time = date('Y-m-01',strtotime($time)).' 00:00:00';
+        $end_time = date('Y-m-30',strtotime($time)).' 23:59:59';
 
-        if($shop_id) {
-            $map[] = ['shop_id','=',$shop_id];
+
+        $szmx['income'] = model('withdraw')->getIncome($shop_id,$start_time,$end_time);//收入
+
+        $szmx['expenditure'] = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);//支出
+
+        $res = Db::name('withdraw')
+            ->where('shop_id','=',$shop_id)
+            ->whereBetweenTime('add_time',$start_time,$end_time)
+            ->order('add_time DESC')
+            ->select();
+
+
+        if(empty($res)) {
+            $this->error('暂时没有数据!');
         }
 
-        if($type) {
-            $map[] = ['type','=',$type];
-        }
-
-        $szmx = [];//收支明细
-
-        $res = Db::name('withdraw')->where($map)->select();
-
-        if(!$res) {
-            $this->error('暂时没有提现记录');
-        }
-
-        foreach ($res as $key => $row){
-            $szmx[$key] = [
-                'id' => $row['id'],
-                'shop_id' => $row['shop_id'],
+        foreach ($res as $row)
+        {
+            if($row['money'] == 0) {
+                continue;
+            }
+            $szmx['info'][] = [
                 'title' => $row['title'],
                 'add_time' => date('Y-m-d H:i:s',$row['add_time']),
-                'money' => $row['money'],//收入支出金额
-                'code' => $row['withdraw_sn'],
+                'money' => $row['type'] == 1 ? '+'.$row['money'] : sprintf('%.2f',-1 * $row['money']),
             ];
-            if($row['type'] == 2) {
-                if($row['status'] == 1) {
-                    $szmx[$key]['money'] = '审核中';
-                }
-                if($row['status'] == 2) {
-                    $szmx[$key]['money'] = '提现失败';
-                }
-            }
         }
 
 
@@ -108,24 +123,23 @@ class Property extends MerchantsBase
         $shop_id = $this->shop_id;
         $withdraw_sn = build_order_no('TXBH');
         $money = $request->param('money');//提现金额
+        $card = $request->param('card');//提现卡号
 
-        if($money < 1) {
-            $this->error('提现金额不能少于1元');
+        if($money < 0.3) {
+            $this->error('提现金额不能少于0.3元');
         }
 
-
-        $start = strtotime(date('Y-m-d').'00:00:00');
-        $end = strtotime(date('Y-m-d').'23:59:59');
+        if($money > 5000) {
+            $this->error('提现金额不能大于5000元');
+        }
 
         //提现次数
-        $num = Db::name('Withdraw')
-            ->where('add_time','between time',[$start,$end])
-            ->where('shop_id',$shop_id)
-            ->find();
+        $check = Cache::store('redis')->hGet($this->shop_tx_key,$shop_id);
 
-        if($num){
+        if($check){
             $this->error('一天只能提现一次哦!');
         }
+
 
         //账户余额
         $balance_money = model('Withdraw')->getAcountMoney($shop_id);
@@ -138,7 +152,8 @@ class Property extends MerchantsBase
         $txsq = [
             'shop_id' => $shop_id,
             'withdraw_sn' => $withdraw_sn,
-            'money' => -$money,
+            'card' => $card,
+            'money' => $money,
             'status' => 1,
             'type' => 2,
             'add_time'=>time(),
@@ -148,6 +163,7 @@ class Property extends MerchantsBase
         $res = DB::name('withdraw')->insert($txsq);
 
         if($res) {
+            Cache::store('redis')->hSet($this->shop_tx_key,$shop_id,1);
             $this->success('申请成功');
         }
         $this->error('申请失败');

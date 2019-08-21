@@ -2,7 +2,6 @@
 
 namespace app\rider\controller;
 
-use think\Controller;
 use think\Request;
 use app\common\controller\RiderBase;
 use think\Db;
@@ -19,21 +18,23 @@ class IncomeExpend extends RiderBase
      */
     public function myWallet()
     {
+        $rider_id = $this->auth->id;
         // 已结算收入
-        $already_money = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($this->auth->id);
+        $already_money = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($rider_id);
 
-        // 提现金额【包括 申请提现、申请提现】
-        $tx_money = (string)model('RiderIncomeExpend')->getTxMoney($this->auth->id);
+        // 提现金额【包括 已提现、申请提现】
+        $tx_money = (string)model('RiderIncomeExpend')->getTxMoney($rider_id);
         
         // 可提现金额
         $can_tx_money = $already_money - $tx_money;
 
         // 将可提现金额写入缓存， 方便在提现过程中的判断可提现金额
-        $key = 'rider_can_tx_money'.$this->auth->id;
-        Cache::store('redis')->set($key,$can_tx_money,600);  
+        $key = "rider_can_tx_money"; 
+        $redis = Cache::store('redis');
+        $redis->hSet($key,$rider_id,$can_tx_money);
 
         // 未结算收入
-        $not_tx_money = model('RiderIncomeExpend')->getNotJsMoney($this->auth->id);
+        $not_tx_money = model('RiderIncomeExpend')->getNotJsMoney($rider_id);
 
         $this->success('获取我的钱包成功',['info'=>['already_tx_money'=>$already_money,'can_tx_money'=>$can_tx_money,'not_tx_money'=>$not_tx_money]]);
 
@@ -78,26 +79,27 @@ class IncomeExpend extends RiderBase
      */
     public function withdraw(Request $request)
     {
-        // 判断提现金额【不能少于1元】
-        if ($request->param('money') < 1) {
-            $this->error('提现金额不能少于1元');            
+        // 判断提现金额【不能少于0.3元】
+        if ($request->param('money') < 0.3) {
+            $this->error('提现金额不能少于0.3元');            
         }
 
         // 计入缓存，每天只能提现一次  # 这块可写一脚本：每天凌晨清除当前缓存【在存缓冲的时候，设置缓存标签，即可指向性的清楚某一标签下的缓存Cache::clear('rider_tx');】
-        $key = 'rider_tx_'.$this->auth->id;
-        $check = Cache::store('redis')->tag('rider_tx')->get($key);  
-
-        if($check){  
-            $this->error('每天只能提现 1 次！',202);
+        $rider_id = $this->auth->id;
+        $redis = Cache::store('redis');
+        $key = "rider_tx_num";
+        $can_key = "rider_can_tx_money";
+        if ($redis->hExists($key,$rider_id)) {
+            $this->error('每天只能提现 1 次！',202); 
         }
 
         // 优先读取缓存，当缓存过期时， 从数据库进行读取
-        $can_money = Cache::store('redis')->get('rider_can_tx_money'.$this->auth->id);  
+        $can_money = $redis->hGet($can_key,$rider_id);  
         if (!$can_money) {
             // 已结算收入
-            $already_money = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($this->auth->id);
-            // 提现金额【包括 申请提现、申请提现】
-            $tx_money = (string)model('RiderIncomeExpend')->getTxMoney($this->auth->id);
+            $already_money = (string)model('RiderIncomeExpend')->getAlreadyJsMoney($rider_id);
+            // 提现金额【包括 已提现、申请提现】
+            $tx_money = (string)model('RiderIncomeExpend')->getTxMoney($rider_id);
             // 可提现金额
             $can_money = $already_money - $tx_money;
         }
@@ -107,20 +109,27 @@ class IncomeExpend extends RiderBase
             $this->error('您的提现金额大于可提现金额！');
         }
 
+        // 提现金额不得大于5000
+        if($request->param('money') > 5000){  
+            $this->error('提现金额不能大于5000元');
+        }
+
+        // 组装数据
         $data['current_money'] = $request->param('money');
-        $data['rider_id'] = $this->auth->id;
+        $data['rider_id'] = $rider_id;
         $data['type'] = 2;
         $data['name'] = '提现';
         $data['serial_number'] = build_order_no('TX');
         $data['add_time'] = time();
         $data['status'] = 1;
 
+        // 存表
         $res = model('RiderIncomeExpend')::create($data);
 
         if (!$res) {
             $this->error('您的提现申请失败');
         } else {
-            Cache::store('redis')->tag('rider_tx')->set($key,1,3600*24);
+            $redis->hSet($key,$rider_id,1);
             $this->success('您的提现申请已提交');
         }
         

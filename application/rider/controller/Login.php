@@ -2,7 +2,7 @@
 
 namespace app\rider\controller;
 
-use think\Controller;
+use app\common\controller\RiderBase;
 use think\Request;
 use app\common\model\RiderInfo;
 use app\common\Auth\JwtAuth;
@@ -12,8 +12,9 @@ use EasyWeChat\Factory;
 /**
  * 骑手登录注册
  */
-class Login extends Controller
+class Login extends RiderBase
 {
+    protected  $noNeedLogin = ['*'];
     /**
      * 授权获取openid、session_key信息
      * 
@@ -24,7 +25,10 @@ class Login extends Controller
         $app = Factory::miniProgram($config);
         $code = $request->param('code');
         $result = $app->auth->session($code);
-
+        //判断返回的结果中是否有错误码
+        if (isset($result['errcode'])) {
+            $this->error($result['errmsg'],$result['errcode']);
+        }
         $this->success('获取 openid 成功',['auth_result'=>$result]);
     }
 
@@ -88,20 +92,22 @@ class Login extends Controller
         $phone = $request->param('phone');
         $code  = $request->param('code');
         $type  = $request->param('type');
-
-        if ($code !=1234) {
-            // 校验验证码
-            $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
-            if (!$result) {
-                $this->error(model('Alisms', 'service')->getError());
-            }
-        }
-        
+        // 校验验证码
+        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
+        if (!$result) {
+            $this->error(model('Alisms', 'service')->getError());
+        }        
         // 判断openid是否存在
         $rid = RiderInfo::where('openid',$openid)->value('id');
         if (!$rid) {
             $this->error('非法参数');
         }
+        // 防止同一手机号，不同的微信openid 登录，必须唯一关系
+        $result_openid = RiderInfo::where('link_tel',$phone)->value('openid');
+        if (!empty($result_openid) && ($result_openid != $openid)) {
+            $this->error('该手机号已绑定');
+        }
+
         // 更新数据
         $res = RiderInfo::where('openid',$openid)->update([
             'link_tel' =>  $phone,
@@ -111,12 +117,15 @@ class Login extends Controller
         if (!$res) {
             $this->error('登录或注册失败');
         }
-        $rider_info = RiderInfo::where('id','=',$rid)->find();
+        $rider_info = RiderInfo::where('id','=',$rid)->field('id,school_id,status,open_status,name')->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($rider_info,604800);
+        $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
-            'token' => $token
+            'token' => $token,
+            'uuid' => 'r'.$rid,
+            'name'  => $rider_info['name'],
+            'phone' =>  $phone
         ]);
 
         
@@ -145,6 +154,12 @@ class Login extends Controller
         if (!$rid) {
             $this->error('非法参数');
         }
+        // 防止同一手机号，不同的微信openid 登录，必须唯一关系
+        $result_openid = RiderInfo::where('link_tel',$data['phone'])->value('openid');
+        if (!empty($result_openid) && ($result_openid != $data['openid'])) {
+            $this->error('该手机号已绑定');
+        }
+
         // 更新数据
         $res = RiderInfo::where('openid',$data['openid'])->update([
             'link_tel' =>  $data['phone'],
@@ -154,12 +169,15 @@ class Login extends Controller
         if (!$res) {
             $this->error('快捷登录失败');
         }
-        $rider_info = RiderInfo::where('id','=',$rid)->find();
+        $rider_info = RiderInfo::where('id','=',$rid)->field('id,school_id,status,open_status,name')->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($rider_info,604800);
+        $token = $jwtAuth->createToken($rider_info,2592000);
         $this->success('success',[
-            'token' => $token
+            'token' => $token,
+            'uuid' => 'r'.$rid,
+            'name'  => $rider_info['name'],
+            'phone' =>  $data['phone']
         ]);
 
     }

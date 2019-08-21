@@ -11,5 +11,13 @@ class ProductsClassify extends Model
         'status' => 1,
     ];
 
-    
+    /**
+     * 获取分类名称
+     * @param $id
+     * @return mixed
+     */
+    public function getNameById($id){
+        return $this->where('id',$id)->value('name');
+    }
+
 }

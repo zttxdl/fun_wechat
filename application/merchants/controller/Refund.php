@@ -6,6 +6,7 @@ use app\common\controller\MerchantsBase;
 use EasyWeChat\Factory;
 use think\Request;
 use think\facade\Env;
+use think\Db;
 
 class Refund extends MerchantsBase
 {
@@ -36,8 +37,10 @@ class Refund extends MerchantsBase
         foreach ($refund_info as &$row) {
             $row['add_time'] = date('m-d H:i',$row['add_time']);//申请退款时间
             $row['refund_time'] = date('m-d H:i',$row['refund_time']);//退款完成时间
+            $row['imgs'] = explode(',',$row['imgs']);
             $detail = $this->detail($row['id']);
             $row['box_money'] = $detail['box_money'];
+            $row['phone'] = $detail['phone'];
             $row['detail'] = $detail['detail'];
         }
 
@@ -56,6 +59,8 @@ class Refund extends MerchantsBase
             ->where('orders_id','=',$id)
             ->select();
 
+        $data = model('Orders')->field('address')->where('id',$id)->find();
+
         foreach ($detail as &$row)
         {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
@@ -63,7 +68,7 @@ class Refund extends MerchantsBase
             $box_money += $row['num'] * $row['box_money'];
         }
 
-        return ['detail'=>$detail,'box_money'=>$box_money];
+        return ['detail'=>$detail,'box_money'=>$box_money,'phone'=>$data['address']->phone];
     }
 
     /**
@@ -73,28 +78,43 @@ class Refund extends MerchantsBase
         $orders_sn = $request->param('orders_sn');
 
         //error_log(print_r($orders_sn,1),3,Env::get('root_path')."./logs/refund.log");
-
+        Db::startTrans();
         try{
             if(empty($orders_sn) && !isset($orders_sn)) {
                 throw new \Exception('订单号不能为空!');
             }
-            $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
+            $data = model('Refund')->where('out_refund_no',$orders_sn)->find();
 
-            if($find['status'] == 2) {
+            if($data['status'] == 2) {
                 throw new \Exception('商家已退款!');
             }
 
-            if($find['status'] == 3) {
+            if($data['status'] == 3) {
                 throw new \Exception('商家已拒绝退款');
             }
 
-            $res = $this->wxRefund($orders_sn);
+            $res = $this->wxRefund($data['out_trade_no']);
 
             if('SUCCESS' == $res['return_code'] && 'SUCCESS' == $res['result_code']) {
+                //更新退单状态 add by ztt 20190722
+                $res = model('Refund')->where('out_refund_no',$orders_sn)->setField('status',2);
+                if(!$res) {
+                    throw new \Exception('refundStatus update fail');
+                }
+                //回写订单主表订单状态
+                $res = model('Orders')->where('orders_sn',$data['out_trade_no'])->setField('status',11);
+                if(!$res) {
+                    throw new \Exception('orderStatus update fail');
+                }
+                //退款收支明细 add by ztt 20190814
+                $res = model('Withdraw')->refund($orders_sn);
 
-                model('Refund')->where('out_trade_no',$orders_sn)->setField('status',2);
-                model('Orders')->where('orders_sn',$orders_sn)->setField('status',13);
+                if(!$res) {
+                    throw new \Exception('refund insert fail');
+                }
 
+                // 提交事务
+                Db::commit();
                 return json_success('退款成功');
             }else{
                 throw new \Exception($res['err_code_des']);
@@ -104,6 +124,8 @@ class Refund extends MerchantsBase
 
 
         }catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
             $this->error($e->getMessage());
         }
     }
@@ -120,27 +142,27 @@ class Refund extends MerchantsBase
             throw new \Exception('订单号不能为空!');
         }
 
-        $find = model('Refund')->where('out_trade_no',$orders_sn)->find();
+        $data = model('Refund')->where('out_refund_no',$orders_sn)->find();
 
-        if($find['status'] == 2) {
+        if($data['status'] == 2) {
             $this->error('商家已退款!');
         }
 
-        if($find['status'] == 3) {
+        if($data['status'] == 3) {
             $this->error('商家已拒绝退款!');
         }
 
-        //外卖表添取消原因,取消时间
-
-        model('Refund')->where('out_trade_no',$orders_sn)->setField('status',3);
-        model('Orders')->where('orders_sn',$orders_sn)->setField('status',12);
+        //更新退单状态 add by ztt 20190722
+        model('Refund')->where('out_refund_no',$orders_sn)->setField('status',3);
+        //回写订单主表订单状态
+        model('Orders')->where('orders_sn',$data['out_trade_no'])->setField('status',12);
 
         $this->success('拒绝退款成功');
 
     }
 
     /**
-     * 微信退款处理
+     * 微信退款处理【用户申请退款的后续退款处理】
      */
     public function wxRefund($orders_sn)
     {

@@ -2,7 +2,6 @@
 
 namespace app\api\controller;
 
-use think\Controller;
 use think\Request;
 use think\facade\Cache;
 use app\common\model\Feedback as FeedbackModel;
@@ -29,19 +28,20 @@ class Feedback extends ApiBase
         if ($check !== true) {
             $this->error($check,201);
         }
+        
+        // 存入缓存，每个用户最多可反馈三次
+        $redis = Cache::store('redis');
+        $key = "user_feedback";
 
-        // 当用户在一天内提交多余三次，提示“您已提交多次，我们会竭力改进”
-        $key = 'feedback_'.$this->auth->id;
-        $check = Cache::store('redis')->has($key);  
-        if($check){  
-            Cache::store('redis')->inc($key);  
-            $count = Cache::store('redis')->get($key);  
-            if($count > 3){  
+        if($redis->hExists($key,$data['user_id'])) {
+            $count = $redis->hGet($key,$data['user_id']);
+            if($count >= 3){  
                 $this->error('您已提交多次，我们会竭力改进',202);
-            }  
-        }else{   
-            Cache::store('redis')->set($key,1,3600*24);  
-        }  
+            } 
+            $redis->hIncrby($key,$data['user_id'],1);
+        }else{
+            $redis->hSet($key,$data['user_id'],1);
+        }
         
         // 提交新增表单
         $result = FeedbackModel::create($data,true);

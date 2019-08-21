@@ -10,9 +10,7 @@ namespace app\api\controller;
 use app\common\controller\ApiBase;
 use EasyWeChat\Factory;
 use think\Db;
-use think\Model;
 use think\Request;
-use think\facade\Env;
 
 
 class Order extends ApiBase
@@ -29,7 +27,9 @@ class Order extends ApiBase
         '7'     =>  '订单已送达 ',
         '8'     =>  '订单已完成',
         '9'     =>  '订单已取消',
-        '10'     =>  '骑手待取餐',
+        '10'    =>  '退款中',
+        '11'    =>   '退款成功',
+        '12'    =>   '退款失败',
     ];
 
 
@@ -38,7 +38,7 @@ class Order extends ApiBase
      * @param Request $request
      * @return \think\response\Json
      * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\db\exception\modelNotFoundException
      * @throws \think\exception\DbException
      */
     public function getList(Request $request)
@@ -102,7 +102,7 @@ class Order extends ApiBase
                 $rider_link_tel = Db::name('takeout')->alias('a')
                     ->leftJoin('rider_info b','a.rider_id = b.id')
                     ->where('a.order_id',$row['id'])
-                    ->value('b.link_tel');
+                    ->value('b.phone');
 
                 $result[$key]['rider_link_tel'] = $rider_link_tel;
 
@@ -137,9 +137,14 @@ class Order extends ApiBase
 
         $rider_info = Db::name('takeout')->alias('a')
             ->join('rider_info b','a.rider_id = b.id')
-            ->field('a.single_time,a.accomplish_time,b.id,b.name,b.headimgurl,b.sex,b.link_tel')
+            ->field('a.single_time,a.accomplish_time,a.single_time,a.accomplish_time,b.id,b.name,b.headimgurl,b.sex,b.phone')
             ->where('a.order_id',$orders_id)
             ->find();
+
+        $rider_info['delivery_time'] = floor(($rider_info['accomplish_time'] - $rider_info['single_time']) / 60);
+        $rider_info['accomplish_time'] = date('H:i',$rider_info['accomplish_time']);//送达时间
+
+
 
         if(!$rider_info) {
             $this->error('暂无骑手信息');
@@ -170,10 +175,12 @@ class Order extends ApiBase
 
         $result['detail'] = $data;
 
-        foreach ($result['detail'] as $row) {
+        foreach ($result['detail'] as &$row) {
             $row['attr_names'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
-            $row['name'] = Model('Product')->getNameById($row['product_id']);
+            $row['name'] = model('Product')->getNameById($row['product_id']);
+            $row['goods_img'] = model('Product')->getImgById($row['product_id']);
             $row['id'] = $row['product_id'];
+            $row['old_price'] = model('Product')->getGoodsOldPrice($row['id']); 
             $result['platform_discount']['id'] = $row['platform_coupon_id'];
             $result['platform_discount']['face_value'] = (int)$row['platform_coupon_money'];
             $result['shop_discount']['id'] = $row['shop_discounts_id'];
@@ -182,7 +189,7 @@ class Order extends ApiBase
             //unset($row['id']);
         }
 
-        $orders = Model('Orders')->getOrderById($orders_id);
+        $orders = model('Orders')->getOrderById($orders_id);
 
         $result['orders'] = [
             'orders_sn' => $orders['orders_sn'],
@@ -196,7 +203,7 @@ class Order extends ApiBase
             'status_name' => $this->order_status[$orders['status']]
         ];
 
-        $shop_info = Model('ShopInfo')->where('id',$orders['shop_id'])->field('id,shop_name,logo_img,run_type')->find();
+        $shop_info = model('ShopInfo')->where('id',$orders['shop_id'])->field('id,shop_name,logo_img,run_type')->find();
 
         $result['shop_info'] = [
             'id' => $shop_info['id'],
@@ -213,8 +220,9 @@ class Order extends ApiBase
             $rider_info = Db::name('takeout')->alias('a')
                 ->leftJoin('rider_info b','a.rider_id = b.id')
                 ->where('a.order_id',$orders_id)
-                ->field('b.*')
+                ->field('b.phone,b.link_tel')
                 ->find();
+            $rider_info['link_tel'] = $rider_info['phone'];
             $result['ping_info']['rider_info'] = isset($rider_info) ? $rider_info : '';//骑手信息
 
         }
@@ -239,64 +247,6 @@ class Order extends ApiBase
         $this->success('获取成功',$result);
     }
 
-    /**
-     * 小程序支付
-     * @param Request $request
-     */
-    public function orderPay(Request $request)
-    {
-        $orders_sn = $request->param('orders_sn');
-        $openid = $this->auth->openid;
-        $user_id = $this->auth->id;
-
-
-        if(!$orders_sn){
-
-            $this->error('订单号不能为空');
-        }
-
-        $order = model('Orders')->getOrder($orders_sn);
-
-        if(!$order){
-            $this->error('订单id错误');
-        }
-
-        if($order->user_id != $user_id){
-            $this->error('非法操作');
-        }
-        if($order->pay_status == 1){
-            $this->error('订单已支付');
-        }
-
-        if($order->status == 11){
-            $this->error('订单已取消');
-        }
-
-        if((time()-$order->add_time) > 15*60){//15分钟失效
-            $this->error('订单已失效');
-        }
-
-        $data['price'] = $order['money'];
-
-        $data = [
-            'openid' => $openid,
-            'body' => "11",
-            'detail' => "11",
-            'out_trade_no' => $orders_sn,
-            'total_fee' => $data['price'],
-        ];
-
-        error_log('request=='.print_r($data,1),3,Env::get('root_path')."./logs/order.log");
-        $wx = new \app\api\controller\Weixin();
-        $result = $wx->pay($data);
-
-        error_log('result=='.print_r($result,1),3,Env::get('root_path')."./logs/order.log");
-
-        if($result) {
-            $this->success('success',$result);
-        }
-
-    }
 
     /**
      * 订单支付真实
@@ -306,9 +256,10 @@ class Order extends ApiBase
     public function orderPayment(Request $request)
     {
         $orders_sn = $request->param('orders_sn');
+        $shop_id = $request->param('shop_id');
         $openid = $this->auth->openid;
         $user_id = $this->auth->id;
-
+        $this->isDisable($shop_id);
         
         if(!$orders_sn){
 
@@ -324,20 +275,20 @@ class Order extends ApiBase
         if($order->user_id != $user_id){
             $this->error('非法操作');
         }
-        if($order->pay_status == 1){
-            $this->error('订单已支付');
+        // 订单超时15分钟，自动失效
+        if($order->status == 9){
+            $this->error('订单已失效');
         }
 
-        if((time()-$order->add_time) > 15*60){//15分钟失效
-            Model('Orders')->updateStatus($orders_sn,9);
-            $this->error('订单已失效');
+        if($order->pay_status == 1){
+            $this->error('订单已支付');
         }
 
         $data['price'] = $order['money'];
 
         if($data['price'] == 0) {
-            Db::name('orders')->where('orders_sn',$orders_sn)->setField('status',2);
-            $this->error('支付成功','10000');
+            model('orders')->where('orders_sn',$orders_sn)->update(['status'=>2,'pay_status'=>1,'pay_time'=>time(),'trade_no'=>'0元付']);
+            $this->success('支付成功','10000');
         }
 
         $config = config('wx_pay');
@@ -461,7 +412,7 @@ class Order extends ApiBase
             $this->error('退单已提交申请,请耐心等待');
         }
 
-        $orders = Model('Orders')->getOrderById($orders_id);
+        $orders = model('Orders')->getOrderById($orders_id);
 
         $data = [
             'orders_id' => $orders_id,
@@ -469,7 +420,7 @@ class Order extends ApiBase
             'orders_info_ids' => $orders_info_ids,
             'content' => $content,
             'imgs' => $imgs,
-            'refund_fee' => $orders['money'] - $orders['ping_fee'],//退单
+            'refund_fee' => $orders['money'],//退单
             'total_fee' => $orders['money'],
             'ping_fee' => $orders['ping_fee'],//配送费
             'num' => $orders['num'],
@@ -477,6 +428,7 @@ class Order extends ApiBase
             'add_time' => time(),
             'out_refund_no' => build_order_no('T'),
             'out_trade_no' => $orders['orders_sn'],
+            'user_id' => $this->auth->id
         ];
 
 
@@ -484,28 +436,11 @@ class Order extends ApiBase
 
         if($res) {
             //更新一下主表订单状态为退款中
-            Model('Orders')->updateStatus($orders['orders_sn'],11);
+            model('Orders')->updateStatus($orders['orders_sn'],10);
             $this->success('售后申请已提交成功,等待商家处理');
         }
     }
 
-    /**
-     * 是否首单
-     */
-    public function is_first_order()
-    {
-        $uid = $this->auth->id;
-
-        $data  = model('orders')->isFirstOrder($uid);
-
-        if(!$data) {
-            return json_success('success',['is_first_order'=> 1]);
-        }
-
-        return json_success('success',['is_first_order'=> 0]);
-
-
-    }
 
     /**
      * 确认订单，生成订单
@@ -515,31 +450,20 @@ class Order extends ApiBase
     public function sureOrder(Request $request)
     {
         $order = $request->param('order');//主表
+        $this->isDisable($order['shop_id']);
         $detail = $request->param('detail');//明细
         $platform_discount = $request->param('platform_discount');//平台活动
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
 
-        set_log('order=',$order,'sureOrder');
-        set_log('detail=',$detail,'sureOrder');
-//        set_log("request请求",$request->param(),'order');
-
-        /*dump($order);
-        dump($detail);
-        dump($platform_discount);
-        dump($shop_discount);*/
-
-
-        /*if(!$order || !$detail || !$platform_discount || !$shop_discount) {
-            $this->error('非法传参');
-        }*/
+       set_log('order=',$order,'sureOrder');
+       set_log('detail=',$detail,'sureOrder');
+       set_log('platform_discount=',$platform_discount,'sureOrder');
+       set_log('shop_discount=',$shop_discount,'sureOrder');
 
         $orders_sn = build_order_no('D');//生成唯一订单号
         $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
-      /*  $orders = Model('Orders');
-        $orders->address = [
 
-        ];*/
         //启动事务
         Db::startTrans();
         try{
@@ -579,7 +503,7 @@ class Order extends ApiBase
                     'order_sn' => $orders_sn,
                 ];
 
-                $res = Model('MyCoupon')->updateStatus($orderData['platform_coupon_id'],$data);
+                $res = model('MyCoupon')->updateStatus($orderData['platform_coupon_id'],$data);
                 if(!$res) {
                     throw new \Exception('红包使用失败');
                 }
@@ -589,10 +513,8 @@ class Order extends ApiBase
             $detailData = [];
             $total_money = $order['total_money'];//订单总价
             $money = $order['money'];//订单结算金额
-            $order_discount = $orderData['shop_discounts_money'] + $orderData['platform_coupon_money'];//订单优惠金额
-            $product_total_money = '0.00';//商品总价和
-            $product_money = '0.00';//商品结算金额(如果有优惠会把运费和包装费去除计算)
-            $old_money = '0.00';//商品原价 如果有优惠商品记录商品原价
+//            $order_discount = $orderData['shop_discounts_money'] + $orderData['platform_coupon_money'];//订单优惠金额
+            /*$product_total_money = '0.00';//商品总价和
 
             foreach ($detail as $row) {
                 $product_total_money += $row['total_money'];
@@ -603,26 +525,24 @@ class Order extends ApiBase
             }
 
 
-            if($money != ($total_money - $order_discount)) {
+            /*if($money != ($total_money - $order_discount)) {
                 throw new \Exception('订单结算金额不正确');
+            }*/
+
+
+            //今日特价商品逻辑
+            $id = model('TodayDeals')->getTodayProduct($orderData['shop_id']);
+            if ($id){
+                $product  = array_column($detail,'product_id');
+                if (in_array($id,$product)){
+                    model('TodayDeals')->updateTodayProductNum($orderData['shop_id'],'dec',$id);
+                }
             }
 
 
+            //今日特价商品逻辑 end
+
             foreach ($detail as $row) {
-
-                //今日特价商品逻辑 start
-                $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
-
-                $today = date('Y-m-d',time());
-
-                if($todaty_goods && $todaty_goods['today'] == $today) {
-                    //加库存
-                    Db::name('today_deals')
-                        ->where('product_id',$row['product_id'])
-                        ->where('today',$today)
-                        ->setDec('num',$row['num']);
-                }
-                //今日特价商品逻辑 end
 
                 //商品均摊金额和商品原价初始化
                 $product_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
@@ -652,6 +572,7 @@ class Order extends ApiBase
                     'total_money' => $row['total_money'],
                     'money' => $product_money,//商品结算金额
                     'old_money' => $old_money,//商品原价
+                    'price' => isset($row['price']) ? $row['price'] : 0.00,//商品单价
                     'box_money' => isset($row['box_money']) ? $row['box_money'] : 0.00,
                     'platform_coupon_id' => isset($platform_discount['id']) ? $platform_discount['id'] : 0,
                     'platform_coupon_money' => isset($platform_discount['face_value']) ? (float)$platform_discount['face_value'] : 0.00,
@@ -692,10 +613,10 @@ class Order extends ApiBase
         $hongbao_status = 1;//未使用
 
         if(isset($order_sn)) {
-           $orders_sn = trim($order_sn);
+            $order_sn = trim($order_sn);
         }
 
-        $order_info = Model('Orders')->getOrder($order_sn);
+        $order_info = model('Orders')->getOrder($order_sn);
 
         $order_detail =  model('Orders')->getOrderDetail($order_info['id']);
 
@@ -708,6 +629,7 @@ class Order extends ApiBase
             $this->error('订单已取消');
         }
 
+        // 这块判断有问题， 状态值 2 跟 3 不能同时存在
         if($order_info['status'] == 2) {//已经支付
 
             if($order_info['status'] == 3) {
@@ -720,28 +642,21 @@ class Order extends ApiBase
         //如果使用红包 状态回滚
         if($order_info['platform_coupon_money'] > 0){
             $data['status'] = $hongbao_status;
-            Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
+            model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
         }
 
-        //今日特价商品逻辑 start
-        foreach ($order_detail as $row)
-        {
-            $todaty_goods = Db::name('today_deals')->where('product_id',$row['product_id'])->find();
-
-            $today = date('Y-m-d',time());
-
-            if($todaty_goods && $todaty_goods['today'] == $today) {
-                //加库存
-                Db::name('today_deals')
-                    ->where('product_id',$row['product_id'])
-                    ->where('today',$today)
-                    ->setInc('num',$row['num']);
+        //今日特价商品逻辑
+        $id = model('TodayDeals')->getTodayProduct($order_info['shop_id']);
+        if ($id){
+            $product  = array_column($order_detail,'product_id');
+            if (in_array($id,$product)){
+                model('TodayDeals')->updateTodayProductNum($order_info['shop_id'],'inc',$id);
             }
-
         }
+
         //今日特价商品逻辑 end
 
-        $res = Model('Orders')->cancelOrder($order_sn,$order_status);
+        $res = model('Orders')->cancelOrder($order_sn,$order_status);
 
         if($res) {
             $this->success('订单取消成功');
@@ -751,7 +666,7 @@ class Order extends ApiBase
     }
 
     /**
-     * 在来一单
+     * 再来一单
      */
     public function agianOrder(Request $request)
     {
@@ -765,14 +680,36 @@ class Order extends ApiBase
         }
 
         $order_detail = model('Orders')->getOrderDetail($order_id);
-
-
-        //dump($order_detail);
         $result = [];
-
+        //获取商家提价
+        $price_hike = model('ShopInfo')->getPriceHike($order_info['shop_id']);
         foreach ($order_detail  as $row)
         {
-            $product_info = Model('Product')->where('id',$row['product_id'])->find();
+            $product_info = model('Product')->where('id',$row['product_id'])->find();
+
+            //如果商品下架 则不返回
+            if($product_info['status'] == 2) {
+                $today = date('Y-m-d',time());
+                $today_goods = model('todayDeals')
+                    ->where('product_id',$row['product_id'])
+                    ->where('today',$today)
+                    ->where('shop_id',$order_info['shop_id'])
+                    ->find();
+
+                if($today_goods) {
+                    //今日特价过期
+                    if(time() > $today_goods['end_time']) {
+                        continue;
+                    }
+
+                    $row['limit_buy_num'] = $today_goods['limit_buy_num'];//限购次数
+                    $product_info['old_price'] = $today_goods['old_price'];
+                    $product_info['price'] = $today_goods['price'];
+                }else{
+                    continue;
+                }
+
+            }
 
 
             $result[] = [
@@ -782,12 +719,17 @@ class Order extends ApiBase
                 'thumb' => $product_info['thumb'],
                 'name' => $product_info['name'],
                 'num' => $row['num'],
-                'price' => $product_info['price'],
-                'old_price' => $product_info['old_price'],
+                'price' => $product_info['price'] + $price_hike,
+                'old_price' => $product_info['old_price'] + $price_hike,
                 'box_money' => $product_info['box_money'],
                 'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
-                'attr_ids' => $row['attr_ids']
+                'attr_ids' => $row['attr_ids'],
+                'limit_buy_num' => isset($row['limit_buy_num']) ? $row['limit_buy_num'] : ''
             ];
+        }
+
+        if (count($result) < 1) {
+            $this->error('该商品已下架');
         }
 
         $this->success('获取成功',$result);
@@ -811,9 +753,9 @@ class Order extends ApiBase
         if (!$find){
             $this->error('商户订单号错误');
         }
-
-        $totalFee = $find->money * 100; //订单金额
-        $refundFee =  $find->money * 100;//退款金额
+        $money = intval((string)($find->money * 100));
+        $totalFee = $money; //订单金额
+        $refundFee =  $money;//退款金额
         $refundNumber = build_order_no('T');//商户退款单号
 
         $pay_config = config('wx_pay');
@@ -823,11 +765,29 @@ class Order extends ApiBase
         $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
             // 可在此处传入其他参数，详细参数见微信支付文档
             'refund_desc' => '取消订单退款',
-//            'notify_url'    => 'http' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+            'notify_url'    => 'http' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
         ]);
 
 
         return $result;
     }
+
+
+    /**
+     * 判断用户是否被禁用 
+     * 
+     */
+    public function checkUserDisabled()
+    {
+        // 判断当前用户是否是禁用用户，如果是禁用用户，则不可以下单【提示，因为您的个人原因， 您已被禁止下单啦】
+        $status = model('User')->where('id','=',$this->auth->id)->value('status');
+        if ($status == 2) {
+            $this->error('因为您的个人原因， 您已被禁止下单啦',202);
+        }
+
+        $this->success('用户可下单',200);
+
+    }
+     
 }
 

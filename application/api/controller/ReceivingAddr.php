@@ -2,7 +2,6 @@
 
 namespace app\api\controller;
 
-use think\Controller;
 use think\Request;
 use app\common\model\ReceivingAddr as ReceiveAddr;
 use app\common\model\School;
@@ -26,7 +25,7 @@ class ReceivingAddr extends ApiBase
             $list[$k]['school_name'] = model('school')->getNameById($list[$k]['school_id']);
         }
         // 判断是否从下单处获取的地址列表
-        if (!$school_id){
+        if ($school_id){
             foreach ($list as &$value) {
                 $value['beyond'] = 0;
                 if ( $value['school_id'] == $school_id){
@@ -44,7 +43,11 @@ class ReceivingAddr extends ApiBase
      */
     public function create(Request $request)
     {
-        $data = $request->param();
+        $data['school_id'] = $request->param('school_id');
+        $data['name'] = $request->param('name');
+        $data['phone'] = $request->param('phone');
+        $data['sex'] = $request->param('sex');
+        $data['area_detail'] = $request->param('area_detail');
         $data['user_id'] = $this->auth->id;
         $data['add_time'] = time();
         // 验证表单数据
@@ -52,17 +55,17 @@ class ReceivingAddr extends ApiBase
         if ($check !== true) {
             $this->error($check,201);
         }
-        // 将物理地址逆解析为经纬度
-        $school_id = $request->param('school_id');
-        $school_name = model('School')->getNameById($school_id);
-        $address = $school_name.$request->param('area_detail');
+        //获取所在学校
+        $school_name = model('School')->getNameById($data['school_id']);
+        $area_name = model('School')->getAreaNameById($data['school_id']);
+        $address = '南京市'.$area_name.$school_name.$data['area_detail'];
+        //获取经纬度
         $location = get_location($address);
-        if (empty($location)) {
-            $this->error('地址无法定位哦，请认真填写',201);            
+        if (!$location) {
+            $this->error('地址有误，请重新输入');
         }
-        $data['latitude'] = $location['lat'];
         $data['longitude'] = $location['lng'];
-
+        $data['latitude'] = $location['lat'];
         // 提交新增表单
         $result = ReceiveAddr::create($data,true);
         if (!$result) {
@@ -103,17 +106,18 @@ class ReceivingAddr extends ApiBase
             $this->error($check,201);
         }
 
-        // 将物理地址逆解析为经纬度
-        $school_id = $request->param('school_id');
-        $school_name = model('School')->getNameById($school_id);
-        $address = $school_name.$request->param('area_detail');
+        //获取所在学校
+        $school_name = model('School')->getNameById($data['school_id']);
+        $area_name = model('School')->getAreaNameById($data['school_id']);
+        $address = '南京市'.$area_name.$school_name.$data['area_detail'];
+        //获取经纬度
         $location = get_location($address);
-        if (empty($location)) {
-            $this->error('地址无法定位哦，请认真填写',201);            
+        if (!$location) {
+            $this->error('地址有误，请重新输入');
         }
-        $data['latitude'] = $location['lat'];
         $data['longitude'] = $location['lng'];
-        
+        $data['latitude'] = $location['lat'];
+
         // 提交表单
         $result = ReceiveAddr::update($data);
         if (!$result) {

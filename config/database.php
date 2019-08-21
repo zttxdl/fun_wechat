@@ -13,7 +13,7 @@ return [
     // 数据库类型
     'type'            => 'mysql',
     // 服务器地址
-    'hostname'        => '118.31.111.94',
+    'hostname'        => '127.0.0.1',
     // 数据库名
     'database'        => 'fun_wechat',
     // 用户名

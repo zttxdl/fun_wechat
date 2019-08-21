@@ -6,6 +6,8 @@ use think\Db;
 use think\Request;
 use app\common\model\RiderInfo;
 use app\common\controller\RiderBase;
+use app\common\Auth\JwtAuth;
+
 
 /**
  * 骑手个人中心控制器
@@ -18,29 +20,28 @@ class Member extends RiderBase
 
     
     /**
-     * 骑手审核状态
+     * 骑手加入表单状态【前端用】
      */
-    public function checkStatus()
+    public function checkJoin()
     {
-        $check_info = model('RiderInfo')->where('id',$this->auth->id)->field('remark,status,check_status')->find();
-        if ($check_info['status'] == 2) { // 审核未通过
-            $check_info['mb_remark'] = Db::name('check_status')->where('type','=',2)->where('id','in',$check_info['remark'])->column('name');
-        }
-        unset($check_info['remark']);
-        return json_success('获取审核状态成功',['check_info'=>$check_info]);
+        $check_join = model('RiderInfo')->where('id',$this->auth->id)->value('check_join');
+        return json_success('获取加入状态成功',['check_join'=>$check_join]);
     }
 
 
     /**
-     * 设置骑手已审核通过状态【前端单独用】
+     * 判断当前身份绑定的状态 
+     * 
      */
-    public function setCheckStatus()
+    public function checkIdentityStatus()
     {
-        $res = Db::name('rider_info')->where('id',$this->auth->id)->setField('check_status',1);
-        if (!$res) {
-            $this->error('设置失败');
+        $info = Db::name('rider_info r')->join('school s','r.school_id = s.id')->where('r.id',$this->auth->id)->field('r.name,r.identity_num,r.card_img,r.back_img,r.hand_card_img,s.name as school_name,r.phone,r.remark,r.status')->find();
+        if ($info['status'] == 2) {
+            $info['mb_remark'] = Db::name('check_status')->where('type','=',2)->where('id','in',$info['remark'])->column('name');
+            unset($info['remark']);
         }
-        $this->success('设置成功');
+        
+        $this->success('获取当前身份绑定状态成功',['info'=>$info]);
     }
 
 
@@ -112,17 +113,57 @@ class Member extends RiderBase
 
 
     /**
-     * 申请入驻【成为骑手】 
+     * 欢迎加入 
+     * 
+     */
+    public function toJoin(Request $request)
+    {
+        $data = $request->post();
+        // 验证表单数据
+        $check = $this->validate($data, 'RiderInfo.join');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+        $data['check_join'] = 1;
+
+        // 更新数据
+        $result = RiderInfo::where('id','=',$this->auth->id)->update($data);
+        if (!$result) {
+            $this->error('加入失败',201);
+        }
+        $rider_info = RiderInfo::where('id','=',$this->auth->id)->field('id,school_id,status,open_status,name')->find();
+
+        $jwtAuth = new JwtAuth();
+        $token = $jwtAuth->createToken($rider_info,2592000);
+
+        $this->success('加入成功',['token'=>$token]);
+    }
+     
+
+    /**
+     * 申请入驻【成为骑手】 【第一次添加或重新编辑】
      * 
      */
     public function applyRider(Request $request)
     {
-        $data = $request->post();
+        $data = $request->param();
         $data['status'] = 1;
         $data['add_time'] = time();
+        $data['overtime'] = time() + 24*7*3600;
+        
+        // 校验手机号
+        $phone = $request->param('phone');
+        $code  = $request->param('code');
+        $type  = $request->param('type');
+
+        // 校验验证码
+        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
+        if (!$result) {
+            return json_error(model('Alisms', 'service')->getError());
+        }
 
         // 验证表单数据
-        $check = $this->validate($data, 'RiderInfo');
+        $check = $this->validate($data, 'RiderInfo.apply');
         if ($check !== true) {
             $this->error($check,201);
         }
@@ -130,9 +171,9 @@ class Member extends RiderBase
         // 更新数据
         $result = RiderInfo::where('id','=',$this->auth->id)->update($data);
         if (!$result) {
-            $this->error('更新失败',201);
+            $this->error('申请失败',201);
         }
-        $this->success('更新成功');
+        $this->success('申请成功');
     }
 
 
@@ -142,7 +183,7 @@ class Member extends RiderBase
      */
     public function edit()
     {
-        $info = model('RiderInfo')->where('id',$this->auth->id)->field('id,name,link_tel,identity_num,card_img,back_img,hand_card_img,school_id')->find();
+        $info = model('RiderInfo')->where('id',$this->auth->id)->field('id,name,link_tel,identity_num,card_img,back_img,hand_card_img,school_id,phone')->find();
         $info['school_name'] = model('school')->getNameById($info['school_id']);
         $this->success('获取成功',['info'=>$info]);        
     }

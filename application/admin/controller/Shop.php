@@ -3,20 +3,19 @@
 
 namespace app\admin\controller;
 
-//use think\Model;
-use think\Controller;
-use think\Model;
+use app\common\controller\Base;
 use think\Request;
-use think\Db;
 use app\common\model\Shop as ShopInfoModel;
+use think\Db;
 
-class Shop extends Controller
+class Shop extends Base
 {
 
     public function __construct()
     {
         $this->shopModel = Model('Shop');
         $this->SchoolModel = Model('School');
+        parent::__construct();
     }
 
     /**
@@ -43,8 +42,6 @@ class Shop extends Controller
             $map[] = ['school_id','=',$school_id];
         }
 
-
-
         // 获取当前学校的已审核通过的商铺列表
         $list = model('ShopInfo')
             ->alias('a')
@@ -53,29 +50,32 @@ class Shop extends Controller
             ->paginate($page_size)
             ->toArray();
 
-        if(!$list['data']) {
-            $this->error('暂无数据');
-        }
+//        if(!$list['data']) {
+//            $this->error('暂无数据',201,[]);
+//        }
 
         $result = [];
-        foreach ($list['data'] as $row)
-        {
-            if($row['id']) {
-                $result['data'][] = [
-                    'id' => $row['id'],
-                    'shop_name' => $row['shop_name'],
-                    'logo_img' => $row['logo_img'],
-                    'link_name' => $row['link_name'],
-                    'link_tel' => $row['link_tel'],
-                    'add_time' => date('Y-m-d',$row['add_time']),
-                    'school_name' =>  Model('School')->getNameById($row['school_id']),
-                    'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
-                    'status' => config('shop_check_status')[$row['status']],
-                    'month_sales' => model('Shop')->getMonthSales($row['id']),
-                    'count_sales' => model('Shop')->getCountSales($row['id']),
-                ];
+        if($list) {
+            foreach ($list['data'] as $row)
+            {
+                if($row['id']) {
+                    $result['data'][] = [
+                        'id' => $row['id'],
+                        'shop_name' => $row['shop_name'],
+                        'logo_img' => $row['logo_img'],
+                        'link_name' => $row['link_name'],
+                        'link_tel' => $row['link_tel'],
+                        'add_time' => date('Y-m-d',$row['add_time']),
+                        'school_name' =>  Model('School')->getNameById($row['school_id']),
+                        'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
+                        'status' => config('shop_check_status')[$row['status']],
+                        'month_sales' => model('Shop')->getMonthSales($row['id']),
+                        'count_sales' => model('Shop')->getCountSales($row['id']),
+                    ];
+                }
             }
         }
+
 
         $result['count'] = $list['total'];
         $result['page'] = $list['current_page'];
@@ -92,9 +92,20 @@ class Shop extends Controller
         $shop_id = $request->param('shop_id');
         $status = $request->param('status');//3 启用 4 禁用
 
+        if ($status == 4) { // 当禁用店铺时，需判断该店铺是否存在未完结的订单往来
+            // 判断该商家是否还有未完结的订单
+            $count = model('Orders')->where([['shop_id','=',$shop_id],['status','in',[2,3,5,6,10,12]]])->count();
+            if ($count) {
+                $this->error('该商家还存在未处理的订单，暂时不可禁用此商家',202);
+            }
+            // 如果该商家存在正在投放中广告，则将该广告暂停投放
+            $advert_ids = model('Advert')->where([['type','=',1],['status','=',1]])->column('id');
+            if ($advert_ids) {
+                model('Advert')->where('id','in',$advert_ids)->setField('status',2);
+            }
+
+        }
         $res = Model('ShopInfo')->where('id',$shop_id)->setField('status',$status);
-
-
         if($res) {
             $this->success('操作成功');
         }
@@ -116,10 +127,8 @@ class Shop extends Controller
         }
         $shop_info = $this->shopModel->getShopInfo($shop_id);
 
-
-
         if(!$shop_info) {
-            return json_error('店铺不存在');
+            $this->error('店铺不存在');
         }
         $result = [];
         foreach ($shop_info as $row)
@@ -131,6 +140,9 @@ class Shop extends Controller
             $result['shop_info']['link_tel'] = $row['link_tel'];
             $result['shop_info']['status'] = config('shop_check_status')[$row['status']];
             $result['shop_info']['manage_category_name'] = Model('ManageCategory')->getNameById($row['manage_category_id']);
+            $result['shop_info']['address'] = $row['address'];
+            $result['shop_info']['school'] = Model('School')->getNameById($row['school_id']);
+            $result['shop_info']['canteen_name'] = Model('Canteen')->getCanteenName($row['canteen_id']);
         }
 
         $shop_more_info = $this->shopModel->getShopMoreInfo($shop_id);
@@ -223,25 +235,30 @@ class Shop extends Controller
 //                            ->fetchSql()
                             ->paginate($page_size)->toArray();
 
-        if(!$data['data']) {
+        /*if(!$data['data']) {
             $this->error('暂无数据');
-        }
+        }*/
 
         $result = [];
 
-        foreach ($data['data'] as $row){
-            $result['info'][] = [
-                'id' => $row['id'],
-                'logo_img' => $row['logo_img'],
-                'shop_name' => $row['shop_name'],
-                'link_name' => $row['link_name'],
-                'link_tel' => $row['link_tel'],
-                'manage_category_name' => $row['manage_category_name'],
-                'school_name' => $row['school_name'],
-                'status' => config('shop_check_status')[$row['status']]
+        if($data) {
+            foreach ($data['data'] as $row){
+                $result['info'][] = [
+                    'id' => $row['id'],
+                    'logo_img' => $row['logo_img'],
+                    'shop_name' => $row['shop_name'],
+                    'link_name' => $row['link_name'],
+                    'link_tel' => $row['link_tel'],
+                    'manage_category_name' => $row['manage_category_name'],
+                    'school_name' => $row['school_name'],
+                    'status' => $row['status'],
+                    'mb_status' => config('shop_check_status')[$row['status']]
 
-            ];
+                ];
+            }
         }
+
+
         $result['count'] = $data['total'];
         $result['page'] = $data['current_page'];
         $result['pageSize'] = $data['per_page'];
@@ -352,7 +369,7 @@ class Shop extends Controller
      */
     public function checkShow()
     {
-        $data = config('check_status')['shop'];
+        $data = Db::name('check_status')->where('type','=',1)->column('name','id');
         $this->success('获取成功',$data);
     }
 
@@ -408,5 +425,94 @@ class Shop extends Controller
         }
         $this->success('设置成功');
     }
+
+
+    /**
+     * 展示编辑商家 
+     * 
+     */
+    public function edit($id)
+    {
+        if(empty((int)$id)) {
+            $this->error('非法请求','404');
+        }
+        $shop_info = $this->shopModel->getShopInfo($id);
+
+        if(!$shop_info) {
+            $this->error('店铺不存在');
+        }
+        $result = [];
+        foreach ($shop_info as $row)
+        {
+            //店铺信息
+            $result['shop_info']['shop_name'] = $row['shop_name'];
+            $result['shop_info']['logo_img'] = $row['logo_img'];
+            $result['shop_info']['link_name'] = $row['link_name'];
+            $result['shop_info']['link_tel'] = $row['link_tel'];
+            $result['shop_info']['status'] = config('shop_check_status')[$row['status']];
+            $result['shop_info']['manage_category_name'] = Model('ManageCategory')->getNameById($row['manage_category_id']);
+            $result['shop_info']['address'] = $row['address'];
+            $result['shop_info']['school'] = Model('School')->getNameById($row['school_id']);
+        }
+
+        $shop_more_info = $this->shopModel->getShopMoreInfo($id);
+
+        $shop_qualification = [];
+        $shop_account = [];
+
+        if($shop_more_info) {
+            foreach ($shop_more_info as $row)
+            {
+                //商家资质
+                $shop_qualification = [
+                    'business_license' => $row['business_license'],
+                    'proprietor' => $row['proprietor'],
+                    'hand_card_front' => $row['hand_card_front'],
+                    'hand_card_back' => $row['hand_card_back'],
+                    'user_name' => $row['user_name'],
+                    'identity_num' => $row['identity_num'],
+                    'sex' => config('sex')[$row['sex']],
+                    'licence' => $row['licence'],
+                ];
+                //收款信息
+                $shop_account = [
+                    'branch_back' => $row['branch_back'],
+                    'back_hand_name' => $row['back_hand_name'],
+                    'back_card_num' => $row['back_card_num'],
+                ];
+            }
+        }
+
+        $result['shop_qualification'] = $shop_qualification;
+        $result['shop_account'] = $shop_account;
+        //补充信息
+        $result['shop_information'] = $this->shopModel->getInformation($id);
+
+        $this->success('获取成功',$result);
+    }
+
+
+    /**
+     * 保存编辑商家 
+     * 
+     */
+    public function update(Request $request)
+    {
+        $data = $request->param();
+        // 验证表单
+        $check = $this->validate($data, 'ShopInfo');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+
+        // 更新至数据库
+        $res = Db::name('shop_info')->update($data);
+        if (!$res) {
+            $this->error('修改失败');
+        }
+        $this->success('修改成功');
+    }
+     
+     
 
 }

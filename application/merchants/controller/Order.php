@@ -11,6 +11,7 @@ namespace app\merchants\controller;
 use app\common\controller\MerchantsBase;
 use app\common\model\Orders;
 use EasyWeChat\Factory;
+use think\facade\Cache;
 use think\Exception;
 use think\Request;
 use think\Db;
@@ -36,14 +37,20 @@ class Order extends MerchantsBase
             $map[] = ['status','=',$status];
         }
 
-        if($shop_id) {
-            $map[] = ['shop_id','=',$this->shop_id];
+        if(!$shop_id) {
+            $this->error('缺少必要参数');
         }
 
-        $orders = Orders::where($map)->paginate($page_size)->toArray();
+        $map[] = ['shop_id','=',$shop_id];
 
-        //dump($orders);
+        $orders = Orders::where($map)->order('add_time DESC')->paginate($page_size)->toArray();
 
+
+        if(!$orders) {
+            $this->error('暂无订单');
+        }
+
+        $data = [];
         foreach ($orders['data'] as $key => &$row)
         {
             $data[] = [
@@ -54,14 +61,17 @@ class Order extends MerchantsBase
                 'box_money' => $row['box_money'],
                 'ping_fee' => $row['ping_fee'],
                 'num'=> $row['num'],
+                'money' => $row['money'],
+                'meal_sn'=> $row['meal_sn'],
+                'rider_tel'=> Model('RiderInfo')->getPhoneById($row['rider_id']),
+                'issuing_status' => $row['issuing_status'],
                 'type' => $this->getShopType($row['status']),
                 'detail' => $this->detail($row['id']),
+
             ];
         }
 
-        if(!$orders) {
-            $this->error('暂无订单');
-        }
+
 
 
         $result['list'] = $data;
@@ -103,6 +113,7 @@ class Order extends MerchantsBase
 
         $orders = model('orders')
             ->where($map)
+            ->order('add_time DESC')
             ->paginate($page_size)->toArray();
 
         //var_dump($result);exit;
@@ -111,7 +122,7 @@ class Order extends MerchantsBase
         }
 
         //$result = [];
-        $type = '';
+        $data = [];
         foreach ($orders['data'] as $row)
         {
             $type = $this->getShopType($row['status']);
@@ -122,7 +133,10 @@ class Order extends MerchantsBase
                 'add_time' => date('Y-m-d H:i',$row['add_time']),
                 'money' => $row['money'],
                 'status' => $row['status'],
-                'type'=>$type
+                'type'=>$type,
+                'meal_sn'=> $row['meal_sn'],
+                'rider_tel'=> Model('RiderInfo')->getPhoneById($row['rider_id']),
+                'issuing_status' => $row['issuing_status']//出餐状态 0:未出餐 1:已出餐
             ];
 
 
@@ -236,6 +250,7 @@ class Order extends MerchantsBase
 
         $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
 
+
         if($order_info['status'] == 3) {
             $this->error('商家已接单');
         }
@@ -248,15 +263,19 @@ class Order extends MerchantsBase
             'address_detail' => $shop_info['address'],
             'phone' => $shop_info['link_tel'],
             'name' => $shop_info['link_name'],
+            'longitude' => $shop_info['longitude'],
+            'latitude' => $shop_info['latitude'],
         ];
 
+        //启动事务
+        Db::startTrans();
         try{
             //封装外卖数据
             $takeout_info = [
                 'order_id' => $order_info['id'],
                 'shop_id' => $order_info['shop_id'],
                 'ping_fee' => $order_info['ping_fee'],//配送费
-                'meal_sn' => createOrderSn('shop_id:'.$order_info['shop_id']),//取餐号
+                'meal_sn' => getMealSn('shop_id:'.$order_info['shop_id']),//取餐号
                 'school_id' => Model('Shop')->getSchoolIdByID($order_info['shop_id']),
                 'create_time' => time(),//商家接单时间
                 'expected_time' => time()+30*60,//预计送达时间
@@ -264,26 +283,54 @@ class Order extends MerchantsBase
                 'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
             ];
 
-
-
-            $takeout = Db::name('takeout')->where('order_id',$orders_sn)->value('order_id');
-
-            if($takeout) {
-                throw new Exception('订单ID重复');
+            $ret = Db::name('orders')->where('id',$order_info['id'])->setField('meal_sn',$takeout_info['meal_sn']);//更新主表取餐号
+            if (!$ret){
+                throw new Exception('主表取餐号更新失败');
             }
+
             //外卖数据入库
-            Db::name('takeout')->insert($takeout_info);
+            $ret = Db::name('takeout')->insert($takeout_info);
 
-
+            if (!$ret){
+                throw new Exception('接单失败');
+            }
 
             $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time()]);
+            if (!$result){
+                throw new Exception('接单失败');
+            }
 
-            return json_success('success');
+            Db::commit();
 
         }catch (\Exception $e) {
+            Db::rollback();
             $this->error($e->getMessage());
         }
 
+        //实例化socket
+        $socket = model('PushEvent','service');
+        $school_id = model('ShopInfo')->where('id',$this->shop_id)->value('school_id');
+
+        // 已成为骑手的情况
+        $map1 = [
+            ['school_id', '=', $school_id],
+            ['open_status', '=', 1],
+            ['status', '=', 3]
+        ];
+        // 暂未成为骑手的情况
+        $map2 = [
+            ['school_id', '=', $school_id],
+            ['status', 'in', [0,1,2]]
+        ];  
+
+        $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
+
+        foreach ($r_list as $item) {
+            $rid = 'r'.$item->id;
+            $socket->setUser($rid)->setContent('1')->push();
+        }
+
+        $this->success('接单成功');
     }
 
     /**
@@ -309,8 +356,6 @@ class Order extends MerchantsBase
         //去微信查一下订单是否退款,没有退款在走下面的退款接口
         $res = $this->refundQuery($orders_sn);
 
-//        dump($res);
-
         if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
             $this->error('订单已拒单,请勿重复提交!');
         }
@@ -318,57 +363,75 @@ class Order extends MerchantsBase
         try{
             $res = $this->wxRefund($orders_sn);//商家拒绝接单把钱退给用户
 
-//            dump($res);
             if($res['result_code'] == 'SUCCESS' && $res['return_code'] == 'SUCCESS') {
                 $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>4,'shop_receive_time'=>time()]);
 
-                if($result) {
-                    return json_success('拒单成功');
+                //如果使用红包 状态回滚
+                if($order_info['platform_coupon_money'] > 0){
+                    $data['status'] = 1;//未使用
+                    Model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
+                }
+
+                if(!$result) {
+                    throw new Exception('拒单失败');
                 }
             }else{
-                throw new Exception('拒单失败');
+                throw new Exception($res['return_msg']);
+            }
+
+            //今日特价商品逻辑
+            $id = model('TodayDeals')->getTodayProduct($this->shop_id);
+            if ($id){
+                $order_detail =  model('Orders')->getOrderDetail($order_info['id']);
+                $product  = array_column($order_detail,'product_id');
+                if (in_array($id,$product)){
+                    model('TodayDeals')->updateTodayProductNum($order_info['shop_id'],'inc',$id);
+                }
             }
 
         }catch (\Exception $e) {
             $this->error($e->getMessage());
         }
 
-
-
+        $this->success('拒单成功');
     }
 
     /**
-     * 微信退款处理
+     * 微信退款处理【商家拒单的退款处理】
      */
     public function wxRefund($orders_sn)
     {
 
-        $number = trim($orders_sn);//商户订单号
+        $request['number'] = trim($orders_sn);//商户订单号
 
-        if (!$number){
+        if (!$request['number']){
             $this->error('非法传参');
         }
 
-        $find = model('Orders')->where('orders_sn',$number)->find();
+        $find = model('Orders')->where('orders_sn',$request['number'])->find();
 
         if (!$find){
             $this->error('商户订单号错误');
         }
+        $money = intval((string)($find->money * 100));
+        $request['totalFee'] = $money;
+        $request['refundFee'] = $money;
 
-        $totalFee = $find->money * 100; //订单金额
-        $refundFee =  $find->money * 100;//退款金额
-        $refundNumber = build_order_no('T');//商户退款单号
+        $request['refundNumber'] = build_order_no('T');
+
+        set_log('request==',$request,'wexRefund');
 
         $pay_config = config('wx_pay');
 
-        //dump($pay_config);
         $app    = Factory::payment($pay_config);//pay_config 微信配置
 
         //根据商户订单号退款
-        $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
+        $result = $app->refund->byOutTradeNumber( $request['number'], $request['refundNumber'], $request['totalFee'], $request['refundFee'], $config = [
             // 可在此处传入其他参数，详细参数见微信支付文档
+
             'refund_desc' => '取消订单退款',
-            //'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+//            'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+
         ]);
 
 
@@ -385,8 +448,6 @@ class Order extends MerchantsBase
         $pay_config = config('wx_pay');
         $app    = Factory::payment($pay_config);//pay_config 微信配置
         $result = $app->refund->queryByOutTradeNumber($outTradeNumber);
-
-        //$this->success('success',$result);
         return $result;
     }
 
@@ -397,12 +458,12 @@ class Order extends MerchantsBase
     {
         $order_sn = $request->param('orders_sn');
 
-        $res = Db::name('orders')->where('orders_sn',$order_sn)->setField('issuing_time',time());
+        $res = Db::name('orders')->where('orders_sn',$order_sn)->update(['issuing_time'=>time(),'issuing_status'=>1]);
 
         if($res){
-            $this->success('送出成功');
+            $this->success('success',['issuing_status'=>1]);
         }
-        $this->success('送出成功');
+        $this->error('fail',201,['issuing_status'=>0]);
     }
 
 

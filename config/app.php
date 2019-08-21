@@ -146,7 +146,7 @@ return [
     'show_error_msg'         => false,
     // 异常处理handle类 留空使用 \think\exception\Handle
 
-//     'exception_handle'       => '\app\common\exception\Http',
+//    'exception_handle'       => '\app\common\exception\Http',
     //'exception_handle'       => '',
     //jwt定义的key
     'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
@@ -161,6 +161,7 @@ return [
     ],
     // 微信小程序的用户端账号信息
     'wx_user'    =>  [
+        /** 校园外卖 */
         'app_id'        => 'wx7e84dbf300d4764d',
         'secret'        =>  '7c6bd82277d5b1d7f77c05d4cb1987b7',
         // 下面为可选项
@@ -175,6 +176,7 @@ return [
 
     // 微信小程序的骑手端账号信息
     'wx_rider'  =>[
+        /** 校园外卖 */
         'app_id'        => 'wx51ecddea44f0ffed',
         'secret'        =>  '90a92131b5844dc7498d28b510386d97',
         'mch_id'             => '1538416851',
@@ -188,6 +190,7 @@ return [
 
     'wx_pay'=>[
         // 必要配置
+        /** 校园外卖 */
         'app_id'             => 'wx7e84dbf300d4764d',
         'mch_id'             => '1538416851',
         'key'                => 'iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
@@ -204,5 +207,9 @@ return [
         'domain'    =>  'http://picture.daigefan.com',
         'style'    =>  'imageView2/0/format/jpg/interlace/1/q/75|imageslim',
     ],
+    //腾讯地图key
+    'lbs_map'=> [
+        'key'=>'5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T'
+    ]
 
 ];

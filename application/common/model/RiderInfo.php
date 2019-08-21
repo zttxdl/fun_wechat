@@ -49,4 +49,13 @@ class RiderInfo extends Model
         $id = $this->where('openid',$openid)->value('id');
         return $id;
     }
+
+    /**
+     * 获取骑手的手机号
+     * @param $openid
+     */
+    public function getPhoneById($id)
+    {
+        return $this->where('id',$id)->value('phone');
+    }
 }

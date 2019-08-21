@@ -9,10 +9,10 @@
 namespace app\admin\controller;
 
 use think\Request;
-use think\Controller;
+use app\common\controller\Base;
 
 
-class Upload extends Controller
+class Upload extends Base
 {
     /**
      * 文件上传提交

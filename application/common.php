@@ -13,6 +13,10 @@
 
 use \Firebase\JWT\JWT;
 use think\facade\Cache; //导入JWT
+use app\common\Libs\Redis;
+use Qiniu\Auth;
+use Qiniu\Config;
+use Qiniu\Storage\BucketManager;
 
  /**
  * 返回封装后的API成功方法
@@ -160,9 +164,9 @@ if (!function_exists('pc_sphere_distance')) {
  */
 if (!function_exists('get_location')) {
     function get_location($address){
-        $make_key = '5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T';
+        $key = config('lbs_map')['key'];
         // 仅学校地址信息，无法解析经纬度，目前需加上当前城市
-        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=南京市".$address."&key=".$make_key;
+        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$key."&region=南京";
         $jsondata=json_decode(file_get_contents($url),true);
         $data = [];
         if ($jsondata['message'] == '查询无结果') {
@@ -175,6 +179,44 @@ if (!function_exists('get_location')) {
     }
 }
 
+/**
+ * BD09 坐标转换GCJ02
+ * 百度地图BD09坐标---->中国正常GCJ02坐标
+ * 腾讯地图用的也是GCJ02坐标
+ * @param double $lat 纬度
+ * @param double $lng 经度
+ * @return array();
+ */
+if (!function_exists('Convert_BD09_To_GCJ02')) {
+    function Convert_BD09_To_GCJ02($lat,$lng){
+        $key = config('lbs_map')['key'];
+        $url = "https://apis.map.qq.com/ws/coord/v1/translate?locations={$lat},{$lng}&type=3&key=".$key;
+        $jsondata=json_decode(file_get_contents($url),true);
+        if ($jsondata['status'] != 0) {
+            return false;
+        }
+        $data['lat'] = $jsondata['locations'][0]['lat'];
+        $data['lng'] = $jsondata['locations'][0]['lng'];
+        
+        return $data;
+    }
+}
+
+/**
+ * 距离计算
+ * @param double $from 起点坐标
+ * @param double $lng 终点坐标
+ * @return array();
+ */
+if (!function_exists('parameters')) {
+    function parameters($from,$to){
+        $key = config('lbs_map')['key'];
+        $url="http://apis.map.qq.com/ws/distance/v1/matrix/?mode=bicycling&from={$from}&to={$to}&key=".$key;
+        $jsondata=json_decode(file_get_contents($url),true);
+        $data = $jsondata['result']['rows'];
+        return $data;
+    }
+}
 
 /**
  *  写日志
@@ -243,7 +285,9 @@ if (!function_exists('set_log')) {
     {
         $path = Env::get('root_path')."./logs/";
         if(!file_exists($path)){
-            mkdir($path,"0777");
+
+            mkdir($path,0755);      
+                 
         }
         error_log($param.print_r($data,1),3,$path.$type.date('Y-m-d').".log");
     }
@@ -280,49 +324,78 @@ if (!function_exists('createOrderSn')) {
         }
         Cache::store('redis')->set($key,$sn);//redis写入，替换一下
         return $snNo;
+
+
     }
+}
+
+if (!function_exists('getMealSn')) {
+    /**
+     * 获取商家取餐号
+     * @param $shop_id
+     * @param int $back
+     */
+    function getMealSn($shop_id) {
+        $redis = Cache::store('redis');
+        $key = 'shop_meal_sn';
+
+        if($redis->hExists($key,$shop_id)){
+            $redis->hIncrby($key,$shop_id,1);
+        }else{
+            $redis->hSet($key, $shop_id, 1);
+        }
+
+        $sn = $redis->hGet($key,$shop_id);
+
+        return $sn;
+
+    }
+}
+
+/**
+ * 获取Redis的静态实例
+ */
+if (!function_exists('redis')) {
+    function redis(){
+        $config = config('cache.redis');
+        $redis = Redis::getInstance($config);
+        return $redis;
+    }
+
 }
 
 
 /**
- * GCJ02坐标转换BD09
- * 中国正常GCJ02坐标---->百度地图BD09坐标
- * 腾讯地图用的也是GCJ02坐标
- * @param double $lat 纬度
- * @param double $lng 经度
+ * 删除七牛云上的物理图片
  */
-if (!function_exists('Convert_GCJ02_To_BD09')) {
-     function Convert_GCJ02_To_BD09($lat,$lng){
-         $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
-         $x = $lng;
-         $y = $lat;
-         $z =sqrt($x * $x + $y * $y) + 0.00002 * sin($y * $x_pi);
-         $theta = atan2($y, $x) + 0.000003 * cos($x * $x_pi);
-         $lng = $z * cos($theta) + 0.0065;
-         $lat = $z * sin($theta) + 0.006;
-         return array('lng'=>$lng,'lat'=>$lat);
-    }
+if (!function_exists('qiniu_img_del')) {
+    function qiniu_img_del($imgurl){
+        // 构建鉴权对象
+        $accessKey = config('qiniu')['accesskey'];
+        $secretKey = config('qiniu')['secretkey'];
+        $bucket = config('qiniu')['bucket'];
+        $auth = new Auth($accessKey, $secretKey);
 
-}
+        // 配置
+        $config = new Config();
 
-/**
- * BD09 坐标转换GCJ02
- * 百度地图BD09坐标---->中国正常GCJ02坐标
- * 腾讯地图用的也是GCJ02坐标
- * @param double $lat 纬度
- * @param double $lng 经度
- * @return array();
- */
-if (!function_exists('Convert_BD09_To_GCJ02')) {
-    function Convert_BD09_To_GCJ02($lat,$lng){
-        $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
-        $x = $lng - 0.0065;
-        $y = $lat - 0.006;
-        $z = sqrt($x * $x + $y * $y) - 0.00002 * sin($y * $x_pi);
-        $theta = atan2($y, $x) - 0.000003 * cos($x * $x_pi);
-        $lng = $z * cos($theta);
-        $lat = $z * sin($theta);
-        return array('lng'=>$lng,'lat'=>$lat);
+        // 管理资源
+        $bucketManager = new BucketManager($auth, $config);
+
+        // 要删除的图片文件，与七牛云空间存在的文件名称相同， 即不能存在域名， 也不存在压缩的后缀
+        // 数据库存储的图片路径为：http://picture.daigefan.com/6cfe8201907051641019024.png?imageView2/0/format/jpg/interlace/1/q/75|imageslim， 
+        // 实际传到七牛云删除的路径为：6cfe8201907051641019024.png
+        $imgstr = reset(explode('?',$imgurl));
+        // 当图片域名换掉时，此处记得更改
+        $img_url = substr($imgstr,28);
+
+        // 删除文件操作
+        $res = $bucketManager->delete($bucket, $img_url);
+        if (is_null($res)) {
+            return true;
+        }else{
+            return false;
+        }
     }
 
 }
