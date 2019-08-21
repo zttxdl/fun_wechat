@@ -71,7 +71,7 @@ class Orders extends RiderBase
 		}
 
         foreach ($list as $item) {
-            if ($item->status != 6 || $item->status != 2) {
+            if ($item->status != 6 && $item->status != 2) {
                 $shop_address = $item->shop_address->latitude.','.$item->shop_address->longitude;
                 $user_address = $item->user_address->latitude.','.$item->user_address->longitude;
                 $from = $location.';'.$shop_address;
@@ -270,7 +270,7 @@ class Orders extends RiderBase
             ->field('order_id,ping_fee,meal_sn,single_time,shop_address,accomplish_time,expected_time,user_address,status,toda_time,cancel_desc,cancel_time')
             ->where('order_id',$orderId)->find();
 
-        if ($data->status != 6 || $data->status != 2) {
+        if ($data->status !== 6 && $data->status !== 2) {
                 $location = $latitude.','.$longitude;
                 $shop_address = $data->shop_address->latitude.','.$data->shop_address->longitude;
                 $user_address = $data->user_address->latitude.','.$data->user_address->longitude;
