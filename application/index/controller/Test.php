@@ -20,6 +20,7 @@ class Test extends Controller
     {
         parent::__construct();
         $this->path = Env::get('ROOT_PATH')."AccInfo.ini";
+        $this->pageSize = 26;//每页显示字段数
     }
 
 
@@ -34,6 +35,7 @@ class Test extends Controller
         for($i = 1;$i <= $num; $i++){
             $data['UserName'] = $request->param('UserName').$i;
             $data['Password'] = $request->param('Password');
+            $data['AccountType'] = $request->param('AccountType');
             $res = $this->addData($data);
             if(is_array($res)) {
                 return json($res);
@@ -64,6 +66,25 @@ class Test extends Controller
      */
     public function addData($data)
     {
+        $check = $this->validate($data,'Test');
+
+        if($check !== true) {
+            return json(['code'=>201,'data'=>$data,'msg'=>$check]);
+        }
+
+        //过期时间
+        $DisableDateTime = date('Y-m-d H:i:s');
+
+        //测试账号
+        if($data['AccountType'] == '1') {
+            $DisableDateTime = date('Y-m-d H:i:s',strtotime('+5 hours'));
+        }
+        //正式账号
+        if($data['AccountType'] == '2') {
+            $DisableDateTime = date('Y-m-d H:i:s',strtotime('+30 days'));
+        }
+
+
         $userInfo = [
             'UserName' => isset($data['UserName']) ? trim($data['UserName']) : '',
             'Password' => isset($data['Password']) ? trim($data['Password']) : '',
@@ -83,12 +104,13 @@ class Test extends Controller
             'BelongsGroup' => isset($data['BelongsGroup']) ? $data['BelongsGroup'] : '',
             'BelongsGroupName' => isset($data['BelongsGroupName']) ? $data['BelongsGroupName'] : '',
             'IsGroup' => isset($data['IsGroup']) ? $data['IsGroup'] : '',
-            'AutoDisable' => isset($data['AutoDisable']) ? $data['AutoDisable'] : '',
-            'DisableDateTime' => isset($data['DisableDateTime']) ? $data['DisableDateTime'] : '',
+            'AutoDisable' => isset($data['AutoDisable']) ? $data['AutoDisable'] : '1',//添加默认值 add by ztt 20100821
+            'DisableDateTime' => isset($DisableDateTime) ? $DisableDateTime : '',//添加账号过期时间 add by ztt 20100821
             'EnableLeftTime' => isset($data['EnableLeftTime']) ? $data['EnableLeftTime'] : '',
             'EnableBandwidthQuota' => isset($data['EnableBandwidthQuota']) ? $data['EnableBandwidthQuota'] : '',
             'BandwidthQuota' => isset($data['BandwidthQuota']) ? $data['BandwidthQuota'] : '',
             'BandwidthQuotaPeriod' => isset($data['BandwidthQuotaPeriod']) ? $data['BandwidthQuotaPeriod'] : '',
+            'AccountType' => isset($data['AccountType']) ? trim($data['AccountType']) : '1',//新增账号类型 add by ztt 20190821
         ];
 
         $userInfo2 = explode("\r\n",file_get_contents($this->path));
@@ -98,12 +120,6 @@ class Test extends Controller
 
         if($keys) {
             return ['msg'=>'用户已经存在!','code'=>201,'data'=>[]];
-        }
-
-        $check = $this->validate($userInfo,'Test');
-
-        if($check !== true) {
-            return json(['msg'=>$check,'code'=>201,'data'=>[]]);
         }
 
         foreach ($userInfo as $key => $value)
@@ -119,8 +135,9 @@ class Test extends Controller
 
 
         $str = $this->toString($userInfo);
-
 //        dump($str);exit;
+
+
 
         //追加写入
         $res = file_put_contents($this->path, $str, FILE_APPEND);
@@ -128,12 +145,21 @@ class Test extends Controller
 
         //统计总人数
         $userInfo = explode("\r\n",file_get_contents($this->path));
+
+        /*foreach ($userInfo as $key => $value)
+        {
+            if($value == '') {
+                unset($userInfo[$key]);
+            }
+        }*/
+
+//        dump($userInfo);exit;
         $UserCount = 'UserCount='.($currCount+1);
         $userInfo['1'] = $UserCount;
 
         //重新写入
         $str = implode("\r\n", $userInfo);
-
+//                dump($str);exit;
         file_put_contents($this->path, $str);
 
         return json(['msg'=>'写入成功','code'=>200,'data'=>[]]);
@@ -164,8 +190,8 @@ class Test extends Controller
         $userInfo = explode("\r\n",file_get_contents($this->path));
 
         $page = 1;//当前第几页
-        $pageSize = 25;//每页显示多少条
-        $countPage = ceil(count($userInfo) / 25);//总页数
+        $pageSize = $this->pageSize;//每页显示多少条
+        $countPage = ceil(count($userInfo) / $this->pageSize);//总页数
         $pageData = [];//返回数据
 
 
@@ -174,7 +200,7 @@ class Test extends Controller
             $start = (($i-1)*$pageSize)+6;//计算每次分页的开始位置
             $pageData[] = array_slice($userInfo,$start,$pageSize);
         }
-        dump($userInfo);exit;
+//        dump($userInfo);exit;
         $userData = [];
         foreach ($pageData as $key => &$val){
             foreach ($val as $k => &$v){
@@ -214,12 +240,15 @@ class Test extends Controller
 
         $userInfo = explode("\r\n",file_get_contents($this->path));
 
-
         //先获取健名
         $key = array_search('UserName='.$UserName,$userInfo);
 
-        //删除对应的数据
-        array_splice($userInfo,$key-1,25);
+        if(empty($key)) {
+            return ['msg'=>'用户不存在!','code'=>201,'data'=>[]];
+        }
+
+        //删除对应的数据段
+        array_splice($userInfo,$key-1,$this->pageSize);
 
 //        dump($userInfo);exit;
 
@@ -235,8 +264,8 @@ class Test extends Controller
 
         //重新写入
         $str = implode("\r\n", $userInfo);
-
         file_put_contents($this->path, $str);
+
         return json(['msg'=>'删除成功','code'=>200,'data'=>[]]);
 
     }
@@ -274,7 +303,7 @@ class Test extends Controller
 
 
         //取出对用数组 并修改
-        $data = array_slice($userInfo,$keys-1,25);
+        $data = array_slice($userInfo,$keys-1,$this->pageSize);
 
         foreach ($data as $key => $val)
         {
@@ -287,7 +316,7 @@ class Test extends Controller
 
 //        dump($keys);
         //删除数组 用新数组代替
-        $a = array_splice($userInfo,$keys-1,25,$data);
+        $a = array_splice($userInfo,$keys-1,$this->pageSize,$data);
 //        dump($userInfo);exit;
 
         //重新写入文件
@@ -328,12 +357,99 @@ class Test extends Controller
             "EnableLeftTime=".$data['EnableLeftTime']. "\r\n" .
             "EnableBandwidthQuota=".$data['EnableBandwidthQuota']. "\r\n" .
             "BandwidthQuota=".$data['BandwidthQuota']. "\r\n" .
-            "BandwidthQuotaPeriod=".$data['BandwidthQuotaPeriod']."\r\n";
+            "BandwidthQuotaPeriod=".$data['BandwidthQuotaPeriod']."\r\n".
+            "AccountType=".$data['AccountType']. "\r\n";
         return $temp;
     }
 
-    public function count()
+    /**
+     * 统计账号个数
+     */
+    public function count(Request $request)
     {
+        $data = explode("\r\n",file_get_contents($this->path));
+
+        $keys = array_search('AccountType=2',$data);
+    }
+
+    /**
+     * 测试接口
+     */
+    public function test()
+    {
+        echo date('Y-m-d H:i:s',strtotime('+30 days'));
+        echo '<br>';
+        echo date('Y-m-d H:i:s',strtotime('+5 hours'));
+    }
+
+    /**
+     * 添加新的字段
+     */
+    public function addColumns(Request $request)
+    {
+        $key = $request->param('key');
+        $value = $request->param('value');
+
+        $data = explode("\r\n",file_get_contents($this->path));
+
+        //先获取健名
+        $keys = array_search($key."=".$value,$data);
+
+        if($keys) {
+            return ['msg'=>'字段已添加,请勿重复操作!','code'=>201,'data'=>[]];
+        }
+
+        $page = 1;//当前第几页
+        $pageSize = $this->pageSize - 1;//每页显示多少条
+        $countPage = ceil(count($data) / $pageSize);//总页数
+        $pageData = [];//返回数据
+
+        //头部数据
+        $headerData = array_slice($data,0,6);
+
+        for($i=$page;$i<=$countPage;$i++){
+            $start = (($i-1)*$pageSize)+6;//计算每次分页的开始位置
+            $pageData[] = array_slice($data,$start,$pageSize);
+        }
+
+        $new_data = [];
+        foreach ($pageData as &$row)
+        {
+            $addColumns = $key.'='.$value;
+            if(!empty($row[0])) {
+                array_push($row,$addColumns);
+            }
+
+        }
+        //向数组开头插入头部数组
+        array_unshift($pageData,$headerData);
+
+        //二维数组转一维数组
+        foreach ($pageData as $v){
+            foreach ($v as $vv){
+                $new_data[] = $vv;
+            }
+        }
+
+//        dump($new_data);exit;
+        //重新写入文件
+        $str = implode("\r\n", $new_data);
+//                dump($str);exit;
+        $res = file_put_contents($this->path,$str);
+
+        if($res) {
+            return json(['msg'=>'添加成功','code'=>200,'data'=>[]]);
+        }
 
     }
+
+    /**
+     * 删除新的字段
+     * @param Request $request
+     */
+    public function delColumns(Request $request)
+    {
+        $key = $request->param('key');
+    }
+
 }
