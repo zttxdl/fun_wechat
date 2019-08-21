@@ -260,21 +260,54 @@ class Orders extends RiderBase
 	public function details(Request $request)
 	{
         $orderId = $request->param('order_id');
-
+        $latitude = $request->param('latitude');
+        $longitude = $request->param('longitude');
+        if (!$latitude || !$longitude) {
+            $this->error('坐标不能为空');
+        }
 
         $data = model('Takeout')
             ->field('order_id,ping_fee,meal_sn,single_time,shop_address,accomplish_time,expected_time,user_address,status,toda_time,cancel_desc,cancel_time')
             ->where('order_id',$orderId)->find();
 
-        if ($data['status'] == 3 || $data['status'] == 4 || $data['status'] == 5  ){
-            $data['rest_time'] = round(($data['expected_time'] - time()) / 60) ;
+        if ($data->status != 6) {
+                $location = $latitude.','.$longitude;
+                $shop_address = $data->shop_address->latitude.','.$data->shop_address->longitude;
+                $user_address = $data->user_address->latitude.','.$data->user_address->longitude;
+                $from = $location.';'.$shop_address;
+                $to = $shop_address.';'.$user_address;
+                $result = parameters($from,$to);
+                $result = parameters($from,$to);
+                $s_distance = $result[0]['elements'][0]['distance'];
+                
+                if (in_array($data->status, [4,5])) {
+                    $u_distance = $result[0]['elements'][1]['distance'];
+                }else{
+                    $u_distance = $result[1]['elements'][1]['distance'];
+                }
+                
+                if ($s_distance >= 100) {
+                    $data->s_distance = round($s_distance / 1000,1).'km';
+                }else{
+                    $data->s_distance = $s_distance.'m';
+                }
+
+                if ($u_distance >= 100) {
+                    $data->u_distance = round($u_distance / 1000,1).'km';
+                }else{
+                    $data->u_distance = $u_distance.'m';
+                }
+            }
+
+        if (in_array($data->status,[3,4,5])){
+            $data->rest_time = round(($data->expected_time - time()) / 60) ;
         }
 
-        $data['single_time'] = $data['single_time'] ? date('H:i',$data['single_time'])  : '';
-        $data['accomplish_time'] =  $data['accomplish_time'] ? date('H:i',$data['accomplish_time']) : '';
-        $data['cancel_time'] = $data['cancel_time'] ? date('H:i',$data['cancel_time']) : '';
-        $data['expected_time'] = $data['expected_time'] ? date('H:i',$data['expected_time']) : '';
-        $data['toda_time'] = $data['toda_time'] ? date('H:i',$data['toda_time']) : '';
+        $data->single_time = $data->single_time ? date('H:i',$data->single_time)  : '';
+        $data->accomplish_time =  $data->accomplish_time ? date('H:i',$data->accomplish_time) : '';
+        $data->cancel_time = $data->cancel_time ? date('H:i',$data->cancel_time) : '';
+        $data->expected_time = $data->expected_time ? date('H:i',$data->expected_time) : '';
+        $data->toda_time = $data->toda_time ? date('H:i',$data->toda_time) : '';
 
         $this->success('success',$data);
     }
