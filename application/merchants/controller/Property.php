@@ -139,7 +139,7 @@ class Property extends MerchantsBase
         if($check){
             $this->error('一天只能提现一次哦!');
         }
-        
+
 
         //账户余额
         $balance_money = model('Withdraw')->getAcountMoney($shop_id);

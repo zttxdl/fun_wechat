@@ -46,11 +46,11 @@ class FinanceManange extends Base
                     'id' => $row['id'],
                     'order_sn' => $row['serial_number'],
                     'name' => Db::name('rider_info')->where('id',$row['rider_id'])->value('name'),
-                    'source' => isset($source) ? $this->source[$source] : '骑手端',
-                    'to_mention ' => isset($source) ? $this->toMention[$source] : '微信',
+                    'source' => !empty($source) ? $this->source[$source] : '骑手端',
+                    'to_mention ' => !empty($source) ? $this->toMention[$source] : '微信',
                     'card' => '',
                     'money' => $row['current_money'],
-                    'add_time' => $row['add_time'],
+                    'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                     'status' => $this->status[$row['status']],
                 ];
             }
@@ -78,11 +78,11 @@ class FinanceManange extends Base
                     'id' => $row['id'],
                     'order_sn' => $row['withdraw_sn'],
                     'name' => Db::name('shop_info')->where('id',$row['shop_id'])->value('shop_name'),
-                    'source' => isset($source) ? $this->source[$source] : '商家端',
-                    'to_mention ' => isset($source) ? $this->toMention[$source] : '银行卡',
+                    'source' => !empty($source) ? $this->source[$source] : '商家端',
+                    'to_mention ' => !empty($source) ? $this->toMention[$source] : '银行卡',
                     'card' => $row['card'],
                     'money' => $row['money'],
-                    'add_time' => $row['add_time'],
+                    'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                     'status' => $this->status[$row['status']],
                 ];
             }
@@ -139,9 +139,11 @@ class FinanceManange extends Base
 
 
     /**
-    *【商家提现 操作】
-    * remark 如果
-    */
+     * 【商家提现 操作】
+     * @param $status 审核状态  1:审核成功 2:审核不成功
+     * @param $id 提现ID
+     * @param string $remark 审核不通过原因ID的集合 [1,2,3]
+     */
     public function shop_tx($status,$id,$remark='')
     {
     	if($status == 1){
@@ -158,8 +160,11 @@ class FinanceManange extends Base
     }
 
     /**
-    *【骑手提现 操作】
-    */
+     * 【骑手提现 操作】
+     * @param $status 审核状态  1:审核成功 2:审核不成功
+     * @param $id 提现ID
+     * @param string $remark 审核不通过原因ID的集合 [1,2,3]
+     */
     public function rider_tx($status,$id,$remark='')
     {
     	if($status == 1) {//审核成功
