@@ -222,7 +222,13 @@ class Shop extends MerchantsBase
             $result['shop_info']['logo_img'] = $shop_info['logo_img'];
             $result['shop_info']['link_name'] = $shop_info['link_name'];
             $result['shop_info']['link_tel'] = $shop_info['link_tel'];
+            if ($shop_info['canteen_id'] == 0) {
+                $result['shop_info']['canteen_name'] = '其他';
+            }else{
+                $result['shop_info']['canteen_name'] = model('Canteen')->where('id',$shop_info['canteen_id'])->value('name');
 
+            }
+            
         }
 
         if($shop_more_info) {
