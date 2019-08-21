@@ -18,7 +18,7 @@ class Withdraw extends Model
      * @param $shop_id 店铺ID
      * @param string $startTime 多少天以前开始计算的时间
      * @return string
-     * 获取账户余额【可提现金额】
+     * 获取账户余额[7天后]【可提现金额】
      */
     public function getAcountMoney($shop_id)
     {
@@ -38,7 +38,7 @@ class Withdraw extends Model
 
 
     /**
-     * 未结算金额
+     * 未结算金额[7天内]
      *
      */
     public function getNotJsMoney($shop_id)
