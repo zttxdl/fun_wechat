@@ -95,12 +95,11 @@ class Login extends ApiBase
         $type  = $request->param('type');
 
         // 校验验证码
-        if ($code !=1234) {
-            $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
-            if (!$result) {
-                $this->error(model('Alisms', 'service')->getError());
-            }
+        $result = model('Alisms', 'service')->checkCode($phone, $type, $code);
+        if (!$result) {
+            $this->error(model('Alisms', 'service')->getError());
         }
+        
         // 判断openid是否存在
         $uid = User::where('openid',$openid)->value('id');
         if (!$uid) {
