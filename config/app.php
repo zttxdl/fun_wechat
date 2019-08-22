@@ -13,6 +13,8 @@
 // | 应用设置
 // +----------------------------------------------------------------------
 
+use think\facade\Env;
+
 // 设置报错等级
 error_reporting(E_ALL ^ E_NOTICE);
 
@@ -23,9 +25,9 @@ return [
     // 应用地址
     'app_host'               => '',
     // 应用调试模式
-    'app_debug'              => true,
+    'app_debug'              => Env::get('app.debug',false),
     // 应用Trace
-    'app_trace'              => false,
+    'app_trace'              => Env::get('app.trace',false),
     // 是否支持多模块
     'app_multi_module'       => true,
     // 入口自动绑定模块

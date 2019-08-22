@@ -23,7 +23,7 @@ class RiderIncomeExpend extends Model
      */
     public function getTxMoney($id)
     {   
-        return $this->where([['rider_id','=',$id],['type','=',2],['status','in','1,2']])->sum('current_money');
+        return $this->where([['rider_id','=',$id],['type','=',2],['status','in','1,3']])->sum('current_money');
 
     }
 
@@ -71,7 +71,7 @@ class RiderIncomeExpend extends Model
      */
     public function getMbStatusAttr($value,$data)
     {
-        $status = ['1' => '待审核','2' => '已提现','3' => '已拒绝',];
+        $status = ['1' => '待审核','2' => '已拒绝','3' => '已提现'];
         return $status[$data['status']];
     }
 

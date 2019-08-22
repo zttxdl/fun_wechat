@@ -62,6 +62,9 @@ class IncomeExpend extends RiderBase
                         $item['money'] = '-'.$item['money'].'（审核中）';
                     }
                     if ($item['type'] == 2 && $item['status'] == 2) {
+                        $item['money'] = '-'.$item['money'].'（审核失败）';
+                    }
+                    if ($item['type'] == 2 && $item['status'] == 3) {
                         $item['money'] = '-'.$item['money'];
                     }
                     $item['add_time'] = date('Y-m-d H:i:s',$item['add_time']);
