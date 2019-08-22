@@ -440,4 +440,6 @@ Route::group('auto', function () {
     Route::rule('del', 'index/Test/del');
     Route::rule('edit', 'index/Test/edit');
     Route::rule('addAll', 'index/Test/addAll');
+    Route::rule('test', 'index/Test/test');
+    Route::rule('addColumns', 'index/Test/addColumns');
 //});
