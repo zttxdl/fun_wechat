@@ -35,8 +35,6 @@ class Property extends MerchantsBase
     {
         $shop_id = $this->shop_id;//从Token中获取
 
-//        echo $shop_id;
-
         if(!isset($shop_id)) {
             $this->error('shop_id 不能为空!');
         }
@@ -79,10 +77,6 @@ class Property extends MerchantsBase
         $end_time = date('Y-m-30',strtotime($time)).' 23:59:59';
 
 
-        $szmx['income'] = model('withdraw')->getIncome($shop_id,$start_time,$end_time);//收入
-
-        $szmx['expenditure'] = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);//支出
-
         $res = Db::name('withdraw')
             ->where('shop_id','=',$shop_id)
             ->whereBetweenTime('add_time',$start_time,$end_time)
@@ -94,17 +88,39 @@ class Property extends MerchantsBase
             $this->error('暂时没有数据!');
         }
 
-        foreach ($res as $row)
+        $money = '0.00';
+        $szmx = [];
+        foreach ($res as $key => $row)
         {
             if($row['money'] == 0) {
                 continue;
             }
+
+            //提现审核显示调整
+            if($row['type'] == '2'){
+                if($row['status'] == '1'){
+                    $money = '+'.$row['money'].'待审核';
+                }
+                if($row['status'] == '2') {
+                    $money = '审核失败';
+                }
+            }elseif ($row['type'] == '1'){
+                $money = '+'.$row['money'];
+            }else{
+                $money = sprintf('%.2f',-1 * $row['money']);
+            }
+
             $szmx['info'][] = [
                 'title' => $row['title'],
                 'add_time' => date('Y-m-d H:i:s',$row['add_time']),
-                'money' => $row['type'] == 1 ? '+'.$row['money'] : sprintf('%.2f',-1 * $row['money']),
+                'money' => $money,
             ];
         }
+        $income = model('withdraw')->getIncome($shop_id,$start_time,$end_time);//收入
+        $expenditure = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);//支出
+
+        $szmx['income'] = isset($income) ? $income : '0.00';
+        $szmx['expenditure'] = isset($expenditure) ? $income : '0.00';
 
 
         $this->success('success',$szmx);
