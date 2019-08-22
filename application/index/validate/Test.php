@@ -21,7 +21,7 @@ class Test extends Validate
     protected $rule = [
         'UserName'          => 'require',
         'Password'          => 'require',
-//        'MACAddress'          => 'require|regex:/^[A-F0-9]{2}([-:]?[A-F0-9]{2})([-:.]?[A-F0-9]{2})([-:]?[A-F0-9]{2})([-:.]?[A-F0-9]{2})([-:]?[A-F0-9]{2})$/',
+        'AccountType'          => ['require','number','regex'=>'^[1-2]{1}$'],
     ];
 
     /**
@@ -33,6 +33,8 @@ class Test extends Validate
     protected $message = [
         'UserName.require'          => '用户名不能为空',
         'Password.require'              => '密码不能为空',
-        'MACAddress.regex'              => 'MAC 地址规则不正确',
+        'AccountType.require'              => '账号类型不能为空',
+        'AccountType.number'              => '账号类型必须是数字',
+        'AccountType.regex'              => '账号类型非法数值',
     ];
 }

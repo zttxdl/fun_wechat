@@ -22,8 +22,9 @@ class Withdraw extends Model
      */
     public function getAcountMoney($shop_id)
     {
-        // 提现规则 7天前
-        $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
+        // 提现规则 7天前 [在测试阶段，设置10分钟之前]
+        // $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
+        $startTime = time()-600;
         //收入
         $shouru_money = $this->getIncome($shop_id,$startTime);
 
@@ -38,16 +39,20 @@ class Withdraw extends Model
 
 
     /**
-     * 未结算金额
+     * 未结算金额[7天内]  
      *
      */
     public function getNotJsMoney($shop_id)
     {
-        // 七天之内的总收入
-        $sr_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->whereTime('add_time', '>=',strtotime("-7 days").'23:59:59')->sum('money');
+        // 未结算金额 7天内 [在测试阶段，设置10分钟内]
+        // $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
+        $startTime = time()-600;
 
-        // 七天之内的总支出[抽成支出 + 退款 + 推广]
-        $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','4,5,6']])->whereTime('add_time', '>=',strtotime("-7 days").'23:59:59')->sum('money');
+        // 七天之内的总收入
+        $sr_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->whereTime('add_time', '>=',$startTime)->sum('money');
+
+        // 七天之内的总支出[抽成支出 + 退款 + 推广][10分钟之内]
+        $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','4,5,6']])->whereTime('add_time', '>=',$startTime)->sum('money');
 
         $not_js_money = $sr_money - $zc_money;
 
