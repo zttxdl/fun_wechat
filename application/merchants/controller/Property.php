@@ -94,15 +94,31 @@ class Property extends MerchantsBase
             $this->error('暂时没有数据!');
         }
 
-        foreach ($res as $row)
+        $money = '0.00';
+        foreach ($res as $key => $row)
         {
             if($row['money'] == 0) {
                 continue;
             }
+
+            //提现审核显示调整
+            if($row['type'] == '2'){
+                if($row['status'] == '1'){
+                    $money = '+'.$row['money'].'待审核';
+                }
+                if($row['status'] == '2') {
+                    $money = '审核失败';
+                }
+            }elseif ($row['type'] == '1'){
+                $money = '+'.$row['money'];
+            }else{
+                $money = sprintf('%.2f',-1 * $row['money']);
+            }
+
             $szmx['info'][] = [
                 'title' => $row['title'],
                 'add_time' => date('Y-m-d H:i:s',$row['add_time']),
-                'money' => $row['type'] == 1 ? '+'.$row['money'] : sprintf('%.2f',-1 * $row['money']),
+                'money' => $money,
             ];
         }
 
