@@ -41,14 +41,10 @@ class Property extends MerchantsBase
             $this->error('shop_id 不能为空!');
         }
 
-        $acount_money = Cache::store('redis')->hGet($this->shop_balance_key,$shop_id);
 
-        if($acount_money) {
-            $acount_money = $acount_money;
-        }else{
-            $acount_money = model('Withdraw')->getAcountMoney($shop_id);
-            Cache::store('redis')->hSet($this->shop_balance_key,$shop_id,$acount_money);
-        }
+        $acount_money = model('Withdraw')->getAcountMoney($shop_id);
+        Cache::store('redis')->hSet($this->shop_balance_key,$shop_id,$acount_money);
+
 
         $totalMoney = model('Shop')->getCountSales($shop_id);
         $monthMoney = model("Shop")->getMonthSales($shop_id);
@@ -142,7 +138,14 @@ class Property extends MerchantsBase
 
 
         //账户余额
-        $balance_money = model('Withdraw')->getAcountMoney($shop_id);
+        $account_money = Cache::store('redis')->hGet($this->shop_balance_key,$shop_id);
+
+        if($account_money) {
+            $balance_money = $account_money;
+        }else{
+            $balance_money = model('Withdraw')->getAcountMoney($shop_id);
+        }
+
 
         if($balance_money < $money) {
             $this->error('您的提现金额大于可提现金额！');
