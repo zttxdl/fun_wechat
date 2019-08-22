@@ -77,7 +77,7 @@ class PushEvent extends Model
             'to' => $this->to_user,
         ];
         $ch = curl_init ();
-        curl_setopt($ch, CURLOPT_URL, Env::get('app.push_api_url'));
+        curl_setopt($ch, CURLOPT_URL, Env::get('app.push_api_url','http://dev.api.daigefan.com:2121'));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

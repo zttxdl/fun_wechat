@@ -203,11 +203,11 @@ return [
         'sandbox' => false,
     ],
     'qiniu' => [
-        'accesskey' => Env::get('qiniu.accesskey'),
-        'secretkey' => Env::get('qiniu.secretkey'),
-        'bucket'    => Env::get('qiniu.bucket'),
-        'domain'    =>  Env::get('qiniu.domain'),
-        'style'    =>  Env::get('qiniu.style'),
+        'accesskey' => Env::get('qiniu.accesskey','_s0jSVLN7y5AGSlCA7LAHnzRv6ne0bEsvc_RoE-C'),
+        'secretkey' => Env::get('qiniu.secretkey','N-Z1qiYlUhTOdGHHnSQETmGdLqtbOcupxlkoDMF0'),
+        'bucket'    => Env::get('qiniu.bucket','daigefun'),
+        'domain'    =>  Env::get('qiniu.domain','http://picture.daigefan.com'),
+        'style'    =>  Env::get('qiniu.style','imageView2/0/format/jpg/interlace/1/q/75|imageslim'),
     ],
     //腾讯地图key
     'lbs_map'=> [
