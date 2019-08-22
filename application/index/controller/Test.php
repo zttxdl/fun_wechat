@@ -32,13 +32,22 @@ class Test extends Controller
     {
         $num = $request->param('num');
 
+        if(empty($num)) {
+            return ['msg'=>'开号数量不能为空!','code'=>201,'data'=>[]];
+        }
+
+        if((int)$num <1) {
+            return ['msg'=>'开号数量要大于1!','code'=>201,'data'=>[]];
+        }
+
+
         for($i = 1;$i <= $num; $i++){
             $data['UserName'] = $request->param('UserName').$i;
             $data['Password'] = $request->param('Password');
             $data['AccountType'] = $request->param('AccountType');
             $res = $this->addData($data);
             if(is_array($res)) {
-                return json($res);
+                return $res;
             }
         }
 
@@ -200,7 +209,7 @@ class Test extends Controller
             $start = (($i-1)*$pageSize)+6;//计算每次分页的开始位置
             $pageData[] = array_slice($userInfo,$start,$pageSize);
         }
-//        dump($userInfo);exit;
+
         $userData = [];
         foreach ($pageData as $key => &$val){
             foreach ($val as $k => &$v){
@@ -369,7 +378,21 @@ class Test extends Controller
     {
         $data = explode("\r\n",file_get_contents($this->path));
 
-        $keys = array_search('AccountType=2',$data);
+        $value = 'AccountType=2';//正式会员
+
+        $new_data = [];
+        foreach($data as $row) {
+//            dump($row);
+            if($row == $value) {
+                $new_data[] = $value;
+            }
+        }
+
+        $user_count =  count($new_data);
+        $total_money = $user_count * 6;
+
+        return json(['code'=>'200','data'=>['user_count'=>$user_count,'total_money'=>$total_money],'msg'=>'获取成功']);
+
     }
 
     /**

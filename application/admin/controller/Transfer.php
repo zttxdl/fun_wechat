@@ -36,7 +36,7 @@ class Transfer extends Base
         // TODO  退款成功时回调处理
         if ($result['return_code']=='SUCCESS' && $result['result_code']=='SUCCESS') {
             // 更新提现表
-            $res = Db::name('rider_income_expend')->where('serial_number','=',$withdraw_sn)->setField('status',2);
+            $res = Db::name('rider_income_expend')->where('serial_number','=',$withdraw_sn)->setField('status',3);
             if ($res) {
                 $str = '企业付款成功'; 
             } else {
@@ -73,7 +73,7 @@ class Transfer extends Base
 
 
     /**
-     * 骑手提现申请审核通过 
+     * 骑手提现申请审核通过  【此块写法在FinanceManage.php 控制器里面有写过，此处仅做保留，暂不删除此代码】
      * 
      */
     public function riderTxCheckPass(Request $request)
@@ -84,7 +84,7 @@ class Transfer extends Base
         $info = Db::name('rider_income_expend rie')->join('rider_info ri','rie.rider_id = ri.id')->where('rie.id','=',$tx_id)->field('rie.current_money,rie.serial_number,ri.openid,ri.name,rie.status')->find();
         
         // 判断是否已提现
-        if ($info['status'] == 2) {
+        if ($info['status'] == 3) {
             $this->error('已提现，请勿重复提交');
         }
 
@@ -100,14 +100,14 @@ class Transfer extends Base
 
 
     /**
-     * 骑手提现申请审核不通过【失败】 
+     * 骑手提现申请审核不通过【失败】 【此块写法在FinanceManage.php 控制器里面有写过，此处仅做保留，暂不删除此代码】
      * 
      */
     public function riderTxCheckNopass(Request $request)
     {
         $tx_id = $request->get('id');
 
-        $res = Db::name('rider_income_expend')->where('id','=',$tx_id)->setField('status',3);
+        $res = Db::name('rider_income_expend')->where('id','=',$tx_id)->setField('status',2);
 
         if (!$res) {
             $this->error('拒绝提现设置失败');

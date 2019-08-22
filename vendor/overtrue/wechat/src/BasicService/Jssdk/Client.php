@@ -82,11 +82,12 @@ class Client extends BaseClient
      * @param bool   $refresh
      * @param string $type
      *
-     * @return array|null
+     * @return array
      *
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
      */
     public function getTicket(bool $refresh = false, string $type = 'jsapi'): array
     {
@@ -96,6 +97,7 @@ class Client extends BaseClient
             return $this->getCache()->get($cacheKey);
         }
 
+        /** @var array<string, mixed> $result */
         $result = $this->castResponseToType(
             $this->requestRaw($this->ticketEndpoint, 'GET', ['query' => ['type' => $type]]),
             'array'

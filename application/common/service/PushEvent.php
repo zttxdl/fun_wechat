@@ -9,6 +9,7 @@
 namespace app\common\service;
 
 
+use think\facade\Env;
 use think\Model;
 
 /**
@@ -28,12 +29,6 @@ class PushEvent extends Model
      * @var string 目标用户id
      */
     protected $to_user;
- 
-
-    /**
-     * @var string 推送服务地址
-     */
-    protected $push_api_url = 'http://dev.api.daigefan.com:2121/';//如果在服务器上127.0.0.1换成服务器上的域名：2121
  
 
     /**
@@ -82,7 +77,7 @@ class PushEvent extends Model
             'to' => $this->to_user,
         ];
         $ch = curl_init ();
-        curl_setopt($ch, CURLOPT_URL, $this->push_api_url);
+        curl_setopt($ch, CURLOPT_URL, Env::get('app.push_api_url','http://dev.api.daigefan.com:2121'));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

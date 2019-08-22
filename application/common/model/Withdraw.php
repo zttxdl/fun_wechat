@@ -39,7 +39,7 @@ class Withdraw extends Model
 
 
     /**
-     * 未结算金额[7天内]
+     * 未结算金额[7天内]  
      *
      */
     public function getNotJsMoney($shop_id)
