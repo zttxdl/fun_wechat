@@ -35,8 +35,6 @@ class Property extends MerchantsBase
     {
         $shop_id = $this->shop_id;//从Token中获取
 
-//        echo $shop_id;
-
         if(!isset($shop_id)) {
             $this->error('shop_id 不能为空!');
         }
@@ -79,10 +77,6 @@ class Property extends MerchantsBase
         $end_time = date('Y-m-30',strtotime($time)).' 23:59:59';
 
 
-        $szmx['income'] = model('withdraw')->getIncome($shop_id,$start_time,$end_time);//收入
-
-        $szmx['expenditure'] = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);//支出
-
         $res = Db::name('withdraw')
             ->where('shop_id','=',$shop_id)
             ->whereBetweenTime('add_time',$start_time,$end_time)
@@ -95,6 +89,7 @@ class Property extends MerchantsBase
         }
 
         $money = '0.00';
+        $szmx = [];
         foreach ($res as $key => $row)
         {
             if($row['money'] == 0) {
@@ -121,6 +116,11 @@ class Property extends MerchantsBase
                 'money' => $money,
             ];
         }
+        $income = model('withdraw')->getIncome($shop_id,$start_time,$end_time);//收入
+        $expenditure = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);//支出
+
+        $szmx['income'] = isset($income) ? $income : '0.00';
+        $szmx['expenditure'] = isset($expenditure) ? $income : '0.00';
 
 
         $this->success('success',$szmx);

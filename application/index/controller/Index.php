@@ -69,8 +69,17 @@ class Index extends Controller
 
 	public function test3()
     {
-        $key = 'user_list';
-        $redis = Cache::store('redis');
+        $orders_sn = 'T190822453583016250';
+        $res = model('Refund')->where('out_refund_no',$orders_sn)->setField('status',2);
+
+        if(!$res) {
+            echo '更新失败';
+        }else{
+            echo '更新成功';
+        }
+
+
+        var_dump($res);
     }
 
 
