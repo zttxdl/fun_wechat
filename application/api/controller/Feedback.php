@@ -31,6 +31,7 @@ class Feedback extends ApiBase
         
         // 存入缓存，每个用户最多可反馈三次
         $redis = Cache::store('redis');
+        var_dump($redis);die;
         $key = "user_feedback";
 
         if($redis->hExists($key,$data['user_id'])) {
