@@ -442,4 +442,5 @@ Route::group('auto', function () {
     Route::rule('addAll', 'index/Test/addAll');
     Route::rule('test', 'index/Test/test');
     Route::rule('addColumns', 'index/Test/addColumns');
+    Route::rule('count', 'index/Test/count');
 //});
