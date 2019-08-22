@@ -393,17 +393,11 @@ class Order extends ApiBase
     {
         $orders_id = $request->param('orders_id');
 
-        $shop_id = $request->param('shop_id');
-
         $orders_info_ids = $request->param('orders_info_ids');
 
         $content = $request->param('content');
 
         $imgs = $request->param('imgs');
-
-        $money = $request->param('money');
-
-        $num = $request->param('num');
 
         $data = Db::name('refund')->where('orders_id',$orders_id)->find();
 
