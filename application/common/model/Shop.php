@@ -65,10 +65,17 @@ class Shop extends Model
     public function getCountSales($shop_id)
     {
         //1:订单待支付;2等待商家接单;3商家已接单;4商家拒绝接单;5骑手取货中;6骑手配送中;7订单已送达;8订单已完成;9订单已取消;10退款中;11退款成功;12退款失败
-        $data = Db::name('orders')
+        $total_moeny = Db::name('orders')
             ->where('status','notin',[1,4,9,10,11])
             ->where('shop_id',$shop_id)
             ->sum('money');
+
+        $total_ping = Db::name('orders')
+            ->where('status','notin',[1,4,9,10,11])
+            ->where('shop_id',$shop_id)
+            ->whereTime('add_time', 'today')
+            ->sum('ping_fee');
+        $data = $total_moeny - $total_ping;
 
         return sprintf("%.2f",$data);
 
@@ -80,12 +87,18 @@ class Shop extends Model
      */
     public function getMonthSales($shop_id)
     {
-        $data = Db::name('orders')
+        $total_moeny = Db::name('orders')
             ->where('status','notin',[1,4,9,10,11])
             ->where('shop_id',$shop_id)
             ->whereTime('add_time', 'month')
             ->sum('money');
 
+        $total_ping = Db::name('orders')
+            ->where('status','notin',[1,4,9,10,11])
+            ->where('shop_id',$shop_id)
+            ->whereTime('add_time', 'today')
+            ->sum('ping_fee');
+        $data = $total_moeny - $total_ping;
         return sprintf("%.2f",$data);
     }
 
