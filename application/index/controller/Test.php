@@ -209,7 +209,7 @@ class Test extends Controller
             $start = (($i-1)*$pageSize)+6;//计算每次分页的开始位置
             $pageData[] = array_slice($userInfo,$start,$pageSize);
         }
-//        dump($userInfo);exit;
+
         $userData = [];
         foreach ($pageData as $key => &$val){
             foreach ($val as $k => &$v){
