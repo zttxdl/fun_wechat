@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit539bb176f2fcd8b1514043d1bc02ca98
+class ComposerStaticInit0d3a4e782da205279ff2bf8b919d6755
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -44,10 +44,12 @@ class ComposerStaticInit539bb176f2fcd8b1514043d1bc02ca98
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
             'Symfony\\Contracts\\Service\\' => 26,
+            'Symfony\\Contracts\\EventDispatcher\\' => 34,
             'Symfony\\Contracts\\Cache\\' => 24,
             'Symfony\\Component\\VarExporter\\' => 30,
             'Symfony\\Component\\Mime\\' => 23,
             'Symfony\\Component\\HttpFoundation\\' => 33,
+            'Symfony\\Component\\EventDispatcher\\' => 34,
             'Symfony\\Component\\Cache\\' => 24,
             'Symfony\\Bridge\\PsrHttpMessage\\' => 30,
             'Stringy\\' => 8,
@@ -133,6 +135,10 @@ class ComposerStaticInit539bb176f2fcd8b1514043d1bc02ca98
         array (
             0 => __DIR__ . '/..' . '/symfony/service-contracts',
         ),
+        'Symfony\\Contracts\\EventDispatcher\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/event-dispatcher-contracts',
+        ),
         'Symfony\\Contracts\\Cache\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/cache-contracts',
@@ -148,6 +154,10 @@ class ComposerStaticInit539bb176f2fcd8b1514043d1bc02ca98
         'Symfony\\Component\\HttpFoundation\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/http-foundation',
+        ),
+        'Symfony\\Component\\EventDispatcher\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
         ),
         'Symfony\\Component\\Cache\\' => 
         array (
@@ -252,9 +262,9 @@ class ComposerStaticInit539bb176f2fcd8b1514043d1bc02ca98
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit539bb176f2fcd8b1514043d1bc02ca98::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit539bb176f2fcd8b1514043d1bc02ca98::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit539bb176f2fcd8b1514043d1bc02ca98::$prefixesPsr0;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit0d3a4e782da205279ff2bf8b919d6755::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit0d3a4e782da205279ff2bf8b919d6755::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit0d3a4e782da205279ff2bf8b919d6755::$prefixesPsr0;
 
         }, null, ClassLoader::class);
     }

@@ -2,6 +2,7 @@
 
 namespace AlibabaCloud\Client\Request\Traits;
 
+use GuzzleHttp\Psr7\Uri;
 use AlibabaCloud\Client\SDK;
 use AlibabaCloud\Client\AlibabaCloud;
 use AlibabaCloud\Client\Request\Request;
@@ -14,7 +15,7 @@ use AlibabaCloud\Client\Exception\ServerException;
  * Trait AcsTrait
  *
  * @package   AlibabaCloud\Client\Request\Traits
- *
+ * @property Uri $uri
  * @mixin     Request
  */
 trait AcsTrait
@@ -170,6 +171,28 @@ trait AcsTrait
         $region_id = $this->realRegionId();
         $host      = '';
 
+        $this->resolveHostWays($host, $region_id);
+
+        if (!$host) {
+            throw new ClientException(
+                "No host found for {$this->product} in the {$region_id}, you can specify host by host() method. " .
+                'Like $request->host(\'xxx.xxx.aliyuncs.com\')',
+                SDK::HOST_NOT_FOUND
+            );
+        }
+
+        $this->uri = $this->uri->withHost($host);
+    }
+
+    /**
+     * @param string $host
+     * @param string $region_id
+     *
+     * @throws ClientException
+     * @throws ServerException
+     */
+    private function resolveHostWays(&$host, $region_id)
+    {
         // 1. Find host by map.
         if ($this->network === 'public' && isset($this->endpointMap[$region_id])) {
             $host = $this->endpointMap[$region_id];
@@ -177,7 +200,7 @@ trait AcsTrait
 
         // 2. Find host by rules.
         if (!$host && $this->endpointRegional !== null) {
-            $host = AlibabaCloud::resolveHostByRule($this, $region_id);
+            $host = AlibabaCloud::resolveHostByRule($this);
         }
 
         // 3. Find in the local array file.
@@ -189,16 +212,6 @@ trait AcsTrait
         if (!$host && $this->serviceCode) {
             $host = LocationService::resolveHost($this);
         }
-
-        if (!$host) {
-            throw new ClientException(
-                "No host found for {$this->product} in the {$region_id}, you can specify host by host() method. " .
-                'Like $request->host(\'xxx.xxx.aliyuncs.com\')',
-                SDK::HOST_NOT_FOUND
-            );
-        }
-
-        $this->uri = $this->uri->withHost($host);
     }
 
     /**

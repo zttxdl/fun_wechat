@@ -202,12 +202,12 @@ return [
         'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
         'sandbox' => false,
     ],
-    'qiniu' => [        
-        'accesskey' => '_s0jSVLN7y5AGSlCA7LAHnzRv6ne0bEsvc_RoE-C',
-        'secretkey' => 'N-Z1qiYlUhTOdGHHnSQETmGdLqtbOcupxlkoDMF0',
-        'bucket'    => 'daigefun',
-        'domain'    =>  'http://picture.daigefan.com',
-        'style'    =>  'imageView2/0/format/jpg/interlace/1/q/75|imageslim',
+    'qiniu' => [
+        'accesskey' => Env::get('qiniu.accesskey','_s0jSVLN7y5AGSlCA7LAHnzRv6ne0bEsvc_RoE-C'),
+        'secretkey' => Env::get('qiniu.secretkey','N-Z1qiYlUhTOdGHHnSQETmGdLqtbOcupxlkoDMF0'),
+        'bucket'    => Env::get('qiniu.bucket','daigefun'),
+        'domain'    =>  Env::get('qiniu.domain','http://picture.daigefan.com'),
+        'style'    =>  Env::get('qiniu.style','imageView2/0/format/jpg/interlace/1/q/75|imageslim'),
     ],
     //腾讯地图key
     'lbs_map'=> [
