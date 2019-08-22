@@ -203,11 +203,11 @@ return [
         'sandbox' => false,
     ],
     'qiniu' => [
-        'accesskey' => Env::get('accesskey'),
-        'secretkey' => Env::get('secretkey'),
-        'bucket'    => Env::get('bucket'),
-        'domain'    =>  Env::get('domain'),
-        'style'    =>  Env::get('style'),
+        'accesskey' => Env::get('qiniu.accesskey'),
+        'secretkey' => Env::get('qiniu.secretkey'),
+        'bucket'    => Env::get('qiniu.bucket'),
+        'domain'    =>  Env::get('qiniu.domain'),
+        'style'    =>  Env::get('qiniu.style'),
     ],
     //腾讯地图key
     'lbs_map'=> [
