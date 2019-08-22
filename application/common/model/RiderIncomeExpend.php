@@ -12,7 +12,10 @@ class RiderIncomeExpend extends Model
      */
     public function getAlreadyJsMoney($id)
     {
-        return $this->where([['rider_id','=',$id],['type','=',1],['status','=',0],['add_time','<',strtotime(date('Y-m-d')) ]])->sum('current_money');
+        // 提现一天前 [仅测试用]
+        // $time = strtotime(date('Y-m-d'));
+        $time = time()-600;
+        return $this->where([['rider_id','=',$id],['type','=',1],['status','=',0],['add_time','<', $time]])->sum('current_money');
 
     }
     
@@ -34,7 +37,10 @@ class RiderIncomeExpend extends Model
      */
     public function getNotJsMoney($id)
     {
-        return $this->where([['rider_id','=',$id],['type','=',1],['status','=',0],['add_time','>=',strtotime(date('Y-m-d'))]])->sum('current_money');
+        // 未结算一天内 [仅测试用]
+        // $time = strtotime(date('Y-m-d'));
+        $time = time()-600;
+        return $this->where([['rider_id','=',$id],['type','=',1],['status','=',0],['add_time','>=',$time]])->sum('current_money');
     }
 
 
