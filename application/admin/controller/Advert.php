@@ -122,8 +122,8 @@ class Advert extends Base
 
         $data = model('Advert')->where('id',$id)->find();
         $typeName = [
-            '1'=>'商家广告',
-            '2'=>'外链广告',
+            '1'=>'商家',
+            '2'=>'外链',
             '3'=>'静态图'
         ];
         if ($data){
