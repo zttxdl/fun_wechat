@@ -27,7 +27,14 @@ class Index extends Controller
     //推送连接
 	public function index($id)
 	{
-		return view('index/index',['uid'=>$id]);
+        $a = "12.00";
+        $b = "12.5";
+        $c = "12.66";
+        var_dump(floatval($a));
+        var_dump(floatval($b));
+        var_dump(floatval($c));
+        die;
+		// return view('index/index',['uid'=>$id]);
 
 	}
 
