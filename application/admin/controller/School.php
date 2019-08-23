@@ -198,9 +198,6 @@ class School extends Base
             Db::rollback();
             $this->error("删除失败");
         }
-
-
-        $result = Db::name('school')->delete($id);
     }
 
 }

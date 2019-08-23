@@ -209,8 +209,11 @@ class Orders extends RiderBase
             $Order->send_time = time();
 
             //取餐离店 计算商家收入
-            model('Withdraw')->income($orderId);
-
+            $result = model('Withdraw')->income($orderId);
+            if (!$result) {
+                // 计算商家收入支出出错，造成写入回滚
+                // 记录到异常订单中 【待更新。。。】
+            }
 
         }elseif ($type ==3){//确认送达
             $result = parameters($location,$user_address);

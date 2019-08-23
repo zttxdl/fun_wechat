@@ -69,8 +69,8 @@ class Store extends ApiBase
             }
 
             $item['sales'] = model('Product')->getMonthSales($item['id']);
-            $item['price'] = $price_hike + $item['price'];
-            $item['old_price'] = $price_hike + $item['old_price'];
+            $item['price'] = sprintf("%.2f",$price_hike + $item['price']);
+            $item['old_price'] = sprintf("%.2f",$price_hike + $item['old_price']);
 
         }
 
@@ -240,11 +240,11 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             //获取商家提价
             $price_hike = model('ShopInfo')->getPriceHike($product['shop_id']);
             if ($data){
-                $product['old_price'] = $data->old_price + $price_hike;
-                $product['price'] = $data->price + $price_hike;
+                $product['old_price'] = sprintf("%.2f",$data->old_price + $price_hike);
+                $product['price'] = sprintf("%.2f",$data->price + $price_hike);
             }else{
-                $product['old_price'] = $product['old_price'] + $price_hike;
-                $product['price'] = $product['price'] + $price_hike;
+                $product['old_price'] = sprintf("%.2f",$product['old_price'] + $price_hike);
+                $product['price'] = sprintf("%.2f",$product['price'] + $price_hike);
             }
         }
 
