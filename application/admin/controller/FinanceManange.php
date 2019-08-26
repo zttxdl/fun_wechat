@@ -102,11 +102,12 @@ class FinanceManange extends Base
         }
 
 
-        $data['info'] = array_merge($rider_result['info'],$shop_result['info']);
+        /*del by ztt 20180822 全部的数据暂时不展示
+         * $data['info'] = array_merge($rider_result['info'],$shop_result['info']);
         $data['count'] = $rider_result['count'] + $shop_result['count'];
         $data['page'] = $rider_result['page'];
         $data['pageSize'] = $rider_result['pageSize'];
-        $this->success('获取成功',$data);
+        $this->success('获取成功',$data);*/
 	}
 
     /**

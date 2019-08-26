@@ -112,6 +112,7 @@ return [
                     'ap-southeast-5'          => 'ecs.ap-southeast-5.aliyuncs.com',
                     'eu-west-1'               => 'ecs.eu-west-1.aliyuncs.com',
                     'ap-south-1'              => 'ecs.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'              => 'ecs.cn-chengdu.aliyuncs.com',
                 ],
             'rds'             =>
                 [
@@ -146,6 +147,7 @@ return [
                     'ap-southeast-5'        => 'rds.ap-southeast-5.aliyuncs.com',
                     'eu-west-1'             => 'rds.eu-west-1.aliyuncs.com',
                     'ap-south-1'            => 'rds.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'            => 'rds.cn-chengdu.aliyuncs.com',
                 ],
             'vpc'             =>
                 [
@@ -179,6 +181,7 @@ return [
                     'ap-southeast-5'        => 'vpc.ap-southeast-5.aliyuncs.com',
                     'eu-west-1'             => 'vpc.eu-west-1.aliyuncs.com',
                     'ap-south-1'            => 'vpc.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'            => 'vpc.cn-chengdu.aliyuncs.com',
                 ],
             'kms'             =>
                 [
@@ -203,6 +206,7 @@ return [
                     'us-west-1'             => 'kms.us-west-1.aliyuncs.com',
                     'us-east-1'             => 'kms.us-east-1.aliyuncs.com',
                     'ap-south-1'            => 'kms.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'            => 'kms.cn-chengdu.aliyuncs.com',
                 ],
             'cms'             =>
                 [
@@ -231,6 +235,7 @@ return [
                     'ap-southeast-5'      => 'metrics.ap-southeast-5.aliyuncs.com',
                     'eu-west-1'           => 'metrics.eu-west-1.aliyuncs.com',
                     'ap-south-1'          => 'metrics.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'          => 'metrics.cn-chengdu.aliyuncs.com',
                 ],
             'slb'             =>
                 [
@@ -259,6 +264,7 @@ return [
                     'ap-southeast-5'      => 'slb.ap-southeast-5.aliyuncs.com',
                     'eu-west-1'           => 'slb.eu-west-1.aliyuncs.com',
                     'ap-south-1'          => 'slb.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'          => 'slb.cn-chengdu.aliyuncs.com',
                 ],
             'cs'              =>
                 [
@@ -415,6 +421,7 @@ return [
                     'eu-central-1'        => 'mongodb.eu-central-1.aliyuncs.com',
                     'me-east-1'           => 'mongodb.me-east-1.aliyuncs.com',
                     'ap-south-1'          => 'mongodb.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'          => 'mongodb.cn-chengdu.aliyuncs.com',
                 ],
             'emr'             =>
                 [
@@ -443,6 +450,7 @@ return [
                     'eu-central-1'        => 'emr.eu-central-1.aliyuncs.com',
                     'me-east-1'           => 'emr.me-east-1.aliyuncs.com',
                     'ap-south-1'          => 'emr.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'          => 'emr.cn-chengdu.aliyuncs.com',
                 ],
             'sms'             =>
                 [
@@ -1379,7 +1387,8 @@ return [
                     'eu-west-1'           => 'ons.eu-west-1.aliyuncs.com',
                     'eu-central-1'        => 'ons.eu-central-1.aliyuncs.com',
                     'me-east-1'           => 'ons.me-east-1.aliyuncs.com',
-                    'ap-south-1'          => 'ons.cn-hangzhou.aliyuncs.com',
+                    'ap-south-1'          => 'ons.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'          => 'ons.cn-chengdu.aliyuncs.com',
                 ],
             'cdn'             =>
                 [
@@ -1488,6 +1497,7 @@ return [
                     'us-west-1'      => 'apigateway.us-west-1.aliyuncs.com',
                     'cn-zhangjiakou' => 'apigateway.cn-zhangjiakou.aliyuncs.com',
                     'cn-huhehaote'   => 'apigateway.cn-huhehaote.aliyuncs.com',
+                    'cn-chengdu'     => 'apigateway.cn-chengdu.aliyuncs.com',
                 ],
             'vod'             =>
                 [
@@ -1526,6 +1536,8 @@ return [
                     'cn-huhehaote'   => 'alikafka.cn-huhehaote.aliyuncs.com',
                     'cn-hongkong'    => 'alikafka.cn-hongkong.aliyuncs.com',
                     'ap-southeast-1' => 'alikafka.ap-southeast-1.aliyuncs.com',
+                    'ap-southeast-5' => 'alikafka.ap-southeast-5.aliyuncs.com',
+                    'ap-south-1'     => 'alikafka.ap-south-1.aliyuncs.com',
                 ],
             'cbn'             =>
                 [
@@ -1548,6 +1560,7 @@ return [
                     'eu-central-1'   => 'cbn.aliyuncs.com',
                     'me-east-1'      => 'cbn.aliyuncs.com',
                     'ap-south-1'     => 'cbn.aliyuncs.com',
+                    'cn-chengdu'     => 'cbn.aliyuncs.com',
                 ],
             'onsvip'          =>
                 [
@@ -1608,6 +1621,7 @@ return [
                     'eu-central-1'   => 'r-kvstore.eu-central-1.aliyuncs.com',
                     'me-east-1'      => 'r-kvstore.me-east-1.aliyuncs.com',
                     'ap-south-1'     => 'r-kvstore.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'     => 'r-kvstore.cn-chengdu.aliyuncs.com',
                 ],
             'nas'             =>
                 [
@@ -1669,6 +1683,7 @@ return [
                     'eu-central-1'   => 'antiddos-openapi.eu-central-1.aliyuncs.com',
                     'me-east-1'      => 'antiddos-openapi.me-east-1.aliyuncs.com',
                     'ap-south-1'     => 'antiddos-openapi.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'     => 'antiddos-openapi.cn-chengdu.aliyuncs.com',
                 ],
             'polardb'         =>
                 [
@@ -1683,7 +1698,7 @@ return [
                     'ap-southeast-1' => 'polardb.aliyuncs.com',
                     'ap-southeast-3' => 'polardb.ap-southeast-3.aliyuncs.com',
                     'ap-southeast-5' => 'polardb.ap-southeast-5.aliyuncs.com',
-                    'us-west-1'      => 'polardb.us-west-1us-west-1.aliyuncs.com',
+                    'us-west-1'      => 'polardb.us-west-1.aliyuncs.com',
                 ],
             'actiontrail'     =>
                 [
@@ -1706,6 +1721,7 @@ return [
                     'eu-central-1'   => 'actiontrail.eu-central-1.aliyuncs.com',
                     'me-east-1'      => 'actiontrail.me-east-1.aliyuncs.com',
                     'ap-south-1'     => 'actiontrail.ap-south-1.aliyuncs.com',
+                    'cn-chengdu'     => 'actiontrail.cn-chengdu.aliyuncs.com',
                 ],
             'codepipeline'    =>
                 [
@@ -1805,6 +1821,7 @@ return [
                     'ap-south-1'     => 'gpdb.ap-south-1.aliyuncs.com',
                     'ap-northeast-1' => 'gpdb.ap-northeast-1.aliyuncs.com',
                     'cn-hongkong'    => 'gpdb.aliyuncs.com',
+                    'cn-chengdu'     => 'gpdb.cn-chengdu.aliyuncs.com',
                 ],
             'eci'             =>
                 [
@@ -1821,12 +1838,14 @@ return [
                     'eu-west-1'      => 'eci.eu-west-1.aliyuncs.com',
                     'us-east-1'      => 'eci.aliyuncs.com',
                     'eu-central-1'   => 'eci.eu-central-1.aliyuncs.com',
+                    'cn-chengdu'     => 'eci.cn-chengdu.aliyuncs.com',
                 ],
             'airec'           =>
                 [
                     'cn-beijing'  => 'airec.cn-beijing.aliyuncs.com',
                     'cn-hangzhou' => 'airec.cn-hangzhou.aliyuncs.com',
                     'cn-shanghai' => 'airec.cn-shanghai.aliyuncs.com',
+                    'cn-shenzhen' => 'airec.cn-shenzhen.aliyuncs.com',
                 ],
             'imm'             =>
                 [
@@ -2109,6 +2128,9 @@ return [
                 [
                     'cn-hangzhou' => 'vs.cn-hangzhou.aliyuncs.com',
                     'cn-shanghai' => 'vs.cn-shanghai.aliyuncs.com',
+                    'cn-qingdao'  => 'vs.cn-qingdao.aliyuncs.com',
+                    'cn-beijing'  => 'vs.cn-beijing.aliyuncs.com',
+                    'cn-shenzhen' => 'vs.cn-shenzhen.aliyuncs.com',
                 ],
             'foas'            =>
                 [
@@ -2179,7 +2201,9 @@ return [
                 ],
             'privatelink'     =>
                 [
-                    'cn-hangzhou' => 'privatelink.cn-hangzhou.aliyuncs.com',
+                    'cn-hangzhou'  => 'privatelink.cn-hangzhou.aliyuncs.com',
+                    'cn-huhehaote' => 'privatelink.cn-huhehaote.aliyuncs.com',
+                    'eu-west-1'    => 'privatelink.eu-west-1.aliyuncs.com',
                 ],
             'batchcomputenew' =>
                 [
@@ -2232,11 +2256,14 @@ return [
                     'cn-hangzhou' => 'oos.cn-hangzhou.aliyuncs.com',
                     'cn-shanghai' => 'oos.cn-shanghai.aliyuncs.com',
                     'cn-shenzhen' => 'oos.cn-shenzhen.aliyuncs.com',
+                    'cn-hongkong' => 'oos.cn-hongkong.aliyuncs.com',
+                    'us-east-1'   => 'oos.us-east-1.aliyuncs.com',
                 ],
             'fnf'             =>
                 [
                     'cn-hangzhou' => 'cn-hangzhou.fnf.aliyuncs.com',
                     'cn-shanghai' => 'cn-shanghai.gamma.test.fnf.aliyun-inc.com',
+                    'cn-shenzhen' => 'cn-shenzhen.fnf.aliyuncs.com',
                 ],
             'smc'             =>
                 [
@@ -2259,6 +2286,7 @@ return [
                     'eu-central-1'   => 'smc.aliyuncs.com',
                     'me-east-1'      => 'smc.aliyuncs.com',
                     'ap-south-1'     => 'smc.aliyuncs.com',
+                    'cn-chengdu'     => 'smc.aliyuncs.com',
                 ],
             'foasconsole'     =>
                 [
@@ -2282,6 +2310,7 @@ return [
                 [
                     'cn-huhehaote' => 'ivpd.cn-huhehaote.aliyuncs.com',
                     'cn-shanghai'  => 'ivpd.cn-shanghai.aliyuncs.com',
+                    'cn-hangzhou'  => 'ivpd.cn-hangzhou.aliyuncs.com',
                 ],
             'hivisengine'     =>
                 [
@@ -2331,6 +2360,70 @@ return [
             'cds'             =>
                 [
                     'ap-southeast-1' => 'cassandra.aliyuncs.com',
+                    'cn-qingdao'     => 'cassandra.aliyuncs.com',
+                    'cn-beijing'     => 'cassandra.aliyuncs.com',
+                    'cn-hangzhou'    => 'cassandra.aliyuncs.com',
+                    'cn-shanghai'    => 'cassandra.aliyuncs.com',
+                    'cn-shenzhen'    => 'cassandra.aliyuncs.com',
+                ],
+            'ads'             =>
+                [
+                    'cn-qingdao'     => 'adb.aliyuncs.com',
+                    'cn-beijing'     => 'adb.aliyuncs.com',
+                    'cn-zhangjiakou' => 'adb.cn-zhangjiakou.aliyuncs.com',
+                    'cn-hangzhou'    => 'adb.aliyuncs.com',
+                    'cn-shanghai'    => 'adb.aliyuncs.com',
+                    'cn-shenzhen'    => 'adb.aliyuncs.com',
+                    'cn-hongkong'    => 'adb.aliyuncs.com',
+                    'ap-southeast-1' => 'adb.aliyuncs.com',
+                    'ap-northeast-1' => 'adb.ap-northeast-1.aliyuncs.com',
+                    'eu-west-1'      => 'adb.eu-west-1.aliyuncs.com',
+                    'us-west-1'      => 'adb.aliyuncs.com',
+                    'us-east-1'      => 'adb.aliyuncs.com',
+                ],
+            'csb'             =>
+                [
+                    'cn-beijing'  => 'csb.cn-beijing.aliyuncs.com',
+                    'cn-hangzhou' => 'csb.cn-hangzhou.aliyuncs.com',
+                    'cn-shanghai' => 'csb.cn-shanghai.aliyuncs.com',
+                    'cn-shenzhen' => 'csb.cn-shenzhen.aliyuncs.com',
+                    'cn-hongkong' => 'csb.cn-hongkong.aliyuncs.com',
+                ],
+            'cityvisual'      =>
+                [
+                    'cn-hangzhou' => 'cityvisual.cn-hangzhou.aliyuncs.com',
+                    'cn-shanghai' => 'cityvisual.cn-shanghai.aliyuncs.com',
+                ],
+            'dbaudit'         =>
+                [
+                    'cn-hangzhou' => 'yundun-dbaudit.aliyuncs.com',
+                ],
+            'bssopenapi'      =>
+                [
+                    'cn-hangzhou'    => 'business.aliyuncs.com',
+                    'cn-shanghai'    => 'business.aliyuncs.com',
+                    'ap-southeast-1' => 'business.ap-southeast-1.aliyuncs.com',
+                ],
+            'indvi'           =>
+                [
+                    'cn-hangzhou' => 'indvi.cn-hangzhou.aliyuncs.com',
+                ],
+            'swcopyright'     =>
+                [
+                    'cn-hangzhou' => 'copyright.aliyuncs.com',
+                ],
+            'multimediaai'    =>
+                [
+                    'cn-beijing' => 'multimediaai.cn-beijing.aliyuncs.com',
+                ],
+            'rsimganalys'     =>
+                [
+                    'cn-hangzhou' => 'rsimganalys.cn-hangzhou.aliyuncs.com',
+                    'cn-shanghai' => 'rsimganalys.cn-hangzhou.aliyuncs.com',
+                ],
+            'tdsr'            =>
+                [
+                    'cn-hangzhou' => 'lyj.cn-hangzhou.aliyuncs.com',
                 ],
         ],
 ];

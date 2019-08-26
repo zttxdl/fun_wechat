@@ -33,13 +33,6 @@ class Orders extends Base
             ->order('id','DESC')
             ->paginate($page_size)->toArray();
 
-
-//        dump($order_list);
-
-/*        if(!$order_list['data']) {
-            $this->error('暂无数据');
-        }*/
-
         $result = [];
 
         if($order_list) {
@@ -214,12 +207,7 @@ class Orders extends Base
             ];
         }
 
-
-
         $this->success('success',$result);
-
-
-
     }
 
     /**
