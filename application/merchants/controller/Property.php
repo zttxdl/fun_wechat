@@ -42,8 +42,8 @@ class Property extends MerchantsBase
         $acount_money = model('Withdraw')->getAcountMoney($shop_id);
         Cache::store('redis')->hSet($this->shop_balance_key,$shop_id,$acount_money);
 
-        $totalMoney = model('Shop')->getCountSales($shop_id);
-        $monthMoney = model("Shop")->getMonthSales($shop_id);
+        $totalMoney = model('Withdraw')->getCountSales($shop_id);
+        $monthMoney = model("Withdraw")->getMonthSales($shop_id);
         $card = model('shop_more_info')->where('shop_id',$shop_id)->value('back_card_num');
 
         $data = [
