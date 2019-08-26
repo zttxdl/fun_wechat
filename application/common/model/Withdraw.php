@@ -167,7 +167,7 @@ class Withdraw extends Model
             }
 
             // 总抽成
-            $totalExpenditure = $ptExpenditure - $stExpenditure - $hbExpenditure;
+            $totalExpenditure = $ptExpenditure + $stExpenditure + $hbExpenditure;
 
             // 更新订单表【写入写入平台抽成、食堂抽成、红包抽成】
             $update_data = [
