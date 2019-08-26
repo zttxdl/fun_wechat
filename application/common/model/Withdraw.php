@@ -236,4 +236,35 @@ class Withdraw extends Model
         return $res;
     }
 
+    /**
+     * 获取店铺销售总额
+     */
+    public function getCountSales($shop_id)
+    {
+        //收入
+        $total_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->sum('money');
+
+        //退款支出
+        $total_refund_money = $this->where([['shop_id','=',$shop_id],['type','=',6]])->sum('money');
+
+        $data = $total_moeny - $total_refund_money;
+        return sprintf("%.2f",$data);
+    }
+
+
+     /**
+      * 获取店铺月销售额
+      */
+    public function getMonthSales($shop_id)
+    {
+        //收入
+        $total_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->whereTime('add_time','month')->sum('money');
+
+        //退款支出
+        $total_refund_money = $this->where([['shop_id','=',$shop_id],['type','=',6]])->whereTime('add_time','month')->sum('money');
+
+        $data = $total_moeny - $total_refund_money;
+        return sprintf("%.2f",$data);
+    }
+
 }
