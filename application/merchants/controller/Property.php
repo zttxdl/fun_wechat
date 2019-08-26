@@ -86,6 +86,7 @@ class Property extends MerchantsBase
         {
             //提现审核显示调整
             if($row['type'] == '2'){  // 提现
+                $type = 2;
                 if($row['status'] == '1'){ // 提现待审核
                     $money = '-'.$row['money'].'（待审核）';
                 }
@@ -96,13 +97,20 @@ class Property extends MerchantsBase
                     $money = '-'.$row['money'];
                 }
             }elseif ($row['type'] == '1'){ // 收入【订单收入】
+                $type = 1;
                 $money = '+'.$row['money'];
             }else{ // 其他支出【3活动支出  5推广支出 6退款】
+                if ($row['type'] == '6') {
+                    $type = 1;
+                } else {
+                    $type = 2;
+                }
                 $money = sprintf('%.2f',-1 * $row['money']);
             }
 
             $szmx['info'][] = [
                 'id'    => $row['id'],
+                'type'  => $type,
                 'withdraw_sn' => $row['withdraw_sn'],
                 'title' => $row['title'],
                 'add_time' => date('Y-m-d H:i:s',$row['add_time']),
@@ -214,7 +222,7 @@ class Property extends MerchantsBase
 
         $data = [
             'orders_sn'  =>  $info['withdraw_sn'],
-            'add_time'  =>  $order_info['add_time'],
+            'add_time'  =>  date('Y-m-d H:i:s',$order_info['add_time']),
             'original_money' =>  sprintf('%.2f',$original_money),
             'box_money' =>  $order_info['box_money'],
             'choucheng' =>$choucheng,
