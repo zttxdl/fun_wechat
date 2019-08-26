@@ -176,17 +176,6 @@ class Withdraw extends Model
                 'hongbao_choucheng' => isset($hbExpenditure) ? $hbExpenditure : 0.00
             ];
             Db::name('Orders')->where('id',$order_id)->update($update_data);
-            $eeee = [
-                'total_money' =>$Order->total_money,
-                'ping_fee' =>$Order->ping_fee,
-                'tijia' =>$Order->num * $shop_info['price_hike'],
-                'platform_choucheng' =>$ptExpenditure,
-                'shitang_choucheng' =>$stExpenditure,
-                'hongbao_choucheng' =>$hbExpenditure,
-                'totalExpenditure' =>$totalExpenditure,
-                'shop_discounts_money' =>$Order->shop_discounts_money,
-            ];
-            set_log('money=',$eeee,'income');
             // 商家订单实际收入 = 商品原价 + 餐盒费 - 商家满减支出 - 抽成支出 《==》 订单总价 - 配送费 - 加价 - 抽成支出 - 商家满减支出
             $shop_money = $Order->total_money - $Order->ping_fee - ($Order->num * $shop_info['price_hike']) - $totalExpenditure - $Order->shop_discounts_money;
             /** 商家用户下单收入*********************************/ 
@@ -228,15 +217,11 @@ class Withdraw extends Model
      */
     public function refund($order_sn)
     {
-        // 查看当前订单的商家实际收入
-        $money = Db::name('withdraw')->where([['withdraw_sn','=',$order_sn],['type','=',1]])->value('money');
-        $sql = Db::name('withdraw')->where([['withdraw_sn','=',$order_sn],['type','=',1]])->fetchSql()->value('money');
-        $aaa = [
-            'order_sn'  =>  $order_sn,
-            'sql'   =>  $sql
-        ];
-        set_log('refund',$aaa,'shop');
+        // 退款表数据结果
         $refundData = model('Refund')->where('out_refund_no',$order_sn)->find();
+
+        // 查看当前订单的商家实际收入
+        $money = Db::name('withdraw')->where([['withdraw_sn','=',$refundData->out_trade_no],['type','=',1]])->value('money');
         $data = [
             'withdraw_sn' => $refundData->out_trade_no,
             'shop_id' => $refundData->shop_id,
