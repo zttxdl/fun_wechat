@@ -186,7 +186,7 @@ class School extends Base
         // 启动事务
         Db::startTrans();
         try {
-            // 修改学校
+            // 删除学校 以及食堂
             Db::name('school')->delete($id);
             Db::name('canteen')->where('school_id','=',$id)->delete();
             
@@ -198,9 +198,6 @@ class School extends Base
             Db::rollback();
             $this->error("删除失败");
         }
-
-
-        $result = Db::name('school')->delete($id);
     }
 
 }

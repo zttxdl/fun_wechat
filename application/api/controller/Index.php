@@ -112,8 +112,8 @@ class Index extends ApiBase
         if ($today_sale){
             foreach ($today_sale as $item) {
                 $item->res_time = $item->end_time - time();
-                $item->old_price =$item->old_price + $item->price_hike;
-                $item->price = $item->price + $item->price_hike;
+                $item->old_price =floatval(sprintf("%.2f",$item->old_price + $item->price_hike));
+                $item->price = floatval(sprintf("%.2f",$item->price + $item->price_hike));
             }
 
         }
@@ -308,8 +308,8 @@ class Index extends ApiBase
         if ($today_sale){
             foreach ($today_sale as $item) {
                 $item->res_time = $item->end_time - time();
-                $item->old_price =$item->old_price + $item->price_hike;
-                $item->price = $item->price + $item->price_hike;
+                $item->old_price =floatval(sprintf("%.2f",$item->old_price + $item->price_hike));
+                $item->price = floatval(sprintf("%.2f",$item->price + $item->price_hike));
             }
         }
         $this->success('success',$today_sale);

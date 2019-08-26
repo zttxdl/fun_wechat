@@ -39,16 +39,12 @@ class Property extends MerchantsBase
             $this->error('shop_id 不能为空!');
         }
 
-
         $acount_money = model('Withdraw')->getAcountMoney($shop_id);
         Cache::store('redis')->hSet($this->shop_balance_key,$shop_id,$acount_money);
-
 
         $totalMoney = model('Shop')->getCountSales($shop_id);
         $monthMoney = model("Shop")->getMonthSales($shop_id);
         $card = model('shop_more_info')->where('shop_id',$shop_id)->value('back_card_num');
-
-
 
         $data = [
             'balanceMoney' => !empty($acount_money) ? $acount_money : 0,//可提现余额
@@ -57,25 +53,22 @@ class Property extends MerchantsBase
             'card' => !empty($card) ? $card: '',//银行卡号
         ];
 
-
-
         $this->success('获取成功',$data);
 
     }
 
     /**
      * 收支明细
+     * mike22待调整
      */
     public function receiptPay(Request $request)
     {
         $shop_id = $this->shop_id;
         $time = $request->param('time',0);
-
         isset($shop_id) ? $shop_id : $request->param('shop_id');
 
         $start_time = date('Y-m-01',strtotime($time)).' 00:00:00';
         $end_time = date('Y-m-30',strtotime($time)).' 23:59:59';
-
 
         $res = Db::name('withdraw')
             ->where('shop_id','=',$shop_id)
@@ -97,16 +90,19 @@ class Property extends MerchantsBase
             }
 
             //提现审核显示调整
-            if($row['type'] == '2'){
-                if($row['status'] == '1'){
-                    $money = '+'.$row['money'].'待审核';
+            if($row['type'] == '2'){  // 提现
+                if($row['status'] == '1'){ // 提现待审核
+                    $money = '-'.$row['money'].'待审核';
                 }
-                if($row['status'] == '2') {
-                    $money = '审核失败';
+                if($row['status'] == '2') { // 提现审核失败
+                    $money = $row['money'].'审核失败';
                 }
-            }elseif ($row['type'] == '1'){
+                if($row['status'] == '3') { // 已提现
+                    $money = '-'.$row['money'];
+                }
+            }elseif ($row['type'] == '1'){ // 收入【订单收入】
                 $money = '+'.$row['money'];
-            }else{
+            }else{ // 其他支出【3活动支出 4抽成支出  5推广支出 6退款】
                 $money = sprintf('%.2f',-1 * $row['money']);
             }
 
@@ -187,6 +183,23 @@ class Property extends MerchantsBase
         }
         $this->error('申请失败');
 
+    }
+
+
+    /**
+     * 收支详情 
+     * mike23待更新
+     * 
+     */
+    public function withdrawDetails(Request $request)
+    {
+        $id = $request->param('id');
+
+        // 查询出当前的收支明细数据
+        $info = Db::name('withdraw')->find($id);
+
+
+        
     }
 
 
