@@ -225,7 +225,7 @@ class Property extends MerchantsBase
             'add_time'  =>  date('Y-m-d H:i:s',$order_info['add_time']),
             'original_money' =>  sprintf('%.2f',$original_money),
             'box_money' =>  $order_info['box_money'],
-            'choucheng' =>$choucheng,
+            'choucheng' =>sprintf('%.2f',$choucheng),
             'discounts_money' => $order_info['shop_discounts_money'],
             'money' =>  $info['money']
         ];
