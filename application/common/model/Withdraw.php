@@ -29,7 +29,7 @@ class Withdraw extends Model
         $shouru_money = $this->getIncome($shop_id,$startTime);
 
         //支出
-        $zc_money = $this->getExpenditure($shop_id,$startTime);
+        $zc_money = $this->getExpenditure($shop_id);
 
         //账户余额等于收入-支出
         $acount_money = $shouru_money - $zc_money;
@@ -68,7 +68,7 @@ class Withdraw extends Model
      * @param string $endTime 结束时间
      * @return string
      */
-    public function getExpenditure($shop_id,$startTime,$endTime = '')
+    public function getExpenditure($shop_id,$startTime = '',$endTime = '')
     {
         if(empty($endTime)) {
             //提现过程中的金额【包括 `已提现`，`申请提现`】支出计算时间
@@ -77,7 +77,6 @@ class Withdraw extends Model
 
             //总支出 过滤提现
             $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','3,5,6']])
-                ->whereTime('add_time', '<',$startTime)
                 ->sum('money');
 
         }else{
