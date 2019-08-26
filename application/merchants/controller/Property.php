@@ -59,17 +59,16 @@ class Property extends MerchantsBase
 
     /**
      * 收支明细
-     * mike22待调整
      */
     public function receiptPay(Request $request)
     {
         $shop_id = $this->shop_id;
         $time = $request->param('time',0);
-        isset($shop_id) ? $shop_id : $request->param('shop_id');
 
         $start_time = date('Y-m-01',strtotime($time)).' 00:00:00';
         $end_time = date('Y-m-30',strtotime($time)).' 23:59:59';
 
+        // 获取本月收入支出集合
         $res = Db::name('withdraw')
             ->where('shop_id','=',$shop_id)
             ->whereBetweenTime('add_time',$start_time,$end_time)
@@ -81,39 +80,38 @@ class Property extends MerchantsBase
             $this->error('暂时没有数据!');
         }
 
-        $money = '0.00';
+        $money = '';
         $szmx = [];
         foreach ($res as $key => $row)
         {
-            if($row['money'] == 0) {
-                continue;
-            }
-
             //提现审核显示调整
             if($row['type'] == '2'){  // 提现
                 if($row['status'] == '1'){ // 提现待审核
-                    $money = '-'.$row['money'].'待审核';
+                    $money = '-'.$row['money'].'（待审核）';
                 }
                 if($row['status'] == '2') { // 提现审核失败
-                    $money = $row['money'].'审核失败';
+                    $money = $row['money'].'（审核失败）';
                 }
                 if($row['status'] == '3') { // 已提现
                     $money = '-'.$row['money'];
                 }
             }elseif ($row['type'] == '1'){ // 收入【订单收入】
                 $money = '+'.$row['money'];
-            }else{ // 其他支出【3活动支出 4抽成支出  5推广支出 6退款】
+            }else{ // 其他支出【3活动支出  5推广支出 6退款】
                 $money = sprintf('%.2f',-1 * $row['money']);
             }
 
             $szmx['info'][] = [
+                'withdraw_sn' => $row['withdraw_sn'],
                 'title' => $row['title'],
                 'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                 'money' => $money,
             ];
         }
-        $income = model('withdraw')->getIncome($shop_id,$start_time,$end_time);//收入
-        $expenditure = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);//支出
+        // 本月收入统计
+        $income = model('withdraw')->getIncome($shop_id,$start_time,$end_time);
+        // 本月支出统计
+        $expenditure = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);
 
         $szmx['income'] = isset($income) ? $income : '0.00';
         $szmx['expenditure'] = isset($expenditure) ? $income : '0.00';

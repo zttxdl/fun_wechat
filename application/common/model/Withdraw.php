@@ -51,8 +51,8 @@ class Withdraw extends Model
         // 七天之内的总收入
         $sr_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->whereTime('add_time', '>=',$startTime)->sum('money');
 
-        // 七天之内的总支出[抽成支出 + 退款 + 推广][10分钟之内]
-        $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','4,5,6']])->whereTime('add_time', '>=',$startTime)->sum('money');
+        // 七天之内的总支出[目前仅退款 3:活动支出 5:推广支出 6:退款]
+        $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','3,5,6']])->whereTime('add_time', '>=',$startTime)->sum('money');
 
         $not_js_money = $sr_money - $zc_money;
 
@@ -62,7 +62,6 @@ class Withdraw extends Model
 
 
     /**
-     * mike23待处理
      * 支出
      * @param $shop_id
      * @param $startTime 开始时间
@@ -76,8 +75,8 @@ class Withdraw extends Model
             $tx_money = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']])
                 ->sum('money');
 
-            //总支出 过滤提现 和商家活动支出(收入 = 商品总价 - 商家优惠 - 平台优惠) 所以这里活动支出就不计算了
-            $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2,3']])
+            //总支出 过滤提现
+            $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','3,5,6']])
                 ->whereTime('add_time', '<',$startTime)
                 ->sum('money');
 
@@ -87,14 +86,11 @@ class Withdraw extends Model
                 ->whereBetweenTime('add_time',$startTime,$endTime)
                 ->sum('money');
 
-            //总支出 过滤提现 和活动支出
-            $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2,3']])
+            //总支出 过滤提现
+            $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','3,5,6']])
                 ->whereBetweenTime('add_time',$startTime,$endTime)
                 ->sum('money');
         }
-
-
-
         return sprintf("%.2f",$tx_money + $zc_money);
     }
 
@@ -129,7 +125,7 @@ class Withdraw extends Model
     }
 
     /**
-     * mike23待调整
+     * mike 已调整
      * 计算商家收入和支出
      * @param $order_id
      * @return bool
@@ -158,7 +154,7 @@ class Withdraw extends Model
             //平台抽成 = （商品原价+餐盒费-优惠金额）* 抽成比例 <==> 平台抽成 = （订单总价 - 配送费 - 每个商品的提价*下单的商品数量  - 平台优惠 - 商家活动优惠）* 抽成比例 
             $ptExpenditure = ($Order->total_money - $Order->ping_fee - ($Order->num * $shop_info['price_hike']) - $Order->platform_coupon_money - $Order->shop_discounts_money) * ($shop_info['segmentation'] / 100);
 
-            //食堂抽成 = 商品总价 - 配送费 - 餐盒费 * 食堂抽成比例
+            //食堂抽成 = 商品原价 * 食堂抽成比例 《==》 （订单总价 - 配送费 - 餐盒费 - 每个商品的提价*下单的商品数量）*食堂抽成比例
             $stExpenditure = 0;
             if ($cut_proportion) {
                 $stExpenditure = ($Order->total_money - $Order->ping_fee - $Order->box_money - ($Order->num * $shop_info['price_hike'])) * ($cut_proportion / 100);
@@ -181,12 +177,14 @@ class Withdraw extends Model
             ];
             Db::name('Orders')->where('id',$order_id)->update($update_data);
 
+            // 商家订单实际收入 = 商品原价 + 餐盒费 - 商家满减支出 - 抽成支出 《==》 订单总价 - 配送费 - 加价 - 抽成支出 - 商家满减支出
+            $shop_money = $Order->total_money - $Order->ping_fee - ($Order->num * $shop_info['price_hike']) - $totalExpenditure - $Order->shop_discounts_money;
             /** 商家用户下单收入*********************************/ 
             $data = [
                 'withdraw_sn' => $Order->orders_sn,
                 'shop_id' => $Order->shop_id,
                 // 商家实际订单收入 = 实付金额 + 平台红包 - 配送费 - 各种抽成
-                'money' => $Order->money + $Order->platform_coupon_money - $Order->ping_fee - $totalExpenditure,
+                'money' => sprintf('%.2f',$shop_money),
                 'type' => 1,
                 'title' => '用户下单',
                 'add_time' => time()
@@ -220,11 +218,14 @@ class Withdraw extends Model
      */
     public function refund($order_sn)
     {
+        // 查看当前订单的商家实际收入
+        $money = Db::name('withdraw')->where([['withdraw_sn','=',$order_sn],['type','=',1]])->value('money');
+
         $refundData = model('Refund')->where('out_refund_no',$order_sn)->find();
         $data = [
             'withdraw_sn' => $refundData->out_trade_no,
             'shop_id' => $refundData->shop_id,
-            'money' => $refundData->refund_fee,
+            'money' => $money,
             'type' => 6,
             'title' => '用户退款',
             'add_time' => time()
