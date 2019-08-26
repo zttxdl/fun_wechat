@@ -230,7 +230,12 @@ class Withdraw extends Model
     {
         // 查看当前订单的商家实际收入
         $money = Db::name('withdraw')->where([['withdraw_sn','=',$order_sn],['type','=',1]])->value('money');
-
+        $sql = Db::name('withdraw')->where([['withdraw_sn','=',$order_sn],['type','=',1]])->fetchSql()->value('money');
+        $aaa = [
+            'order_sn'  =>  $order_sn,
+            'sql'   =>  $sql
+        ];
+        set_log('refund',$aaa,'shop');
         $refundData = model('Refund')->where('out_refund_no',$order_sn)->find();
         $data = [
             'withdraw_sn' => $refundData->out_trade_no,
