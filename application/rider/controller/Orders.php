@@ -280,7 +280,6 @@ class Orders extends RiderBase
                 $from = $location.';'.$shop_address;
                 $to = $shop_address.';'.$user_address;
                 $result = parameters($from,$to);
-                $result = parameters($from,$to);
                 $s_distance = $result[0]['elements'][0]['distance'];
                 
                 if (in_array($data->status, [4,5])) {

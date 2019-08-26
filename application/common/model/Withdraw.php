@@ -176,14 +176,24 @@ class Withdraw extends Model
                 'hongbao_choucheng' => isset($hbExpenditure) ? $hbExpenditure : 0.00
             ];
             Db::name('Orders')->where('id',$order_id)->update($update_data);
-
+            $eeee = [
+                'total_money' =>$Order->total_money,
+                'ping_fee' =>$Order->ping_fee,
+                'tijia' =>$Order->num * $shop_info['price_hike'],
+                'platform_choucheng' =>$ptExpenditure,
+                'shitang_choucheng' =>$stExpenditure,
+                'hongbao_choucheng' =>$hbExpenditure,
+                'totalExpenditure' =>$totalExpenditure,
+                'shop_discounts_money' =>$Order->shop_discounts_money,
+            ];
+            set_log('money=',$eeee,'income');
             // 商家订单实际收入 = 商品原价 + 餐盒费 - 商家满减支出 - 抽成支出 《==》 订单总价 - 配送费 - 加价 - 抽成支出 - 商家满减支出
             $shop_money = $Order->total_money - $Order->ping_fee - ($Order->num * $shop_info['price_hike']) - $totalExpenditure - $Order->shop_discounts_money;
             /** 商家用户下单收入*********************************/ 
             $data = [
                 'withdraw_sn' => $Order->orders_sn,
                 'shop_id' => $Order->shop_id,
-                // 商家实际订单收入 = 实付金额 + 平台红包 - 配送费 - 各种抽成
+                // 商家实际订单收入
                 'money' => sprintf('%.2f',$shop_money),
                 'type' => 1,
                 'title' => '用户下单',
