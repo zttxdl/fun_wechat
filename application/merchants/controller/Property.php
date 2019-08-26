@@ -123,7 +123,7 @@ class Property extends MerchantsBase
         $expenditure = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);
 
         $szmx['income'] = isset($income) ? $income : '0.00';
-        $szmx['expenditure'] = isset($expenditure) ? $income : '0.00';
+        $szmx['expenditure'] = isset($expenditure) ? $expenditure : '0.00';
 
 
         $this->success('success',$szmx);
