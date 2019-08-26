@@ -102,6 +102,7 @@ class Property extends MerchantsBase
             }
 
             $szmx['info'][] = [
+                'id'    => $row['id'],
                 'withdraw_sn' => $row['withdraw_sn'],
                 'title' => $row['title'],
                 'add_time' => date('Y-m-d H:i:s',$row['add_time']),
@@ -186,7 +187,7 @@ class Property extends MerchantsBase
 
     /**
      * 收支详情 
-     * mike23待更新
+     * mike 已调整
      * 
      */
     public function withdrawDetails(Request $request)
@@ -195,9 +196,33 @@ class Property extends MerchantsBase
 
         // 查询出当前的收支明细数据
         $info = Db::name('withdraw')->find($id);
+        if (empty($info)) {
+            $this->error('网络加载失败');
+        }
+        // 商品提价金额
+        $price_hike = Db::name('shop_info')->where('id',$info['shop_id'])->value('price_hike');
 
+        // 订单表详细信息
+        $order_info = Db::name('orders')->where('orders_sn','=',$info['withdraw_sn'])
+                    ->field('add_time,box_money,platform_choucheng,shitang_choucheng,hongbao_choucheng,total_money,shop_discounts_money,num,ping_fee')->find();
 
+        // 抽成支出
+        $choucheng = $order_info['platform_choucheng'] + $order_info['shitang_choucheng'] + $order_info['hongbao_choucheng'];
+
+        // 商品原价 = 订单总价 - 配送费 - 包装费 - 商品提价金额
+        $original_money = $order_info['total_money'] - $order_info['box_money'] - $order_info['ping_fee'] - ($order_info['num'] * $price_hike);
+
+        $data = [
+            'orders_sn'  =>  $info['withdraw_sn'],
+            'add_time'  =>  $order_info['add_time'],
+            'original_money' =>  sprintf('%.2f',$original_money),
+            'box_money' =>  $order_info['box_money'],
+            'choucheng' =>$choucheng,
+            'discounts_money' => $order_info['shop_discounts_money'],
+            'money' =>  $info['money']
+        ];
         
+        $this->success('获取成功',['info'=>$data]);
     }
 
 
