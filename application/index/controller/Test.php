@@ -18,9 +18,10 @@ class Test extends Controller
 
     public function __construct()
     {
+
         parent::__construct();
         $this->path = Env::get('ROOT_PATH')."AccInfo.ini";
-        $this->pageSize = 26;//每页显示字段数
+        $this->pageSize = 25;//每页显示字段数
     }
 
 
@@ -97,7 +98,7 @@ class Test extends Controller
         $userInfo = [
             'UserName' => isset($data['UserName']) ? trim($data['UserName']) : '',
             'Password' => isset($data['Password']) ? trim($data['Password']) : '',
-            'MACAddress' => isset($data['MACAddress']) ? $data['MACAddress'] : '',
+            'MACAddress' => isset($data['AccountType']) ? $data['AccountType'] : '',//新增账号类型 add by ztt 20190821
             'IPAddressLow' => isset($data['IPAddressLow']) ? $data['IPAddressLow'] : '',
             'IPAddressHigh' => isset($data['IPAddressHigh']) ? $data['IPAddressHigh'] : '',
             'ServiceMask' => isset($data['ServiceMask']) ? $data['ServiceMask'] : '254',
@@ -111,7 +112,7 @@ class Test extends Controller
             'EnableMACAddress' => isset($data['EnableMACAddress']) ? $data['EnableMACAddress'] : '',
             'Enable' => isset($data['Enable']) ? $data['Enable'] : '',
             'BelongsGroup' => isset($data['BelongsGroup']) ? $data['BelongsGroup'] : '',
-            'BelongsGroupName' => isset($data['BelongsGroupName']) ? $data['BelongsGroupName'] : '',
+            'BelongsGroupName' => date('Y-m-d'),//新增账号添加时间 add by ztt 20190823
             'IsGroup' => isset($data['IsGroup']) ? $data['IsGroup'] : '',
             'AutoDisable' => isset($data['AutoDisable']) ? $data['AutoDisable'] : '1',//添加默认值 add by ztt 20100821
             'DisableDateTime' => isset($DisableDateTime) ? $DisableDateTime : '',//添加账号过期时间 add by ztt 20100821
@@ -119,7 +120,6 @@ class Test extends Controller
             'EnableBandwidthQuota' => isset($data['EnableBandwidthQuota']) ? $data['EnableBandwidthQuota'] : '',
             'BandwidthQuota' => isset($data['BandwidthQuota']) ? $data['BandwidthQuota'] : '',
             'BandwidthQuotaPeriod' => isset($data['BandwidthQuotaPeriod']) ? $data['BandwidthQuotaPeriod'] : '',
-            'AccountType' => isset($data['AccountType']) ? trim($data['AccountType']) : '1',//新增账号类型 add by ztt 20190821
         ];
 
         $userInfo2 = explode("\r\n",file_get_contents($this->path));
@@ -129,6 +129,12 @@ class Test extends Controller
 
         if($keys) {
             return ['msg'=>'用户已经存在!','code'=>201,'data'=>[]];
+        }
+
+        //判断测试账号是否当天的测试账号是否超过200个
+        $res = $this->TestUserCount();
+        if($res) {
+            return  ['msg'=>'测试账号一天不能超过200个!','code'=>201,'data'=>[]];
         }
 
         foreach ($userInfo as $key => $value)
@@ -194,7 +200,7 @@ class Test extends Controller
      * @return \think\response\Json
      * 获取所有用户信息
      */
-    public function get(Request $request)
+    public function get()
     {
         $userInfo = explode("\r\n",file_get_contents($this->path));
 
@@ -235,7 +241,7 @@ class Test extends Controller
             }
         }
 
-        return json(['msg'=>'获取成功','code'=>200,'data'=>$userData]);
+        return ['msg'=>'获取成功','code'=>200,'data'=>$userData];
 
     }
 
@@ -366,9 +372,36 @@ class Test extends Controller
             "EnableLeftTime=".$data['EnableLeftTime']. "\r\n" .
             "EnableBandwidthQuota=".$data['EnableBandwidthQuota']. "\r\n" .
             "BandwidthQuota=".$data['BandwidthQuota']. "\r\n" .
-            "BandwidthQuotaPeriod=".$data['BandwidthQuotaPeriod']."\r\n".
-            "AccountType=".$data['AccountType']. "\r\n";
+            "BandwidthQuotaPeriod=".$data['BandwidthQuotaPeriod']."\r\n";
         return $temp;
+    }
+
+    /**
+     * 测试账号每天只能添加200个
+     * 返回true
+     */
+    public function TestUserCount()
+    {
+        $data = $this->get();
+        $time = date('Y-m-d');
+
+        $test_user = [];
+
+        foreach ($data['data'] as $row)
+        {
+            if($row['BelongsGroupName'] == $time) {
+                if($row['MACAddress'] == '1') {
+                    $test_user[] = $row['UserName'];
+                }
+            }
+        }
+
+        $test_user_count = count($test_user);
+        if($test_user_count > 200) {
+            return true;
+        }
+        return false;
+
     }
 
     /**
@@ -378,20 +411,38 @@ class Test extends Controller
     {
         $data = explode("\r\n",file_get_contents($this->path));
 
-        $value = 'AccountType=2';//正式会员
+//        dump($data);
 
-        $new_data = [];
+        $test_code = 'MACAddress=1';//测试会员
+        $prod_code = 'MACAddress=2';//正式会员
+
+        $test_data = [];
+        $prod_data = [];
+
         foreach($data as $row) {
 //            dump($row);
-            if($row == $value) {
-                $new_data[] = $value;
+            if($row == $test_code) {
+                $test_data[] = $test_code;
+            }
+
+            if($row == $prod_code) {
+                $prod_data[] = $prod_code;
             }
         }
 
-        $user_count =  count($new_data);
-        $total_money = $user_count * 6;
+        $test_user_count =  count($test_data);
+        $prod_user_count =  count($prod_data);
+        $user_count = $prod_user_count + $test_user_count;
+        $total_money = $prod_user_count * 6;
 
-        return json(['code'=>'200','data'=>['user_count'=>$user_count,'total_money'=>$total_money],'msg'=>'获取成功']);
+        $data = [
+            'user_count' => $user_count,
+            'test_user_count' => $test_user_count,
+            'prod_user_count' => $prod_user_count,
+            'total_money' => $total_money,
+        ];
+
+        return json(['code'=>'200','data'=>$data,'msg'=>'获取成功']);
 
     }
 
