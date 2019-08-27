@@ -133,7 +133,7 @@ class Orders extends Base
                             d.name,
                             a.platform_choucheng,
                             a.shitang_choucheng,
-                            a.hongbao_choucheng,
+                            a.hongbao_choucheng
                             '
             )->find();
 
