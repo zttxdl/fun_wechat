@@ -207,7 +207,11 @@ class Orders extends RiderBase
             $Order->status = 6;
             $Takeout->status = 5;
             $Order->send_time = time();
-
+            // 判断当前订单是否已取餐离店
+            $res = model('withdraw')->where([['withdraw_sn','=',$Order->orders_sn],['type','=',1]])->count();
+            if ($res) {
+                $this->error('您已取餐离店，请勿重新点击');
+            }
             //取餐离店 计算商家收入
             $result = model('Withdraw')->income($orderId);
             if (!$result) {
