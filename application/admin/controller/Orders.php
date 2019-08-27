@@ -33,13 +33,6 @@ class Orders extends Base
             ->order('id','DESC')
             ->paginate($page_size)->toArray();
 
-
-//        dump($order_list);
-
-/*        if(!$order_list['data']) {
-            $this->error('暂无数据');
-        }*/
-
         $result = [];
 
         if($order_list) {
@@ -126,7 +119,6 @@ class Orders extends Base
                             a.status,
                             a.num,
                             a.message,
-                            a.platform_choucheng,
                             b.headimgurl,
                             b.nickname,
                             b.type,
@@ -138,9 +130,15 @@ class Orders extends Base
                             c.school_id,
                             d.headimgurl as rider_img,
                             d.link_tel,
-                            d.name
+                            d.name,
+                            a.platform_choucheng,
+                            a.shitang_choucheng,
+                            a.hongbao_choucheng
                             '
             )->find();
+
+        // 获取商家实际收入
+        $shop_income_money = model('withdraw')->where([['withdraw_sn','=',$list['orders_sn']],['type','=',1]])->value('money');
 
         //订单信息
         $result['order_info'] = [
@@ -157,7 +155,10 @@ class Orders extends Base
             'status' => $this->getOrdertStatus($list['status']),
             'num' => $list['num'],
             'remark' => $list['message'],
-            'platform_choucheng' => $list['platform_choucheng']
+            'platform_choucheng' => $list['platform_choucheng'],
+            'shitang_choucheng' => $list['shitang_choucheng'],
+            'hongbao_choucheng' => $list['hongbao_choucheng'],
+            'shop_income_money' => $shop_income_money
         ];
 
         //会员信息
@@ -214,12 +215,7 @@ class Orders extends Base
             ];
         }
 
-
-
         $this->success('success',$result);
-
-
-
     }
 
     /**

@@ -220,6 +220,7 @@ Route::group('merchants',function (){
     Route::post('propertyIndex','merchants/Property/myIndex');//列表
     Route::post('propertyDetail','merchants/Property/receiptPay');//明细
     Route::post('propertyWithdraw','merchants/Property/withdraw');//提现
+    Route::get('withdrawDetails','merchants/Property/withdrawDetails');//明细详情
     //设置
     Route::rule('updatePwd','merchants/Shop/updatePwd');//忘记密码
     Route::rule('loginOut','merchants/Shop/loginOut');//退出
@@ -444,3 +445,5 @@ Route::group('auto', function () {
     Route::rule('addColumns', 'index/Test/addColumns');
     Route::rule('count', 'index/Test/count');
 //});
+
+

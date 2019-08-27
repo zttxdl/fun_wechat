@@ -623,15 +623,15 @@ class Order extends ApiBase
             $this->error('订单已取消');
         }
 
+        if($order_info['status'] == 3) {
+            $this->error('商家已接单,无法退款,请去申请退款');
+        }
+
         // 这块判断有问题， 状态值 2 跟 3 不能同时存在
         if($order_info['status'] == 2) {//已经支付
-
-            if($order_info['status'] == 3) {
-                $this->error('商家已接单,无法退款,请去申请退款');
-            }
-
             $this->refund($order_info['orders_sn']);//退款
         }
+
 
         //如果使用红包 状态回滚
         if($order_info['platform_coupon_money'] > 0){

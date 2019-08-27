@@ -11,7 +11,7 @@ use think\Db;
 class Shop extends Model
 {
     protected $table = 'fun_shop_info';
-    private $shop_id;
+    
     /**
      * 获取已经审核的商家店铺
      * @param $page_no
@@ -61,14 +61,23 @@ class Shop extends Model
 
     /**
      * 获取店铺销售总额
+     * mike23待更新
      */
     public function getCountSales($shop_id)
     {
         //1:订单待支付;2等待商家接单;3商家已接单;4商家拒绝接单;5骑手取货中;6骑手配送中;7订单已送达;8订单已完成;9订单已取消;10退款中;11退款成功;12退款失败
-        $data = Db::name('orders')
+        // 实付总金额
+        $total_moeny = Db::name('orders')
             ->where('status','notin',[1,4,9,10,11])
             ->where('shop_id',$shop_id)
             ->sum('money');
+        
+        // 平台配送总金额
+        $total_ping = Db::name('orders')
+            ->where('status','notin',[1,4,9,10,11])
+            ->where('shop_id',$shop_id)
+            ->sum('ping_fee');
+        $data = $total_moeny - $total_ping;
 
         return sprintf("%.2f",$data);
 
@@ -77,20 +86,30 @@ class Shop extends Model
 
     /**
      * 获取店铺月销售额
+     * mike23待更新
      */
     public function getMonthSales($shop_id)
     {
-        $data = Db::name('orders')
+        // 实付总金额
+        $total_moeny = Db::name('orders')
             ->where('status','notin',[1,4,9,10,11])
             ->where('shop_id',$shop_id)
             ->whereTime('add_time', 'month')
             ->sum('money');
 
+        // 平台配送总金额
+        $total_ping = Db::name('orders')
+            ->where('status','notin',[1,4,9,10,11])
+            ->where('shop_id',$shop_id)
+            ->whereTime('add_time', 'month')
+            ->sum('ping_fee');
+        $data = $total_moeny - $total_ping;
         return sprintf("%.2f",$data);
     }
 
     /**
      * 获取店铺日销售总额
+     * mike23待更新
      */
     public function getDaySales($shop_id)
     {
@@ -172,6 +191,7 @@ class Shop extends Model
 
     /**
      * 获取店铺结算金额
+     * mike23待更新 [没有用的数据请删掉]
      */
     public function getSettlelMoney($shop_id)
     {
@@ -188,6 +208,7 @@ class Shop extends Model
 
     /**
      * 获取店铺待结算金额
+     * mike23待更新 [没有用的数据请删掉]
      */
     public function getNoSettlelMoney($shop_id)
     {

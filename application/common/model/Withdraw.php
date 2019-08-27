@@ -29,7 +29,7 @@ class Withdraw extends Model
         $shouru_money = $this->getIncome($shop_id,$startTime);
 
         //支出
-        $zc_money = $this->getExpenditure($shop_id,$startTime);
+        $zc_money = $this->getExpenditure($shop_id);
 
         //账户余额等于收入-支出
         $acount_money = $shouru_money - $zc_money;
@@ -51,8 +51,8 @@ class Withdraw extends Model
         // 七天之内的总收入
         $sr_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->whereTime('add_time', '>=',$startTime)->sum('money');
 
-        // 七天之内的总支出[抽成支出 + 退款 + 推广][10分钟之内]
-        $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','4,5,6']])->whereTime('add_time', '>=',$startTime)->sum('money');
+        // 七天之内的总支出[目前仅退款 3:活动支出 5:推广支出 6:退款]
+        $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','3,5,6']])->whereTime('add_time', '>=',$startTime)->sum('money');
 
         $not_js_money = $sr_money - $zc_money;
 
@@ -68,16 +68,15 @@ class Withdraw extends Model
      * @param string $endTime 结束时间
      * @return string
      */
-    public function getExpenditure($shop_id,$startTime,$endTime = '')
+    public function getExpenditure($shop_id,$startTime = '',$endTime = '')
     {
         if(empty($endTime)) {
             //提现过程中的金额【包括 `已提现`，`申请提现`】支出计算时间
             $tx_money = $this->where([['shop_id','=',$shop_id],['type','=',2],['status','in','1,3']])
                 ->sum('money');
 
-            //总支出 过滤提现 和商家活动支出(收入 = 商品总价 - 商家优惠 - 平台优惠) 所以这里活动支出就不计算了
-            $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2,3']])
-                ->whereTime('add_time', '<',$startTime)
+            //总支出 过滤提现
+            $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','3,5,6']])
                 ->sum('money');
 
         }else{
@@ -86,14 +85,11 @@ class Withdraw extends Model
                 ->whereBetweenTime('add_time',$startTime,$endTime)
                 ->sum('money');
 
-            //总支出 过滤提现 和活动支出
-            $zc_money = $this->where([['shop_id','=',$shop_id],['type','notin','1,2,3']])
+            //总支出 过滤提现
+            $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','3,5,6']])
                 ->whereBetweenTime('add_time',$startTime,$endTime)
                 ->sum('money');
         }
-
-
-
         return sprintf("%.2f",$tx_money + $zc_money);
     }
 
@@ -116,9 +112,6 @@ class Withdraw extends Model
                 ->whereBetweenTime('add_time',$startTime,$endTime)
                 ->sum('money');
         }
-
-
-
         return sprintf("%.2f",$shouru_money);
     }
 
@@ -131,84 +124,80 @@ class Withdraw extends Model
     }
 
     /**
-     *
+     * mike 已调整
      * 计算商家收入和支出
      * @param $order_id
      * @return bool
      */
     public function income($order_id)
     {
+        // 获取当前订单信息
         $Order = \app\common\model\Orders::get($order_id);
-        $shop_info = Db::name('shop_info')->where('id',$Order->shop_id)->field('canteen_id,segmentation')->find();
-        $cut_proportion = Db::name('canteen')->where('id',$shop_info['canteen_id'])->value('cut_proportion');
-        $assume_ratio = Db::name('platform_coupon')->where('id',$Order->platform_coupon_id)->value('assume_ratio');
+        // 食堂主键值 + 平台抽成 + 平台对商家的提价金额
+        $shop_info = Db::name('shop_info')->where('id',$Order->shop_id)->field('canteen_id,segmentation,price_hike')->find();
+        // 食堂抽成比例（百分制）
+        $cut_proportion = '';
+        if ($shop_info['canteen_id']) {
+            $cut_proportion = Db::name('canteen')->where('id',$shop_info['canteen_id'])->value('cut_proportion');
+        }
+        // 平台红包抽成比例（百分制）
+        $assume_ratio = '';
+        if ($Order->platform_coupon_id) {
+            $assume_ratio = Db::name('platform_coupon')->where('id',$Order->platform_coupon_id)->value('assume_ratio');
+        }
+        
+        // 启动事务
+        Db::startTrans();
+        try {
+            /** 商家各种抽成支出*********************************/ 
+            //平台抽成 = （商品原价+餐盒费-优惠金额）* 抽成比例 <==> 平台抽成 = （订单总价 - 配送费 - 每个商品的提价*下单的商品数量  - 平台优惠 - 商家活动优惠）* 抽成比例 
+            $ptExpenditure = ($Order->total_money - $Order->ping_fee - ($Order->num * $shop_info['price_hike']) - $Order->platform_coupon_money - $Order->shop_discounts_money) * ($shop_info['segmentation'] / 100);
 
-        $data = [
-            'withdraw_sn' => $Order->orders_sn,
-            'shop_id' => $Order->shop_id,
-            'money' => $Order->money + $Order->platform_coupon_money,
-            'type' => 1,
-            'title' => '用户下单',
-            'add_time' => time()
-        ];
+            //食堂抽成 = 商品原价 * 食堂抽成比例 《==》 （订单总价 - 配送费 - 餐盒费 - 每个商品的提价*下单的商品数量）*食堂抽成比例
+            $stExpenditure = 0;
+            if ($cut_proportion) {
+                $stExpenditure = ($Order->total_money - $Order->ping_fee - $Order->box_money - ($Order->num * $shop_info['price_hike'])) * ($cut_proportion / 100);
+            }
+            
+            //红包抽成 = 红包总金额 * 商家承担比列
+            $hbExpenditure = 0;
+            if ($assume_ratio) {
+                $hbExpenditure = $Order->platform_coupon_money * ($assume_ratio / 100);
+            }
 
-        Db::name('withdraw')->insert($data);
+            // 总抽成
+            $totalExpenditure = $ptExpenditure + $stExpenditure + $hbExpenditure;
 
-        //活动支出
-        if(!empty($Order->shop_discounts_id) && $Order->shop_discounts_money > 0 ) {
-
+            // 更新订单表【写入写入平台抽成、食堂抽成、红包抽成】
+            $update_data = [
+                'platform_choucheng' => isset($ptExpenditure) ? $ptExpenditure : 0.00,
+                'shitang_choucheng' => isset($stExpenditure) ? $stExpenditure : 0.00,
+                'hongbao_choucheng' => isset($hbExpenditure) ? $hbExpenditure : 0.00
+            ];
+            Db::name('Orders')->where('id',$order_id)->update($update_data);
+            // 商家订单实际收入 = 商品原价 + 餐盒费 - 商家满减支出 - 抽成支出 《==》 订单总价 - 配送费 - 加价 - 抽成支出 - 商家满减支出
+            $shop_money = $Order->total_money - $Order->ping_fee - ($Order->num * $shop_info['price_hike']) - $totalExpenditure - $Order->shop_discounts_money;
+            /** 商家用户下单收入*********************************/ 
             $data = [
                 'withdraw_sn' => $Order->orders_sn,
                 'shop_id' => $Order->shop_id,
-                'money' => $Order->shop_discounts_money,
-                'type' => 3,
-                'title' => '活动支出',
+                // 商家实际订单收入
+                'money' => sprintf('%.2f',$shop_money),
+                'type' => 1,
+                'title' => '用户下单',
                 'add_time' => time()
             ];
             Db::name('withdraw')->insert($data);
+
+            // 提交事务
+            Db::commit();
+            return true;
+        } catch (\think\Exception\DbException $e) {
+            // 回滚事务
+            Db::rollback();
+            return false;
         }
 
-        //平台抽成 = （商品原价+餐盒费-优惠金额） * 平台抽成比列
-        $ptExpenditure = ($Order->total_money - $Order->ping_fee) * ($shop_info['segmentation'] / 100);
-
-        //如果商品提价不计算抽成
-        if($shop_info['price_hike']) {
-            $ptExpenditure = $ptExpenditure - $shop_info['price_hike'];
-        }
-
-        //食堂抽成 = 商品总价 - 配送费 - 餐盒费 * 食堂抽成比例
-        $stExpenditure = ($Order->total_money - $Order->ping_fee - $Order->box_money) * ($cut_proportion / 100);
-
-        //红包抽成 = 红包总金额 * 商家承担比列
-        $hbExpenditure = $Order->platform_coupon_money * ($assume_ratio / 100);
-
-        //抽成总支出 平台抽成 + 食堂抽成 + 红包抽成
-        $total_expenditure = round($ptExpenditure + $stExpenditure + $hbExpenditure,2);
-
-        //抽成支出不为0的时候记录
-        if($total_expenditure != 0) {
-            $data = [
-                'withdraw_sn' => $Order->orders_sn,
-                'shop_id' => $Order->shop_id,
-                'money' => $total_expenditure,
-                'type' => 4,
-                'title' => '抽成支出',
-                'add_time' => time()
-            ];
-            Db::name('withdraw')->insert($data);
-        }
-
-        //抽成明细回写订单主表
-        $update_data = [
-            'platform_choucheng' => isset($ptExpenditure) ? $ptExpenditure : 0.00,
-            'shitang_choucheng' => isset($stExpenditure) ? $stExpenditure : 0.00,
-            'hongbao_choucheng' => isset($hbExpenditure) ? $hbExpenditure : 0.00
-        ];
-        Db::name('Orders')->where('id',$order_id)->update($update_data);
-
-
-
-        return true;
     }
 
 
@@ -227,11 +216,15 @@ class Withdraw extends Model
      */
     public function refund($order_sn)
     {
+        // 退款表数据结果
         $refundData = model('Refund')->where('out_refund_no',$order_sn)->find();
+
+        // 查看当前订单的商家实际收入
+        $money = Db::name('withdraw')->where([['withdraw_sn','=',$refundData->out_trade_no],['type','=',1]])->value('money');
         $data = [
             'withdraw_sn' => $refundData->out_trade_no,
             'shop_id' => $refundData->shop_id,
-            'money' => $refundData->refund_fee,
+            'money' => $money,
             'type' => 6,
             'title' => '用户退款',
             'add_time' => time()
@@ -240,6 +233,37 @@ class Withdraw extends Model
         $res = Db::name('withdraw')->insert($data);
 
         return $res;
+    }
+
+    /**
+     * 获取店铺销售总额
+     */
+    public function getCountSales($shop_id)
+    {
+        //收入
+        $total_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->sum('money');
+
+        //退款支出
+        $total_refund_money = $this->where([['shop_id','=',$shop_id],['type','=',6]])->sum('money');
+
+        $data = $total_money - $total_refund_money;
+        return sprintf("%.2f",$data);
+    }
+
+
+     /**
+      * 获取店铺月销售额
+      */
+    public function getMonthSales($shop_id)
+    {
+        //收入
+        $total_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->whereTime('add_time','month')->sum('money');
+
+        //退款支出
+        $total_refund_money = $this->where([['shop_id','=',$shop_id],['type','=',6]])->whereTime('add_time','month')->sum('money');
+
+        $data = $total_money - $total_refund_money;
+        return sprintf("%.2f",$data);
     }
 
 }
