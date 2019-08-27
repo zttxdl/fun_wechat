@@ -445,3 +445,5 @@ Route::group('auto', function () {
     Route::rule('addColumns', 'index/Test/addColumns');
     Route::rule('count', 'index/Test/count');
 //});
+
+
