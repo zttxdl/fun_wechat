@@ -13,7 +13,9 @@ class School extends Model
     public function getSchoolList()
     {
         // 学区列表
-        $school_district_list = $this->field('id,name as label,name as value')->where('level',1)->select()->toArray();
+        $area_ids = $this->where('fid','<>',0)->distinct(true)->column('fid');
+        $school_district_list = $this->field('id,name as label,name as value')->where('id','in',$area_ids)->select()->toArray();
+
         // 学校列表
         $school_list = $this->field('id,fid,name as label,name as value')->where('level',2)->select()->toArray();
         // 组装三维数组
@@ -24,12 +26,8 @@ class School extends Model
                     $v['children'][] = $vo;
                 }
             }
-            if (empty($v['children'])) {
-                // unset($v)  无效，使用的是引用传值，有些纳闷了
-                unset($school_district_list[$k]);
-            }
         }
-
+        
         return $school_district_list;
 
     }
