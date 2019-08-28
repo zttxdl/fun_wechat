@@ -4,6 +4,8 @@ namespace app\api\controller;
 
 use app\common\model\School as SchoolModel;
 use app\common\controller\ApiBase;
+use think\Request;
+
 
 class School extends ApiBase
 {

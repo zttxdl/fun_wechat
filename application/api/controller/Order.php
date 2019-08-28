@@ -653,6 +653,10 @@ class Order extends ApiBase
         $res = model('Orders')->cancelOrder($order_sn,$order_status);
 
         if($res) {
+            //实例化socket
+            $socket = model('PushEvent','service');
+            $socket->setUser('s_'.$order_info['shop_id'])->setContent('用户取消订单')->push();
+
             $this->success('订单取消成功');
         }
         $this->error('订单取消失败');

@@ -23,11 +23,16 @@ class MyCoupon extends Model
     }
 
     /**
-     * 获取优惠券信息
+     * 获取当前用户的首单红包
      */
-    public function getCouponInfo($id)
+    public function getUserCoupon($pt_coupon_ids,$uid)
     {
-
+        $list = Db::name('my_coupon m')
+                        ->join('platform_coupon p','m.platform_coupon_id = p.id')
+                        ->where([['m.platform_coupon_id','in',$pt_coupon_ids],['m.user_id','=',$uid]])
+                        ->field('p.face_value,p.threshold,p.shop_ids')
+                        ->select();
+        return $list;
     }
 
     /**
