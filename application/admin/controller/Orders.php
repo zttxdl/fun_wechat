@@ -140,7 +140,7 @@ class Orders extends Base
         // 获取商家实际收入
         $shop_income_money = model('withdraw')->where([['withdraw_sn','=',$list['orders_sn']],['type','=',1]])->value('money');
 
-        //订单信息
+        //订单信息 
         $result['order_info'] = [
             'orders_sn' => $list['orders_sn'],
             'add_time' => date('Y-m-d H:i:s',$list['add_time']),
@@ -150,7 +150,8 @@ class Orders extends Base
             'pro_type' => $this->getPromotionType($list['shop_discounts_id'],$list['platform_coupon_id']),
             'total_money' => $list['total_money'],
             'ping_fee' => $list['ping_fee'],
-            'discount_money' => $list['shop_discounts_money'] + $list['platform_coupon_money'],
+            'shop_discount_money' => $list['shop_discounts_money'],
+            'coupon_money' => $list['platform_coupon_money'],
             'money' => $list['money'],
             'status' => $this->getOrdertStatus($list['status']),
             'num' => $list['num'],
