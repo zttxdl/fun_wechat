@@ -11,7 +11,6 @@ namespace app\merchants\controller;
 use app\common\controller\MerchantsBase;
 use app\common\model\Orders;
 use EasyWeChat\Factory;
-use think\facade\Cache;
 use think\Exception;
 use think\Request;
 use think\Db;
