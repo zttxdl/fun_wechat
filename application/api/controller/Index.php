@@ -151,7 +151,7 @@ class Index extends ApiBase
             }
 
             // 获取优惠券信息
-            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('threshold','asc')->select();
+            $item->disc = model('ShopDiscounts')->getDiscountsList($item->id);
             // 获取月销售额
             $item->sales = model('Shop')->getMonthNum($item->id);
         });
@@ -174,9 +174,7 @@ class Index extends ApiBase
             
             // 获取当前用户的首单红包
             if ($pt_coupon_ids) {
-                $pt_coupon = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')
-                                ->where([['m.platform_coupon_id','in',$pt_coupon_ids],['m.user_id','=',$uid]])
-                                ->field('p.face_value,p.threshold,p.shop_ids')->select();
+                $pt_coupon = model('MyCoupon')->getUserCoupon($pt_coupon_ids,$uid);
             }
         }
 
@@ -236,7 +234,7 @@ class Index extends ApiBase
             }
 
             // 获取优惠券信息
-            $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('threshold','asc')->select();
+            $item->disc = model('ShopDiscounts')->getDiscountsList($item->id);
             // 获取月销售额
             $item->sales = model('Shop')->getMonthNum($item->id);
         });
@@ -260,9 +258,7 @@ class Index extends ApiBase
             
             // 获取当前用户的首单红包
             if ($pt_coupon_ids) {
-                $pt_coupon = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')
-                                ->where([['m.platform_coupon_id','in',$pt_coupon_ids],['m.user_id','=',$uid]])
-                                ->field('p.face_value,p.threshold,p.shop_ids')->select();
+                $pt_coupon = model('MyCoupon')->getUserCoupon($pt_coupon_ids,$uid);
             }
         }
 
@@ -389,7 +385,7 @@ class Index extends ApiBase
                 }
 
                 // 获取优惠券信息
-                $item->disc = model('ShopDiscounts')->field('face_value,threshold')->where('shop_id',$item->id)->where('delete',0)->order('threshold','asc')->select();
+                $item->disc = model('ShopDiscounts')->getDiscountsList($item->id);
                 // 获取月销售额
                 $item->sales = model('Shop')->getMonthNum($item->id);
         });
@@ -412,9 +408,7 @@ class Index extends ApiBase
 
             // 获取当前用户的首单红包
             if ($pt_coupon_ids) {
-                $pt_coupon = Db::name('my_coupon m')->join('platform_coupon p','m.platform_coupon_id = p.id')
-                    ->where([['m.platform_coupon_id','in',$pt_coupon_ids],['m.user_id','=',$uid]])
-                    ->field('p.face_value,p.threshold,p.shop_ids')->select();
+                $pt_coupon = model('MyCoupon')->getUserCoupon($pt_coupon_ids,$uid);
             }
         }
 
