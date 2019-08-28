@@ -10,7 +10,7 @@ use think\Request;
 use think\Db;
 
 
-//我是hello
+// mike 调试
 class Index extends Controller
 {
 
