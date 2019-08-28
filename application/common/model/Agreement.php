@@ -12,7 +12,7 @@ class Agreement extends Model
      */
     public function getAgreementContent($id)
     {
-        $info = $this->where('id','=',$id)->field('title,content')->find();
+        $info = $this->where('id','=',$id)->field('id,title,content')->find();
         return $info;
     }
      
