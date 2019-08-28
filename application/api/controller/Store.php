@@ -284,7 +284,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
      */
     public function countUserVistor(Request $request)
     {
-
+        set_log('shop_uv','进来了');
         $shop_id = $request->param('shop_id',1);
         $openid = $request->param('openid',1);
         $this->isDisable($shop_id);
