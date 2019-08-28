@@ -140,7 +140,7 @@ class Orders extends Base
         // 获取商家实际收入
         $shop_income_money = model('withdraw')->where([['withdraw_sn','=',$list['orders_sn']],['type','=',1]])->value('money');
 
-        //订单信息
+        //订单信息 
         $result['order_info'] = [
             'orders_sn' => $list['orders_sn'],
             'add_time' => date('Y-m-d H:i:s',$list['add_time']),
