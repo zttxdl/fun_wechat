@@ -77,9 +77,7 @@ class Order extends ApiBase
         }
 
         $result = [];
-
         foreach ($data as $key => $row) {
-
             $result[$key] = [
                 'id' => $row['id'],
                 'shop_id' => $row['shop_id'],
@@ -94,7 +92,8 @@ class Order extends ApiBase
                 'shop_name' => $row['shop_name'],
                 'name' => model('Product')->getNameById($row['product_id']),
                 'product_id' => $row['product_id'],
-                'shop_tel' => $row['link_tel']
+                'shop_tel' => $row['link_tel'],
+                'is_refund' => $is_refund,
             ];
 
             if(in_array($row['status'],[5,6,7,8])) {//骑手取货、配货、已送达、已完成显示配送信息
@@ -191,6 +190,13 @@ class Order extends ApiBase
 
         $orders = model('Orders')->getOrderById($orders_id);
 
+        $is_refund = 1;//是否屏蔽退款入口 1:放开 0:屏蔽
+        if($orders['status'] =='7') {//已送达订单 24小时之后 屏蔽申请售后入口
+            if((time() - $row['arrive_time']) > 86400) {
+                $is_refund = 0;
+            }
+        }
+
         $result['orders'] = [
             'orders_sn' => $orders['orders_sn'],
             'add_time' => date("Y-m-d H:i",$orders['add_time']),
@@ -200,7 +206,8 @@ class Order extends ApiBase
             'money' => $orders['money'],
             'num' => $orders['num'],
             'status' => $orders['status'],
-            'status_name' => $this->order_status[$orders['status']]
+            'status_name' => $this->order_status[$orders['status']],
+            'is_refund' => $is_refund
         ];
 
         $shop_info = model('ShopInfo')->where('id',$orders['shop_id'])->field('id,shop_name,logo_img,run_type')->find();
