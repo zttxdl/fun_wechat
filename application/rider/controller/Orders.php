@@ -196,7 +196,7 @@ class Orders extends RiderBase
         
         if ($type == 1){//我已到店
             $result = parameters($location,$shop_address);
-            if ($result[0]['elements'][0]['distance'] > 300) {
+            if ($result[0]['elements'][0]['distance'] > 500) {
                 $this->error('暂未到指定范围，还不可以点击哦');
             }
             $Order->status = 5;
