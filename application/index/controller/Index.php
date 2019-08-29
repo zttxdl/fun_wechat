@@ -1,7 +1,7 @@
 <?php 
 namespace app\Index\Controller;
 
-use think\Controller;
+use app\common\controller\Base;
 
 use GuzzleHttp\Client;
 use app\common\service\PushEvent;
@@ -10,7 +10,8 @@ use think\Request;
 use think\Db;
 
 
-class Index extends Controller
+
+class Index extends Base
 {
 
     //提现时间规则当天可提现七天之前的结算金额
@@ -85,9 +86,12 @@ class Index extends Controller
 
 
     //测试推送
-	public function push(PushEvent $push)
+	public function push($id,$content)
 	{
-	    $push->setUser(1)->setContent('你好啊1')->push();
+        $push = new PushEvent();
+        $ret = $push->setUser($id)->setContent($content)->push();
+        $this->success('推送成功');
+        
 
 	}
 
