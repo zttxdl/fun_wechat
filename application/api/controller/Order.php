@@ -192,7 +192,7 @@ class Order extends ApiBase
 
         $is_refund = 1;//是否屏蔽退款入口 1:放开 0:屏蔽
         if($orders['status'] =='7') {//已送达订单 24小时之后 屏蔽申请售后入口
-            if((time() - $row['arrive_time']) > 86400) {
+            if((time() - $orders['arrive_time']) > 86400) {
                 $is_refund = 0;
             }
         }
