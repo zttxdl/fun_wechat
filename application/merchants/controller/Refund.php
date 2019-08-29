@@ -38,7 +38,7 @@ class Refund extends MerchantsBase
             $row['add_time'] = date('m-d H:i',$row['add_time']);//申请退款时间
             $row['refund_time'] = date('m-d H:i',$row['refund_time']);//退款完成时间
             $row['imgs'] = explode(',',$row['imgs']);
-            $detail = $this->detail($row['id']);
+            $detail = $this->detail($row['orders_id']);
             $row['box_money'] = $detail['box_money'];
             $row['phone'] = $detail['phone'];
             $row['detail'] = $detail['detail'];
