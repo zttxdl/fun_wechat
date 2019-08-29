@@ -11,7 +11,6 @@ namespace app\merchants\controller;
 use app\common\controller\MerchantsBase;
 use app\common\model\Orders;
 use EasyWeChat\Factory;
-use think\facade\Cache;
 use think\Exception;
 use think\Request;
 use think\Db;
@@ -255,6 +254,10 @@ class Order extends MerchantsBase
             $this->error('商家已接单');
         }
 
+        if($order_info['status'] == 9) {
+            $this->error('订单已取消!');
+        }
+
         $shop_info = Model('Shop')->getShopDetail($order_info['shop_id']);
 
 
@@ -351,6 +354,10 @@ class Order extends MerchantsBase
 
         if($order_info['status'] == '4') {
             $this->error('订单已拒单,请勿重复提交!');
+        }
+
+        if($order_info['status'] == '9') {
+            $this->error('订单已取消!');
         }
 
         //去微信查一下订单是否退款,没有退款在走下面的退款接口
