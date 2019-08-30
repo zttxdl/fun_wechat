@@ -147,7 +147,7 @@ class Goods extends MerchantsBase
         $result->attr_name = model('ProductAttrClassify')->getNameByIds($result->attr_ids);
 
         $data = TodayDeals::get(['product_id'=>$id]);
-        if ($data){
+        if ($data->end_time > time()){
             $result->old_price = $data->old_price;
             $result->price = $data->price;
         }
