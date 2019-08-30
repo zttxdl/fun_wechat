@@ -23,6 +23,7 @@ class Member extends ApiBase
     public function index()
     {
         $info = model('User')->getUserInfo($this->auth->id);
+        set_log('token',$this->auth);
         $this->success('获取用户信息成功',['info'=>$info]);
 
     }
