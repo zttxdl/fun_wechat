@@ -67,15 +67,12 @@ class Notify extends Collection
             model('orders')->where('orders_sn',$orders_sn)->update(['status'=>2,'pay_status'=>1,'pay_time'=>time(),'trade_no'=>$wx_id]);
 
             //用户下单 就更改状态
-            $data = [];
-            $data[] = ['new_buy'=>2];
-            // 如果存在首单红包未使用，将首单红包作废
-            $id = model('user')->where([['id','=',$user_id],['first_coupon','=',1],['status','=',1]])->value('id');
+            model('User')->where('id',$user_id)->setField('new_buy',2);
+            // 判断首单红包是否使用
+            $id = model('MyCoupon')->where([['user_id','=',$user_id],['first_coupon','=',1],['status','=',1]])->value('id');
             if ($id) {
-                $data[] = ['status'=>3];
+                model('MyCoupon')->where('id',$id)->setField('status',3);
             }
-            model('User')->where('id',$user_id)->update($data);
-
             Db::commit();
         } catch (\Throwable $e) {
             Db::rollback();
