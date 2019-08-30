@@ -16,6 +16,7 @@ class TodayDeals extends Model
         $today = date('Y-m-d',time());
         $where[] = ['today','=',$today];
         $where[] = ['shop_id','=',$shop_id];
+        $where[] = ['end_time','>',time()];
         $id = $this->where($where)->value('product_id');
 
         return $id;
