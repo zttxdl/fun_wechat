@@ -33,7 +33,14 @@ class Order extends MerchantsBase
         $map = [];
 
         if($status) {
-            $map[] = ['status','=',$status];
+            if($status == '2') {//新订单
+                $map[] = ['status','=',$status];
+            }elseif($status == '3'){//处理中
+                $map[] = ['status','in',[3,5]];
+            }else{//已完成
+                $map[] = ['status','in',[6,7,8]];
+            }
+            
         }
 
         if(!$shop_id) {
