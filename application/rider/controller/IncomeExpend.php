@@ -132,6 +132,10 @@ class IncomeExpend extends RiderBase
         if (!$res) {
             $this->error('您的提现申请失败');
         } else {
+            // 将可提现金额写入缓存， 方便在提现过程中的判断可提现金额
+            $keys = "rider_can_tx_money"; 
+            $redis->hSet($keys,$rider_id,$can_money-$request->param('money'));
+            // 记录提现次数【每天只能提现一次】
             $redis->hSet($key,$rider_id,1);
             $this->success('您的提现申请已提交');
         }
