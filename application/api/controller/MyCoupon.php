@@ -49,7 +49,7 @@ class MyCoupon extends ApiBase
         $where = [['m.user_id','=',$this->auth->id],['m.status','=',1]];
 
         $list = Db::name('my_coupon m')->leftJoin('platform_coupon p','m.platform_coupon_id = p.id')->where($where)
-                ->field('m.id,m.phone,m.indate,m.status,p.face_value,p.threshold,p.type,p.name,p.limit_use,p.school_id,p.shop_ids')->select();
+                ->field('p.id,m.phone,m.indate,m.status,p.face_value,p.threshold,p.type,p.name,p.limit_use,p.school_id,p.shop_ids')->select();
 
         // 当前用户的手机号
         $phone = $this->auth->phone;
