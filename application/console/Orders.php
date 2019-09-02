@@ -30,7 +30,9 @@ class Orders extends Command
 
            //如果使用红包 状态回滚
             if($v['platform_coupon_money'] > 0){
-                Db::table('fun_my_coupon')->where('id',$v['platform_coupon_id'])->setField('status',1);
+                // Mike需调整
+                $my_coupon_id = model('MyCoupon')->where([['user_id','=',$v['user_id']],['platform_coupon_id','=',$v['platform_coupon_id']]])->value('id');
+                Db::table('fun_my_coupon')->where('id',$my_coupon_id)->setField('status',1);
                 
             }
 
