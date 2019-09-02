@@ -646,8 +646,8 @@ class Order extends ApiBase
 
             $data['status'] = $hongbao_status;
             // Mike需调整
-
-            model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
+            $my_coupon_id = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$order_info['platform_coupon_id']]])->value('id');
+            model('MyCoupon')->updateStatus($my_coupon_id,$data);
         }
 
         //今日特价商品逻辑
