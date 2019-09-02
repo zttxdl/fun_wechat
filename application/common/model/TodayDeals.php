@@ -36,7 +36,7 @@ class TodayDeals extends Model
        if($desc == 'inc') {//加库存
            $this->where($where)->setInc('num',1);
        }else{
-           $this->where($where)->setDec('num',1);
+           $this->where($where)->where('num','>',0)->setDec('num',1);
        }
 
         return true;

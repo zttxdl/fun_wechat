@@ -707,7 +707,7 @@ class Order extends ApiBase
 
                 if($today_goods) {
                     //今日特价过期
-                    if(time() > $today_goods['end_time']) {
+                    if(time() > $today_goods['end_time'] ||  $today_goods['num'] < 1) {
                         continue;
                     }
 

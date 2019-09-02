@@ -39,6 +39,7 @@ class Store extends ApiBase
         $toWhere[] = ['a.today','=',$today];
         $toWhere[] = ['a.shop_id','=',$shop_id];
         $toWhere[] = ['a.end_time','>=',time()];
+        $toWhere[] = ['a.num','>',0];
         $days = Db::name('today_deals')->alias('a')
             ->join('product b','a.product_id = b.id ')
             ->field('b.id,b.name,a.old_price,a.price,a.num,a.limit_buy_num,a.thumb,a.start_time,a.end_time,b.products_classify_id as classId,b.attr_ids,b.box_money,b.sales')
