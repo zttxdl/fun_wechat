@@ -98,11 +98,13 @@ class Index extends ApiBase
         // 搜索条件
         $day = date('Y-m-d',time());
         $where[] = ['t.today','=',$day];
+        $where[] = ['t.num','>',0];
         $where[] = ['t.status','=',1];
         $where[] = ['t.school_id','=',$school_id];
         $where[] = ['t.end_time', '>=',time()];
         $where[] = ['s.status', '=',3];
         $where[] = ['s.open_status', '=',1];
+
 
         $today_sale = model('TodayDeals')->alias('t')
             ->join('shop_info s','t.shop_id = s.id')
@@ -293,6 +295,7 @@ class Index extends ApiBase
         $day = date('Y-m-d',time());
         $where[] = ['t.today','=',$day];
         $where[] = ['t.status','=',1];
+        $where[] = ['t.num','>',0];
         $where[] = ['s.status','=',3];
         $where[] = ['t.school_id','=',$school_id];
         $where[] = ['s.open_status', '=',1];
