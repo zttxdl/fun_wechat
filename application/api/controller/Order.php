@@ -503,8 +503,9 @@ class Order extends ApiBase
                     'status' => $hongbao_status,
                     'order_sn' => $orders_sn,
                 ];
-
-                $res = model('MyCoupon')->updateStatus($orderData['platform_coupon_id'],$data);
+                // Mike需调整
+                $my_coupon_id = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$platform_discount['id']]])->value('id');
+                $res = model('MyCoupon')->updateStatus($my_coupon_id,$data);
                 if(!$res) {
                     throw new \Exception('红包使用失败');
                 }
@@ -642,7 +643,10 @@ class Order extends ApiBase
 
         //如果使用红包 状态回滚
         if($order_info['platform_coupon_money'] > 0){
+
             $data['status'] = $hongbao_status;
+            // Mike需调整
+
             model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
         }
 
