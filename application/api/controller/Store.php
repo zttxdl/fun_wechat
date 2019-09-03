@@ -83,6 +83,7 @@ class Store extends ApiBase
             if ($value['type'] === 2){
                 $cakes[] = $value;
             }elseif($value['type'] == 3){
+                $value['limit_buy_num'] = 1;
                 $preferential[] = $value;
             }
         }
