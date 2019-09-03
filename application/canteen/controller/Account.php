@@ -2,31 +2,12 @@
 
 namespace app\canteen\controller;
 
-use think\Controller;
+use app\common\controller\Base;
+use app\common\model\CanteenAccount;
 use think\Request;
 
-class Account extends Controller
+class Account extends Base
 {
-    /**
-     * 显示资源列表
-     *
-     * @return \think\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * 显示创建资源表单页.
-     *
-     * @return \think\Response
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * 保存新建的资源
      *
@@ -35,7 +16,19 @@ class Account extends Controller
      */
     public function save(Request $request)
     {
-        //
+        $data =  $request->post();
+        // 验证表单数据
+        $check = $this->validate($data, 'Account');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+        $find = CanteenAccount::get(['canteen_id'=>$data['canteen_id']]);
+        if ($find) {
+            $this->error('添加失败',401);
+        }
+        $res = CanteenAccount::create($data);
+
+        $this->success('success',$res);
     }
 
     /**
@@ -46,18 +39,8 @@ class Account extends Controller
      */
     public function read($id)
     {
-        //
-    }
-
-    /**
-     * 显示编辑资源表单页.
-     *
-     * @param  int  $id
-     * @return \think\Response
-     */
-    public function edit($id)
-    {
-        //
+        $data = CanteenAccount::get(['canteen_id'=>$id]);
+        $this->success('success',$data);
     }
 
     /**
@@ -69,17 +52,9 @@ class Account extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $data =  $request->post();
+        $res = CanteenAccount::update($data, ['id' => $id]);
+        $this->success('success',$res);
     }
 
-    /**
-     * 删除指定资源
-     *
-     * @param  int  $id
-     * @return \think\Response
-     */
-    public function delete($id)
-    {
-        //
-    }
 }

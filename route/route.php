@@ -446,4 +446,7 @@ Route::group('auto', function () {
     Route::rule('count', 'index/Test/count');
 //});
 
+Route::get('canteen/account/:id','canteen/account/read');
+Route::post('canteen/account','canteen/account/save');
+Route::put('canteen/account/:id','canteen/account/update');
 

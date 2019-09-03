@@ -12,7 +12,12 @@ class Account extends Validate
      *
      * @var array
      */	
-	protected $rule = [];
+	protected $rule = [
+        'back_name'          => 'require',
+        'name'         => 'require',
+        'back_num'     => 'require',
+        'canteen_id'     => 'require',
+    ];
     
     /**
      * 定义错误信息
@@ -20,5 +25,10 @@ class Account extends Validate
      *
      * @var array
      */	
-    protected $message = [];
+    protected $message = [
+        'back_name.require'             => '开户行不能为空',
+        'name.require'                 => '开户人姓名不能为空',
+        'back_num.require'                   => '银行卡号不能为空',
+        'canteen_id.require'                   => '用户id不能为空',
+    ];
 }
