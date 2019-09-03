@@ -27,11 +27,13 @@ class Index extends Base
     //推送连接
 	public function index($id)
 	{
-        
-		return view('index/index',['uid'=>$id]);
+        $addr = "南京市栖霞区南京财经大学（仙林校区）北苑13宿管站";
+        $location = get_location($addr);
+        dump($location);
+		// return view('index/index',['uid'=>$id]);
 
-	}
-
+    }
+    
 	/****** TP 自带缓存单元测试 ******/
 	public function test2()
 	{
