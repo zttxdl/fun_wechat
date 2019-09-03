@@ -12,7 +12,11 @@ class Account extends Validate
      *
      * @var array
      */	
-	protected $rule = [];
+	protected $rule = [
+        'old_pwd' => 'require',
+        'new_pwd' => 'require',
+        'sure_pwd' => 'require',
+    ];
     
     /**
      * 定义错误信息
@@ -20,5 +24,9 @@ class Account extends Validate
      *
      * @var array
      */	
-    protected $message = [];
+    protected $message = [
+        'old_pwd.require' => '旧密码不能为空',
+        'new_pwd.require' => '新密码不能为空',
+        'sure_pwd.require' => '确认密码不能为空'
+    ];
 }

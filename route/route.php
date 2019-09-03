@@ -423,9 +423,18 @@ Route::group('r-upload', function () {
 })->prefix('rider/Upload/');
 
 
+/*************** 食堂端 *********************************************************************************************/
+//登录
+Route::rule('/canteen/login','canteen/Login/login');
+Route::rule('/canteen/verify','canteen/Login/verify');
+Route::rule('/canteen/loginOut','canteen/Login/loginOut');
+
+Route::group('canteen', function () {
+    //修改密码
+    Route::rule('/setPwd','canteen/Login/updatePwd');
+})->middleware('CanteenIsLogin');
 
 /*************** 定时脚本接口 *********************************************************************************************/
-
 // 用户端
 Route::group('auto', function () {
     Route::rule('/zero_execute', 'zeroExecute');
