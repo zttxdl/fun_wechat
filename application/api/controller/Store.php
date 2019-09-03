@@ -72,6 +72,9 @@ class Store extends ApiBase
             $item['sales'] = model('Product')->getMonthSales($item['id']);
             $item['price'] = floatval(sprintf("%.2f",$price_hike + $item['price']));
             $item['old_price'] = floatval(sprintf("%.2f",$price_hike + $item['old_price']));
+            if ($item['type'] == 3) {
+                $item['limit_buy_num'] = 1;
+            }
 
         }
 
