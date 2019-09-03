@@ -212,7 +212,17 @@ return [
     //腾讯地图key
     'lbs_map'=> [
         'key'=>'5DNBZ-YEKC4-5HGUE-X7TP3-7W4F3-EWF3T'
-    ]
+    ],
+
+    //验证码设置
+    'captcha' => [
+        // 验证码字体大小
+        'fontSize' => 30,
+        //验证码位数
+        'length' => 4,
+    ],
+
+
 
 ];
 
