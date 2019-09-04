@@ -428,6 +428,9 @@ Route::group('r-upload', function () {
 Route::rule('/canteen/login','canteen/Login/login');
 Route::rule('/canteen/verify','canteen/Login/verify');
 Route::rule('/canteen/loginOut','canteen/Login/loginOut');
+Route::rule('/canteen/getList','canteen/ShopInfo/getList');//商家列表
+Route::rule('/canteen/getDetail','canteen/ShopInfo/getDetail');//商家详情
+Route::rule('/canteen/setOpenStatus','canteen/ShopInfo/setOpenStatus');//修改商家营业状态
 
 Route::group('canteen', function () {
     //修改密码
