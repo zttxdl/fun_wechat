@@ -63,7 +63,7 @@ class User extends Base
             ->join('user b','a.user_id = b.id')
             ->leftJoin('school c','a.school_id = c.id')
             ->where('a.user_id','=',$uid)
-            ->field('a.id,a.name,a.phone,b.sex,c.name as school_name ,a.area_detail')
+            ->field('a.id,a.name,a.phone,b.sex,c.name as school_name ,a.area_detail,a.house_number')
             ->select();
         
         foreach ($result['user_address'] as &$row) {
