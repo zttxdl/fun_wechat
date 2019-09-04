@@ -15,6 +15,9 @@ class Canteen extends Validate
     protected $rule = [
         'name'      => 'require|max:30',
         'cut_proportion'    => 'require',
+        'account'    => 'require',
+        'password'    => 'require',
+        'withdraw_cycle'    => 'require',
     ];
     
     /**
@@ -27,5 +30,8 @@ class Canteen extends Validate
         'name.require'      => '食堂名称不能为空',
         'name.max'              => '食堂名称不能超过30位',
         'cut_proportion.require'     => '食堂抽成不能为空',
+        'account.require'      => '食堂账户名不能为空',
+        'password.require'      => '食堂密码不能为空',
+        'withdraw_cycle.require'      => '提现周期不能为空',
     ];
 }

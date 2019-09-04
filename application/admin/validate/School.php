@@ -14,6 +14,8 @@ class School extends Validate
      */	
 	protected $rule = [
         'name'      => 'require|max:30',
+        'longitude'      => 'require',
+        'latitude'      => 'require',
     ];
     
     /**
@@ -25,5 +27,7 @@ class School extends Validate
     protected $message = [
         'name.require'      => '学校名称不能为空',
         'name.max'          => '学校名称不能超过30位',
+        'longitude.require' => '经度必传',
+        'latitude.require'  => '纬度必传',
     ];
 }
