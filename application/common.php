@@ -166,8 +166,9 @@ if (!function_exists('get_location')) {
     function get_location($address){
         $key = config('lbs_map')['key'];
         // 仅学校地址信息，无法解析经纬度，目前需加上当前城市
-        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$key."&region=南京";
+        $url="https://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$key."&region=南京";
         $jsondata=json_decode(file_get_contents($url),true);
+        dump($jsondata);die;
         $data = [];
         if ($jsondata['message'] == '查询无结果') {
             return $data;
@@ -178,6 +179,32 @@ if (!function_exists('get_location')) {
         return $data;
     }
 }
+
+
+/**
+ * 百度地图物理地址解析经纬度
+ */
+
+if (!function_exists('get_baidu_location')) {
+    function get_baidu_location($address){
+        $result = array();
+        $ak = '2DnX1SRN72z9rnLAGBSDvFEZvnhyVbZV';//您的百度地图ak，可以去百度开发者中心去免费申请
+        $url ="http://api.map.baidu.com/geocoding/v3/?address=".$address."&ret_coordtype=gcj02ll&output=json&ak=".$ak;
+        $data = file_get_contents($url);
+        $data = str_replace('renderOption&&renderOption(', '', $data);
+        $data = str_replace(')', '', $data);
+        $data = json_decode($data,true);
+        dump($data);die;
+        if (!empty($data) && $data['status'] == 0) {
+            $result['lat'] = $data['result']['location']['lat'];
+            $result['lng'] = $data['result']['location']['lng'];
+            return $result;//返回经纬度结果
+        }else{
+            return null;
+        }
+    }
+}
+
 
 /**
  * BD09 坐标转换GCJ02

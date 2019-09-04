@@ -696,6 +696,11 @@ class Order extends ApiBase
         {
             $product_info = model('Product')->where('id',$row['product_id'])->find();
 
+            //优惠商品第二件原价
+            if($product_info['type'] == 3) {
+                $row['limit_buy_num'] = 1;//默认是一件
+            }
+
             //如果商品下架 则不返回
             if($product_info['status'] == 2) {
                 $today = date('Y-m-d',time());

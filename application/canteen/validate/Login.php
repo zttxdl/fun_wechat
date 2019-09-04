@@ -12,7 +12,11 @@ class Login extends Validate
      *
      * @var array
      */	
-	protected $rule = [];
+	protected $rule = [
+        'account' => ['require'],
+	    'password' => 'require',
+        'code' => 'require',
+    ];
     
     /**
      * 定义错误信息
@@ -20,5 +24,9 @@ class Login extends Validate
      *
      * @var array
      */	
-    protected $message = [];
+    protected $message = [
+        'account.require' => '账号不能为空',
+        'password.require' => '密码不能为空',
+        'code.require' => '验证码不能为空',
+    ];
 }
