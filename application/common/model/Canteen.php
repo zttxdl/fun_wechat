@@ -11,4 +11,10 @@ class Canteen extends Model
 		$name = $this->where('id',$canteen_id)->value('name');
 		return isset($name) ? $name : '';
 	}
+
+	public function canteenIncomeExpend()
+    {
+        return $this->hasOne('CanteenIncomeExpend','canteen_id');
+    }
+
 }
