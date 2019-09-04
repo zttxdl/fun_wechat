@@ -9,9 +9,7 @@ use think\Request;
 class IncomeExpend extends Base
 {
     /**
-     * 显示资源列表
-     *
-     * @return \think\Response
+     * 提现记录
      */
     public function index(Request $request)
     {
@@ -29,4 +27,16 @@ class IncomeExpend extends Base
         $this->success('success',$list);
     }
 
+    /**
+     * 获取商家名称
+     */
+    public function selectShopName(Request $request)
+    {
+        $canteen_id = $request->get('canteen_id');
+        $list = model('Shop')->field('id,shop_name')
+                ->where('canteen_id',$canteen_id)
+                ->order('id', 'desc')->select();
+        
+        $this->success('success',$list);
+    }
 }

@@ -452,4 +452,5 @@ Route::put('canteen/account/:id','canteen/account/update');
 Route::get('canteen/account/:id/balance','canteen/account/accountBalance');
 Route::get('canteen/account/withdrawal','canteen/account/withdrawal');
 Route::get('canteen/income','canteen/IncomeExpend/index');
+Route::get('canteen/income/select_shop_name','canteen/IncomeExpend/selectShopName');
 
