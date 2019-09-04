@@ -3,7 +3,9 @@
 namespace app\canteen\controller;
 
 use app\common\controller\Base;
+use app\common\model\Canteen;
 use app\common\model\CanteenAccount;
+use app\common\model\CanteenIncomeExpend;
 use think\Request;
 
 class Account extends Base
@@ -57,4 +59,58 @@ class Account extends Base
         $this->success('success',$res);
     }
 
+    /**
+     * 获取账户资金
+     */
+    public function accountBalance($id)
+    {
+        $canteen = Canteen::get($id);
+        if (!$canteen) {
+            $this->error('获取失败');
+        }
+
+        $data = [
+            'account'=> $canteen->account,
+            'can_balance'=> $canteen->can_balance,
+            'balance'=> $canteen->canteenIncomeExpend->balance,
+        ];
+
+        $this->success('success',$data);
+    }
+
+    /**
+     * 提现
+     */
+    public function withdrawal(Request $request)
+    {
+
+        $money = $request->post('money');
+        $canteen_id = $request->post('canteen_id');
+        $can_balance = model('Canteen')->where('id',$canteen_id)->value('can_balance');
+        if ($money > $can_balance) {
+            $this->error('提现金额不能大于可提现余额');
+        }
+        if ($money < 10) {
+            $this->error('提现金额最低10元起');
+        }
+        $balance = model('CanteenIncomeExpend')->where('canteen_id',$canteen_id)->order('add_time','desc')->value('balance');
+        $balance = $balance - $money;
+        $data = [
+            'canteen_id'=>$canteen_id,
+            'name'=>'提现',
+            'money'=>$money,
+            'balance'=>$balance,
+            'type'=>2,
+            'serial_number'=> build_order_no('TX'),
+            'add_time'=> time(),
+            'status'=> 1,
+        ];
+        $ret = model('Canteen')->where('id',$canteen_id)->update(['can_balance'=>$can_balance - $money]);
+        if (!$ret) {
+            $this->error('提现失败');
+        }
+        $res = CanteenIncomeExpend::create($data);
+
+        $this->success('success',$res);
+    }
 }

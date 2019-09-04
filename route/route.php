@@ -449,4 +449,7 @@ Route::group('auto', function () {
 Route::get('canteen/account/:id','canteen/account/read');
 Route::post('canteen/account','canteen/account/save');
 Route::put('canteen/account/:id','canteen/account/update');
+Route::get('canteen/account/:id/balance','canteen/account/accountBalance');
+Route::get('canteen/account/withdrawal','canteen/account/withdrawal');
+Route::get('canteen/income','canteen/IncomeExpend/index');
 
