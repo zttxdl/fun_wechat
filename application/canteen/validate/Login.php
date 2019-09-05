@@ -16,6 +16,10 @@ class Login extends Validate
         'account' => ['require'],
 	    'password' => 'require',
         'code' => 'require',
+        'old_pwd' => 'require',
+        'new_pwd' => 'require',
+        'sure_pwd' => 'require',
+
     ];
     
     /**
@@ -28,5 +32,19 @@ class Login extends Validate
         'account.require' => '账号不能为空',
         'password.require' => '密码不能为空',
         'code.require' => '验证码不能为空',
+        'old_pwd.require' => '旧密码不能为空',
+        'new_pwd.require' => '新密码不能为空',
+        'sure_pwd.require' => '确认密码不能为空',
+    ];
+
+    /**
+     * 定义场景验证
+     * 格式：'方法名'	=>	['参数1',参数2]
+     *
+     * @var array
+     */	
+    protected $scene = [
+        'login'  =>  ['account','password','code'],
+        'updatePwd'  =>  ['old_pwd','new_pwd','sure_pwd'],
     ];
 }

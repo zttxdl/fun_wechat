@@ -212,10 +212,10 @@ class Orders extends RiderBase
             if ($res) {
                 $this->error('您已取餐离店，请勿重新点击');
             }
-            //取餐离店 计算商家收入
+            //取餐离店 计算商家收入、食堂收入
             $result = model('Withdraw')->income($orderId);
             if (!$result) {
-                // 计算商家收入支出出错，造成写入回滚
+                // 计算商家收入存表、食堂收入存表有误，造成写入回滚
                 // 记录到异常订单中 【待更新。。。】
             }
 
