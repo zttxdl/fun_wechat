@@ -253,7 +253,7 @@ class Withdraw extends Model
             // 更新商家收支明细表
             Db::name('withdraw')->insert($data);
 
-            $canteen_id = Db::name('orders')->where('id','=',$refundData->orders_id)->value('canteen_id');
+            $canteen_id = Db::name('shop_info')->where('id','=',$refundData->shop_id)->value('canteen_id');
             if ($canteen_id) {
                 // 获取最新的食堂账户余额信息
                 $balance = Db::name('canteen_income_expend')->where('canteen_id','=',$canteen_id)->order('id','desc')->value('balance');
