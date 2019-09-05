@@ -430,9 +430,13 @@ Route::rule('/canteen/login','canteen/Login/login');
 Route::rule('/canteen/verify','canteen/Login/verify');
 Route::rule('/canteen/loginOut','canteen/Login/loginOut');
 
+
 Route::group('canteen', function () {
-    //修改密码
-    Route::rule('/setPwd','canteen/Login/updatePwd');
+    Route::rule('/setPwd','canteen/Login/updatePwd');//修改密码
+    Route::rule('/getList','canteen/ShopInfo/getList');//商家列表
+    Route::rule('/getDetail','canteen/ShopInfo/getDetail');//商家详情
+    Route::rule('setOpenStatus','canteen/ShopInfo/setOpenStatus');//修改商家营业状态
+    Route::rule('/getShopFlow','canteen/ShopInfo/getShopFlow');//获取商家流水
 })->middleware('CanteenIsLogin');
 
 /*************** 定时脚本接口 *********************************************************************************************/

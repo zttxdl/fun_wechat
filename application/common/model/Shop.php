@@ -406,6 +406,21 @@ class Shop extends Model
         return count(json_decode($day_uv));
     }
 
+    /**
+     * 根据食堂ID获取店铺ID
+     */
+    public function getShopIdByCanteenId($canteen_id)
+    {   
+        return $this->where('canteen_id',$canteen_id)->value('id');
+    }
+
+    /**
+     * 食堂ID获取所有店铺列表
+     */
+    public function getShopListByCanteenID($canteen_id)
+    {
+        return $this->field('id,shop_name')->where('canteen_id',$canteen_id)->select();
+    }
 
 
 
