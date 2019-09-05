@@ -5,10 +5,14 @@ namespace app\canteen\controller;
 use app\common\controller\Base;
 use think\Request;
 
-class ShopInfo extends CanteenBase
-{
-    protected $isLogin;
-    
+class ShopInfo extends Base
+{  
+    protected $canteen_id;
+    public function __construct()
+    {
+        parent::__construct();
+        $this->canteen_id = session('canteen.id');
+    }
     /**
      * 获取商家列表
      */
@@ -17,8 +21,7 @@ class ShopInfo extends CanteenBase
         $page_no = $request->param('page');
         $page_size = $request->param('pageSize');
         $key_word = $request->param('keyword');
-        // $school_id = $request->param('school_id/d');
-        $id = session('canteen.id');
+        $id = $this->canteen_id;
 
         if($id) {
             $map[] = ['canteen_id','=',$id];
@@ -29,13 +32,6 @@ class ShopInfo extends CanteenBase
         if($key_word) {
             $map[] = ['a.shop_name|a.link_name|a.link_tel','like',$key_word.'%'];
         }
-
-        // 学校列表
-        // $school_list = Model('school')->getSchoolList();
-
-        // if ($school_id) {
-        //     $map[] = ['school_id','=',$school_id];
-        // }
 
         // 获取当前学校的已审核通过的商铺列表
         $list = model('ShopInfo')
@@ -60,8 +56,6 @@ class ShopInfo extends CanteenBase
                         'school_name' =>  Model('School')->getNameById($row['school_id']),
                         'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
                         'open_status' => $row['open_status'],
-                        // 'month_sales' => model('Shop')->getMonthSales($row['id']),
-                        // 'count_sales' => model('Shop')->getCountSales($row['id']),
                     ];
                 }
             }
@@ -71,7 +65,6 @@ class ShopInfo extends CanteenBase
         $result['count'] = $list['total'];
         $result['page'] = $list['current_page'];
         $result['pageSize'] = $list['per_page'];
-        // $result['school_list'] = $school_list;
         $this->success('获取成功',$result);
     }
 
@@ -172,16 +165,16 @@ class ShopInfo extends CanteenBase
      */
     public function setOpenStatus(Request $request)
     {
-        $canteen_id = session('canteen.id');
+        $canteen_id = $this->canteen_id;
         $shop_id = model('Shop')->getShopIdByCanteenId($canteen_id);
-
-        dump($shop_id);exit;
 
         $open_status = $request->param('open_status');
 
         $res = Model('shopInfo')->where('id',$shop_id)->setField('open_status',$open_status);
+        //店铺营业状态更新
+        Model('shopInfo')->where('id',$shop_id)->setField('canteen_open_status',$open_status);
 
-        $result = ShopInfo::where('id',$shop_id)->find();
+        $result = Model('shopInfo')->where('id',$shop_id)->find();
 
         if($res) {
             $this->success('更新成功',['open_status'=>$result['open_status']]);
@@ -194,9 +187,49 @@ class ShopInfo extends CanteenBase
     /**
      * 商家流水
      */
-    public function getShopFlow()
+    public function getShopFlow(Request $request)
     {
         $canteen_id = $this->canteen_id;
+        $shop_id = $request->param('shopId');
+        $page = $request->param('page');
+        $page_size = $request->param('pageSize');
+        $key_word = $request->param('keyword');
+        $trade_type = $request->param('tradeType');//0:全部 1:支付 2:退款
+
+
+        // 搜索条件
+        if($key_word)  $map[] = ['a.orders_sn','like',$key_word.'%'];
+        if($shop_id) $map[] = ['a.shop_id','=',$shop_id];
+        if($trade_type == 1){
+            $map[] = ['a.status','=',8];
+        }elseif($trade_type == 2) {
+            $map[] = ['a.status','=',11];
+        }else{
+            $map[] = ['a.status','in',[8,11]];
+        }
+        
+        $result = model('Orders')
+                    ->alias('a')
+                    ->join('shopInfo b','a.shop_id = b.id')
+                    ->field('a.id,a.orders_sn,a.status,a.money,b.shop_name,a.pay_mode,a.pay_time')
+                    ->where($map)
+                    ->paginate($page_size)
+                    ->toArray();
+        if(empty($result['data']) && !isset($result['data'])) {
+            $this->error('暂无数据');
+        }
+        
+        //获取食堂对应商家列表
+        $shop_list = model('Shop')->getShopListByCanteenID($canteen_id);
+        $result['shop_list'] = $shop_list;
+        foreach ($result['data'] as $key => $value) {
+           $result[$key]['tradeType'] = $value['status'] == 8 ? '支付' : '退款';
+           $result[$key]['tradeWay'] = $value['pay_mode'] == 1 ? '微信支付' : '支付宝支付';
+
+        }
+
+         $this->success('获取成功',$result);
     }
+
 
 }

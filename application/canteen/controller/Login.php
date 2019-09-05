@@ -21,7 +21,7 @@ class Login extends Base
         ];
 
         //第一种方法
-        $result = $this->validate($data,'Login');
+        $result = $this->validate($data,'Login.login');
 
         if(true !== $result)
         {
@@ -66,7 +66,7 @@ class Login extends Base
 
 
         //参数校验
-        $check = $this->validate($request->param(), 'Account');
+        $check = $this->validate($request->param(), 'Login.updatePwd');
         if ($check !== true) {
             $this->error($check);
         }
@@ -85,6 +85,7 @@ class Login extends Base
         }
 
         $result->password = md5($new_pwd);
+        $result->cleartext = $new_pwd;
         $ret = $result->save();
         if($ret) {
             $this->success('更新成功');

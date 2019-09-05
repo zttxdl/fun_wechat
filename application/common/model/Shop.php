@@ -414,6 +414,14 @@ class Shop extends Model
         return $this->where('canteen_id',$canteen_id)->value('id');
     }
 
+    /**
+     * 食堂ID获取所有店铺列表
+     */
+    public function getShopListByCanteenID($canteen_id)
+    {
+        return $this->field('id,shop_name')->where('canteen_id',$canteen_id)->select();
+    }
+
 
 
 }

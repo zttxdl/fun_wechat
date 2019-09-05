@@ -13,9 +13,10 @@ class Account extends Validate
      * @var array
      */	
 	protected $rule = [
-        'old_pwd' => 'require',
-        'new_pwd' => 'require',
-        'sure_pwd' => 'require',
+        'back_name'    => 'require',
+        'name'         => 'require',
+        'back_num'     => 'require',
+        'canteen_id'   => 'require',
     ];
     
     /**
@@ -25,8 +26,10 @@ class Account extends Validate
      * @var array
      */	
     protected $message = [
-        'old_pwd.require' => '旧密码不能为空',
-        'new_pwd.require' => '新密码不能为空',
-        'sure_pwd.require' => '确认密码不能为空'
+        'back_name.require'           => '开户行不能为空',
+        'name.require'                => '开户人姓名不能为空',
+        'back_num.require'            => '银行卡号不能为空',
+        'canteen_id.require'          => '用户id不能为空',
+
     ];
 }

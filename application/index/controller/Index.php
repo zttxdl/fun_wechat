@@ -29,6 +29,7 @@ class Index extends Base
 	{
         $addr = "南京市栖霞区南京财经大学（仙林校区）北苑13宿管站";
         $location = get_location($addr);
+        dump($addr);
         dump($location);
 		// return view('index/index',['uid'=>$id]);
 
