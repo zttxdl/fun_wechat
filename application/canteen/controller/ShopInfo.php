@@ -11,6 +11,8 @@ class ShopInfo extends Base
     public function __construct()
     {
         parent::__construct();
+        $this->shopModel = Model('Shop');
+        $this->SchoolModel = Model('School');
         $this->canteen_id = session('canteen.id');
     }
     /**
@@ -24,7 +26,7 @@ class ShopInfo extends Base
         $id = $this->canteen_id;
 
         if($id) {
-            $map[] = ['a.canteen_id','=',2];
+            $map[] = ['a.canteen_id','=',$id];
         }
 
         $map[] = ['a.status','in','3,4'];
@@ -33,17 +35,16 @@ class ShopInfo extends Base
             $map[] = ['a.shop_name|a.link_name|a.link_tel','like',$key_word.'%'];
         }
 
-        exit;
-
         // 获取当前学校的已审核通过的商铺列表
-        $result = model('ShopInfo')
+        $list = model('ShopInfo')
             ->alias('a')
             ->page($page_no,$page_size)
             ->where($map)
             ->paginate($page_size)
             ->toArray();
-        if($result['data']) {
-            foreach ($result['data'] as $key => &$row)
+        $result = [];
+        if($list) {
+            foreach ($list['data'] as $row)
             {
                 if($row['id']) {
                     $result['data'][] = [
@@ -57,12 +58,14 @@ class ShopInfo extends Base
                         'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
                         'status' => config('shop_check_status')[$row['status']],
                     ];
-                    unset($row);
                 }
             }
-        }else{
-            $result['data'] = [];
         }
+
+
+        $result['count'] = $list['total'];
+        $result['page'] = $list['current_page'];
+        $result['pageSize'] = $list['per_page'];
         $this->success('获取成功',$result);
 
         // 获取当前学校的已审核通过的商铺列表
@@ -95,7 +98,7 @@ class ShopInfo extends Base
     {
         $shop_id = $request->param('id');
 
-        if(empty((int)$shop_id)) {
+        if(empty($shop_id)) {
             $this->error('非法请求','404');
         }
         $shop_info = $this->shopModel->getShopInfo($shop_id);
@@ -212,6 +215,7 @@ class ShopInfo extends Base
         $page_size = $request->param('pageSize');
         $key_word = $request->param('keyword');
         $trade_type = $request->param('tradeType');//0:全部 1:支付 2:退款
+        $canteen_id = $this->canteen_id;
 
 
         // 搜索条件
