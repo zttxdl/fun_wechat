@@ -24,7 +24,7 @@ class ShopInfo extends Base
         $id = $this->canteen_id;
 
         if($id) {
-            $map[] = ['a.canteen_id','=',$id];
+            $map[] = ['a.canteen_id','=',2];
         }
 
         $map[] = ['a.status','in','3,4'];
@@ -32,6 +32,8 @@ class ShopInfo extends Base
         if($key_word) {
             $map[] = ['a.shop_name|a.link_name|a.link_tel','like',$key_word.'%'];
         }
+
+        exit;
 
         // 获取当前学校的已审核通过的商铺列表
         $result = model('ShopInfo')
@@ -41,7 +43,7 @@ class ShopInfo extends Base
             ->paginate($page_size)
             ->toArray();
         if($result['data']) {
-            foreach ($result['data'] as $row)
+            foreach ($result['data'] as $key => &$row)
             {
                 if($row['id']) {
                     $result['data'][] = [
@@ -55,6 +57,7 @@ class ShopInfo extends Base
                         'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
                         'status' => config('shop_check_status')[$row['status']],
                     ];
+                    unset($row);
                 }
             }
         }else{
@@ -71,7 +74,6 @@ class ShopInfo extends Base
             ->paginate($page_size)
             ->toArray();
 
-            dump($result);
 
         if($result['data']) {
             foreach ($result['data'] as $key=>$row)
