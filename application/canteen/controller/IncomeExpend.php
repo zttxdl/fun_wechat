@@ -14,9 +14,10 @@ class IncomeExpend extends Base
     public function index(Request $request)
     {
         $pagesize = $request->get('pagesize',20);
-
+        $canteen_id = session('canteen.id');
         $list = CanteenIncomeExpend::scope(function ($query) {
             $query->where('type',2)
+                ->where('canteen_id',$canteen_id)
                 ->order('id', 'desc');
         })->paginate($pagesize)->each(function ($item) {
             $item->add_time = date('Y-m-d H:i:s',$item->add_time);
@@ -27,16 +28,4 @@ class IncomeExpend extends Base
         $this->success('success',$list);
     }
 
-    /**
-     * 获取商家名称
-     */
-    public function selectShopName(Request $request)
-    {
-        $canteen_id = $request->get('canteen_id');
-        $list = model('Shop')->field('id,shop_name')
-                ->where('canteen_id',$canteen_id)
-                ->order('id', 'desc')->select();
-        
-        $this->success('success',$list);
-    }
 }

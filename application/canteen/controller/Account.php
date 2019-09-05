@@ -18,13 +18,14 @@ class Account extends Base
      */
     public function save(Request $request)
     {
+        $canteen_id = session('canteen.id');
         $data =  $request->post();
         // 验证表单数据
         $check = $this->validate($data, 'Account');
         if ($check !== true) {
             $this->error($check,201);
         }
-        $find = CanteenAccount::get(['canteen_id'=>$data['canteen_id']]);
+        $find = CanteenAccount::get(['canteen_id'=>$canteen_id]);
         if ($find) {
             $this->error('添加失败',401);
         }
@@ -39,9 +40,10 @@ class Account extends Base
      * @param  int  $id
      * @return \think\Response
      */
-    public function read($id)
+    public function read()
     {
-        $data = CanteenAccount::get(['canteen_id'=>$id]);
+        $canteen_id = session('canteen.id');
+        $data = CanteenAccount::get(['canteen_id'=>$canteen_id]);
         $this->success('success',$data);
     }
 
@@ -62,9 +64,12 @@ class Account extends Base
     /**
      * 获取账户资金
      */
-    public function accountBalance($id)
+    public function accountBalance()
     {
-        $canteen = Canteen::get($id);
+        $canteen_id = session('canteen.id');
+        $canteen = Canteen::get($canteen_id);
+        $income = $canteen->canteenIncomeExpend()->order('id','desc')->find();
+        
         if (!$canteen) {
             $this->error('获取失败');
         }
@@ -72,7 +77,7 @@ class Account extends Base
         $data = [
             'account'=> $canteen->account,
             'can_balance'=> $canteen->can_balance,
-            'balance'=> $canteen->canteenIncomeExpend->balance,
+            'balance'=> $income->balance,
         ];
 
         $this->success('success',$data);
@@ -83,9 +88,8 @@ class Account extends Base
      */
     public function withdrawal(Request $request)
     {
-
+        $canteen_id = session('canteen.id');
         $money = $request->post('money');
-        $canteen_id = $request->post('canteen_id');
         $can_balance = model('Canteen')->where('id',$canteen_id)->value('can_balance');
         if ($money > $can_balance) {
             $this->error('提现金额不能大于可提现余额');
@@ -93,7 +97,7 @@ class Account extends Base
         if ($money < 10) {
             $this->error('提现金额最低10元起');
         }
-        $balance = model('CanteenIncomeExpend')->where('canteen_id',$canteen_id)->order('add_time','desc')->value('balance');
+        $balance = model('CanteenIncomeExpend')->where('canteen_id',$canteen_id)->order('id','desc')->value('balance');
         $balance = $balance - $money;
         $data = [
             'canteen_id'=>$canteen_id,

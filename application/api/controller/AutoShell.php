@@ -132,5 +132,21 @@ class AutoShell extends Controller
 
         echo 'success';
     }
-    
+
+    /**
+     * 食堂余额更新
+     * @return [type] [description]
+     */
+    public function canteen()
+    {
+        $list = model('Canteen')->field('id,withdraw_cycle')->select();
+        foreach ($list as $val) {
+            $balance = model('CanteenIncomeExpend')
+                ->where('canteen_id',$val->id)
+                ->whereTime('add_time', '<', '-'.$val->withdraw_cycle.'days')
+                ->order('id','desc')
+                ->value('balance');
+             
+        }
+    }
 }
