@@ -190,14 +190,14 @@ class Withdraw extends Model
             Db::name('withdraw')->insert($data);
 
             /** 食堂收入 *************************************/
-            if ($Order->canteen_id) {
+            if ($shop_info['canteen_id']) {
                 // 获取最新的食堂账户余额信息
-                $balance = Db::name('canteen_income_expend')->where('canteen_id','=',$Order->canteen_id)->order('id','desc')->value('balance');
+                $balance = Db::name('canteen_income_expend')->where('canteen_id','=',$shop_info['canteen_id'])->order('id','desc')->value('balance');
                 if (!$balance) {
                     $balance = 0;
                 }
                 $canteen = [
-                    'canteen_id' => $Order->canteen_id,
+                    'canteen_id' => $shop_info['canteen_id'],
                     'name' => '收入',
                     'balance' => sprintf('%.2f',$stExpenditure + $balance),
                     'money' => sprintf('%.2f',$stExpenditure),

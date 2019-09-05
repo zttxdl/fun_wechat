@@ -165,7 +165,6 @@ Route::group('a-school', function () {
 
 // 食堂管理模块
 Route::group('a-canteen', function () {
-    Route::post('/verification', 'verification');
     Route::post('/insert', 'insert');
     Route::get('/del/:id', 'delete');
 })->prefix('admin/canteen/')->middleware('IsLogin');
@@ -437,6 +436,8 @@ Route::group('canteen', function () {
     Route::rule('/getDetail','canteen/ShopInfo/getDetail');//商家详情
     Route::rule('setOpenStatus','canteen/ShopInfo/setOpenStatus');//修改商家营业状态
     Route::rule('/getShopFlow','canteen/ShopInfo/getShopFlow');//获取商家流水
+    Route::rule('/getShopNameList','canteen/ShopInfo/getShopNameList');//商家名称列表
+
 })->middleware('CanteenIsLogin');
 
 /*************** 定时脚本接口 *********************************************************************************************/
