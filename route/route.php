@@ -431,13 +431,20 @@ Route::rule('/canteen/loginOut','canteen/Login/loginOut');
 
 
 Route::group('canteen', function () {
+    //修改密码
+    Route::rule('/setPwd','canteen/Login/updatePwd');
     Route::rule('/setPwd','canteen/Login/updatePwd');//修改密码
     Route::rule('/getList','canteen/ShopInfo/getList');//商家列表
     Route::rule('/getDetail','canteen/ShopInfo/getDetail');//商家详情
     Route::rule('setOpenStatus','canteen/ShopInfo/setOpenStatus');//修改商家营业状态
     Route::rule('/getShopFlow','canteen/ShopInfo/getShopFlow');//获取商家流水
     Route::rule('/getShopNameList','canteen/ShopInfo/getShopNameList');//商家名称列表
-
+    Route::get('/account','canteen/account/read');
+    Route::post('/account','canteen/account/save');
+    Route::put('/account/:id','canteen/account/update');
+    Route::get('/account/balance','canteen/account/accountBalance');
+    Route::get('/account/withdrawal','canteen/account/withdrawal');
+    Route::get('/income','canteen/IncomeExpend/index');
 })->middleware('CanteenIsLogin');
 
 /*************** 定时脚本接口 *********************************************************************************************/
@@ -446,6 +453,7 @@ Route::group('auto', function () {
     Route::rule('/zero_execute', 'zeroExecute');
     Route::rule('/cancel_orders', 'cancelOrders');
     Route::rule('/update_advert', 'updateAdvert');
+    Route::rule('/canteen', 'canteen');
 })->prefix('api/AutoShell/');
 
 
@@ -461,11 +469,4 @@ Route::group('auto', function () {
     Route::rule('count', 'index/Test/count');
 //});
 
-Route::get('canteen/account/:id','canteen/account/read');
-Route::post('canteen/account','canteen/account/save');
-Route::put('canteen/account/:id','canteen/account/update');
-Route::get('canteen/account/:id/balance','canteen/account/accountBalance');
-Route::get('canteen/account/withdrawal','canteen/account/withdrawal');
-Route::get('canteen/income','canteen/IncomeExpend/index');
-Route::get('canteen/income/select_shop_name','canteen/IncomeExpend/selectShopName');
 
