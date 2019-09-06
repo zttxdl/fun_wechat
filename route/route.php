@@ -165,6 +165,7 @@ Route::group('a-school', function () {
 
 // 食堂管理模块
 Route::group('a-canteen', function () {
+    Route::post('/verification', 'verification');
     Route::post('/insert', 'insert');
     Route::get('/del/:id', 'delete');
 })->prefix('admin/canteen/')->middleware('IsLogin');

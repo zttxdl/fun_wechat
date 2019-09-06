@@ -34,19 +34,25 @@ class Index extends ApiBase
     {
         $lat = $request->param('latitude','');
         $lng = $request->param('longitude','');
-        $school_id = $request->param('school_id')? $request->param('school_id') : 14;
+        $school_id = $request->param('school_id');
+
+        if (!$school_id) {
+            $data['current_school'] = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
+                ->having('distance < 5')->where('level',2)->order('distance asc')->find();
+            
+            if (!$data['current_school']) {
+                $school_id = 14; // 默认南京财经大学仙林学院
+            }
+        }
+
+        if ($school_id) { // 如果有学校主键值，则直接获取学校信息
+            $data['current_school'] = model('School')->field("id,name")->where('id','=',$school_id)->find();
+        }
 
         // 调用轮播图
         $data['slide'] = $this->getSlide($school_id);
         // 调用分类导航
         $data['channel'] = $this->getChannel();
-
-        if ($school_id) { // 如果有学校主键值，则直接获取学校信息
-            $data['current_school'] = model('School')->field("id,name")->where('id','=',$school_id)->find();
-        } else { // 如果没有学校主键值，通过经纬度获取最近学校
-            $data['current_school'] = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
-                ->having('distance < 5')->where('level',2)->order('distance asc')->find();
-        }
 
         $this->success('success',$data);
     }
