@@ -280,7 +280,7 @@ class Orders extends RiderBase
         }
 
         $data = model('Takeout')
-            ->field('order_id,ping_fee,meal_sn,single_time,shop_address,accomplish_time,expected_time,user_address,status,toda_time,cancel_desc,cancel_time')
+            ->field('order_id,ping_fee,meal_sn,single_time,shop_address,accomplish_time,expected_time,user_address,status,fetch_time,toda_time,cancel_desc,cancel_time')
             ->where('order_id',$orderId)->find();
 
         if ($data->status !== 6 && $data->status !== 2) {
@@ -314,7 +314,9 @@ class Orders extends RiderBase
         if (in_array($data->status,[3,4,5])){
             $data->rest_time = round(($data->expected_time - time()) / 60) ;
         }
-
+        if ($data->status == 3) {
+            $data->fetch_time = round(($data->fetch_time - time()) / 60);
+        }
         $data->single_time = $data->single_time ? date('H:i',$data->single_time)  : '';
         $data->accomplish_time =  $data->accomplish_time ? date('H:i',$data->accomplish_time) : '';
         $data->cancel_time = $data->cancel_time ? date('H:i',$data->cancel_time) : '';
