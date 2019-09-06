@@ -56,6 +56,8 @@ class School extends Base
         $data['name'] = $request->param('name');
         $data['longitude'] = $request->param('longitude');
         $data['latitude'] = $request->param('latitude');
+        $data['completion_time'] = $request->param('completion_time');
+        $data['fetch_time'] = $request->param('fetch_time');
         $canteen = $request->param('canteen');
 
         // 验证表单数据
@@ -124,6 +126,8 @@ class School extends Base
         $data['name'] = $request->param('name');
         $data['longitude'] = $request->param('longitude');
         $data['latitude'] = $request->param('latitude');
+        $data['completion_time'] = $request->param('completion_time');
+        $data['fetch_time'] = $request->param('fetch_time');
         $canteen = $request->param('canteen');
 
         // 验证表单数据
@@ -146,7 +150,8 @@ class School extends Base
              $canteen_list = json_decode($canteen,true);
              if (!empty($canteen_list)) {
                  foreach ($canteen_list as $k => $v) {
-                     // 修改食堂
+                    // 修改食堂
+                    $v['password'] = md5($v['cleartext']);
                      Db::name('canteen')->update($v);
                  }
              }
@@ -169,7 +174,7 @@ class School extends Base
     {
         $info = Db::name('school')->where('id','=',$id)->field('fid,name,longitude,latitude')->find();
         $info['area'] = Db::name('school')->where('id','=',$info['fid'])->value('name');
-        $canteen_list = Db::name('canteen')->where('school_id','=',$id)->field('id,name,cut_proportion,account,withdraw_cycle,cleartext')->select();
+        $canteen_list = Db::name('canteen')->where('school_id','=',$id)->field('id,name,cut_proportion,account,withdraw_cycle,cleartext,completion_time,fetch_time')->select();
 
         $this->success('获取编辑学校信息成功',['info'=>$info,'canteen_list'=>$canteen_list]);
     }
