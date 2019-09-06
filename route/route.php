@@ -165,6 +165,7 @@ Route::group('a-school', function () {
 
 // 食堂管理模块
 Route::group('a-canteen', function () {
+    Route::post('/verification', 'verification');
     Route::post('/insert', 'insert');
     Route::get('/del/:id', 'delete');
 })->prefix('admin/canteen/')->middleware('IsLogin');
@@ -431,8 +432,6 @@ Route::rule('/canteen/loginOut','canteen/Login/loginOut');
 
 
 Route::group('canteen', function () {
-    //修改密码
-    Route::rule('/setPwd','canteen/Login/updatePwd');
     Route::rule('/setPwd','canteen/Login/updatePwd');//修改密码
     Route::rule('/getList','canteen/ShopInfo/getList');//商家列表
     Route::rule('/getDetail','canteen/ShopInfo/getDetail');//商家详情
