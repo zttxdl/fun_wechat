@@ -57,6 +57,7 @@ class ShopInfo extends Base
                         'school_name' =>  Model('School')->getNameById($row['school_id']),
                         'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
                         'status' => config('shop_check_status')[$row['status']],
+                        'canteen_open_status' => $row['canteen_open_status']
                     ];
                 }
             }
