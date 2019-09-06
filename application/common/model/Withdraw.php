@@ -269,20 +269,12 @@ class Withdraw extends Model
             ];
             // 更新食堂收支明细表
             $ret2 = Db::name('canteen_income_expend')->insert($canteen);
-
-            if($ret && $ret2) {
-                return true;
-            }else{
-                return false;
-            }
         }
-        //不结算食堂抽成
-        if($ret) {
+        if($ret && $ret2) {
             return true;
         }else{
             return false;
         }
-        
 
 
 
