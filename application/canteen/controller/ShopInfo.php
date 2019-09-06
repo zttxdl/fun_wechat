@@ -216,7 +216,7 @@ class ShopInfo extends Base
         $page_size = $request->param('pageSize');
         $key_word = $request->param('keyword');
         $trade_type = $request->param('tradeType');//0:全部 1:支付 2:退款
-        $canteen_id = $this->canteen_id;
+        $canteen_id = 2;
 
 
         // 搜索条件
@@ -249,8 +249,9 @@ class ShopInfo extends Base
         // }
     
         foreach ($result['data'] as $key => $value) {
-           $result[$key]['tradeType'] = $value['status'] == 8 ? '支付' : '退款';
-           $result[$key]['tradeWay'] = $value['pay_mode'] == 1 ? '微信支付' : '支付宝支付';
+           $result['data'][$key]['pay_time'] = date('Y-m-d H:i:s',$value['pay_time']);
+           $result['data'][$key]['pay_mode'] = $value['status'] == 8 ? '支付' : '退款';
+           $result['data'][$key]['tradeWay'] = $value['pay_mode'] == 1 ? '微信支付' : '支付宝支付';
 
         }
 
