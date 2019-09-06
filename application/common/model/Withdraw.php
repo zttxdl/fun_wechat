@@ -29,7 +29,7 @@ class Withdraw extends Model
         $shouru_money = $this->getIncome($shop_id,$startTime);
 
         //支出
-        $zc_money = $this->getExpenditure($shop_id);
+        $zc_money = $this->getExpenditure($shop_id,$startTime);
 
         //账户余额等于收入-支出
         $acount_money = $shouru_money - $zc_money;
@@ -77,6 +77,7 @@ class Withdraw extends Model
 
             //总支出 过滤提现
             $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','3,5,6']])
+                ->whereTime('add_time', '<',$startTime)
                 ->sum('money');
 
         }else{
