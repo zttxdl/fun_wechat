@@ -29,6 +29,7 @@ class Account extends Base
         if ($find) {
             $this->error('添加失败',401);
         }
+        $data['canteen_id'] = $canteen_id;
         $res = CanteenAccount::create($data);
 
         $this->success('success',$res);
