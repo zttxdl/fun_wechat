@@ -60,13 +60,16 @@ class Orders extends RiderBase
             $data['count'] = $count;
             $where[] = ['status','<>','1'];
             $list = model('Takeout')
-                ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
+                ->field('order_id,fetch_time,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
                 ->where($where)
                 ->order('single_time desc')
                 ->select();
 
             foreach ($list as $key => $item) {
                 $item->rest_time = round(($item->expected_time - time()) / 60);
+                if ($item->status == 3) {
+                    $item->fetch_time = round(($item->fetch_time - time()) / 60);
+                }
             }
 		}
 
@@ -135,11 +138,14 @@ class Orders extends RiderBase
         if (in_array($result['status'],[3,4,5,6])){
             $this->error('手慢了，被人抢走了');
         }
+        $time = model('School')->where('id',$result['school_id'])->value('fetch_time');
+        $fetch_time = time() + 60 * $time;
         $data = [
             'rider_id'=>$this->auth->id,
             'status'=>3,
             'single_time'=>time(),
             'update_time'=>time(),
+            'fetch_time'=> $fetch_time,
         ];
         Db::startTrans();
         try {
