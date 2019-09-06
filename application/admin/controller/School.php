@@ -124,6 +124,7 @@ class School extends Base
         $data['name'] = $request->param('name');
         $data['longitude'] = $request->param('longitude');
         $data['latitude'] = $request->param('latitude');
+        $canteen = $request->param('canteen');
 
         // 验证表单数据
         $check = $this->validate($data, 'School');
@@ -137,12 +138,26 @@ class School extends Base
             $this->error('学校名称已存在！');
         }
 
-        $res = Db::name('school')->update($data);
-        if ($res !== false) {
-            $this->success("修改学校成功");
-        }
-        $this->error("修改学校失败");
-       
+         // 启动事务
+         Db::startTrans();
+         try {
+             // 修改学校
+             Db::name('school')->update($data);
+             $canteen_list = json_decode($canteen,true);
+             if (!empty($canteen_list)) {
+                 foreach ($canteen_list as $k => $v) {
+                     // 修改食堂
+                     Db::name('canteen')->update($v);
+                 }
+             }
+             // 提交事务
+             Db::commit();
+             $this->success("修改学校成功");
+         } catch (\think\Exception\DbException $e) {
+             // 回滚事务
+             Db::rollback();
+             $this->error("修改学校失败");
+         }
     }
 
 
