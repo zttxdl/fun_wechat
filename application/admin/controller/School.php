@@ -107,7 +107,7 @@ class School extends Base
      */
     public function edit($id)
     {
-        $info = Db::name('school')->where('id','=',$id)->field('id,name,fid,latitude,longitude')->find();
+        $info = Db::name('school')->where('id','=',$id)->field('id,name,fid,latitude,longitude,completion_time,fetch_time')->find();
         $info['cname'] = Db::name('school')->where('id','=',$info['fid'])->value('name');
         $area_list = Db::name('school')->where('level','=',1)->field('id,name')->select();
         $canteen_list = Db::name('canteen')->where('school_id','=',$id)->select();
