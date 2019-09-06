@@ -431,8 +431,6 @@ Route::rule('/canteen/loginOut','canteen/Login/loginOut');
 
 
 Route::group('canteen', function () {
-    //修改密码
-    Route::rule('/setPwd','canteen/Login/updatePwd');
     Route::rule('/setPwd','canteen/Login/updatePwd');//修改密码
     Route::rule('/getList','canteen/ShopInfo/getList');//商家列表
     Route::rule('/getDetail','canteen/ShopInfo/getDetail');//商家详情
