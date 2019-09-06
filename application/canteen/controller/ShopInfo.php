@@ -216,7 +216,7 @@ class ShopInfo extends Base
         $page_size = $request->param('pageSize');
         $key_word = $request->param('keyword');
         $trade_type = $request->param('tradeType');//0:全部 1:支付 2:退款
-        $canteen_id = 2;
+        $canteen_id = $this->canteen_id;
 
 
         // 搜索条件
