@@ -186,11 +186,11 @@ class ShopInfo extends Base
      */
     public function setOpenStatus(Request $request)
     {
-        $canteen_id = $this->canteen_id;
-        $shop_id = model('Shop')->getShopIdByCanteenId($canteen_id);
-
+        $shop_id = $request->param('shop_id');
         $open_status = $request->param('open_status');
-
+        if(!$shop_id) {
+            $this->error('商家ID不能为空');
+        }
         $res = Model('shopInfo')->where('id',$shop_id)->setField('open_status',$open_status);
         //店铺营业状态更新
         Model('shopInfo')->where('id',$shop_id)->setField('canteen_open_status',$open_status);
