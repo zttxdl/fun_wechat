@@ -423,6 +423,42 @@ class Orders extends RiderBase
 
         return true;
     }
+
+
+    /**
+     * 我已到店
+     * 
+     */
+    public function arriveShop()
+    {
+
+    }
+
+
+    /**
+     * 取餐离店
+     * 
+     */
+    public function leaveShop()
+    {
+
+    }
+
+
+    /**
+     * 确认送达
+     * 
+     */
+    public function confirmSend()
+    {
+
+    }
+
+
+
+
+
+
     
 }
 
