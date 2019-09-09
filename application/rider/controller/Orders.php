@@ -151,8 +151,8 @@ class Orders extends RiderBase
         }
 
         // 当骑手目前存在五单以上的未完成订单，提示骑手暂时不可接单
-        $count = Db::name('takeout')->where('status','in',[3,4,5])->count('id');
-        if ($count > 1) {
+        $count = Db::name('takeout')->where([['status','in',[3,4,5]],['rider_id','=',$this->auth->id]])->count('id');
+        if ($count > 4) {
             $this->error('您目前的未完成订单量过多，目前不可再抢单，请优先配送未完成的订单',206);            
         }
 
