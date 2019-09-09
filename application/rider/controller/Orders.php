@@ -5,6 +5,7 @@ namespace app\rider\controller;
 use think\Db;
 use think\Request;
 use app\common\controller\RiderBase;
+use think\facade\Cache;
 
 /**
  * 骑手订单控制器
