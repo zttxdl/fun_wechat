@@ -9,8 +9,8 @@ use app\admin\controller\Transfer;
 
 class FinanceManange extends Base
 {
-    protected $source = ['1'=>'骑手端','2'=>'商家端'];
-    protected $toMention = ['1'=>'微信','2'=>'银行卡'];
+    protected $source = ['1'=>'骑手端','2'=>'商家端','3'=>'食堂端'];
+    protected $toMention = ['1'=>'微信','2'=>'银行卡','3'=>'银行卡'];
     protected $status = ['1'=>'待审核','2'=>'审核失败','3'=>'提现成功'];
 
 
@@ -18,88 +18,145 @@ class FinanceManange extends Base
 	{
         $page = $request->param('page');
         $page_size = $request->param('pageSize');
-        $source = $request->param('source');//0:全部 1:骑手端 2:商家端
-        $status = $request->param('status');//1:待审核 2:审核不成功 3:提现成功
+        $source = $request->param('source');//0:全部 1:骑手端 2:商家端 3:食堂端
+        $status = $request->param('status');//0:全部 1:待审核 2:审核不成功 3:提现成功
 
         $rider_result = [];//骑手端提现数据
         $shop_result = [];//商家端端提现数据
+        $canteen_result = [];//食堂端提现数据
         $map = [];
 
         if($status) {
             $map[] = ['a.status','=',$status];
         }
 
-        $rider = Db::name('rider_income_expend')
-        		->alias('a')
-                ->leftJoin('rider_info b','a.rider_id = b.id')
-                ->field('a.*,b.name')
-        		->where($map)
-        		->where('type','=','2')
-        		->order('a.id DESC')
-        		->paginate($page_size)
-        		->toArray();
+        switch ($source) {
+            case 1 :
+                $rider = Db::name('rider_income_expend')
+                    ->alias('a')
+                    ->leftJoin('rider_info b','a.rider_id = b.id')
+                    ->field('a.*,b.name')
+                    ->where($map)
+                    ->where('type','=','2')
+                    ->order('a.id DESC')
+                    ->paginate($page_size)
+                    ->toArray();
 
-        if($rider['data']) {
-            foreach ($rider['data'] as $row)
-            {
-                $rider_result['info'][] = [
-                    'id' => $row['id'],
-                    'order_sn' => $row['serial_number'],
-                    'name' => Db::name('rider_info')->where('id',$row['rider_id'])->value('name'),
-                    'source' => !empty($source) ? $this->source[$source] : '骑手端',
-                    'to_mention ' => !empty($source) ? $this->toMention[$source] : '微信',
-                    'card' => '',
-                    'money' => $row['current_money'],
-                    'add_time' => date('Y-m-d H:i:s',$row['add_time']),
-                    'status' => $this->status[$row['status']],
-                ];
-            }
-        }else{
-            $rider_result['info'] = [];
+                if($rider['data']) {
+                    foreach ($rider['data'] as $row)
+                    {
+                        $rider_result['info'][] = [
+                            'id' => $row['id'],
+                            'order_sn' => $row['serial_number'],
+//                    'name' => Db::name('rider_info')->where('id',$row['rider_id'])->value('name'),
+                            'name' => $row['name'],
+                            'source' => !empty($source) ? $this->source[$source] : '骑手端',
+                            'to_mention ' => !empty($source) ? $this->toMention[$source] : '微信',
+                            'card' => '',
+                            'money' => $row['current_money'],
+                            'add_time' => date('Y-m-d H:i:s',$row['add_time']),
+                            'status' => $this->status[$row['status']],
+                        ];
+                    }
+                }else{
+                    $rider_result['info'] = [];
+                }
+
+                $rider_result['count'] = $rider['total'];
+                $rider_result['page'] = $rider['current_page'];
+                $rider_result['pageSize'] = $rider['per_page'];
+                if($source == 1) {
+                    $this->success('获取成功',$rider_result);
+                };
+                break;
+
+            case 2 :
+                $shop = Db::name('withdraw')
+                    ->alias('a')
+                    ->leftJoin('shop_info b','a.shop_id = b.id')
+                    ->field('a.*,b.shop_name')
+                    ->where($map)
+                    ->where('type','=','2')
+                    ->order('a.id DESC')
+                    ->paginate($page_size)
+                    ->toArray();
+                if($shop['data']) {
+                    foreach ($shop['data'] as $row)
+                    {
+                        $shop_result['info'][] = [
+                            'id' => $row['id'],
+                            'order_sn' => $row['withdraw_sn'],
+//                    'name' => Db::name('shop_info')->where('id',$row['shop_id'])->value('shop_name'),
+                            'name' => $row['shop_name'],
+                            'source' => !empty($source) ? $this->source[$source] : '商家端',
+                            'to_mention ' => !empty($source) ? $this->toMention[$source] : '银行卡',
+                            'card' => $row['card'],
+                            'money' => $row['money'],
+                            'add_time' => date('Y-m-d H:i:s',$row['add_time']),
+                            'status' => $this->status[$row['status']],
+                        ];
+                    }
+                }else{
+                    $shop_result['info'] = [];
+                }
+
+
+                $shop_result['count'] = $shop['total'];
+                $shop_result['page'] = $shop['current_page'];
+                $shop_result['pageSize'] = $shop['per_page'];
+                if($source == 2){
+                    $this->success('获取成功',$shop_result);
+                };
+                break;
+            case 3:
+                //食堂端
+                $canteen = Db::name('canteen_income_expend')
+                    ->alias('a')
+                    ->leftJoin('canteen b','a.canteen_id = b.id')
+                    ->leftJoin('canteen_account c','a.canteen_id = c.canteen_id')
+                    ->field('a.*,b.name,c.back_num')
+                    ->where($map)
+                    ->where('type','=','2')
+                    ->order('a.id DESC')
+                    ->paginate($page_size)
+                    ->toArray();
+
+                if($canteen['data']) {
+                    foreach ($canteen['data'] as $row)
+                    {
+                        $canteen_result['info'][] = [
+                            'id' => $row['id'],
+                            'order_sn' => $row['serial_number'],
+//                    'name' => Db::name('rider_info')->where('id',$row['rider_id'])->value('name'),
+                            'name' => $row['name'],
+                            'source' => !empty($source) ? $this->source[$source] : '骑手端',
+                            'to_mention ' => !empty($source) ? $this->toMention[$source] : '微信',
+                            'card' => $row['back_num'],
+                            'money' => $row['money'],
+                            'add_time' => date('Y-m-d H:i:s',$row['add_time']),
+                            'status' => $this->status[$row['status']],
+                        ];
+                    }
+                }else{
+                    $canteen_result['info'] = [];
+                }
+
+                $canteen_result['count'] = $canteen['total'];
+                $canteen_result['page'] = $canteen['current_page'];
+                $canteen_result['pageSize'] = $canteen['per_page'];
+
+                if($source == 3){
+                    $this->success('获取成功',$canteen_result);
+                };
+                break;
         }
 
-        $rider_result['count'] = $rider['total'];
-        $rider_result['page'] = $rider['current_page'];
-        $rider_result['pageSize'] = $rider['per_page'];
-
-        $shop = Db::name('withdraw')
-        			->alias('a')
-                	->leftJoin('shop_info b','a.shop_id = b.id')
-                	->field('a.*,b.shop_name')
-        			->where($map)
-        			->where('type','=','2')
-        			->order('a.id DESC')
-        			->paginate($page_size)
-        			->toArray();
-        if($shop['data']) {
-            foreach ($shop['data'] as $row)
-            {
-                $shop_result['info'][] = [
-                    'id' => $row['id'],
-                    'order_sn' => $row['withdraw_sn'],
-                    'name' => Db::name('shop_info')->where('id',$row['shop_id'])->value('shop_name'),
-                    'source' => !empty($source) ? $this->source[$source] : '商家端',
-                    'to_mention ' => !empty($source) ? $this->toMention[$source] : '银行卡',
-                    'card' => $row['card'],
-                    'money' => $row['money'],
-                    'add_time' => date('Y-m-d H:i:s',$row['add_time']),
-                    'status' => $this->status[$row['status']],
-                ];
-            }
-        }else{
-            $shop_result['info'] = [];
-        }
 
 
-        $shop_result['count'] = $shop['total'];
-        $shop_result['page'] = $shop['current_page'];
-        $shop_result['pageSize'] = $shop['per_page'];
-        if($source == 1) {
-            $this->success('获取成功',$rider_result);
-        }
-        if($source == 2){
-            $this->success('获取成功',$shop_result);
-        }
+
+
+
+
 
 
         /*del by ztt 20180822 全部的数据暂时不展示
