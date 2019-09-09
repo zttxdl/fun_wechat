@@ -60,13 +60,16 @@ class Orders extends RiderBase
             $data['count'] = $count;
             $where[] = ['status','<>','1'];
             $list = model('Takeout')
-                ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
+                ->field('order_id,fetch_time,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
                 ->where($where)
                 ->order('single_time desc')
                 ->select();
 
             foreach ($list as $key => $item) {
                 $item->rest_time = round(($item->expected_time - time()) / 60);
+                if ($item->status == 3) {
+                    $item->fetch_time = round(($item->fetch_time - time()) / 60);
+                }
             }
 		}
 
@@ -146,11 +149,14 @@ class Orders extends RiderBase
             }
         }
 
+        $time = model('School')->where('id',$result['school_id'])->value('fetch_time');
+        $fetch_time = time() + 60 * $time;
         $data = [
             'rider_id'=>$this->auth->id,
             'status'=>3,
             'single_time'=>time(),
             'update_time'=>time(),
+            'fetch_time'=> $fetch_time,
         ];
         Db::startTrans();
         try {
@@ -285,7 +291,7 @@ class Orders extends RiderBase
         }
 
         $data = model('Takeout')
-            ->field('order_id,ping_fee,meal_sn,single_time,shop_address,accomplish_time,expected_time,user_address,status,toda_time,cancel_desc,cancel_time')
+            ->field('order_id,ping_fee,meal_sn,single_time,shop_address,accomplish_time,expected_time,user_address,status,fetch_time,toda_time,cancel_desc,cancel_time')
             ->where('order_id',$orderId)->find();
 
         if ($data->status !== 6 && $data->status !== 2) {
@@ -319,7 +325,9 @@ class Orders extends RiderBase
         if (in_array($data->status,[3,4,5])){
             $data->rest_time = round(($data->expected_time - time()) / 60) ;
         }
-
+        if ($data->status == 3) {
+            $data->fetch_time = round(($data->fetch_time - time()) / 60);
+        }
         $data->single_time = $data->single_time ? date('H:i',$data->single_time)  : '';
         $data->accomplish_time =  $data->accomplish_time ? date('H:i',$data->accomplish_time) : '';
         $data->cancel_time = $data->cancel_time ? date('H:i',$data->cancel_time) : '';
@@ -475,12 +483,12 @@ class Orders extends RiderBase
             $Order->save();
             // 提交事务
             Db::commit();
-            $this->success('骑手已到店成功');
         } catch (\think\Exception\DbException $e) {
             // 回滚事务
             Db::rollback();
             $this->error('骑手已到店状态回写失败');            
         }
+        $this->success('骑手已到店成功');
     }
 
 
@@ -581,12 +589,13 @@ class Orders extends RiderBase
 
             // 提交事务
             Db::commit();
-            $this->success('骑手取餐离店成功');
+            
         } catch (\think\Exception\DbException $e) {
             // 回滚事务
             Db::rollback();
             $this->error('骑手取餐离店回写失败');            
         }
+        $this->success('骑手取餐离店成功');
     }
 
 
@@ -651,13 +660,13 @@ class Orders extends RiderBase
 
             // 提交事务
             Db::commit();
-            $this->success('骑手取餐离店成功');
         } catch (\think\Exception\DbException $e) {
             // 回滚事务
             Db::rollback();
-            $this->error('骑手取餐离店回写失败');            
+            $this->error('确认送达回写失败');            
         }
 
+        $this->success('确认送达');
     }
 
 

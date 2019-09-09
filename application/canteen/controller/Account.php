@@ -29,6 +29,7 @@ class Account extends Base
         if ($find) {
             $this->error('添加失败',401);
         }
+        $data['canteen_id'] = $canteen_id;
         $res = CanteenAccount::create($data);
 
         $this->success('success',$res);
@@ -44,6 +45,8 @@ class Account extends Base
     {
         $canteen_id = session('canteen.id');
         $data = CanteenAccount::get(['canteen_id'=>$canteen_id]);
+        $arr = explode(',', $data->back_name);
+        $data->back_name = $arr;
         $this->success('success',$data);
     }
 
