@@ -456,6 +456,7 @@ Route::group('auto', function () {
     Route::rule('/cancel_orders', 'cancelOrders');
     Route::rule('/update_advert', 'updateAdvert');
     Route::rule('/canteen', 'canteen');
+    Route::rule('/riderOvertimeOrder', 'riderOvertimeOrder');
 })->prefix('api/AutoShell/');
 
 

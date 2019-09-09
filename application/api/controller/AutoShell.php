@@ -71,6 +71,9 @@ class AutoShell extends Controller
         /***************** 清除商家可提现金额的缓存记录  ******************************************************************/
         Cache::store('redis')->del('shop_balance_key');
 
+        /***************** 清除骑手抢单超时未取餐记录  ******************************************************************/
+        Cache::store('redis')->del('rider_overtime_number');
+
         /***************** 待更新  ******************************************************************/
 
         
@@ -145,5 +148,60 @@ class AutoShell extends Controller
             model('Canteen')->where('id',$val->id)->update(['can_balance'=>$balance]);
         }
         echo "success";
+    }
+
+
+    /**
+     * 超过15分钟，骑手抢完单后，未到商家取餐
+     */
+    public function riderOvertimeOrder()
+    {
+        $orderlist=Db::name('takeout')->where([['single_time','<',time()-60],['status','=',3]])->field('id,school_id,rider_id')->select();
+
+        // 没有数据时
+        if (!$orderlist) {
+            return false;
+        }
+        
+        $school_ids = array_unique(array_column($orderlist,'school_id'));
+        $takeout_ids = array_column($orderlist,'id');
+        $rider_ids = array_column($orderlist,'rider_id');
+        //实例化socket
+        $socket = model('PushEvent','service');
+        // 订单返回到骑手抢单状态
+        Db::name('takeout')->where(['id','in',$takeout_ids])->update(['status'=>1,'single_time'=>0]);
+        // 推送socket
+        foreach ($school_ids as $kk => $vv) {
+            // 已成为骑手的情况
+            $map1 = [
+                ['school_id', '=', $vv],
+                ['open_status', '=', 1],
+                ['status', '=', 3]
+            ];
+            // 暂未成为骑手的情况
+            $map2 = [
+                ['school_id', '=', $vv],
+                ['status', 'in', [0,1,2]]
+            ];  
+
+            $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
+
+            foreach ($r_list as $item) {
+                $rid = 'r'.$item->id;
+                $socket->setUser($rid)->setContent('refresh')->push();
+            }
+        }
+
+        // 存入缓存，每个骑手最多两次取消接单情况
+        $redis = Cache::store('redis');
+        $key = "rider_overtime_number";
+        foreach ($rider_ids as $k => $v) {
+            if ($redis->hExists($key,$v)) {
+                $redis->hIncrby($key,$v,1);
+            } else {
+                $redis->hSet($key,$v,1);
+            }
+        }
+
     }
 }

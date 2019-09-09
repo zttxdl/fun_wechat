@@ -337,7 +337,7 @@ class Order extends MerchantsBase
 
         foreach ($r_list as $item) {
             $rid = 'r'.$item->id;
-            $socket->setUser($rid)->setContent('1')->push();
+            $socket->setUser($rid)->setContent('new')->push();
         }
 
         $this->success('接单成功');
