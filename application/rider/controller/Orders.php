@@ -138,6 +138,17 @@ class Orders extends RiderBase
         if (in_array($result['status'],[3,4,5,6])){
             $this->error('手慢了，被人抢走了');
         }
+
+        // 骑手两次超时15分钟未取餐，今日将不可接单
+        $redis = Cache::store('redis');
+        $key = "rider_overtime_number";
+        if ($redis->hExists($key,$this->auth->id)) {
+            $count = $redis->hGet($key,$this->auth->id);
+            if ($count > 1) {
+                $this->error('您今天存在多次超时未取餐状况，今天不可再抢单',206);
+            }
+        }
+
         $time = model('School')->where('id',$result['school_id'])->value('fetch_time');
         $fetch_time = time() + 60 * $time;
         $data = [
@@ -448,6 +459,11 @@ class Orders extends RiderBase
 
         $Order = \app\common\model\Orders::get($orderId);
         $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
+
+        // 骑手超时未到商家取餐，订单将回滚到抢单状态
+        if ($Takeout->status == 1) {
+            $this->error('该订单已失效，请重新抢单');
+        }
         
         $location = $latitude.','.$longitude;
         $shop_address = $Takeout->shop_address->latitude.','.$Takeout->shop_address->longitude;
