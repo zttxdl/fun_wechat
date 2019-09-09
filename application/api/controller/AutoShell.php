@@ -169,7 +169,7 @@ class AutoShell extends Controller
         //实例化socket
         $socket = model('PushEvent','service');
         // 订单返回到骑手抢单状态
-        $res = Db::name('takeout')->where('id','in',$takeout_ids)->update(['status'=>1,'single_time'=>0]);
+        $res = Db::name('takeout')->where('id','in',$takeout_ids)->update(['status'=>1,'single_time'=>0,'rider_id'=>0]);
 
         // 推送socket
         foreach ($school_ids as $kk => $vv) {
