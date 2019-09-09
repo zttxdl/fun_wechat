@@ -407,6 +407,9 @@ Route::group('r-orders', function () {
     Route::rule('/details', 'details');
     Route::rule('/grabSingle', 'grabSingle');
     Route::rule('/statusUpdate', 'statusUpdate');
+    Route::rule('/arriveShop', 'arriveShop');
+    Route::rule('/leaveShop', 'leaveShop');
+    Route::rule('/confirmSend', 'confirmSend');
 
 })->prefix('rider/Orders/');
 
