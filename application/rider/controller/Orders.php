@@ -467,12 +467,12 @@ class Orders extends RiderBase
             $Order->save();
             // 提交事务
             Db::commit();
-            $this->success('骑手已到店成功');
         } catch (\think\Exception\DbException $e) {
             // 回滚事务
             Db::rollback();
             $this->error('骑手已到店状态回写失败');            
         }
+        $this->success('骑手已到店成功');
     }
 
 
@@ -573,12 +573,13 @@ class Orders extends RiderBase
 
             // 提交事务
             Db::commit();
-            $this->success('骑手取餐离店成功');
+            
         } catch (\think\Exception\DbException $e) {
             // 回滚事务
             Db::rollback();
             $this->error('骑手取餐离店回写失败');            
         }
+        $this->success('骑手取餐离店成功');
     }
 
 
@@ -643,13 +644,13 @@ class Orders extends RiderBase
 
             // 提交事务
             Db::commit();
-            $this->success('骑手取餐离店成功');
         } catch (\think\Exception\DbException $e) {
             // 回滚事务
             Db::rollback();
-            $this->error('骑手取餐离店回写失败');            
+            $this->error('确认送达回写失败');            
         }
 
+        $this->success('确认送达');
     }
 
 
