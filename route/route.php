@@ -177,6 +177,7 @@ Route::group('financeManange', function () {
     Route::rule('/action', 'action');//提现操作
     Route::rule('/getCheck', 'getCheck');//查看不通过原因
     Route::rule('/getRemark', 'getRemark');//获取原因
+    Route::rule('/getCardInfo', 'getCardInfo');//获取银行账户信息
 })->prefix('admin/financeManange/')->middleware('IsLogin');
 
 
