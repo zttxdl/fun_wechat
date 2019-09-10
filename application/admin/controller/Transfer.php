@@ -64,7 +64,7 @@ class Transfer extends Base
 
         // 获取集合
         $list = model('RiderIncomeExpend')->alias('rie')->join('rider_info ri','rie.rider_id = ri.id')
-                ->field('rie.id,rie.status,rie.current_money,rie.serial_number,rie.add_time,ri.name,ri.link_tel')
+                ->field('rie.id,rie.status,rie.current_money,rie.serial_number,rie.add_time,ri.name,ri.phone as link_tel')
                 ->append(['mb_status'])->order('rie.id desc')->where($where)->paginate($pagesize);
 
         $this->success('获取骑手提现申请列表成功',['list'=>$list]);

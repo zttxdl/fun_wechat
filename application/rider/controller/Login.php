@@ -7,7 +7,7 @@ use think\Request;
 use app\common\model\RiderInfo;
 use app\common\Auth\JwtAuth;
 use EasyWeChat\Factory;
-
+use think\Db;
 
 /**
  * 骑手登录注册
@@ -34,7 +34,7 @@ class Login extends RiderBase
 
 
     /**
-     * 授权时，存储 openid 等用户相关信息 
+     * 授权时，存储 openid 等用户相关信息 ，并存表
      * 
      */
     public function saveRiderBaseInfo(Request $request)
@@ -47,17 +47,20 @@ class Login extends RiderBase
         $list['add_time'] = time();
 
         // 判断当前用户是否已授权
-        $id = RiderInfo::where('openid','=',$data['openid'])->count('id');
-        if ($id) {
-            $this->error('该用户已授权');
+        $rid = Db::name('rider_info')->where('openid','=',$data['openid'])->value('id');
+        if (!$rid) {
+            $rid = Db::name('rider_info')->insertGetId($list);
+            if(!$rid) {
+                $this->error('授权入表失败');
+            }
         }
-
-        // 存入数据
-        $result = RiderInfo::create($list);
-        if(!$result) {
-            $this->error('授权入表失败');
-        }
-        $this->success('授权入表成功');
+        $info = Db::name('rider_info')->where('openid','=',$data['openid'])->field('id,school_id,status,open_status')->find();
+        $jwtAuth = new JwtAuth();
+        $token = $jwtAuth->createToken($info,31104000);   // 一年有效期
+        $this->success('已授权',[
+            'token' => $token,
+            'uuid' => 'r'.$rid
+        ]);
         
     }
 
@@ -83,7 +86,7 @@ class Login extends RiderBase
 
 
     /**
-     * 使用其他手机号登录|注册 
+     * 使用其他手机号登录|注册 【此功能已关闭】
      * 
      */
     public function login(Request $request)
@@ -103,14 +106,14 @@ class Login extends RiderBase
             $this->error('非法参数');
         }
         // 防止同一手机号，不同的微信openid 登录，必须唯一关系
-        $result_openid = RiderInfo::where('link_tel',$phone)->value('openid');
+        $result_openid = RiderInfo::where('phone',$phone)->value('openid');
         if (!empty($result_openid) && ($result_openid != $openid)) {
             $this->error('该手机号已绑定');
         }
 
         // 更新数据
         $res = RiderInfo::where('openid',$openid)->update([
-            'link_tel' =>  $phone,
+            'phone' =>  $phone,
             'last_login_time'   =>  time()
         ]);
         
@@ -127,13 +130,11 @@ class Login extends RiderBase
             'name'  => $rider_info['name'],
             'phone' =>  $phone
         ]);
-
-        
     }
 
 
     /**
-     * 微信用户快捷登录 
+     * 微信用户快捷登录 【此功能已关闭】
      * 
      */
     public function celerityLogin(Request $request)
@@ -155,14 +156,14 @@ class Login extends RiderBase
             $this->error('非法参数');
         }
         // 防止同一手机号，不同的微信openid 登录，必须唯一关系
-        $result_openid = RiderInfo::where('link_tel',$data['phone'])->value('openid');
+        $result_openid = RiderInfo::where('phone',$data['phone'])->value('openid');
         if (!empty($result_openid) && ($result_openid != $data['openid'])) {
             $this->error('该手机号已绑定');
         }
 
         // 更新数据
         $res = RiderInfo::where('openid',$data['openid'])->update([
-            'link_tel' =>  $data['phone'],
+            'phone' =>  $data['phone'],
             'last_login_time'   =>  time()
         ]);
         
@@ -179,13 +180,12 @@ class Login extends RiderBase
             'name'  => $rider_info['name'],
             'phone' =>  $data['phone']
         ]);
-
     }
      
     
 
     /**
-     * 获取微信手机号 
+     * 获取微信手机号 【此功能已关闭】
      * 
      */
     public function getWechatPhone($encrypted_data,$code,$iv)
@@ -205,7 +205,6 @@ class Login extends RiderBase
             $res = ['code'=>203,'msg'=>'请求失败'];
         }
         return $res;
-
     }
 
      
