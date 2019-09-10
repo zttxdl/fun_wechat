@@ -503,8 +503,9 @@ class Order extends ApiBase
                     'status' => $hongbao_status,
                     'order_sn' => $orders_sn,
                 ];
-
-                $res = model('MyCoupon')->updateStatus($orderData['platform_coupon_id'],$data);
+                // Mike需调整
+                $my_coupon_id = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$platform_discount['id']]])->value('id');
+                $res = model('MyCoupon')->updateStatus($my_coupon_id,$data);
                 if(!$res) {
                     throw new \Exception('红包使用失败');
                 }
@@ -642,8 +643,11 @@ class Order extends ApiBase
 
         //如果使用红包 状态回滚
         if($order_info['platform_coupon_money'] > 0){
+
             $data['status'] = $hongbao_status;
-            model('MyCoupon')->updateStatus($order_info['platform_coupon_id'],$data);
+            // Mike需调整
+            $my_coupon_id = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$order_info['platform_coupon_id']]])->value('id');
+            model('MyCoupon')->updateStatus($my_coupon_id,$data);
         }
 
         //今日特价商品逻辑
@@ -692,6 +696,11 @@ class Order extends ApiBase
         {
             $product_info = model('Product')->where('id',$row['product_id'])->find();
 
+            //优惠商品第二件原价
+            if($product_info['type'] == 3) {
+                $row['limit_buy_num'] = 1;//默认是一件
+            }
+
             //如果商品下架 则不返回
             if($product_info['status'] == 2) {
                 $today = date('Y-m-d',time());
@@ -703,7 +712,7 @@ class Order extends ApiBase
 
                 if($today_goods) {
                     //今日特价过期
-                    if(time() > $today_goods['end_time']) {
+                    if(time() > $today_goods['end_time'] ||  $today_goods['num'] < 1) {
                         continue;
                     }
 

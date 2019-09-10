@@ -14,7 +14,7 @@ use think\Request;
 
 class Store extends ApiBase
 {
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['*'];
     //获取商家菜单
     public function index(Request $request)
     {
@@ -39,6 +39,7 @@ class Store extends ApiBase
         $toWhere[] = ['a.today','=',$today];
         $toWhere[] = ['a.shop_id','=',$shop_id];
         $toWhere[] = ['a.end_time','>=',time()];
+        $toWhere[] = ['a.num','>',0];
         $days = Db::name('today_deals')->alias('a')
             ->join('product b','a.product_id = b.id ')
             ->field('b.id,b.name,a.old_price,a.price,a.num,a.limit_buy_num,a.thumb,a.start_time,a.end_time,b.products_classify_id as classId,b.attr_ids,b.box_money,b.sales')
@@ -71,6 +72,9 @@ class Store extends ApiBase
             $item['sales'] = model('Product')->getMonthSales($item['id']);
             $item['price'] = floatval(sprintf("%.2f",$price_hike + $item['price']));
             $item['old_price'] = floatval(sprintf("%.2f",$price_hike + $item['old_price']));
+            if ($item['type'] == 3) {
+                $item['limit_buy_num'] = 1;
+            }
 
         }
 
@@ -82,6 +86,7 @@ class Store extends ApiBase
             if ($value['type'] === 2){
                 $cakes[] = $value;
             }elseif($value['type'] == 3){
+                $value['limit_buy_num'] = 1;
                 $preferential[] = $value;
             }
         }
@@ -284,7 +289,6 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
      */
     public function countUserVistor(Request $request)
     {
-        set_log('shop_uv','进来了');
         $shop_id = $request->param('shop_id',1);
         $openid = $request->param('openid',1);
         $this->isDisable($shop_id);

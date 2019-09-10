@@ -28,6 +28,8 @@ class Coupon extends Base
         $where = [];
         !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
         !empty($request->get('category/d')) ? $where[] = ['limit_use',['like',$request->get('category/d').',%'],['like','%,'.$request->get('category/d').',%'],['like','%,'.$request->get('category/d')],'or']: null;
+        // 另一种写法 ，实现字段区间内查询，后续可根据数据量大的时候，判断两种写法哪一种写法效率更高【此写法适用于tp5.1.7以上版本】
+        // !empty($request->get('category/d')) ? $where[] = ['','exp',Db::raw("FIND_IN_SET(1,limit_use)")]: null;
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
     

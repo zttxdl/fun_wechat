@@ -233,8 +233,8 @@ class Shop extends Model
         $day_order_num = $this->getDayNum($shop_id);//日均订单量
         $settlement_money = model('Withdraw')->getAcountMoney($shop_id); //结算金额
         $settlement_wait_money =  model('Withdraw')->getNotJsMoney($shop_id); //待结算金额
-        $month_money = $this->getMonthSales($shop_id);//月销售额
-        $total_money = $this->getCountSales($shop_id);//总销售额
+        $month_money = model('Withdraw')->getMonthSales($shop_id);//月销售额
+        $total_money = model('Withdraw')->getCountSales($shop_id);//总销售额
 
         return [
             'total_num' => $total_num,
@@ -406,6 +406,21 @@ class Shop extends Model
         return count(json_decode($day_uv));
     }
 
+    /**
+     * 根据食堂ID获取店铺ID
+     */
+    public function getShopIdByCanteenId($canteen_id)
+    {   
+        return $this->where('canteen_id',$canteen_id)->value('id');
+    }
+
+    /**
+     * 食堂ID获取所有店铺列表
+     */
+    public function getShopListByCanteenID($canteen_id)
+    {
+        return $this->field('id,shop_name')->where('canteen_id',$canteen_id)->select();
+    }
 
 
 

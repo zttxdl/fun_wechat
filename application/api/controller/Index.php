@@ -34,19 +34,27 @@ class Index extends ApiBase
     {
         $lat = $request->param('latitude','');
         $lng = $request->param('longitude','');
-        $school_id = $request->param('school_id')? $request->param('school_id') : 13;
+        $school_id = $request->param('school_id');
+
+        if (!$school_id) {
+            if ($lat && $lng) {
+                $data['current_school'] = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
+                ->having('distance < 5')->where('level',2)->order('distance asc')->find();
+            }
+            
+            if (!$data['current_school']) {
+                $school_id = 14; // 默认南京财经大学仙林学院
+            }
+        }
+
+        if ($school_id) { // 如果有学校主键值，则直接获取学校信息
+            $data['current_school'] = model('School')->field("id,name")->where('id','=',$school_id)->find();
+        }
 
         // 调用轮播图
         $data['slide'] = $this->getSlide($school_id);
         // 调用分类导航
         $data['channel'] = $this->getChannel();
-
-        if ($school_id) { // 如果有学校主键值，则直接获取学校信息
-            $data['current_school'] = model('School')->field("id,name")->where('id','=',$school_id)->find();
-        } else { // 如果没有学校主键值，通过经纬度获取最近学校
-            $data['current_school'] = model('School')->field("id,name,ROUND(6371 * acos (cos ( radians($lat)) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( $lng) ) + sin ( radians( $lat) ) * sin( radians( latitude ) ) ),1 ) AS distance ")
-                ->having('distance < 5')->where('level',2)->order('distance asc')->find();
-        }
 
         $this->success('success',$data);
     }
@@ -98,11 +106,14 @@ class Index extends ApiBase
         // 搜索条件
         $day = date('Y-m-d',time());
         $where[] = ['t.today','=',$day];
+        $where[] = ['t.num','>',0];
         $where[] = ['t.status','=',1];
         $where[] = ['t.school_id','=',$school_id];
         $where[] = ['t.end_time', '>=',time()];
+        $where[] = ['t.start_time', '<=',time()];
         $where[] = ['s.status', '=',3];
         $where[] = ['s.open_status', '=',1];
+
 
         $today_sale = model('TodayDeals')->alias('t')
             ->join('shop_info s','t.shop_id = s.id')
@@ -293,13 +304,16 @@ class Index extends ApiBase
         $day = date('Y-m-d',time());
         $where[] = ['t.today','=',$day];
         $where[] = ['t.status','=',1];
+        $where[] = ['t.num','>',0];
         $where[] = ['s.status','=',3];
         $where[] = ['t.school_id','=',$school_id];
         $where[] = ['s.open_status', '=',1];
+        $where[] = ['t.start_time', '<=',time()];
+        $where[] = ['t.end_time', '>=',time()];
         $pagesize = $request->param('pagesize',10);
 
         $today_sale = model('TodayDeals')->alias('t')->join('shop_info s','t.shop_id = s.id')->field('t.name,t.shop_id,t.product_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,t.start_time,t.end_time,s.shop_name,s.up_to_send_money,s.ping_fee,s.price_hike')
-            ->where($where)->whereTime('t.end_time', '>=', time())->paginate($pagesize);
+            ->where($where)->paginate($pagesize);
 
         if ($today_sale){
             foreach ($today_sale as $item) {

@@ -165,6 +165,7 @@ Route::group('a-school', function () {
 
 // 食堂管理模块
 Route::group('a-canteen', function () {
+    Route::post('/verification', 'verification');
     Route::post('/insert', 'insert');
     Route::get('/del/:id', 'delete');
 })->prefix('admin/canteen/')->middleware('IsLogin');
@@ -176,6 +177,7 @@ Route::group('financeManange', function () {
     Route::rule('/action', 'action');//提现操作
     Route::rule('/getCheck', 'getCheck');//查看不通过原因
     Route::rule('/getRemark', 'getRemark');//获取原因
+    Route::rule('/getCardInfo', 'getCardInfo');//获取银行账户信息
 })->prefix('admin/financeManange/')->middleware('IsLogin');
 
 
@@ -406,6 +408,9 @@ Route::group('r-orders', function () {
     Route::rule('/details', 'details');
     Route::rule('/grabSingle', 'grabSingle');
     Route::rule('/statusUpdate', 'statusUpdate');
+    Route::rule('/arriveShop', 'arriveShop');
+    Route::rule('/leaveShop', 'leaveShop');
+    Route::rule('/confirmSend', 'confirmSend');
 
 })->prefix('rider/Orders/');
 
@@ -423,14 +428,36 @@ Route::group('r-upload', function () {
 })->prefix('rider/Upload/');
 
 
+/*************** 食堂端 *********************************************************************************************/
+//登录
+Route::rule('/canteen/login','canteen/Login/login');
+Route::rule('/canteen/verify','canteen/Login/verify');
+Route::rule('/canteen/loginOut','canteen/Login/loginOut');
+
+
+Route::group('canteen', function () {
+    Route::rule('/setPwd','canteen/Login/updatePwd');//修改密码
+    Route::rule('/getList','canteen/ShopInfo/getList');//商家列表
+    Route::rule('/getDetail','canteen/ShopInfo/getDetail');//商家详情
+    Route::rule('setOpenStatus','canteen/ShopInfo/setOpenStatus');//修改商家营业状态
+    Route::rule('/getShopFlow','canteen/ShopInfo/getShopFlow');//获取商家流水
+    Route::rule('/getShopNameList','canteen/ShopInfo/getShopNameList');//商家名称列表
+    Route::get('/account','canteen/account/read');
+    Route::post('/account','canteen/account/save');
+    Route::put('/account/:id','canteen/account/update');
+    Route::get('/account/balance','canteen/account/accountBalance');
+    Route::get('/account/withdrawal','canteen/account/withdrawal');
+    Route::get('/income','canteen/IncomeExpend/index');
+})->middleware('CanteenIsLogin');
 
 /*************** 定时脚本接口 *********************************************************************************************/
-
 // 用户端
 Route::group('auto', function () {
     Route::rule('/zero_execute', 'zeroExecute');
     Route::rule('/cancel_orders', 'cancelOrders');
     Route::rule('/update_advert', 'updateAdvert');
+    Route::rule('/canteen', 'canteen');
+    Route::rule('/riderOvertimeOrder', 'riderOvertimeOrder');
 })->prefix('api/AutoShell/');
 
 

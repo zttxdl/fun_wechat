@@ -29,7 +29,7 @@ class Withdraw extends Model
         $shouru_money = $this->getIncome($shop_id,$startTime);
 
         //支出
-        $zc_money = $this->getExpenditure($shop_id);
+        $zc_money = $this->getExpenditure($shop_id,$startTime);
 
         //账户余额等于收入-支出
         $acount_money = $shouru_money - $zc_money;
@@ -77,6 +77,7 @@ class Withdraw extends Model
 
             //总支出 过滤提现
             $zc_money = $this->where([['shop_id','=',$shop_id],['type','in','3,5,6']])
+                ->whereTime('add_time', '<',$startTime)
                 ->sum('money');
 
         }else{
@@ -125,7 +126,7 @@ class Withdraw extends Model
 
     /**
      * mike 已调整
-     * 计算商家收入和支出
+     * 计算商家收入和支出 【后期此方法将会被删除】
      * @param $order_id
      * @return bool
      */
@@ -189,6 +190,25 @@ class Withdraw extends Model
             ];
             Db::name('withdraw')->insert($data);
 
+            /** 食堂收入 *************************************/
+            if ($shop_info['canteen_id']) {
+                // 获取最新的食堂账户余额信息
+                $balance = Db::name('canteen_income_expend')->where('canteen_id','=',$shop_info['canteen_id'])->order('id','desc')->value('balance');
+                if (!$balance) {
+                    $balance = 0;
+                }
+                $canteen = [
+                    'canteen_id' => $shop_info['canteen_id'],
+                    'name' => '收入',
+                    'balance' => sprintf('%.2f',$stExpenditure + $balance),
+                    'money' => sprintf('%.2f',$stExpenditure),
+                    'type' => 1,
+                    'serial_number' => $Order->orders_sn,
+                    // 食堂收入
+                    'add_time' => time()
+                ];
+                Db::name('canteen_income_expend')->insert($canteen);
+            }
             // 提交事务
             Db::commit();
             return true;
@@ -229,10 +249,44 @@ class Withdraw extends Model
             'title' => '用户退款',
             'add_time' => time()
         ];
+        // 更新商家收支明细表
+        $ret = Db::name('withdraw')->insert($data);
 
-        $res = Db::name('withdraw')->insert($data);
+        $canteen_id = Db::name('shop_info')->where('id','=',$refundData->shop_id)->value('canteen_id');
+        if ($canteen_id) {
+            // 获取最新的食堂账户余额信息
+            $balance = Db::name('canteen_income_expend')->where('canteen_id','=',$canteen_id)->order('id','desc')->value('balance');
+            $money = Db::name('canteen_income_expend')->where([['serial_number','=',$refundData->out_trade_no],['type','=',1]])->value('money');
 
-        return $res;
+            $canteen = [
+                'canteen_id' => $canteen_id,
+                'name' => '退款',
+                'balance' => sprintf('%.2f',$balance - $money),
+                'money' => $money,
+                'type' => 3,
+                'serial_number' => $refundData->out_trade_no,
+                // 食堂退款
+                'add_time' => time()
+            ];
+            // 更新食堂收支明细表
+            $ret2 = Db::name('canteen_income_expend')->insert($canteen);
+
+            if($ret && $ret2) {
+                return true;
+            }else{
+                return false;
+            }
+        }
+        //不结算食堂抽成
+        if($ret) {
+            return true;
+        }else{
+            return false;
+        }
+        
+
+
+
     }
 
     /**

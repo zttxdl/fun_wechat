@@ -27,11 +27,10 @@ class Index extends Base
     //推送连接
 	public function index($id)
 	{
-        
 		return view('index/index',['uid'=>$id]);
 
-	}
-
+    }
+    
 	/****** TP 自带缓存单元测试 ******/
 	public function test2()
 	{

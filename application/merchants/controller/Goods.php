@@ -33,6 +33,7 @@ class Goods extends MerchantsBase
         $preferential = [];
         //获取热销商品
         foreach ($list as $item) {
+            $item['sales'] = model('Product')->getMonthSales($item['id']);
             if ($item['type'] == 2){
                 $cakes[] = $item;
             }elseif($item['type'] == 3){
@@ -104,6 +105,9 @@ class Goods extends MerchantsBase
         }
 
         $data   = $request->param();
+        if (isset($data['type']) && $data['type'] != 3 ){
+            $data['old_price'] = $data['price'];
+        }
 
         $result = Product::update($data, ['id' => $id]);
         $this->success('success',$result);

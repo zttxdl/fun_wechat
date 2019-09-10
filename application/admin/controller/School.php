@@ -54,6 +54,10 @@ class School extends Base
     {
         $data['fid'] = $request->param('fid');
         $data['name'] = $request->param('name');
+        $data['longitude'] = $request->param('longitude');
+        $data['latitude'] = $request->param('latitude');
+        $data['completion_time'] = $request->param('completion_time');
+        $data['fetch_time'] = $request->param('fetch_time');
         $canteen = $request->param('canteen');
 
         // 验证表单数据
@@ -61,16 +65,13 @@ class School extends Base
         if ($check !== true) {
             $this->error($check,201);
         }
-        
-        // 获取经纬度信息
-        $area_name = Db::name('school')->where('id','=',$data['fid'])->value('name');
-        $long_lat = get_location('南京市'.$area_name.$data['name']);
-        if (empty($long_lat)) {
-            $this->error('地址解析出现问题，请确认学校名称填写是否正确');
+
+        // 验证学校是否重名
+        $count = Db::name('school')->where('name','=',$data['name'])->count();
+        if ($count) {
+            $this->error('学校名称已存在！');
         }
-        $data['longitude'] = $long_lat['lng'];
-        $data['latitude'] = $long_lat['lat'];
-        
+
         // 启动事务
         Db::startTrans();
         try {
@@ -80,6 +81,8 @@ class School extends Base
             if (!empty($canteen_list)) {
                 foreach ($canteen_list as $k => &$v) {
                     $v['school_id'] = $school_id;
+                    $v['cleartext'] = $v['password'];
+                    $v['password'] = md5($v['password']);
                 }
                 unset($v);
                 // 添加食堂
@@ -104,7 +107,7 @@ class School extends Base
      */
     public function edit($id)
     {
-        $info = Db::name('school')->where('id','=',$id)->field('id,name,fid')->find();
+        $info = Db::name('school')->where('id','=',$id)->field('id,name,fid,latitude,longitude,completion_time,fetch_time')->find();
         $info['cname'] = Db::name('school')->where('id','=',$info['fid'])->value('name');
         $area_list = Db::name('school')->where('level','=',1)->field('id,name')->select();
         $canteen_list = Db::name('canteen')->where('school_id','=',$id)->select();
@@ -121,44 +124,45 @@ class School extends Base
         $data['id'] = $request->param('id');
         $data['fid'] = $request->param('fid');
         $data['name'] = $request->param('name');
+        $data['longitude'] = $request->param('longitude');
+        $data['latitude'] = $request->param('latitude');
+        $data['completion_time'] = $request->param('completion_time');
+        $data['fetch_time'] = $request->param('fetch_time');
         $canteen = $request->param('canteen');
-        
+
         // 验证表单数据
         $check = $this->validate($data, 'School');
         if ($check !== true) {
             $this->error($check,201);
         }
-        
-        // 获取经纬度信息
-        $area_name = Db::name('school')->where('id','=',$data['fid'])->value('name');
-        $long_lat = get_location('南京市'.$area_name.$data['name']);
-        if (empty($long_lat)) {
-            $this->error('地址解析出现问题，请确认学校名称填写是否正确');
+
+        // 验证学校是否重名
+        $count = Db::name('school')->where([['name','=',$data['name']],['id','<>',$data['id']]])->count();
+        if ($count) {
+            $this->error('学校名称已存在！');
         }
-        $data['longitude'] = $long_lat['lng'];
-        $data['latitude'] = $long_lat['lat'];
-        
-        // 启动事务
-        Db::startTrans();
-        try {
-            // 修改学校
-            Db::name('school')->update($data);
-            $canteen_list = json_decode($canteen,true);
-            if (!empty($canteen_list)) {
-                foreach ($canteen_list as $k => $v) {
+
+         // 启动事务
+         Db::startTrans();
+         try {
+             // 修改学校
+             Db::name('school')->update($data);
+             $canteen_list = json_decode($canteen,true);
+             if (!empty($canteen_list)) {
+                 foreach ($canteen_list as $k => $v) {
                     // 修改食堂
-                    Db::name('canteen')->update($v);
-                }
-            }
-            
-            // 提交事务
-            Db::commit();
-            $this->success("修改学校成功");
-        } catch (\think\Exception\DbException $e) {
-            // 回滚事务
-            Db::rollback();
-            $this->error("修改学校失败");
-        }
+                    $v['password'] = md5($v['cleartext']);
+                     Db::name('canteen')->update($v);
+                 }
+             }
+             // 提交事务
+             Db::commit();
+             $this->success("修改学校成功");
+         } catch (\think\Exception\DbException $e) {
+             // 回滚事务
+             Db::rollback();
+             $this->error("修改学校失败");
+         }
     }
 
 
@@ -168,9 +172,9 @@ class School extends Base
      */
     public function show($id)
     {
-        $info = Db::name('school')->where('id','=',$id)->field('fid,name')->find();
+        $info = Db::name('school')->where('id','=',$id)->field('fid,name,longitude,latitude,completion_time,fetch_time')->find();
         $info['area'] = Db::name('school')->where('id','=',$info['fid'])->value('name');
-        $canteen_list = Db::name('canteen')->where('school_id','=',$id)->field('id,name,cut_proportion')->select();
+        $canteen_list = Db::name('canteen')->where('school_id','=',$id)->field('id,name,cut_proportion,account,withdraw_cycle,cleartext')->select();
 
         $this->success('获取编辑学校信息成功',['info'=>$info,'canteen_list'=>$canteen_list]);
     }
@@ -182,6 +186,10 @@ class School extends Base
      */
     public function delete($id)
     {
+        $count = Db::name('shop_info')->where('school_id','=',$id)->count();
+        if ($count) {
+            $this->error("当前学校已有商家入驻，不可删除");
+        }
 
         // 启动事务
         Db::startTrans();

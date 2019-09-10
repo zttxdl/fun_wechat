@@ -17,6 +17,9 @@ class ReceivingAddr extends Validate
         'phone'         => 'require|regex:/^1[3456789]{1}\d{9}$/',
         'school_id'     => 'require',
         'area_detail'   => 'require',
+        'longitude'   => 'require',
+        'latitude'   => 'require',
+
     ];
     
     /**
@@ -32,5 +35,7 @@ class ReceivingAddr extends Validate
         'phone.regex'           => '手机号格式不对',
         'school_id.require'     => '请选择收货地址',
         'area_detail.require'   => '请填写门牌号',
+        'longitude.require'   => '经度必传',
+        'latitude.require'   => '纬度必传',
     ];
 }

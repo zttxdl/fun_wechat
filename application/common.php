@@ -160,13 +160,13 @@ if (!function_exists('pc_sphere_distance')) {
 
 
 /**
- * 物理地址解析经纬度
+ * 物理地址解析经纬度 【因解析偏差过大作废，可适用于大概范围的经纬度获取场景】
  */
 if (!function_exists('get_location')) {
     function get_location($address){
         $key = config('lbs_map')['key'];
         // 仅学校地址信息，无法解析经纬度，目前需加上当前城市
-        $url="http://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$key."&region=南京";
+        $url="https://apis.map.qq.com/ws/geocoder/v1/?address=".$address."&key=".$key."&region=南京";
         $jsondata=json_decode(file_get_contents($url),true);
         $data = [];
         if ($jsondata['message'] == '查询无结果') {
@@ -178,6 +178,31 @@ if (!function_exists('get_location')) {
         return $data;
     }
 }
+
+
+/**
+ * 百度地图物理地址解析经纬度 【因解析偏差过大作废，可适用于大概范围的经纬度获取场景】
+ */
+
+if (!function_exists('get_baidu_location')) {
+    function get_baidu_location($address){
+        $result = array();
+        $ak = '2DnX1SRN72z9rnLAGBSDvFEZvnhyVbZV';//您的百度地图ak，可以去百度开发者中心去免费申请
+        $url ="http://api.map.baidu.com/geocoding/v3/?address=".$address."&ret_coordtype=gcj02ll&output=json&ak=".$ak;
+        $data = file_get_contents($url);
+        $data = str_replace('renderOption&&renderOption(', '', $data);
+        $data = str_replace(')', '', $data);
+        $data = json_decode($data,true);
+        if (!empty($data) && $data['status'] == 0) {
+            $result['lat'] = $data['result']['location']['lat'];
+            $result['lng'] = $data['result']['location']['lng'];
+            return $result;//返回经纬度结果
+        }else{
+            return null;
+        }
+    }
+}
+
 
 /**
  * BD09 坐标转换GCJ02
@@ -211,7 +236,7 @@ if (!function_exists('Convert_BD09_To_GCJ02')) {
 if (!function_exists('parameters')) {
     function parameters($from,$to){
         $key = config('lbs_map')['key'];
-        $url="http://apis.map.qq.com/ws/distance/v1/matrix/?mode=bicycling&from={$from}&to={$to}&key=".$key;
+        $url="https://apis.map.qq.com/ws/distance/v1/matrix/?mode=bicycling&from={$from}&to={$to}&key=".$key;
         $jsondata=json_decode(file_get_contents($url),true);
         $data = $jsondata['result']['rows'];
         return $data;

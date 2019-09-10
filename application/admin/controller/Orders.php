@@ -130,7 +130,7 @@ class Orders extends Base
                             c.link_name,
                             c.school_id,
                             d.headimgurl as rider_img,
-                            d.link_tel,
+                            d.phone as rider_phone,
                             d.name,
                             a.platform_choucheng,
                             a.shitang_choucheng,
@@ -185,11 +185,11 @@ class Orders extends Base
             $result['shop_info'] = [];
         }
 
-        if(in_array($list['status'],[5,6,7,8])){
+        if(in_array($list['status'],[5,6,7,8,10,11,12])){
             //骑手信息
             $result['rider_info'] = [
                 'rider_img' => $list['rider_img'],
-                'link_tel' => $list['link_tel'],
+                'link_tel' => $list['rider_phone'],
                 'name' => $list['name'],
             ];
         }else{

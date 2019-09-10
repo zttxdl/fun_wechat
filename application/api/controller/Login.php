@@ -117,7 +117,7 @@ class Login extends ApiBase
         $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy,status')->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($user_info,2592000);
+        $token = $jwtAuth->createToken($user_info,31104000); // 一年有效期
         $this->success('success',[
             'token' => $token
         ]);
@@ -159,7 +159,7 @@ class Login extends ApiBase
         $user_info = User::where('id','=',$uid)->field('id,phone,openid,new_buy,status')->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($user_info,2592000);
+        $token = $jwtAuth->createToken($user_info,31104000);  // 一年有效期
         $this->success('success',[
             'token' => $token
         ]);

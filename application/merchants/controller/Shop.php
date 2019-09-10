@@ -115,15 +115,24 @@ class Shop extends MerchantsBase
 
         $open_status = $request->param('open_status');
 
-        $res = Model('shopInfo')->where('id',$shop_id)->setField('open_status',$open_status);
-
         $result = ShopInfo::where('id',$shop_id)->find();
 
-        if($res) {
-            $this->success('更新成功',['open_status'=>$result['open_status']]);
+        if($open_status == 1) {//商家开启营业
+            if($result['canteen_open_status'] == 0) {
+                $this->error('你已经被停止营业,请联系是食堂相关负责人',201,['open_status'=>$result['open_status']]);
+            }
         }
 
-        $this->error('更新失败',201,['open_status'=>$result['open_status']]);
+
+        $res = Model('shopInfo')->where('id',$shop_id)->setField('open_status',$open_status);
+
+        
+
+        if($res) {
+            $this->success('更新成功',['open_status'=>$open_status]);
+        }
+
+        $this->error('更新失败',201,['open_status'=>$open_status]);
 
     }
 

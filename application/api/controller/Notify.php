@@ -68,6 +68,11 @@ class Notify extends Collection
 
             //用户下单 就更改状态
             model('User')->where('id',$user_id)->setField('new_buy',2);
+            // 判断首单红包是否使用
+            $id = model('MyCoupon')->where([['user_id','=',$user_id],['first_coupon','=',1],['status','=',1]])->value('id');
+            if ($id) {
+                model('MyCoupon')->where('id',$id)->setField('status',3);
+            }
             Db::commit();
         } catch (\Throwable $e) {
             Db::rollback();
