@@ -129,8 +129,8 @@ class FinanceManange extends Base
                             'order_sn' => $row['serial_number'],
 //                    'name' => Db::name('rider_info')->where('id',$row['rider_id'])->value('name'),
                             'name' => $row['name'],
-                            'source' => !empty($source) ? $this->source[$source] : '骑手端',
-                            'to_mention ' => !empty($source) ? $this->toMention[$source] : '微信',
+                            'source' => !empty($source) ? $this->source[$source] : '食堂端',
+                            'to_mention ' => !empty($source) ? $this->toMention[$source] : '银行卡',
                             'card' => $row['back_num'],
                             'money' => $row['money'],
                             'add_time' => date('Y-m-d H:i:s',$row['add_time']),
@@ -181,7 +181,7 @@ class FinanceManange extends Base
         }
 
         $status = $request->param('status');////1:审核成功 2:审核不成功
-        $source = $request->param('source');//1:骑手端 2:商家端
+        $source = $request->param('source');//1:骑手端 2:商家端 3:食堂端
         $id = $request->param('id');//提现ID
         $remark = $request->param('remark','');//审核不通过理由
 
@@ -191,6 +191,10 @@ class FinanceManange extends Base
 
         if($source == 2) {
         	$this->shop_tx($status,$id,$remark);
+        }
+
+        if($source == 3) {
+            $this->canteen_tx($status,$id,$remark);
         }
         
     }
@@ -216,6 +220,30 @@ class FinanceManange extends Base
     	}
     	
     }
+
+
+    /**
+     * 【食堂提现 操作】
+     * @param $status 审核状态  1:审核成功 2:审核不成功
+     * @param $id 提现ID
+     * @param string $remark 审核不通过原因ID的集合 [1,2,3]
+     */
+    public function canteen_tx($status,$id,$remark='')
+    {
+        if($status == 1){
+            Db::name('canteen_income_expend')->where('id',$id)->setField('status',3);
+            $this->success('审核通过');
+        }else{
+            Db::name('canteen_income_expend')->where('id',$id)->update([
+                    'status' => 2,
+                    'remark' => $remark
+                    ]);//更新审核失败状态
+            $this->success('审核不通过');
+        }
+        
+    }
+
+
 
     /**
      * 【骑手提现 操作】
@@ -279,6 +307,10 @@ class FinanceManange extends Base
         	$remark = Db::name('withdraw')->where('id',$id)->value('remark');
         }
 
+        if($source == 3) {
+            $remark = Db::name('canteen_income_expend')->where('id',$id)->value('remark');
+        }
+
 
         $check_names = [];
 
@@ -303,6 +335,43 @@ class FinanceManange extends Base
 
         $this->success('获取成功',$tx_check);
         
+    }
+
+    /**
+     * 获取银行账户信息
+     */
+    public function getCardInfo(Request $request)
+    {
+        $id = $request->param('id');
+        $source = $request->param('source');//1:骑手端 2:商家端 3:食堂端
+
+        if(empty($source)) {
+            $this->error('来源不能为空');
+        }
+
+        if(empty($id)) {
+            $this->error('ID不能为空');
+        }
+
+        if($source == 2) {
+            $res = Db::name('withdraw')
+                    ->alias('a')
+                    ->leftJoin('shop_more_info b','a.shop_id = b.shop_id')
+                    ->field('b.back_card_num as back_num,b.branch_back as back_name,b.back_hand_name as name')
+                    ->where('a.id',$id)
+                    ->find();
+            $this->success('账户获取成功',$res);
+        }
+
+        if($source == 3) {
+            $res = Db::name('canteen_income_expend')
+                    ->alias('a')
+                    ->leftJoin('canteen_account b','a.canteen_id = b.canteen_id')
+                    ->field('b.back_num,b.back_name,b.name')
+                    ->where('a.id',$id)
+                    ->find();
+            $this->success('账户获取成功',$res);
+        }
     }
 }
 	
