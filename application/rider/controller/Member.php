@@ -51,7 +51,7 @@ class Member extends RiderBase
      */
     public function index()
     {
-        $info = Db::name('rider_info')->where('id',$this->auth->id)->field('id,headimgurl,link_tel,nickname,status,open_status')->find();
+        $info = Db::name('rider_info')->where('id',$this->auth->id)->field('id,headimgurl,nickname,phone,status,open_status')->find();
         return json_success('获取骑手信息成功',['info'=>$info]);
 
     }
@@ -74,7 +74,7 @@ class Member extends RiderBase
         }
 
         // 校验当前手机号真实性
-        $sql_phone = model('RiderInfo')->where('id','=',$this->auth->id)->value('link_tel');
+        $sql_phone = model('RiderInfo')->where('id','=',$this->auth->id)->value('phone');
 
         if ($sql_phone != $phone) {
             $this->error('校验失败,当前手机号非绑定手机号');
@@ -102,7 +102,7 @@ class Member extends RiderBase
 
         // 更新数据
         $rider = RiderInfo::get($rid);
-        $rider->link_tel = $phone;
+        $rider->phone = $phone;
         $res = $rider->save();
         if (!$res) {
             return json_error('更换失败');
@@ -131,10 +131,10 @@ class Member extends RiderBase
         if (!$result) {
             $this->error('加入失败',201);
         }
-        $rider_info = RiderInfo::where('id','=',$this->auth->id)->field('id,school_id,status,open_status,name')->find();
+        $rider_info = RiderInfo::where('id','=',$this->auth->id)->field('id,school_id,status,open_status')->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($rider_info,2592000);
+        $token = $jwtAuth->createToken($rider_info,31104000);
 
         $this->success('加入成功',['token'=>$token]);
     }
@@ -183,7 +183,7 @@ class Member extends RiderBase
      */
     public function edit()
     {
-        $info = model('RiderInfo')->where('id',$this->auth->id)->field('id,name,link_tel,identity_num,card_img,back_img,hand_card_img,school_id,phone')->find();
+        $info = model('RiderInfo')->where('id',$this->auth->id)->field('id,name,identity_num,card_img,back_img,hand_card_img,school_id,phone')->find();
         $info['school_name'] = model('school')->getNameById($info['school_id']);
         $this->success('获取成功',['info'=>$info]);        
     }
