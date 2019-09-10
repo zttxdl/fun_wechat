@@ -105,7 +105,7 @@ class Goods extends MerchantsBase
         }
 
         $data   = $request->param();
-        if ($data['type'] != 3 ){
+        if (isset($data['type']) && $data['type'] != 3 ){
             $data['old_price'] = $data['price'];
         }
 
