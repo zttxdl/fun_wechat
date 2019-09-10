@@ -236,7 +236,7 @@ if (!function_exists('Convert_BD09_To_GCJ02')) {
 if (!function_exists('parameters')) {
     function parameters($from,$to){
         $key = config('lbs_map')['key'];
-        $url="http://apis.map.qq.com/ws/distance/v1/matrix/?mode=bicycling&from={$from}&to={$to}&key=".$key;
+        $url="https://apis.map.qq.com/ws/distance/v1/matrix/?mode=bicycling&from={$from}&to={$to}&key=".$key;
         $jsondata=json_decode(file_get_contents($url),true);
         $data = $jsondata['result']['rows'];
         return $data;
