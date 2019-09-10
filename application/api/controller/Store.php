@@ -14,7 +14,7 @@ use think\Request;
 
 class Store extends ApiBase
 {
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['*'];
     //获取商家菜单
     public function index(Request $request)
     {

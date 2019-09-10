@@ -120,7 +120,7 @@ class Login extends RiderBase
         $rider_info = RiderInfo::where('id','=',$rid)->field('id,school_id,status,open_status,name')->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($rider_info,2592000);
+        $token = $jwtAuth->createToken($rider_info,31104000);   // 一年有效期
         $this->success('success',[
             'token' => $token,
             'uuid' => 'r'.$rid,
@@ -172,7 +172,7 @@ class Login extends RiderBase
         $rider_info = RiderInfo::where('id','=',$rid)->field('id,school_id,status,open_status,name')->find();
 
         $jwtAuth = new JwtAuth();
-        $token = $jwtAuth->createToken($rider_info,2592000);
+        $token = $jwtAuth->createToken($rider_info,31104000);   // 一年有效期
         $this->success('success',[
             'token' => $token,
             'uuid' => 'r'.$rid,

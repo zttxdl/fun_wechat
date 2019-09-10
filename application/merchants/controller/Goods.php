@@ -105,6 +105,9 @@ class Goods extends MerchantsBase
         }
 
         $data   = $request->param();
+        if ($data['type'] != 3 ){
+            $data['old_price'] = $data['price'];
+        }
 
         $result = Product::update($data, ['id' => $id]);
         $this->success('success',$result);

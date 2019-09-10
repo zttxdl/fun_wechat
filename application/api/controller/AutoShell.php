@@ -156,7 +156,7 @@ class AutoShell extends Controller
      */
     public function riderOvertimeOrder()
     {
-        $orderlist=Db::name('takeout')->where([['single_time','<',time() - 15*60],['status','=',3]])->field('id,school_id,rider_id')->select();
+        $orderlist=Db::name('takeout')->where([['single_time','<',time() - 60],['status','=',3]])->field('id,school_id,rider_id')->select();
 
         // 没有数据时
         if (!$orderlist) {

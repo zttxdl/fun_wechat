@@ -199,7 +199,7 @@ class Orders extends RiderBase
 	}
 
     /**
-     * 改变订单状态
+     * 改变订单状态【此功能后续会删除，已将该方法拆分为多个方法】
      */
 	public function statusUpdate(Request $request)
     {
