@@ -185,7 +185,7 @@ class Orders extends Base
             $result['shop_info'] = [];
         }
 
-        if(in_array($list['status'],[5,6,7,8])){
+        if(in_array($list['status'],[5,6,7,8,10,11,12])){
             //骑手信息
             $result['rider_info'] = [
                 'rider_img' => $list['rider_img'],

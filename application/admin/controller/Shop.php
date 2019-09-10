@@ -69,8 +69,8 @@ class Shop extends Base
                         'school_name' =>  Model('School')->getNameById($row['school_id']),
                         'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
                         'status' => config('shop_check_status')[$row['status']],
-                        'month_sales' => model('Shop')->getMonthSales($row['id']),
-                        'count_sales' => model('Shop')->getCountSales($row['id']),
+                        'month_sales' => model('Withdraw')->getMonthSales($row['id']),
+                        'count_sales' => model('Withdraw')->getCountSales($row['id']),
                     ];
                 }
             }
