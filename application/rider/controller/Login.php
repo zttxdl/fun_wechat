@@ -59,8 +59,7 @@ class Login extends RiderBase
         $token = $jwtAuth->createToken($info,31104000);   // 一年有效期
         $this->success('已授权',[
             'token' => $token,
-            'uuid' => 'r'.$rid,
-            'rider_info'=>$info
+            'uuid' => 'r'.$rid
         ]);
         
     }
