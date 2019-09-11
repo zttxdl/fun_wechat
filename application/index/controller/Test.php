@@ -12,6 +12,7 @@ namespace app\index\Controller;
 use think\Request;
 use think\Controller;
 use think\facade\Env;
+use think\facade\Cache;
 
 class Test extends Controller
 {
@@ -451,9 +452,8 @@ class Test extends Controller
      */
     public function test()
     {
-        echo date('Y-m-d H:i:s',strtotime('+30 days'));
-        echo '<br>';
-        echo date('Y-m-d H:i:s',strtotime('+5 hours'));
+        $ret = Cache::store('redis')->get('rdsname');
+        dump($ret);
     }
 
     /**
