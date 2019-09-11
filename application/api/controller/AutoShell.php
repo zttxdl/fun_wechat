@@ -152,11 +152,11 @@ class AutoShell extends Controller
 
 
     /**
-     * 超过15分钟，骑手抢完单后，未到商家取餐
+     * 骑手抢完单后，超过指定时间还未到商家取餐
      */
     public function riderOvertimeOrder()
     {
-        $orderlist=Db::name('takeout')->where([['single_time','<',time() - 15*60],['status','=',3]])->field('id,school_id,rider_id')->select();
+        $orderlist=Db::name('takeout')->where([['fetch_time','<',time()],['status','=',3]])->field('id,school_id,rider_id')->select();
 
         // 没有数据时
         if (!$orderlist) {
