@@ -136,7 +136,7 @@ class Member extends RiderBase
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($rider_info,31104000);
 
-        $this->success('加入成功',['token'=>$token,'rider_info'=>$rider_info]);
+        $this->success('加入成功',['token'=>$token]);
     }
      
 
