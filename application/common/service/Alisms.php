@@ -79,7 +79,8 @@ class Alisms extends Model
             if ($result['Code'] == 'OK'){
                 return true;
             }else{
-                return false;
+                //短信接口抛出异常
+                throw new ClientException($result['Message'], $result['Code']);
             }
         }catch (ClientException $e) {
              $this->error($e->getErrorMessage());
