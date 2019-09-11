@@ -17,11 +17,11 @@ class RiderInfo extends Base
     {
         // 搜索条件
         $where= [];
-        !empty($request->get('name/s')) ? $where[] = ['name|link_tel','like',$request->get('name/s').'%'] : null;
+        !empty($request->get('name/s')) ? $where[] = ['name|phone','like',$request->get('name/s').'%'] : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
         $where[] = ['status','in','3,4'];
 
-        $list = Db::name('rider_info')->where($where)->field('id,name,link_tel,status,add_time,last_login_time')->order('id desc')
+        $list = Db::name('rider_info')->where($where)->field('id,name,phone as link_tel,status,add_time,last_login_time')->order('id desc')
                 ->paginate($pagesize)->each(function ($item, $key) {
                     // 当前骑手的送餐信息
                     $temp = Db::name('rider_income_expend')->where('rider_id','=',$item['id'])->where('type','=',1)->field('count(id) as order_nums, sum(current_money) as earnings')->find();
@@ -72,7 +72,7 @@ class RiderInfo extends Base
     public function checkShow($id)
     {
         // 骑手的基本信息
-        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status,school_id')->find($id);
+        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,phone as link_tel,identity_num,card_img,back_img,hand_card_img,status,school_id')->find($id);
         $info['school_name'] = model('School')->getNameById($info['school_id']);
 
         $info['mb_status'] = config('rider_check_status')[$info['status']];
@@ -88,7 +88,7 @@ class RiderInfo extends Base
     public function show($id)
     {
         // 骑手的基本信息
-        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,link_tel,identity_num,card_img,back_img,hand_card_img,status,pass_time,school_id')->find($id);
+        $info = Db::name('rider_info')->field('id,nickname,name,headimgurl,phone as link_tel,identity_num,card_img,back_img,hand_card_img,status,pass_time,school_id')->find($id);
         $info['school_name'] = model('School')->getNameById($info['school_id']);
 
         /** 结算信息 */
@@ -140,7 +140,7 @@ class RiderInfo extends Base
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : $where[] = ['status','notin','0,4'];
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
 
-        $list = Db::name('rider_info')->where($where)->field('id,nickname,name,headimgurl,link_tel,identity_num,hand_card_img,status')->order('id desc')->paginate($pagesize)
+        $list = Db::name('rider_info')->where($where)->field('id,nickname,name,headimgurl,phone as link_tel,identity_num,hand_card_img,status')->order('id desc')->paginate($pagesize)
                 ->each(function ($item, $key) {
                     // 审核状态
                     $item['mb_status'] = config('rider_check_status')[$item['status']];

@@ -23,8 +23,8 @@ class Withdraw extends Model
     public function getAcountMoney($shop_id)
     {
         // 提现规则 7天前 [在测试阶段，设置10分钟之前]
-        // $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
-        $startTime = time()-600;
+        $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
+        // $startTime = time()-600;
         //收入
         $shouru_money = $this->getIncome($shop_id,$startTime);
 
@@ -45,8 +45,8 @@ class Withdraw extends Model
     public function getNotJsMoney($shop_id)
     {
         // 未结算金额 7天内 [在测试阶段，设置10分钟内]
-        // $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
-        $startTime = time()-600;
+        $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
+        // $startTime = time()-600;
 
         // 七天之内的总收入
         $sr_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->whereTime('add_time', '>=',$startTime)->sum('money');
