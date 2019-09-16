@@ -6,7 +6,7 @@ use think\Controller;
 use think\Request;
 use think\Db;
 
-// 测试服务器自动 git pull
+
 class User extends Controller
 {
     /**
