@@ -560,8 +560,8 @@ class Orders extends RiderBase
             $Takeout->status = 5;
             $Takeout->save();
 
-            // 商家订单实际收入 = 商品原价 + 餐盒费 - 商家满减支出 - 抽成支出 《==》 订单总价 - 配送费 - 加价 - 抽成支出 - 商家满减支出
-            $shop_money = $Order->total_money - $Order->ping_fee - ($Order->num * $shop_info['price_hike']) - $totalExpenditure - $Order->shop_discounts_money;
+            // 商家订单实际收入 = 商品原价 - 商家满减支出 - 抽成支出 《==》 订单总价 - 餐盒费 - 配送费 - 加价 - 抽成支出 - 商家满减支出
+            $shop_money = $Order->total_money - $Order->ping_fee - $Order->box_money - ($Order->num * $shop_info['price_hike']) - $totalExpenditure - $Order->shop_discounts_money;
             /** 商家用户下单收入*********************************/ 
             $data = [
                 'withdraw_sn' => $Order->orders_sn,
