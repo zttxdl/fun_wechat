@@ -10,6 +10,18 @@ class Search extends ApiBase
 {
     protected $noNeedLogin = ['*'];
 
+    public function __construct()
+    {
+        parent::__construct();
+        //判断是否要登录验证
+        $token = $this->request->header('api-token');
+        if ($token) {
+            $this->valid_token();
+        } else {
+            $this->auth = [];
+        }
+    }
+
     //搜索页面
     public function index()
     {
