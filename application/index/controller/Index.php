@@ -127,6 +127,19 @@ class Index extends Base
 
         return $this->success('200','测试返回结果',$callback);
     }
+
+    public function swoole()
+    {
+        $seve = new Swoole\Server("127.0.0.1",9501);
+
+        //监听
+        $seve->on('Content',function ($serv, $fd){
+            echo 'Client:Content.\n';
+        });
+
+        //监听数据接收事件
+
+    }
 	 
 
 

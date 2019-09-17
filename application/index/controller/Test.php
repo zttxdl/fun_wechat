@@ -452,8 +452,11 @@ class Test extends Controller
      */
     public function test()
     {
-        $ret = Cache::store('redis')->get('rdsname');
-        dump($ret);
+//        phpinfo();exit;
+//        $ret = Cache::store('redis')->get('list');
+//        dump($ret);
+        $data = model('Withdraw')->getDaySales(49);
+        dump($data);exit;
     }
 
     /**

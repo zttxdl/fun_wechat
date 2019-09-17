@@ -114,7 +114,7 @@ class Shop extends Model
     public function getDaySales($shop_id)
     {
         $total_moeny = Db::name('orders')
-            ->where('status','notin',[1,4,9,11])
+            ->where('status','notin',[1,4,9,10,11])
             ->where('shop_id',$shop_id)
             ->whereTime('add_time', 'today')
             ->sum('money');
