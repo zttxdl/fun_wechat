@@ -587,6 +587,9 @@ class Order extends ApiBase
             //订单明细入库
             $res = model('Orders')->addOrderDetail($detailData);
 
+            //统计店铺日订单量
+            model('Shop')->setDayNum($orderData['shop_id']);
+
             //dump($res);
 
             if(!$res) {
@@ -670,6 +673,9 @@ class Order extends ApiBase
 
             $this->success('订单取消成功');
         }
+
+        //统计店铺日订单量
+        model('Shop')->setDayCancelNum($order_info['shop_id']);
         $this->error('订单取消失败');
 
     }

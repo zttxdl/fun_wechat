@@ -455,8 +455,10 @@ class Test extends Controller
 //        phpinfo();exit;
 //        $ret = Cache::store('redis')->get('list');
 //        dump($ret);
-        $data = model('Withdraw')->getDaySales(49);
-        dump($data);exit;
+        $shop_id = 49;
+        return model('Shop')->getDayCancelNum($shop_id);
+        return model('Shop')->getDayNum($shop_id);
+        return true;
     }
 
     /**
