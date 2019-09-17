@@ -117,14 +117,19 @@ class Index extends ApiBase
 
         $today_sale = model('TodayDeals')->alias('t')
             ->join('shop_info s','t.shop_id = s.id')
-            ->field('t.id,t.name,t.product_id,t.shop_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,t.start_time,t.end_time,s.price_hike')
-            ->where($where)->limit(4)->select();;
+            ->field('t.id,t.name,t.product_id,t.shop_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,t.start_time,t.end_time,s.price_hike,s.hike_type')
+            ->where($where)->limit(4)->select();
 
         if ($today_sale){
             foreach ($today_sale as $item) {
                 $item->res_time = $item->end_time - time();
-                $item->old_price =floatval(sprintf("%.2f",$item->old_price + $item->price_hike));
-                $item->price = floatval(sprintf("%.2f",$item->price + $item->price_hike));
+                if ($item->hike_type == 1) {
+                    $item->old_price =floatval(sprintf("%.2f",$item->old_price + $item->price_hike));
+                    $item->price = floatval(sprintf("%.2f",$item->price + $item->price_hike));
+                } else {
+                    $item->old_price =floatval(sprintf("%.2f",$item->old_price * (1 + $item->price_hike * 0.01)));
+                    $item->price = floatval(sprintf("%.2f",$item->price  * (1 + $item->price_hike * 0.01)));
+                }
             }
 
         }
@@ -312,14 +317,19 @@ class Index extends ApiBase
         $where[] = ['t.end_time', '>=',time()];
         $pagesize = $request->param('pagesize',10);
 
-        $today_sale = model('TodayDeals')->alias('t')->join('shop_info s','t.shop_id = s.id')->field('t.name,t.shop_id,t.product_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,t.start_time,t.end_time,s.shop_name,s.up_to_send_money,s.ping_fee,s.price_hike')
+        $today_sale = model('TodayDeals')->alias('t')->join('shop_info s','t.shop_id = s.id')->field('t.name,t.shop_id,t.product_id,t.old_price,t.price,t.num,t.limit_buy_num,t.thumb,t.start_time,t.end_time,s.shop_name,s.up_to_send_money,s.ping_fee,s.price_hike,s.hike_type')
             ->where($where)->paginate($pagesize);
 
         if ($today_sale){
             foreach ($today_sale as $item) {
                 $item->res_time = $item->end_time - time();
-                $item->old_price =floatval(sprintf("%.2f",$item->old_price + $item->price_hike));
-                $item->price = floatval(sprintf("%.2f",$item->price + $item->price_hike));
+                if ($item->hike_type == 1) {
+                    $item->old_price =floatval(sprintf("%.2f",$item->old_price + $item->price_hike));
+                    $item->price = floatval(sprintf("%.2f",$item->price + $item->price_hike));
+                } else {
+                    $item->old_price =floatval(sprintf("%.2f",$item->old_price * (1 + $item->price_hike * 0.01)));
+                    $item->price = floatval(sprintf("%.2f",$item->price  * (1 + $item->price_hike * 0.01)));
+                }
             }
         }
         $this->success('success',$today_sale);

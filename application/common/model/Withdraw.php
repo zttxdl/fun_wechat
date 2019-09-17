@@ -135,7 +135,7 @@ class Withdraw extends Model
         // 获取当前订单信息
         $Order = \app\common\model\Orders::get($order_id);
         // 食堂主键值 + 平台抽成 + 平台对商家的提价金额
-        $shop_info = Db::name('shop_info')->where('id',$Order->shop_id)->field('canteen_id,segmentation,price_hike')->find();
+        $shop_info = Db::name('shop_info')->where('id',$Order->shop_id)->field('canteen_id,segmentation,price_hike,hike_type')->find();
         // 食堂抽成比例（百分制）
         $cut_proportion = '';
         if ($shop_info['canteen_id']) {
@@ -147,17 +147,24 @@ class Withdraw extends Model
             $assume_ratio = Db::name('platform_coupon')->where('id',$Order->platform_coupon_id)->value('assume_ratio');
         }
         
+        // 商品提价金额
+        if ($shop_info['hike_type'] == 1) {
+            $total_hike_price = $Order->num * $shop_info['price_hike'];
+        } else {
+            $total_hike_price = (($Order['total_money'] - $Order['box_money'] - $Order['ping_fee']) / (1 + $shop_info['price_hike'] * 0.01)) * $shop_info['price_hike'] * 0.01;
+        }
+
         // 启动事务
         Db::startTrans();
         try {
             /** 商家各种抽成支出*********************************/ 
-            //平台抽成 = （商品原价+餐盒费-优惠金额）* 抽成比例 <==> 平台抽成 = （订单总价 - 配送费 - 每个商品的提价*下单的商品数量  - 平台优惠 - 商家活动优惠）* 抽成比例 
-            $ptExpenditure = ($Order->total_money - $Order->ping_fee - ($Order->num * $shop_info['price_hike']) - $Order->platform_coupon_money - $Order->shop_discounts_money) * ($shop_info['segmentation'] / 100);
+            //平台抽成 = （商品原价-优惠金额）* 抽成比例 <==> 平台抽成 = （订单总价 - 配送费 - 餐盒费 - 每个商品的提价*下单的商品数量  - 平台优惠 - 商家活动优惠）* 抽成比例 
+            $ptExpenditure = ($Order->total_money - $Order->ping_fee - $Order->box_money - $total_hike_price - $Order->platform_coupon_money - $Order->shop_discounts_money) * ($shop_info['segmentation'] / 100);
 
-            //食堂抽成 = 商品原价 * 食堂抽成比例 《==》 （订单总价 - 配送费 - 餐盒费 - 每个商品的提价*下单的商品数量）*食堂抽成比例
+            //食堂抽成 = （商品原价 - 商家活动优惠） * 食堂抽成比例 《==》 （订单总价 - 配送费 - 餐盒费 - 提价 - 商家活动优惠）*食堂抽成比例
             $stExpenditure = 0;
             if ($cut_proportion) {
-                $stExpenditure = ($Order->total_money - $Order->ping_fee - $Order->box_money - ($Order->num * $shop_info['price_hike'])) * ($cut_proportion / 100);
+                $stExpenditure = ($Order->total_money - $Order->ping_fee - $Order->box_money - $total_hike_price - $Order->shop_discounts_money) * ($cut_proportion / 100);
             }
             
             //红包抽成 = 红包总金额 * 商家承担比列
@@ -176,8 +183,8 @@ class Withdraw extends Model
                 'hongbao_choucheng' => isset($hbExpenditure) ? $hbExpenditure : 0.00
             ];
             Db::name('Orders')->where('id',$order_id)->update($update_data);
-            // 商家订单实际收入 = 商品原价 + 餐盒费 - 商家满减支出 - 抽成支出 《==》 订单总价 - 配送费 - 加价 - 抽成支出 - 商家满减支出
-            $shop_money = $Order->total_money - $Order->ping_fee - ($Order->num * $shop_info['price_hike']) - $totalExpenditure - $Order->shop_discounts_money;
+            // 商家订单实际收入 = 商品原价 - 商家满减支出 - 抽成支出 《==》 订单总价 - 配送费 - 餐盒费 - 加价 - 抽成支出 - 商家满减支出
+            $shop_money = $Order->total_money - $Order->box_money - $Order->ping_fee - $total_hike_price - $totalExpenditure - $Order->shop_discounts_money;
             /** 商家用户下单收入*********************************/ 
             $data = [
                 'withdraw_sn' => $Order->orders_sn,
