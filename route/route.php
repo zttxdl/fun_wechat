@@ -400,6 +400,7 @@ Route::group('r-member', function () {
     Route::get('/check_identity_status', 'checkIdentityStatus');
     Route::post('/tojoin', 'toJoin');
     Route::rule('/getEvaluation', 'getEvaluation');
+    Route::get('/getSchoolLatLong', 'getSchoolLatLong');
 })->prefix('rider/Member/');
 
 // 骑手订单组

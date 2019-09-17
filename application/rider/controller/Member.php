@@ -244,6 +244,19 @@ class Member extends RiderBase
         $this->success('success',$data);
 
     }
+
+
+    /**
+     * 获取当前骑手绑定学校的经纬度 
+     * 
+     */
+    public function getSchoolLatLong()
+    {
+        $info = Db::name('rider_info r')->join('school s','r.school_id = s.id')->where('r.id','=',$this->auth->id)->field('s.longitude,s.latitude')->find();
+
+        $this->success('获取成功',['info'=>$info]);
+    }
+     
      
      
 }
