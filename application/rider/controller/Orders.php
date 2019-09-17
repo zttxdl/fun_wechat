@@ -622,7 +622,10 @@ class Orders extends RiderBase
         $Order = \app\common\model\Orders::get($orderId);
         $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
         $user = model('User')->field('phone,invitation_id')->where('id',$Order->user_id)->find();
-        
+        // 判断当前订单是否已送达
+        if ($Takeout->status == 6) {
+            $this->error('您已送达，请勿重新点击');
+        }
         $location = $latitude.','.$longitude;
         $user_address = $Takeout->user_address->latitude.','.$Takeout->user_address->longitude;
         $result = parameters($location,$user_address);
