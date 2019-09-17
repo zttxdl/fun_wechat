@@ -89,7 +89,8 @@ class ShopInfo extends Model
     }
 
     /**
-     * 获取平台提价
+     * 获取平台提价【此功能后续删除】
+     * 
      */
     public function getPriceHike($id)
     {

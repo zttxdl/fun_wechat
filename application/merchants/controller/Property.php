@@ -207,24 +207,27 @@ class Property extends MerchantsBase
         if (empty($info)) {
             $this->error('网络加载失败');
         }
-        // 商品提价金额
-        $price_hike = Db::name('shop_info')->where('id',$info['shop_id'])->value('price_hike');
-
+        
         // 订单表详细信息
         $order_info = Db::name('orders')->where('orders_sn','=',$info['withdraw_sn'])
                     ->field('add_time,box_money,platform_choucheng,shitang_choucheng,hongbao_choucheng,total_money,shop_discounts_money,num,ping_fee')->find();
 
+        // 商品提价金额
+        $hike_arr = Db::name('shop_info')->where('id',$info['shop_id'])->field('price_hike,hike_type')->find();
+        // 商品原价 = 订单总价 - 配送费 - 包装费 - 商品提价金额
+        if ($hike_arr['hike_type'] == 1) {
+            $original_money = $order_info['total_money'] - $order_info['box_money'] - $order_info['ping_fee'] - ($order_info['num'] * $hike_arr['price_hike']);
+        } else {
+            $original_money = ($order_info['total_money'] - $order_info['box_money'] - $order_info['ping_fee']) / (1 + $hike_arr['price_hike'] * 0.01);
+        }
+
         // 抽成支出
         $choucheng = $order_info['platform_choucheng'] + $order_info['shitang_choucheng'] + $order_info['hongbao_choucheng'];
-
-        // 商品原价 = 订单总价 - 配送费 - 包装费 - 商品提价金额
-        $original_money = $order_info['total_money'] - $order_info['box_money'] - $order_info['ping_fee'] - ($order_info['num'] * $price_hike);
 
         $data = [
             'orders_sn'  =>  $info['withdraw_sn'],
             'add_time'  =>  date('Y-m-d H:i:s',$order_info['add_time']),
             'original_money' =>  sprintf('%.2f',$original_money),
-            'box_money' =>  $order_info['box_money'],
             'choucheng' =>sprintf('%.2f',$choucheng),
             'discounts_money' => $order_info['shop_discounts_money'],
             'money' =>  $info['money']
