@@ -327,4 +327,23 @@ class Withdraw extends Model
         return sprintf("%.2f",$data);
     }
 
+    /**
+     * @param $shop_id
+     * 今日交易额
+     */
+    public function getDaySales($shop_id)
+    {
+        //收入
+        $total_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->whereTime('add_time','day')->sum('money');
+
+        //退款支出
+        $total_refund_money = $this->where([['shop_id','=',$shop_id],['type','=',6]])->whereTime('add_time','day')->sum('money');
+
+        $data = $total_money - $total_refund_money;
+        return sprintf("%.2f",$data);
+    }
+
+
+
+
 }
