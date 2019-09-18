@@ -23,7 +23,7 @@ class PlatformCoupon extends Model
                 unset($list[$k]);
             }
         }
-        return $list;
+        return array_values($list);
     }
      
 }
