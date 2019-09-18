@@ -113,7 +113,7 @@ class MyCoupon extends ApiBase
 
         $count = Db::name('platform_coupon')->where('id',$info->id)->value('surplus_num');
         if ($count < 1) {
-            $this->error('该优惠券已被领取完了');            
+            $this->error('该红包已被领取完了');            
         }
 
         // 启动事务
@@ -156,8 +156,6 @@ class MyCoupon extends ApiBase
         // 这里需注意：针对首单减红包， 仅限新注册用户，如若是老用户，则不展示
         $new_buy = model('user')->getNewBuy($user_id);
 
-        
-        
         foreach ($list as $k => &$v) {
             // 判断当前用户是否已领取过首单红包，如果已领取过，就不再给该用户继续发放【此处不可放在循环外面，防止这一批次红包存在多个首单红包】
             $first_coupon = Db::name('my_coupon')->where([['user_id','=',$user_id],['first_coupon','=',1]])->count('id');
@@ -166,7 +164,6 @@ class MyCoupon extends ApiBase
             // 老用户 去掉首单立减  || 用户已领取，则直接返回，进入下一次循环
             if ((($first_coupon > 0 || $new_buy == 2) && $v['coupon_type'] == 2) || $check_get) { 
                 unset($list[$k]);
-                // array_splice($list,$k,1); // 删除数组元素后，新数组会自动重新建立索引。此功能在这块有问题，会多一次循环
                 continue;
             }
 
@@ -198,7 +195,7 @@ class MyCoupon extends ApiBase
      
      
     /**
-     * 判断当前用户是否当天第一次进入本页面【用于判断是否弹红包】 
+     * 判断当前用户是否当天第一次进入本页面【用于判断是否弹红包】【此功能后续删除】 
      * 
      */
     public function judgeActiveCoupon()
