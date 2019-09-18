@@ -46,7 +46,8 @@ class Withdraw extends Model
     public function getNotJsMoney($shop_id)
     {
         // 未结算金额 7天内 [在测试阶段，设置10分钟内]
-        $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
+        $withdraw_cycle = Db::name('shop_info')->where('id',$shop_id)->value('withdraw_cycle');
+        $startTime = date('Y-m-d',strtotime("-".$withdraw_cycle. "days")).'23:59:59';
         // $startTime = time()-600;
 
         // 七天之内的总收入
