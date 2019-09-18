@@ -130,16 +130,19 @@ class Index extends Base
 
     public function swoole()
     {
-        $seve = new Swoole\Server("127.0.0.1",9501);
-
-        //监听
-        $seve->on('Content',function ($serv, $fd){
-            echo 'Client:Content.\n';
+        $http = new Swoole\Http\Server("127.0.0.1", 9501);
+        $http->on('request', function ($request, $response) {
+            $response->end("<h1>Hello Swoole. #".rand(1000, 9999)."</h1>");
         });
-
-        //监听数据接收事件
+        $http->start();
 
     }
+
+    public function test()
+    {
+        phpinfo();
+    }
+
 	 
 
 

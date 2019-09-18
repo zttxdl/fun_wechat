@@ -58,4 +58,15 @@ class RiderInfo extends Model
     {
         return $this->where('id',$id)->value('phone');
     }
+
+    /**
+     * 获取骑手名称
+     * @param $id
+     * @return mixed
+     */
+    public function getNameById($id)
+    {
+        return $this->where('id',$id)->value('name');
+    }
+
 }
