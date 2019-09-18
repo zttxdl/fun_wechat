@@ -23,7 +23,8 @@ class Withdraw extends Model
     public function getAcountMoney($shop_id)
     {
         // 提现规则 7天前 [在测试阶段，设置10分钟之前]
-        $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
+        $withdraw_cycle = Db::name('shop_info')->where('id',$shop_id)->value('withdraw_cycle');
+        $startTime = date('Y-m-d',strtotime("-".$withdraw_cycle. "days")).'23:59:59';
         // $startTime = time()-600;
         //收入
         $shouru_money = $this->getIncome($shop_id,$startTime);
