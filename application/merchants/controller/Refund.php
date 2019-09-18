@@ -113,6 +113,9 @@ class Refund extends MerchantsBase
                     throw new \Exception('refund insert fail');
                 }
 
+                //统计店铺日取消订单量
+                model('Shop')->setDayCancelNum($data['shop_id']);
+
                 // 提交事务
                 Db::commit();
                 return json_success('退款成功');

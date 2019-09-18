@@ -671,11 +671,12 @@ class Order extends ApiBase
             $socket = model('PushEvent','service');
             $socket->setUser('s_'.$order_info['shop_id'])->setContent('用户取消订单')->push();
 
+            //统计店铺日取消订单量
+            model('Shop')->setDayCancelNum($order_info['shop_id']);
             $this->success('订单取消成功');
         }
 
-        //统计店铺日订单量
-        model('Shop')->setDayCancelNum($order_info['shop_id']);
+
         $this->error('订单取消失败');
 
     }
