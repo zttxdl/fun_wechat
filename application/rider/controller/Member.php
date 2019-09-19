@@ -252,7 +252,7 @@ class Member extends RiderBase
      */
     public function getSchoolLatLong()
     {
-        $info = Db::name('rider_info r')->join('school s','r.school_id = s.id')->where('r.id','=',$this->auth->id)->field('s.longitude,s.latitude')->find();
+        $info = Db::name('rider_info r')->join('school s','r.school_id = s.id')->where('r.id','=',$this->auth->id)->field('s.longitude,s.latitude,s.name')->find();
 
         $this->success('获取成功',['info'=>$info]);
     }
