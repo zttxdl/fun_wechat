@@ -53,13 +53,13 @@ class Orders extends RiderBase
                 ->where($where)
                 ->order('create_time desc')
                 ->select();
-		}else{
+		}elseif($type == 2){
 			//获取已接单
             $where[] = ['school_id','=',$this->auth->school_id];
             $where[] = ['rider_id','=',$this->auth->id];
             $count = model('Takeout')->where($where)->where('status','in','3,4,5')->count();
             $data['count'] = $count;
-            $where[] = ['status','<>','1'];
+            $where[] = ['status','in','3,4,5'];
             $list = model('Takeout')
                 ->field('order_id,fetch_time,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
                 ->where($where)
@@ -72,7 +72,19 @@ class Orders extends RiderBase
                     $item->fetch_time = round(($item->fetch_time - time()) / 60);
                 }
             }
-		}
+		}else{
+		    //获取已完成订单
+            $where[] = ['school_id','=',$this->auth->school_id];
+            $where[] = ['rider_id','=',$this->auth->id];
+            $count = model('Takeout')->where($where)->where('status','in','3,4,5')->count();
+            $data['count'] = $count;
+            $where[] = ['status','=','6'];
+            $list = model('Takeout')
+                ->field('order_id,accomplish_time,fetch_time,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
+                ->where($where)
+                ->order('accomplish_time desc')
+                ->select();
+        }
 
         foreach ($list as $item) {
             if ($item->status != 6 && $item->status != 2) {
