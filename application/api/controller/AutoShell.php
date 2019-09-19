@@ -57,7 +57,7 @@ class AutoShell extends Controller
         Cache::store('redis')->del('rider_can_tx_money');
 
         /***************** 清除用户每天第一次进入小程序的缓存记录 【此功能后续删除】   ******************************************************************/
-        Cache::store('redis')->del('homepage_active_coupon');
+        // Cache::store('redis')->del('homepage_active_coupon');
 
         /***************** 清除用户每天商户今日访客量  ******************************************************************/
         Cache::store('redis')->del('shop_uv_count');
