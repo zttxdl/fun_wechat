@@ -75,6 +75,7 @@ class Order extends MerchantsBase
                 'rider_name'=> Model('RiderInfo')->getNameById($row['rider_id']),
                 'issuing_status' => $row['issuing_status'],
                 'type' => $this->getShopType($row['status']),
+                'status' => $row['status'],
                 'detail' => $this->detail($row['id']),
 
             ];
