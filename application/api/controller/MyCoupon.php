@@ -43,8 +43,10 @@ class MyCoupon extends ApiBase
     public function myOrderCoupon(Request $request)
     {
         $shop_id = $request->param('shop_id');//店铺ID
+        $school_id = $request->param('school_id');//当前学校主键值
         $category_id = $request->param('category_id');//品类ID
         $money = $request->param('money');//订单结算金额
+        $school_name = model('School')->getNameById($school_id);
 
         $where = [['m.user_id','=',$this->auth->id],['m.status','=',1]];
 
@@ -87,6 +89,11 @@ class MyCoupon extends ApiBase
                 // 通过 $limit_use 去获取品类名称，并展示
                 $category_names = model('ManageCategory')->getNames($limit_use);
                 $row['remark'][] = '仅限'.$category_names.'品类使用';
+            }
+            // 限制范围的使用
+            if ($row['school_id'] != 0 && $row['school_id'] != $school_id) {
+                $row['is_use'] = 0;
+                $row['remark'][] = '仅限'.$school_name.'使用';
             }
 
             /*********红包使用逻辑判断 end**********/
