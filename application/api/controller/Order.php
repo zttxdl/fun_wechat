@@ -670,6 +670,8 @@ class Order extends ApiBase
 
             $this->success('订单取消成功');
         }
+
+
         $this->error('订单取消失败');
 
     }
@@ -690,8 +692,7 @@ class Order extends ApiBase
 
         $order_detail = model('Orders')->getOrderDetail($order_id);
         $result = [];
-        //获取商家提价
-        $price_hike = model('ShopInfo')->getPriceHike($order_info['shop_id']);
+
         foreach ($order_detail  as $row)
         {
             $product_info = model('Product')->where('id',$row['product_id'])->find();
@@ -725,7 +726,15 @@ class Order extends ApiBase
 
             }
 
-
+            //获取商家提价
+            $hike_arr = model('ShopInfo')->where('id','=',$order_info['shop_id'])->field('price_hike,hike_type')->find();
+            if ($hike_arr['hike_type'] == 1) {
+                $price = floatval(sprintf("%.2f",$product_info['price'] + $hike_arr['price_hike']));
+                $old_price = floatval(sprintf("%.2f",$product_info['old_price'] + $hike_arr['price_hike']));
+            } else {
+                $price = floatval(sprintf("%.2f",$product_info['price'] * (1 + $hike_arr['price_hike'] * 0.01)));
+                $old_price = floatval(sprintf("%.2f",$product_info['old_price'] * (1 + $hike_arr['price_hike'] * 0.01)));
+            }
             $result[] = [
                 'orders_id' => $row['orders_id'],
                 'product_id' => $product_info['id'],
@@ -733,8 +742,8 @@ class Order extends ApiBase
                 'thumb' => $product_info['thumb'],
                 'name' => $product_info['name'],
                 'num' => $row['num'],
-                'price' => $product_info['price'] + $price_hike,
-                'old_price' => $product_info['old_price'] + $price_hike,
+                'price' => $price,
+                'old_price' => $old_price,
                 'box_money' => $product_info['box_money'],
                 'attr_names' => model('Shop')->getGoodsAttrName($row['attr_ids']),
                 'attr_ids' => $row['attr_ids'],

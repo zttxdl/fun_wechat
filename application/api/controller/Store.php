@@ -24,7 +24,7 @@ class Store extends ApiBase
         $where[] = ['shop_id','=',$shop_id];
         $where[] = ['status','=',1];
         //获取商家提价
-        $price_hike = model('ShopInfo')->getPriceHike($shop_id);
+        $hike_arr = model('ShopInfo')->where('id','=',$shop_id)->field('price_hike,hike_type')->find();
 
         //获取商品
         $list = model('Product')
@@ -39,15 +39,15 @@ class Store extends ApiBase
         $toWhere[] = ['a.today','=',$today];
         $toWhere[] = ['a.shop_id','=',$shop_id];
         $toWhere[] = ['a.end_time','>=',time()];
+        $toWhere[] = ['a.start_time','<',time()];
+        $toWhere[] = ['a.status','=',1];
         $toWhere[] = ['a.num','>',0];
         $days = Db::name('today_deals')->alias('a')
             ->join('product b','a.product_id = b.id ')
             ->field('b.id,b.name,a.old_price,a.price,a.num,a.limit_buy_num,a.thumb,a.start_time,a.end_time,b.products_classify_id as classId,b.attr_ids,b.box_money,b.sales')
             ->where($toWhere)
             ->find();
-
         if ($days){
-
             $list[] = $days;
         }
 
@@ -70,8 +70,14 @@ class Store extends ApiBase
             }
 
             $item['sales'] = model('Product')->getMonthSales($item['id']);
-            $item['price'] = floatval(sprintf("%.2f",$price_hike + $item['price']));
-            $item['old_price'] = floatval(sprintf("%.2f",$price_hike + $item['old_price']));
+            if ($hike_arr['hike_type'] == 1) {
+                $item['price'] = floatval(sprintf("%.2f",$hike_arr['price_hike'] + $item['price']));
+                $item['old_price'] = floatval(sprintf("%.2f",$hike_arr['price_hike'] + $item['old_price']));
+            } else {
+                $item['price'] = floatval(sprintf("%.2f",$item['price'] * (1 + $hike_arr['price_hike'] * 0.01)));
+                $item['old_price'] = floatval(sprintf("%.2f",$item['old_price'] * (1 + $hike_arr['price_hike'] * 0.01)));
+            }
+            
             if ($item['type'] == 3) {
                 $item['limit_buy_num'] = 1;
             }
@@ -243,13 +249,23 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             $product = $product->toArray();
 
             //获取商家提价
-            $price_hike = model('ShopInfo')->getPriceHike($product['shop_id']);
-            if ($data){
-                $product['old_price'] = floatval(sprintf("%.2f",$data->old_price + $price_hike));
-                $product['price'] = floatval(sprintf("%.2f",$data->price + $price_hike));
-            }else{
-                $product['old_price'] = floatval(sprintf("%.2f",$product['old_price'] + $price_hike));
-                $product['price'] = floatval(sprintf("%.2f",$product['price'] + $price_hike));
+            $hike_arr = model('ShopInfo')->where('id','=',$product['shop_id'])->field('price_hike,hike_type')->find();
+            if ($data) {
+                if ($hike_arr['hike_type'] == 1) {
+                    $product['old_price'] = floatval(sprintf("%.2f",$data->old_price + $hike_arr['price_hike']));
+                    $product['price'] = floatval(sprintf("%.2f",$data->price + $hike_arr['price_hike']));
+                } else {
+                    $product['old_price'] = floatval(sprintf("%.2f",$data->old_price * (1 + $hike_arr['price_hike'] * 0.01)));
+                    $product['price'] = floatval(sprintf("%.2f",$data->price * (1 + $hike_arr['price_hike'] * 0.01)));
+                }
+            } else {
+                if ($hike_arr['hike_type'] == 1) {
+                    $product['old_price'] = floatval(sprintf("%.2f",$product['old_price'] + $hike_arr['price_hike']));
+                    $product['price'] = floatval(sprintf("%.2f",$product['price'] + $hike_arr['price_hike']));
+                } else {
+                    $product['old_price'] = floatval(sprintf("%.2f",$product['old_price'] * (1 + $hike_arr['price_hike'] * 0.01)));
+                    $product['price'] = floatval(sprintf("%.2f",$product['price'] * (1 + $hike_arr['price_hike'] * 0.01)));
+                }
             }
         }
 

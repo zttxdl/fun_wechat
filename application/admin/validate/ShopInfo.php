@@ -15,6 +15,8 @@ class ShopInfo extends Validate
 	protected $rule = [
         'segmentation'   => 'require',
         'price_hike'     => 'require',
+        'sort'     => 'require',
+        'withdraw_cycle'     => 'require'
     ];
     
     /**
@@ -26,5 +28,7 @@ class ShopInfo extends Validate
     protected $message = [
         'segmentation.require'  => '平台抽成不能为空',
         'price_hike.require'  => '商家调价不能为空',
+        'sort.require'  => '商家排序不能为空',
+        'withdraw_cycle.require'  => '提现周期不能为空',
     ];
 }

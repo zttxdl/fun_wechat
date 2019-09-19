@@ -56,8 +56,8 @@ class AutoShell extends Controller
         /***************** 清除骑手可提现金额的缓存记录  ******************************************************************/
         Cache::store('redis')->del('rider_can_tx_money');
 
-        /***************** 清除用户每天第一次进入小程序的缓存记录  ******************************************************************/
-        Cache::store('redis')->del('homepage_active_coupon');
+        /***************** 清除用户每天第一次进入小程序的缓存记录 【此功能后续删除】   ******************************************************************/
+        // Cache::store('redis')->del('homepage_active_coupon');
 
         /***************** 清除用户每天商户今日访客量  ******************************************************************/
         Cache::store('redis')->del('shop_uv_count');
@@ -73,6 +73,12 @@ class AutoShell extends Controller
 
         /***************** 清除骑手抢单超时未取餐记录  ******************************************************************/
         Cache::store('redis')->del('rider_overtime_number');
+
+        /***************** 清除统计店铺日订单量记录  ******************************************************************/
+        Cache::store('redis')->del('shop_day_order_count');
+
+        /***************** 清除统计店铺日取消订单量记录  ******************************************************************/
+        Cache::store('redis')->del('shop_day_cancel_order_count');
 
         /***************** 待更新  ******************************************************************/
 
@@ -152,11 +158,11 @@ class AutoShell extends Controller
 
 
     /**
-     * 超过15分钟，骑手抢完单后，未到商家取餐
+     * 骑手抢完单后，超过指定时间还未到商家取餐
      */
     public function riderOvertimeOrder()
     {
-        $orderlist=Db::name('takeout')->where([['single_time','<',time() - 15*60],['status','=',3]])->field('id,school_id,rider_id')->select();
+        $orderlist=Db::name('takeout')->where([['fetch_time','<',time()],['status','=',3]])->field('id,school_id,rider_id')->select();
 
         // 没有数据时
         if (!$orderlist) {

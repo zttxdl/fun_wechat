@@ -40,7 +40,9 @@ class Order extends MerchantsBase
             }else{//已完成
                 $map[] = ['status','in',[6,7,8]];
             }
-            
+        }else{
+           //全部
+            $map[] = ['status','in',[2,3,4,5,6,7,8]];
         }
 
         if(!$shop_id) {
@@ -49,7 +51,7 @@ class Order extends MerchantsBase
 
         $map[] = ['shop_id','=',$shop_id];
 
-        $orders = Orders::where($map)->order('add_time DESC')->paginate($page_size)->toArray();
+        $orders = Orders::where($map)->whereTime('add_time','today')->order('add_time DESC')->paginate($page_size)->toArray();
 
 
         if(!$orders) {
@@ -70,8 +72,10 @@ class Order extends MerchantsBase
                 'money' => $row['money'],
                 'meal_sn'=> $row['meal_sn'],
                 'rider_tel'=> Model('RiderInfo')->getPhoneById($row['rider_id']),
+                'rider_name'=> Model('RiderInfo')->getNameById($row['rider_id']),
                 'issuing_status' => $row['issuing_status'],
                 'type' => $this->getShopType($row['status']),
+                'status' => $row['status'],
                 'detail' => $this->detail($row['id']),
 
             ];

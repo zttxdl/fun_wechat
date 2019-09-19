@@ -10,6 +10,18 @@ class Search extends ApiBase
 {
     protected $noNeedLogin = ['*'];
 
+    public function __construct()
+    {
+        parent::__construct();
+        //判断是否要登录验证
+        $token = $this->request->header('api-token');
+        if ($token) {
+            $this->valid_token();
+        } else {
+            $this->auth = [];
+        }
+    }
+
     //搜索页面
     public function index()
     {
@@ -42,7 +54,7 @@ class Search extends ApiBase
          $list = Db::name('shop_info a')
                     ->distinct(true)
                     ->leftjoin('product b','a.id = b.shop_id')
-                    ->field("a.id,a.shop_name,a.marks,a.sales,a.logo_img,a.up_to_send_money,a.run_time,
+                    ->field("a.id,a.shop_name,a.marks,a.sales,a.logo_img,a.up_to_send_money,a.open_status as business,a.run_time,
                     a.address,a.manage_category_id,a.ping_fee")
                     ->where('a.shop_name|b.name','like','%'.$keywords.'%')
                     ->where( 'a.school_id','=', $school_id)
@@ -55,9 +67,10 @@ class Search extends ApiBase
         }
 
         foreach ($list as &$value) {
-            if (! empty($value['run_time'])){
+            // 判断是否休息中
+            if ($value['business'] == 1 && !empty($value['run_time'])) {
                 $value['business'] = model('ShopInfo')->getBusiness($value['run_time']);
-            }else{
+            } else {
                 $value['business'] = 0;
             }
             // 获取优惠券信息
