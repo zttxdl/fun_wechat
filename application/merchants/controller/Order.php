@@ -70,6 +70,7 @@ class Order extends MerchantsBase
                 'money' => $row['money'],
                 'meal_sn'=> $row['meal_sn'],
                 'rider_tel'=> Model('RiderInfo')->getPhoneById($row['rider_id']),
+                'rider_name'=> Model('RiderInfo')->getNameById($row['rider_id']),
                 'issuing_status' => $row['issuing_status'],
                 'type' => $this->getShopType($row['status']),
                 'detail' => $this->detail($row['id']),
@@ -406,6 +407,9 @@ class Order extends MerchantsBase
         }catch (\Exception $e) {
             $this->error($e->getMessage());
         }
+
+        //统计店铺日取消订单量
+        model('Shop')->setDayCancelNum($order_info['shop_id']);
 
         $this->success('拒单成功');
     }

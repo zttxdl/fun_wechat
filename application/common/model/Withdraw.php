@@ -23,7 +23,8 @@ class Withdraw extends Model
     public function getAcountMoney($shop_id)
     {
         // 提现规则 7天前 [在测试阶段，设置10分钟之前]
-        $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
+        $withdraw_cycle = Db::name('shop_info')->where('id',$shop_id)->value('withdraw_cycle');
+        $startTime = date('Y-m-d',strtotime("-".$withdraw_cycle. "days")).'23:59:59';
         // $startTime = time()-600;
         //收入
         $shouru_money = $this->getIncome($shop_id,$startTime);
@@ -45,7 +46,8 @@ class Withdraw extends Model
     public function getNotJsMoney($shop_id)
     {
         // 未结算金额 7天内 [在测试阶段，设置10分钟内]
-        $startTime = date('Y-m-d',strtotime("-7 days")).'23:59:59';
+        $withdraw_cycle = Db::name('shop_info')->where('id',$shop_id)->value('withdraw_cycle');
+        $startTime = date('Y-m-d',strtotime("-".$withdraw_cycle. "days")).'23:59:59';
         // $startTime = time()-600;
 
         // 七天之内的总收入
@@ -326,5 +328,24 @@ class Withdraw extends Model
         $data = $total_money - $total_refund_money;
         return sprintf("%.2f",$data);
     }
+
+    /**
+     * @param $shop_id
+     * 今日交易额
+     */
+    public function getDaySales($shop_id)
+    {
+        //收入
+        $total_money = $this->where([['shop_id','=',$shop_id],['type','=',1]])->whereTime('add_time','today')->sum('money');
+
+        //退款支出
+        $total_refund_money = $this->where([['shop_id','=',$shop_id],['type','=',6]])->whereTime('add_time','today')->sum('money');
+
+        $data = $total_money - $total_refund_money;
+        return sprintf("%.2f",$data);
+    }
+
+
+
 
 }

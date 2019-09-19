@@ -164,6 +164,12 @@ class Shop extends Model
      */
     public function getDayNum($shop_id)
     {
+        $key = 'shop_day_order_count';
+        $redis = Cache::store('redis');
+        if($redis->hExists($key,$shop_id)) {
+            $data = $redis->hGet($key, $shop_id);
+            return $data;
+        }
         $data = Db::name('orders')
             ->where('status','notin',[1,4,9])
             ->where('shop_id',$shop_id)
@@ -175,10 +181,37 @@ class Shop extends Model
     }
 
     /**
+     * @param $shop_id
+     * 统计店铺日订单量
+     */
+    public function setDayNum($shop_id)
+    {
+        $key = 'shop_day_order_count';
+        $redis = Cache::store('redis');
+
+        if(!$redis->hExists($key,$shop_id)) {
+
+            $redis->hSet($key, $shop_id, 1);
+        }else{
+            $redis->HINCRBY($key, $shop_id, 1);
+        }
+
+        return true;
+
+    }
+
+
+    /**
      * 获取店铺日取消订单量
      */
     public function getDayCancelNum($shop_id)
     {
+        $key = 'shop_day_cancel_order_count';
+        $redis = Cache::store('redis');
+        if($redis->hExists($key,$shop_id)) {
+            $data = $redis->hGet($key, $shop_id);
+            return $data;
+        }
         $data = Db::name('orders')
             ->where('status','=',9)
             ->where('shop_id',$shop_id)
@@ -190,11 +223,30 @@ class Shop extends Model
     }
 
     /**
+     * 统计店铺日取消订单量
+     */
+    public function setDayCancelNum($shop_id)
+    {
+        $key = 'shop_day_cancel_order_count';
+        $redis = Cache::store('redis');
+
+        if(!$redis->hExists($key,$shop_id)) {
+
+            $redis->hSet($key, $shop_id, 1);
+        }else{
+            $redis->HINCRBY($key, $shop_id, 1);
+        }
+
+        return true;
+    }
+
+    /**
      * 获取店铺结算金额
      * mike23待更新 [没有用的数据请删掉]
      */
     public function getSettlelMoney($shop_id)
     {
+
         $data = Db::name('withdraw')
             ->where('type','2')//支出
             ->where('status','3')//审核成功

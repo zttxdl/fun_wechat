@@ -13,6 +13,7 @@ use think\Request;
 use think\Controller;
 use think\facade\Env;
 use think\facade\Cache;
+use think\Db;
 
 class Test extends Controller
 {
@@ -452,8 +453,15 @@ class Test extends Controller
      */
     public function test()
     {
-        $ret = Cache::store('redis')->get('rdsname');
-        dump($ret);
+//        phpinfo();exit;
+//        $ret = Cache::store('redis')->get('list');
+//        dump($ret);
+        $withdraw_cycle = Db::name('shop_info')->where('id',49)->value('withdraw_cycle');
+        dump($withdraw_cycle);exit;
+        $shop_id = 49;
+        return model('Shop')->getDayCancelNum($shop_id);
+        return model('Shop')->getDayNum($shop_id);
+        return true;
     }
 
     /**
