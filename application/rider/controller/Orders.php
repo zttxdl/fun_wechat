@@ -615,6 +615,8 @@ class Orders extends RiderBase
                 Db::name('canteen_income_expend')->insert($canteen);
             }
 
+            //统计店铺日订单量
+            model('Shop')->setDayNum($Order->shop_id);
             // 提交事务
             Db::commit();
             
