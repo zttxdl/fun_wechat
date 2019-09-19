@@ -408,9 +408,6 @@ class Order extends MerchantsBase
             $this->error($e->getMessage());
         }
 
-        //统计店铺日取消订单量
-        model('Shop')->setDayCancelNum($order_info['shop_id']);
-
         $this->success('拒单成功');
     }
 
