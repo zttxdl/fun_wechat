@@ -189,7 +189,7 @@ class MyCoupon extends ApiBase
             }
         }
 
-        $this->success('获取成功',['list'=>$list]);
+        $this->success('获取成功',['list'=>array_values($list)]);
 
     }
      
