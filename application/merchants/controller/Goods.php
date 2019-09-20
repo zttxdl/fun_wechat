@@ -20,7 +20,7 @@ class Goods extends MerchantsBase
     public function index()
     {
 
-        $where = ['shop_id'=>$this->shop_id];
+        $where = [['shop_id','=',$this->shop_id],['delete','=',0]];
         //获取商品
         $list = model('Product')
             ->field('id,name,price,old_price,attr_ids,thumb,sales,products_classify_id as classId,type,status')
@@ -46,7 +46,8 @@ class Goods extends MerchantsBase
         //获取分类
         $class = model('ProductsClassify')
             ->field('id as classId,name as className')
-            ->where($where)
+            ->where('shop_id','=',$this->shop_id)
+            ->order('sort')
             ->select()
             ->toArray();
 
@@ -130,7 +131,10 @@ class Goods extends MerchantsBase
             $this->error('没有权限删除');
         }
 
-        Product::destroy($id);
+        $res = Db::name('product')->where('id','=',$id)->update(['status'=>2,'delete'=>1]);
+        if (!$res) {
+            $this->error('删除失败');
+        }
         $this->success('success');
     }
 
