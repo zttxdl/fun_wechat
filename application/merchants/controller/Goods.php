@@ -6,6 +6,7 @@ use app\common\controller\MerchantsBase;
 use think\Request;
 use app\common\model\Product;
 use app\common\model\TodayDeals;
+use think\Db;
 
 /**
  * 商品模块控制器
