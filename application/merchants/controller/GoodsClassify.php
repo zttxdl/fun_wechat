@@ -6,6 +6,7 @@ use app\common\controller\MerchantsBase;
 use app\common\model\Product;
 use think\Request;
 use app\common\model\ProductsClassify;
+use think\Db;
 
 /**
  * 商品分类模块控制器
@@ -90,13 +91,24 @@ class GoodsClassify extends MerchantsBase
      */
     public function classifySort(Request $request)
     {
-        $data = $request->param();
+        $sorts = $request->param('sorts');
+        $data = json_decode($sorts,true);
 
-        $result = Db::name('products_classify')->update($data);
+        // 启动事务
+        Db::startTrans();
+        try {
+            foreach ($data as $k => $v) {
+                Db::name('products_classify')->update($v);
+            }
 
-        if ($result !== false) {
-            $this->success('分类排序更新成功');
-        }
+             // 提交事务
+             Db::commit();
+             $this->success("分类排序更新成功");
+         } catch (\think\Exception\DbException $e) {
+             // 回滚事务
+             Db::rollback();
+             $this->error("分类排序更新失败");
+         }
         $this->error('分类排序更新失败');
 
     }

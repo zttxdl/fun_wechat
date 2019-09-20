@@ -200,7 +200,7 @@ Route::group('merchants',function (){
     Route::rule('getCanteen','merchants/Merchants/getCanteen');
     Route::get('check_status', 'merchants/Merchants/checkStatus');
     Route::get('set_status', 'merchants/Merchants/setCheckStatus');
-    Route::get('classifySort', 'merchants/GoodsClassify/classifySort');
+    Route::post('classifySort', 'merchants/GoodsClassify/classifySort');
 	//文件上传
 	Route::rule('upload','merchants/Upload/up');
 
