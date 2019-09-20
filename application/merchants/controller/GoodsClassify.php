@@ -82,4 +82,22 @@ class GoodsClassify extends MerchantsBase
 
         $this->success('success');
     }
+
+    
+    /**
+     * 更新分类排序 
+     * 
+     */
+    public function classifySort(Request $request)
+    {
+        $data = $request->param();
+
+        $result = Db::name('products_classify')->update($data);
+
+        if ($result !== false) {
+            $this->success('分类排序更新成功');
+        }
+        $this->error('分类排序更新失败');
+
+    }
 }

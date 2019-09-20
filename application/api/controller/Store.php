@@ -103,6 +103,7 @@ class Store extends ApiBase
         $data['class'] = model('ProductsClassify')
             ->field('id as classId,name as className')
             ->where($where)
+            ->order('sort')
             ->select();
 
         $this->success('success',$data);
