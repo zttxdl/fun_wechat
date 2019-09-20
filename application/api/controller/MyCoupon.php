@@ -91,10 +91,10 @@ class MyCoupon extends ApiBase
                 $row['remark'][] = '仅限'.$category_names.'品类使用';
             }
             // 限制范围的使用
-            if ($row['school_id'] != 0 && $row['school_id'] != $school_id) {
-                $row['is_use'] = 0;
-                $row['remark'][] = '仅限'.$school_name.'使用';
-            }
+            // if ($row['school_id'] != 0 && $row['school_id'] != $school_id) {
+            //     $row['is_use'] = 0;
+            //     $row['remark'][] = '仅限'.$school_name.'使用';
+            // }
 
             /*********红包使用逻辑判断 end**********/
         }
