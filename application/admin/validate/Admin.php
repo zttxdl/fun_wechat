@@ -12,7 +12,11 @@ class Admin extends Validate
      *
      * @var array
      */	
-	protected $rule = [];
+	protected $rule = [
+        'name'                 => 'require|max:10',
+        'phone'                => 'require|regex:/^1[3456789]{1}\d{9}$/',
+        'role_id'                => 'require',
+    ];
     
     /**
      * 定义错误信息
@@ -20,5 +24,11 @@ class Admin extends Validate
      *
      * @var array
      */	
-    protected $message = [];
+    protected $message = [
+        'name.require'                  => '联系人必填',
+        'name.max'                      => '联系人不能超过10位',
+        'phone.require'                 => '手机号必填',
+        'phone.regex'                   => '手机号格式不对',
+        'role_id.require'               => '请选择管理员角色',
+    ];
 }

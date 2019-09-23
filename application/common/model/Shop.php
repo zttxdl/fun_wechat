@@ -374,6 +374,7 @@ class Shop extends Model
             ->join('products_classify b','a.products_classify_id = b.id')
             ->where('a.shop_id',$shop_id)
             ->where('a.status',1)
+            ->where('a.delete',0)
             ->field('a.id,a.name,a.attr_ids,b.name as class_name,a.price')
             ->select();
         return $data;
