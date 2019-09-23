@@ -180,6 +180,25 @@ Route::group('financeManange', function () {
     Route::rule('/getCardInfo', 'getCardInfo');//获取银行账户信息
 })->prefix('admin/financeManange/')->middleware('IsLogin');
 
+// 权限管理--管理员模块
+Route::group('a-admin', function () {
+    Route::get('/index', 'index');
+    Route::rule('/insert','insert','GET|POST');
+    Route::rule('/update','update','GET|POST');
+    Route::get('/delete', 'delete');
+})->prefix('admin/admin/')->middleware('IsLogin');
+
+// 权限管理--角色模块
+Route::group('a-role', function () {
+    
+})->prefix('admin/role/')->middleware('IsLogin');
+
+// 权限管理--菜单模块
+Route::group('a-node', function () {
+    
+})->prefix('admin/node/')->middleware('IsLogin');
+
+
 
 
 
