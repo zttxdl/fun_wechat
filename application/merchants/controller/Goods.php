@@ -175,6 +175,7 @@ class Goods extends MerchantsBase
         $result = model('Product')
            ->where('status',2)
            ->where('shop_id',$this->shop_id)
+            ->where('delete',0)
             ->select();
 
         $this->success('success',$result);

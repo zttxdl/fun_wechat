@@ -70,13 +70,14 @@ class Store extends ApiBase
             }
 
             $item['sales'] = model('Product')->getMonthSales($item['id']);
-            if ($hike_arr['hike_type'] == 1) {
+            list($item['price'],$item['old_price']) = model('Shop')->getShopProductHikePrice($hike_arr,$item['price'],$item['old_price']);
+            /*if ($hike_arr['hike_type'] == 1) {
                 $item['price'] = floatval(sprintf("%.2f",$hike_arr['price_hike'] + $item['price']));
                 $item['old_price'] = floatval(sprintf("%.2f",$hike_arr['price_hike'] + $item['old_price']));
             } else {
                 $item['price'] = floatval(sprintf("%.2f",$item['price'] * (1 + $hike_arr['price_hike'] * 0.01)));
                 $item['old_price'] = floatval(sprintf("%.2f",$item['old_price'] * (1 + $hike_arr['price_hike'] * 0.01)));
-            }
+            }*/
             
             if ($item['type'] == 3) {
                 $item['limit_buy_num'] = 1;
@@ -244,7 +245,7 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
 
         $data = model('TodayDeals')->where('product_id',$product_id)->find();
 
-        if (! $product){
+        if (!$product){
             $this->error('商品已下架');
         }else{
             $product = $product->toArray();
@@ -252,21 +253,9 @@ LEFT JOIN fun_shop_comments as c ON a.comments_id = c.id WHERE c.shop_id = $shop
             //获取商家提价
             $hike_arr = model('ShopInfo')->where('id','=',$product['shop_id'])->field('price_hike,hike_type')->find();
             if ($data) {
-                if ($hike_arr['hike_type'] == 1) {
-                    $product['old_price'] = floatval(sprintf("%.2f",$data->old_price + $hike_arr['price_hike']));
-                    $product['price'] = floatval(sprintf("%.2f",$data->price + $hike_arr['price_hike']));
-                } else {
-                    $product['old_price'] = floatval(sprintf("%.2f",$data->old_price * (1 + $hike_arr['price_hike'] * 0.01)));
-                    $product['price'] = floatval(sprintf("%.2f",$data->price * (1 + $hike_arr['price_hike'] * 0.01)));
-                }
+                list($product['price'],$product['old_price']) = model('Shop')->getShopProductHikePrice($hike_arr,$data->price,$data->old_price);
             } else {
-                if ($hike_arr['hike_type'] == 1) {
-                    $product['old_price'] = floatval(sprintf("%.2f",$product['old_price'] + $hike_arr['price_hike']));
-                    $product['price'] = floatval(sprintf("%.2f",$product['price'] + $hike_arr['price_hike']));
-                } else {
-                    $product['old_price'] = floatval(sprintf("%.2f",$product['old_price'] * (1 + $hike_arr['price_hike'] * 0.01)));
-                    $product['price'] = floatval(sprintf("%.2f",$product['price'] * (1 + $hike_arr['price_hike'] * 0.01)));
-                }
+                list($product['price'],$product['old_price']) = model('Shop')->getShopProductHikePrice($hike_arr,$product['price'],$product['old_price']);
             }
         }
 
