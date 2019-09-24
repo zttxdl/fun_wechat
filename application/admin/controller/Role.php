@@ -41,7 +41,8 @@ class Role extends Base
                 $this->error('添加失败');
             }
         } else {
-            $list = Db::name("node")->where('level','=',1)->field('id,name')->select();
+            $arr = Db::name("node")->field('id,fid,level,name')->select();
+            $list = get_node($arr);
             $this->success('获取角色列表',['list'=>$list]);
         }
     }
@@ -67,7 +68,8 @@ class Role extends Base
             }
         } else {
             $info = Db::name("role")->find($data['id']);
-            $list = Db::name("node")->where('level','=',1)->field('id,name')->select();
+            $arr = Db::name("node")->field('id,fid,level,name')->select();
+            $list = get_node($arr);
             $this->success('获取角色信息成功',['info' => $info, 'list' => $list]);
         }
     }
