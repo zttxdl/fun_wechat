@@ -70,7 +70,7 @@ class Admin extends Base
                 $this->error('修改失败');
             }
         } else {
-            $info = Db::name("admin")->field('id,name,phone,role_id')->find($data['id']);
+            $info = Db::name("admin a")->join('role r','a.role_id = r.id')->field('a.id,a.name,a.phone,a.role_id,r.name as role_name')->where('a.id','=',$data['id'])->find();
             $list = Db::name("role")->field('id,name')->select();
             $this->success('获取管理员信息成功',['info' => $info, 'list' => $list]);
         }
