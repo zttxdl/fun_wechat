@@ -3,6 +3,7 @@
 namespace app\common\model;
 
 use think\Model;
+use think\Db;
 
 class Orders extends Model
 {
@@ -109,6 +110,66 @@ class Orders extends Model
     public function updateStatus($order_sn,$status)
     {
         return $this->where('orders_sn',$order_sn)->setField('status',$status);
+    }
+
+    /**
+     * 获取订单total_money
+     * @param $product_id
+     */
+    public function getTotalMoney($order,$detail)
+    {
+        $goods_total_money = 0.00;
+        foreach ($detail as $row)
+        {
+            $goods_total_money += Db::name('product')->where('id',$row['product_id'])->value('price');
+        }
+
+        $shop_price = Db::name('ShopInfo')->where('id',$order['shop_id'])->value('price_hike');
+        $shop_ping = Db::name('ShopInfo')->where('id',$order['shop_id'])->value('ping_fee');
+        //订单总价 = 商品总价 + 提价 + 配送费
+        $total_money = $goods_total_money + $shop_price + $shop_ping;
+
+        return $total_money;
+    }
+
+    /**
+     *获取平台优惠金额
+     */
+    public function getPlatformDisCountMoney($id)
+    {
+        $data = Db::name('platformCoupon')->where('id',$id)->value('face_value');
+        return isset($data) ? $data : 0.00;
+    }
+
+    /**
+     * 获取商家优惠金额
+     */
+    public function getShopDisCountMoney($id)
+    {
+        $data = Db::name('shopDiscounts')->where('id',$id)->value('face_value');
+        return isset($data) ? $data : 0.00;
+    }
+
+    /**
+     * 获取订单优惠金额
+     */
+    public function getDisMoney($shop_dis,$plat_dis)
+    {
+        if($shop_dis['id']) {
+            $shop_dis_money = $this->getShopDisCountMoney($shop_dis['id']);
+        }else{
+            $shop_dis_money = 0.00;
+        }
+
+        if($plat_dis['id']) {
+            $plat_dis_money = $this->getPlatformDisCountMoney($plat_dis['id']);
+        }else{
+            $plat_dis_money = 0.00;
+        }
+
+        $dis_money = $shop_dis_money + $plat_dis_money;
+        return $dis_money;
+
     }
 
 

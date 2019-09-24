@@ -457,82 +457,94 @@ class Order extends ApiBase
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
 
-       set_log('order=',$order,'sureOrder');
-       set_log('detail=',$detail,'sureOrder');
-       set_log('platform_discount=',$platform_discount,'sureOrder');
-       set_log('shop_discount=',$shop_discount,'sureOrder');
 
         $orders_sn = build_order_no('D');//生成唯一订单号
         $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
+        $total_money = $order['total_money'];//订单总价
+        $order_discount = $shop_discount['face_value'] + $platform_discount['face_value'];//订单优惠金额
+        $money = $order['money'];//订单结算金额
+
+
+        $total_money_cash = model('Orders')->getTotalMoney($order,$detail);//订单总价
+        $order_discount_cash = model('Orders')->getDisMoney($shop_discount,$platform_discount);//订单优惠
+
+        if($total_money_cash != $total_money) {
+            $this->error('订单总价不正确');
+        }
+
+        if(($total_money_cash - $order_discount_cash)  != $money) {
+            $this->error('订单结算金额不正确');
+        }
+
+        /*
+        $goods_total_money = 0.00;
+        foreach($detail as $row) {
+             $goods_total_money += $row['price']
+        }
+
+        if($goods_total_money + $order['box_money'] + $order['ping_fee']) {
+            $this->error('订单总价不正确');
+        }
+
+        if($money != ($total_money - $order_discount)) {
+            $this->error('订单结算金额不正确');
+        }
+        */
+
+        $orderData = [
+            'orders_sn' => $orders_sn,//订单
+            'user_id' => $this->auth->id,
+            'shop_id' => isset($order['shop_id']) ? $order['shop_id'] : 0,
+            'school_id' => $school_id,
+            'money' => isset($order['money']) ? (float)$order['money'] : 0.00,//实付金额
+            'total_money' => isset($order['total_money']) ? (float)$order['total_money'] : 0.00,//订单总价
+            'box_money' => isset($order['box_money']) ? (float)$order['box_money'] : 0.00,//订单参盒费
+            'ping_fee' => isset($order['ping_fee']) ? (float)$order['ping_fee'] : 0.00,//订单配送费
+            'pay_mode' => isset($order['pay_mode']) ? $order['pay_mode'] : 1,//支付方式
+            'address' => isset($order['address']) ? $order['address'] : '',//配送地址
+            'num' => isset($order['num']) ? $order['num'] : '',//商品总数
+            'message' => isset($order['remark']) ? $order['remark'] : '',//订单备注
+            'source' => 1,//订单来源
+            'add_time' => time(),//订单创建时间
+            //店铺优惠信息
+            'shop_discounts_id' => isset($shop_discount['id']) ? $shop_discount['id']: 0,
+            'shop_discounts_money' => isset($shop_discount['face_value']) ? $shop_discount['face_value'] : 0.00,
+            //平台优惠信息
+            'platform_coupon_id' => isset($platform_discount['id']) ? $platform_discount['id'] : 0 ,
+            'platform_coupon_money' => isset($platform_discount['face_value']) ? $platform_discount['face_value'] : 0.00,
+        ];
+        //添加日志
+        set_log('order=',$orderData,'sureOrder');
+        set_log('platform_discount=',$platform_discount,'sureOrder');
+        set_log('shop_discount=',$shop_discount,'sureOrder');
 
         //启动事务
         Db::startTrans();
         try{
-            $orderData = [
-                'orders_sn' => $orders_sn,//订单
-                'user_id' => $this->auth->id,
-                'shop_id' => isset($order['shop_id']) ? $order['shop_id'] : 0,
-                'school_id' => $school_id,
-                'money' => isset($order['money']) ? (float)$order['money'] : 0.00,//实付金额
-                'total_money' => isset($order['total_money']) ? (float)$order['total_money'] : 0.00,//订单总价
-                'box_money' => isset($order['box_money']) ? (float)$order['box_money'] : 0.00,//订单参盒费
-                'ping_fee' => isset($order['ping_fee']) ? (float)$order['ping_fee'] : 0.00,//订单配送费
-                'pay_mode' => isset($order['pay_mode']) ? $order['pay_mode'] : 1,//支付方式
-                'address' => isset($order['address']) ? $order['address'] : '',//配送地址
-                'num' => isset($order['num']) ? $order['num'] : '',//商品总数
-                'message' => isset($order['remark']) ? $order['remark'] : '',//订单备注
-                'source' => 1,//订单来源
-                'add_time' => time(),//订单创建时间
-                //店铺优惠信息
-                'shop_discounts_id' => isset($shop_discount['id']) ? $shop_discount['id']: 0,
-                'shop_discounts_money' => isset($shop_discount['face_value']) ? $shop_discount['face_value'] : 0.00,
-                //平台优惠信息
-                'platform_coupon_id' => isset($platform_discount['id']) ? $platform_discount['id'] : 0 ,
-                'platform_coupon_money' => isset($platform_discount['face_value']) ? $platform_discount['face_value'] : 0.00,
-            ];
-
-            $orders_id = model('Orders')->addOrder($orderData);
-
-            if(!$orders_id) {
-                throw new \Exception('订单添加失败');
-            }
 
             //更新红包状态
             if($orderData['platform_coupon_money'] > 0){
+
                 $data = [
                     'status' => $hongbao_status,
                     'order_sn' => $orders_sn,
                 ];
-                // Mike需调整
+
+                //红包使用状态判断
+                $coupon_status = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$platform_discount['id']]])->value('status');
+                if($coupon_status == 2) {
+                    throw new \Exception('红包已使用');
+                }
+
                 $my_coupon_id = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$platform_discount['id']]])->value('id');
+
                 $res = model('MyCoupon')->updateStatus($my_coupon_id,$data);
                 if(!$res) {
                     throw new \Exception('红包使用失败');
                 }
             }
 
-
-            $detailData = [];
-            $total_money = $order['total_money'];//订单总价
-            $money = $order['money'];//订单结算金额
-//            $order_discount = $orderData['shop_discounts_money'] + $orderData['platform_coupon_money'];//订单优惠金额
-            /*$product_total_money = '0.00';//商品总价和
-
-            foreach ($detail as $row) {
-                $product_total_money += $row['total_money'];
-            }
-
-            if($total_money != ($product_total_money + $orderData['box_money'] + $orderData['ping_fee'])) {
-                throw new \Exception('订单总价不正确');
-            }
-
-
-            /*if($money != ($total_money - $order_discount)) {
-                throw new \Exception('订单结算金额不正确');
-            }*/
-
-
-            //今日特价商品逻辑
+            //今日特价商品逻辑 start
             $id = model('TodayDeals')->getTodayProduct($orderData['shop_id']);
             if ($id){
                 $product  = array_column($detail,'product_id');
@@ -540,9 +552,15 @@ class Order extends ApiBase
                     model('TodayDeals')->updateTodayProductNum($orderData['shop_id'],'dec',$id);
                 }
             }
-
-
             //今日特价商品逻辑 end
+
+
+            $orders_id = model('Orders')->addOrder($orderData);
+
+            if(!$orders_id) {
+                throw new \Exception('订单添加失败');
+            }
+
 
             foreach ($detail as $row) {
 
@@ -584,6 +602,7 @@ class Order extends ApiBase
 
             }
 
+            set_log('detail=',$detailData,'sureOrder');
             //订单明细入库
             $res = model('Orders')->addOrderDetail($detailData);
 
