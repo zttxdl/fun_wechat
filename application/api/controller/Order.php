@@ -737,13 +737,9 @@ class Order extends ApiBase
 
             //获取商家提价
             $hike_arr = model('ShopInfo')->where('id','=',$order_info['shop_id'])->field('price_hike,hike_type')->find();
-            if ($hike_arr['hike_type'] == 1) {
-                $price = floatval(sprintf("%.2f",$product_info['price'] + $hike_arr['price_hike']));
-                $old_price = floatval(sprintf("%.2f",$product_info['old_price'] + $hike_arr['price_hike']));
-            } else {
-                $price = floatval(sprintf("%.2f",$product_info['price'] * (1 + $hike_arr['price_hike'] * 0.01)));
-                $old_price = floatval(sprintf("%.2f",$product_info['old_price'] * (1 + $hike_arr['price_hike'] * 0.01)));
-            }
+
+            list($price,$old_price) = model('Shop')->getShopProductHikePrice($hike_arr,$product_info['price'],$product_info['old_price']);
+
             $result[] = [
                 'orders_id' => $row['orders_id'],
                 'product_id' => $product_info['id'],
