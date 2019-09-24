@@ -119,15 +119,47 @@ class Orders extends Model
     public function getTotalMoney($order,$detail)
     {
         $goods_total_money = 0.00;
-        foreach ($detail as $row)
-        {
-            $goods_total_money += Db::name('product')->where('id',$row['product_id'])->value('price');
-        }
+        $goods_money = 0.00;
+        //获取商家提价
+        $shop_info = model('ShopInfo')->where('id','=',$order['shop_id'])->field('price_hike,hike_type,ping_fee')->find();
 
-        $shop_price = Db::name('ShopInfo')->where('id',$order['shop_id'])->value('price_hike');
-        $shop_ping = Db::name('ShopInfo')->where('id',$order['shop_id'])->value('ping_fee');
-        //订单总价 = 商品总价 + 提价 + 配送费
-        $total_money = $goods_total_money + $shop_price + $shop_ping;
+        //今日特价
+        $today_id = model('TodayDeals')->getTodayProduct($order['shop_id']);
+
+        foreach ($detail as $item)
+        {
+            $price = Db::name('product')->where('id',$item['product_id'])->value('price');
+            $old_price = Db::name('product')->where('id',$item['product_id'])->value('old_price');
+            if ($shop_info['hike_type'] == 1) {
+                $price = floatval(sprintf("%.2f",$shop_info['price_hike'] + $price));
+                $old_price = floatval(sprintf("%.2f",$shop_info['price_hike'] + $old_price));
+            } else {
+                $price = floatval(sprintf("%.2f",$price * (1 + $shop_info['price_hike'] * 0.01)));
+                $old_price = floatval(sprintf("%.2f",$old_price * (1 + $shop_info['price_hike'] * 0.01)));
+            }
+
+            //今日特价第二件按原价算
+            if($today_id && $item['num'] > 1) {
+                $goods_money = $price + ($old_price * ($item['num'] - 1));
+            }else{
+                $goods_money = $price * $item['num'];
+            }
+
+            $product_info = model('Product')->getProductById($item['product_id'])->toArray();
+
+            //优惠商品第二件按原价算
+            if($product_info['type'] == 3 && $item['num'] > 1) {
+                $goods_money = $price + ($old_price * ($item['num'] - 1));//优惠商品第二件按原价算
+            }else{
+                $goods_money = $price * $item['num'];
+            }
+
+            $goods_total_money += $goods_money;
+
+
+        }
+        //订单总价 = 商品总价 + 配送费
+        $total_money = $goods_total_money + $shop_info['ping_fee'];
 
         return $total_money;
     }
