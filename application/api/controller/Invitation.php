@@ -12,7 +12,7 @@ use app\common\controller\ApiBase;
 
 class Invitation extends ApiBase
 {
-    protected $noNeedLogin = ['*'];
+    protected $noNeedLogin = [];
     // 邀请有奖
     public function index()
     {
