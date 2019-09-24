@@ -468,6 +468,8 @@ class Order extends ApiBase
         $total_money_cash = model('Orders')->getTotalMoney($order,$detail);//订单总价
         $order_discount_cash = model('Orders')->getDisMoney($shop_discount,$platform_discount);//订单优惠
 
+        return $total_money_cash;
+
         if($total_money_cash != $total_money) {
             $this->error('订单总价不正确');
         }
@@ -567,16 +569,6 @@ class Order extends ApiBase
                 //商品均摊金额和商品原价初始化
                 $product_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
                 $old_money = isset($row['total_money']) ? $row['total_money'] : '0.00';
-
-                $product_info = model('Product')->getProductById($row['product_id'])->toArray();
-                //dump($product_info);
-
-                //优惠商品计算逻辑
-                if($product_info['type'] == 2 && $row['num'] > 1) {
-                    $product_money = $product_info['total_money'] + ($product_info['old_price'] * ($row['num'] - 1));//优惠商品第二件按原价算
-                    $old_money = $product_info['old_price'] * $row['num'];//商品原价
-                }
-
 
                 //如果订单包含 商家或者店铺优惠均摊到 商品结算金额计算逻辑
                 if($orderData['shop_discounts_id'] || $orderData['platform_coupon_id']){
