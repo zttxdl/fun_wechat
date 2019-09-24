@@ -373,6 +373,14 @@ class FinanceManange extends Base
             $this->success('账户获取成功',$res);
         }
     }
+
+    /**
+     * 财务流水
+     */
+    public  function financeFlow()
+    {
+        
+    }
 }
 	
  ?>
