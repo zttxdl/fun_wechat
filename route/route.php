@@ -180,7 +180,31 @@ Route::group('financeManange', function () {
     Route::rule('/getCardInfo', 'getCardInfo');//获取银行账户信息
 })->prefix('admin/financeManange/')->middleware('IsLogin');
 
+// 权限管理--管理员模块
+Route::group('a-admin', function () {
+    Route::get('/index', 'index');
+    Route::rule('/insert','insert','GET|POST');
+    Route::rule('/update','update','GET|POST');
+    Route::get('/delete', 'delete');
+    Route::post('/set-password', 'setPassword');
+})->prefix('admin/admin/')->middleware('IsLogin');
 
+// 权限管理--角色模块
+Route::group('a-role', function () {
+    Route::get('/index', 'index');
+    Route::rule('/insert','insert','GET|POST');
+    Route::rule('/update','update','GET|POST');
+    Route::get('/delete', 'delete');
+})->prefix('admin/role/')->middleware('IsLogin');
+
+// 权限管理--菜单模块
+Route::group('a-node', function () {
+    Route::get('/index', 'index');
+    Route::rule('/insert','insert','GET|POST');
+    Route::rule('/update','update','GET|POST');
+    Route::get('/delete', 'delete');
+    Route::post('/sort-update', 'sortUpdate');
+})->prefix('admin/node/')->middleware('IsLogin');
 
 
 /*************** 商家端 *********************************************************************************************/
