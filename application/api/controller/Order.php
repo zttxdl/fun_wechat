@@ -456,6 +456,10 @@ class Order extends ApiBase
         $shop_discount = $request->param('shop_discount');//店铺活动
         $hongbao_status = 2;//红包已经使用
 
+        set_log('order=',$order,'sureOrder');
+        set_log('platform_discount=',$platform_discount,'sureOrder');
+        set_log('shop_discount=',$shop_discount,'sureOrder');
+
 
         $orders_sn = build_order_no('D');//生成唯一订单号
         $school_id = Db::name('shop_info')->where('id',$order['shop_id'])->value('school_id');
@@ -515,9 +519,7 @@ class Order extends ApiBase
             'platform_coupon_money' => isset($platform_discount['face_value']) ? $platform_discount['face_value'] : 0.00,
         ];
         //添加日志
-        set_log('order=',$orderData,'sureOrder');
-        set_log('platform_discount=',$platform_discount,'sureOrder');
-        set_log('shop_discount=',$shop_discount,'sureOrder');
+        set_log('orderData=',$orderData,'sureOrder');
 
         //启动事务
         Db::startTrans();
@@ -593,7 +595,7 @@ class Order extends ApiBase
 
             }
 
-            set_log('detail=',$detailData,'sureOrder');
+            set_log('detailData=',$detailData,'sureOrder');
             //订单明细入库
             $res = model('Orders')->addOrderDetail($detailData);
 
