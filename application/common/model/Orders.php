@@ -163,7 +163,7 @@ class Orders extends Model
             $goods_total_money += $goods_money;
         }
         //订单总价 = 商品总价 + 配送费
-        $total_money = $goods_total_money + $shop_info['ping_fee'];
+        $total_money = sprintf("%.2f",$goods_total_money + $shop_info['ping_fee']);
 
         return $total_money;
     }
