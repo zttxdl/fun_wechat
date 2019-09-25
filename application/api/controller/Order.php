@@ -457,6 +457,7 @@ class Order extends ApiBase
         $hongbao_status = 2;//红包已经使用
 
         set_log('order=',$order,'sureOrder');
+        set_log('detail=',$detail,'sureOrder');
         set_log('platform_discount=',$platform_discount,'sureOrder');
         set_log('shop_discount=',$shop_discount,'sureOrder');
 
