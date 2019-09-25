@@ -46,7 +46,8 @@ class Admin extends Base
             }
         } else {
             $list = Db::name("role")->field('id,name')->select();
-            $this->success('获取角色列表',['list'=>$list]);
+            $school_list = model('School')->where('level','=',2)->field('id,name')->select();
+            $this->success('获取角色列表',['list'=>$list,'school_list'=>$school_list]);
         }
     }
 
@@ -72,7 +73,8 @@ class Admin extends Base
         } else {
             $info = Db::name("admin a")->join('role r','a.role_id = r.id')->field('a.id,a.name,a.phone,a.role_id,r.name as role_name')->where('a.id','=',$data['id'])->find();
             $list = Db::name("role")->field('id,name')->select();
-            $this->success('获取管理员信息成功',['info' => $info, 'list' => $list]);
+            $school_list = model('School')->where('level','=',2)->field('id,name')->select();
+            $this->success('获取管理员信息成功',['info' => $info, 'list' => $list,'school_list'=>$school_list]);
         }
     }
 
@@ -102,12 +104,17 @@ class Admin extends Base
     {
         $data = $request->param();
         $id = $request->param('id');
-        $password = $request->param('password');
+
         $check = $this->validate($data, 'Admin.pwd');
         if ($check !== true) {
             $this->error($check,201);
         }
-        if (Db::name("admin")->where('id','=',$id)->setField('password',md5($password)) !== false) {
+        $old_pwd = Db::name('admin')->where('id','=',$id)->value('password');
+        if ($old_pwd != md5($data['old_password'])) {
+            $this->error('原密码错误');
+        }
+
+        if (Db::name("admin")->where('id','=',$id)->setField('password',md5($data['password'])) !== false) {
             $this->success('修改成功');
         } else {
             $this->error('修改失败');            
