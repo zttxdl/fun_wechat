@@ -472,8 +472,6 @@ class Order extends ApiBase
         $total_money_cash = model('Orders')->getTotalMoney($order,$detail);//订单总价
         $order_discount_cash = model('Orders')->getDisMoney($shop_discount,$platform_discount);//订单优惠
 
-        return $total_money_cash;
-
         if($total_money_cash != $total_money) {
             $this->error('订单总价不正确');
         }
