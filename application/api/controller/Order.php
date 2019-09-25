@@ -93,7 +93,6 @@ class Order extends ApiBase
                 'name' => model('Product')->getNameById($row['product_id']),
                 'product_id' => $row['product_id'],
                 'shop_tel' => $row['link_tel'],
-                'is_refund' => $is_refund,
             ];
 
             if(in_array($row['status'],[5,6,7,8])) {//骑手取货、配货、已送达、已完成显示配送信息

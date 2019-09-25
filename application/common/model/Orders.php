@@ -131,7 +131,7 @@ class Orders extends Model
         {
             $product_info = Db::name('product')->field('price,old_price,type,box_money')->where('id',$item['product_id'])->find();
             //今日特价第二件按原价算
-            $today_data = model('TodayDeals')->getTodayProductPrice($order['shop_id'],$order['shop_id']);
+            $today_data = model('TodayDeals')->getTodayProductPrice($order['shop_id'],$item['product_id']);
 
             list($price,$old_price) = model('Shop')->getShopProductHikePrice($shop_info,$product_info['price'],$product_info['old_price']);
 
