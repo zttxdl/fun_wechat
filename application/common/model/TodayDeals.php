@@ -47,13 +47,14 @@ class TodayDeals extends Model
     /**
      * 获取今日特价
      */
-    public function  getTodayProductPrice($shop_id)
+    public function  getTodayProductPrice($shop_id,$product_id)
     {
         $today = date('Y-m-d',time());
         $where[] = ['today','=',$today];
         $where[] = ['shop_id','=',$shop_id];
         $where[] = ['end_time','>=',time()];
         $where[] = ['start_time','<=',time()];
+        $where[] = ['product_id','=',$product_id];
         $data = $this->where($where)->field('price,old_price')->find();
 
         return $data;
