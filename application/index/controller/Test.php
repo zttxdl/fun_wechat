@@ -456,12 +456,21 @@ class Test extends Controller
 //        phpinfo();exit;
 //        $ret = Cache::store('redis')->get('list');
 //        dump($ret);
-        $withdraw_cycle = Db::name('shop_info')->where('id',49)->value('withdraw_cycle');
-        dump($withdraw_cycle);exit;
-        $shop_id = 49;
-        return model('Shop')->getDayCancelNum($shop_id);
-        return model('Shop')->getDayNum($shop_id);
-        return true;
+        $data = [
+            [
+                'pid' => 320,
+                'price' => 1.00,
+            ],
+            [
+                'pid' => 320,
+                'price' => 2.00,
+            ],
+        ];
+        $data = array_column($data,'pid');
+
+        $_data = array_count_values($data);
+        dump($_data['320']);
+
     }
 
     /**

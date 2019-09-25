@@ -82,20 +82,13 @@ Route::group('admin',function (){
     Route::rule('register','admin/Login/register');//用户注册
     Route::rule('verify','admin/Login/verify');//验证码
     Route::rule('clearCache','admin/Login/clear_all');//缓存清理
+    Route::rule('login-auth','admin/Login/loginAuth');//用户登录
 });
-
-//权限模块
-Route::group('admin',function (){
-    Route::rule('index','admin/Admin/index');//后台用户列表
-    Route::rule('add','admin/Admin/add');//后台用户新增
-    Route::rule('edit','admin/Admin/update');//后台用户新增
-})->middleware('IsLogin');
-
 
 
 // 首页模块
-Route::group('admin',function (){
-    Route::rule('indexInfo','admin/Index/getUserList');
+Route::group('a-index',function (){
+    Route::get('index','admin/Index/index');
 });
 
 
@@ -186,20 +179,25 @@ Route::group('a-admin', function () {
     Route::rule('/insert','insert','GET|POST');
     Route::rule('/update','update','GET|POST');
     Route::get('/delete', 'delete');
+    Route::post('/set-password', 'setPassword');
 })->prefix('admin/admin/')->middleware('IsLogin');
 
 // 权限管理--角色模块
 Route::group('a-role', function () {
-    
+    Route::get('/index', 'index');
+    Route::rule('/insert','insert','GET|POST');
+    Route::rule('/update','update','GET|POST');
+    Route::get('/delete', 'delete');
 })->prefix('admin/role/')->middleware('IsLogin');
 
 // 权限管理--菜单模块
 Route::group('a-node', function () {
-    
+    Route::get('/index', 'index');
+    Route::rule('/insert','insert','GET|POST');
+    Route::rule('/update','update','GET|POST');
+    Route::get('/delete', 'delete');
+    Route::post('/sort-update', 'sortUpdate');
 })->prefix('admin/node/')->middleware('IsLogin');
-
-
-
 
 
 /*************** 商家端 *********************************************************************************************/

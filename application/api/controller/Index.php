@@ -123,13 +123,14 @@ class Index extends ApiBase
         if ($today_sale){
             foreach ($today_sale as $item) {
                 $item->res_time = $item->end_time - time();
-                if ($item->hike_type == 1) {
+                list($item->price,$item->old_price) = model('Shop')->getShopProductHikePrice(['hike_type'=>$item->hike_type,'price_hike'=>$item->price_hike],$item->price,$item->old_price);
+                /*if ($item->hike_type == 1) {
                     $item->old_price =floatval(sprintf("%.2f",$item->old_price + $item->price_hike));
                     $item->price = floatval(sprintf("%.2f",$item->price + $item->price_hike));
                 } else {
                     $item->old_price =floatval(sprintf("%.2f",$item->old_price * (1 + $item->price_hike * 0.01)));
                     $item->price = floatval(sprintf("%.2f",$item->price  * (1 + $item->price_hike * 0.01)));
-                }
+                }*/
             }
 
         }
@@ -323,13 +324,14 @@ class Index extends ApiBase
         if ($today_sale){
             foreach ($today_sale as $item) {
                 $item->res_time = $item->end_time - time();
-                if ($item->hike_type == 1) {
+                list($item->price,$item->old_price) = model('Shop')->getShopProductHikePrice(['hike_type'=>$item->hike_type,'price_hike'=>$item->price_hike],$item->price,$item->old_price);
+                /*if ($item->hike_type == 1) {
                     $item->old_price =floatval(sprintf("%.2f",$item->old_price + $item->price_hike));
                     $item->price = floatval(sprintf("%.2f",$item->price + $item->price_hike));
                 } else {
                     $item->old_price =floatval(sprintf("%.2f",$item->old_price * (1 + $item->price_hike * 0.01)));
                     $item->price = floatval(sprintf("%.2f",$item->price  * (1 + $item->price_hike * 0.01)));
-                }
+                }*/
             }
         }
         $this->success('success',$today_sale);

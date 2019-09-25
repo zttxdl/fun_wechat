@@ -116,4 +116,35 @@ class Login extends Base
         }
     }
 
+
+    /**
+     * 权限下的登录 【测试通过后，将替换原来的登录】
+     * 
+     */
+    public function loginAuth(Request $request)
+    {
+        $phone = $request->param('phone');
+        $pwd = $request->param('pwd');
+        $code = $request->param('code');
+
+        if (!captcha_check($code)) {
+            $this->error('验证码错误');
+        }
+       
+        $where = [['phone','=',$phone],['password','=',md5($pwd)]];
+        $user = model('admin')->where($where)->field('id,name,phone,role_id,last_login_time,school_ids')->find();
+        
+        if ($user) {
+            session('admin_user',$user);
+            model('admin')->where('phone',$phone)->setField('last_login_time',time());    //记录登录时间
+            
+            $this->success('登录成功');
+        }
+        
+        $this->error('账号或密码不正确');
+
+
+    }
+     
+
 }

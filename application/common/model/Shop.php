@@ -476,5 +476,22 @@ class Shop extends Model
     }
 
 
+    /**
+     * 获取商家商品提价
+     */
+    public function getShopProductHikePrice($shop_info,$price,$old_price)
+    {
+        if ($shop_info['hike_type'] == 1) {
+            $price = floatval(sprintf("%.2f",$shop_info['price_hike'] + $price));
+            $old_price = floatval(sprintf("%.2f",$shop_info['price_hike'] + $old_price));
+        } else {
+            $price = floatval(sprintf("%.2f",$price * (1 + $shop_info['price_hike'] * 0.01)));
+            $old_price = floatval(sprintf("%.2f",$old_price * (1 + $shop_info['price_hike'] * 0.01)));
+        }
+
+        return [$price,$old_price];
+    }
+
+
 
 }
