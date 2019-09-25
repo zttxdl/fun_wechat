@@ -132,10 +132,10 @@ class Login extends Base
         }
        
         $where = [['phone','=',$phone],['password','=',md5($pwd)]];
-        $user = model('admin')->where($where)->field('id,name,phone,role_id,last_login_time')->find();
+        $user = model('admin')->where($where)->field('id,name,phone,role_id,last_login_time,school_ids')->find();
         
         if ($user) {
-            session('admin_account',$user);
+            session('admin_user',$user);
             model('admin')->where('phone',$phone)->setField('last_login_time',time());    //记录登录时间
             
             $this->success('登录成功');
