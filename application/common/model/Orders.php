@@ -123,12 +123,15 @@ class Orders extends Model
 
         //获取商家提价
         $shop_info = model('ShopInfo')->where('id','=',$order['shop_id'])->field('price_hike,hike_type,ping_fee')->find();
-        //今日特价第二件按原价算
-        $today_data = model('TodayDeals')->getTodayProductPrice($order['shop_id']);
+
+
+
 
         foreach ($detail as $item)
         {
             $product_info = Db::name('product')->field('price,old_price,type,box_money')->where('id',$item['product_id'])->find();
+            //今日特价第二件按原价算
+            $today_data = model('TodayDeals')->getTodayProductPrice($order['shop_id'],$order['shop_id']);
 
             list($price,$old_price) = model('Shop')->getShopProductHikePrice($shop_info,$product_info['price'],$product_info['old_price']);
 
@@ -141,7 +144,6 @@ class Orders extends Model
                     $goods_money = $old_price * $item['num'] + ($product_info['box_money'] * $item['num']);
                 }
             }else{
-
                 //优惠商品第二件按原价算
                 if($product_info['type'] == 3 && $item['num'] > 1) {
                     $goods_money = $price + ($old_price * ($item['num'] - 1)) + ($product_info['box_money'] * $item['num']);//优惠商品第二件按原价算
