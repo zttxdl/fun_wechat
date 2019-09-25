@@ -121,20 +121,18 @@ class Orders extends Model
         $goods_total_money = 0.00;
         $goods_money = 0.00;
 
-        //今日特价
-        $today_data = model('TodayDeals')->getTodayProductPrice($order['shop_id']);
-
         //获取商家提价
-        $shop_info = model('ShopInfo')->where('id','=',$order['shop_id'])->field('price_hike,hike_type')->find();
+        $shop_info = model('ShopInfo')->where('id','=',$order['shop_id'])->field('price_hike,hike_type,ping_fee')->find();
+        //今日特价第二件按原价算
+        $today_data = model('TodayDeals')->getTodayProductPrice($order['shop_id']);
 
         foreach ($detail as $item)
         {
-            $price = Db::name('product')->where('id',$item['product_id'])->value('price');
-            $old_price = Db::name('product')->where('id',$item['product_id'])->value('old_price');
+            $product_info = Db::name('product')->field('price,old_price,type')->where('id',$item['product_id'])->find();
 
-            list($price,$old_price) = model('Shop')->getShopProductHikePrice($shop_info,$price,$old_price);
+            list($price,$old_price) = model('Shop')->getShopProductHikePrice($shop_info,$product_info['price'],$product_info['old_price']);
 
-            //今日特价第二件按原价算
+
             if($today_data) {
                 list($price,$old_price) = model('Shop')->getShopProductHikePrice($shop_info,$today_data['price'],$today_data['price']);
                 if($item['num'] > 1) {
@@ -142,24 +140,20 @@ class Orders extends Model
                 }else{
                     $goods_money = $old_price * $item['num'];
                 }
-            }
-
-            $product_info = model('Product')->getProductById($item['product_id'])->toArray();
-
-            //优惠商品第二件按原价算
-            if($product_info['type'] == 3 && $item['num'] > 1) {
-                $goods_money = $price + ($old_price * ($item['num'] - 1));//优惠商品第二件按原价算
             }else{
-                $goods_money = $price * $item['num'];
+
+                //优惠商品第二件按原价算
+                if($product_info['type'] == 3 && $item['num'] > 1) {
+                    $goods_money = $price + ($old_price * ($item['num'] - 1));//优惠商品第二件按原价算
+                }else{
+                    $goods_money = $price * $item['num'];
+                }
             }
 
             $goods_total_money += $goods_money;
-
-
         }
         //订单总价 = 商品总价 + 配送费
-        $ping_fee = model('ShopInfo')->where('id',$order['shop_id'])->value('ping_fee');
-        $total_money = $goods_total_money + $ping_fee;
+        $total_money = $goods_total_money + $shop_info['ping_fee'];
 
         return $total_money;
     }
