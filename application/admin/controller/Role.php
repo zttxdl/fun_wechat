@@ -87,9 +87,8 @@ class Role extends Base
         if ($count) {
             $this->error('该角色下有管理员，暂不可以删除'); 
         }
-        $res = Db::name("admin")->where(['id'=>$id])->fetchSql()->delete();
-        if (Db::name("admin")->where('id','=',$id)->delete()) {
-            $this->success('删除成功',['res'=>$res]);
+        if (Db::name("role")->where('id','=',$id)->delete()) {
+            $this->success('删除成功');
         } else {
             $this->error('删除失败');            
         } 
