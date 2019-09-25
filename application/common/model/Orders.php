@@ -128,7 +128,7 @@ class Orders extends Model
 
         foreach ($detail as $item)
         {
-            $product_info = Db::name('product')->field('price,old_price,type')->where('id',$item['product_id'])->find();
+            $product_info = Db::name('product')->field('price,old_price,type,box_money')->where('id',$item['product_id'])->find();
 
             list($price,$old_price) = model('Shop')->getShopProductHikePrice($shop_info,$product_info['price'],$product_info['old_price']);
 
@@ -136,17 +136,17 @@ class Orders extends Model
             if($today_data) {
                 list($price,$old_price) = model('Shop')->getShopProductHikePrice($shop_info,$today_data['price'],$today_data['price']);
                 if($item['num'] > 1) {
-                    $goods_money = $price + ($today_data['old_price'] * ($item['num'] - 1));
+                    $goods_money = $price + ($today_data['old_price'] * ($item['num'] - 1)) + ($product_info['box_money'] * $item['num']);
                 }else{
-                    $goods_money = $old_price * $item['num'];
+                    $goods_money = $old_price * $item['num'] + ($product_info['box_money'] * $item['num']);
                 }
             }else{
 
                 //优惠商品第二件按原价算
                 if($product_info['type'] == 3 && $item['num'] > 1) {
-                    $goods_money = $price + ($old_price * ($item['num'] - 1));//优惠商品第二件按原价算
+                    $goods_money = $price + ($old_price * ($item['num'] - 1)) + ($product_info['box_money'] * $item['num']);//优惠商品第二件按原价算
                 }else{
-                    $goods_money = $price * $item['num'];
+                    $goods_money = $price * $item['num'] + ($product_info['box_money'] * $item['num']);
                 }
             }
 
