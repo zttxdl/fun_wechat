@@ -245,6 +245,7 @@ Route::group('merchants',function (){
     Route::rule('updatePwd','merchants/Shop/updatePwd');//忘记密码
     Route::rule('loginOut','merchants/Shop/loginOut');//退出
     Route::rule('ShopInfo','merchants/Shop/ShopInfo');//关于我们
+    Route::get('autoReceive', 'merchants/Shop/autoReceive'); // 设置自动接单状态
     //评价
     Route::rule('getEvaluation','merchants/Merchants/getEvaluation');
 });
