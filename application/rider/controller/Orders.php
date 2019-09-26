@@ -114,6 +114,12 @@ class Orders extends RiderBase
                 }
             }
 
+            //已完成订单 送达时间超过两小时不展示用户联系方式
+            if($item->status == 6 && (time() - $item->accomplish_time) > 7200) {
+                $item->user_address->name = '';
+                $item->user_address->phone = '';
+            }
+
             $item->expected_time = date('H:i',$item->expected_time);
 
         }
@@ -339,7 +345,13 @@ class Orders extends RiderBase
                 }else{
                     $data->u_distance = $u_distance.'m';
                 }
-            }
+        }
+
+        //已完成订单 送达时间超过两小时不展示用户联系方式
+        if($data->status == 6 && (time() - $data->accomplish_time) > 7200) {
+            $data->user_address->name = '';
+            $data->user_address->phone = '';
+        }
 
         if (in_array($data->status,[3,4,5])){
             $data->rest_time = round(($data->expected_time - time()) / 60) ;
