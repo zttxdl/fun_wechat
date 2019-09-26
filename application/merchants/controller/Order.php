@@ -82,9 +82,10 @@ class Order extends MerchantsBase
         }
 
 
-
+        $auto_receive = Db::name('shop_info')->where('id','=',$this->shop_id)->value('auto_receive');
 
         $result['list'] = $data;
+        $result['auto_receive'] = $auto_receive;
         $result['count'] = $orders['total'];
         $result['page'] = $orders['current_page'];
         $result['pageSize'] = $orders['per_page'];
@@ -290,17 +291,12 @@ class Order extends MerchantsBase
                 'shop_id' => $order_info['shop_id'],
                 'ping_fee' => $order_info['ping_fee'],//配送费
                 'meal_sn' => getMealSn('shop_id:'.$order_info['shop_id']),//取餐号
-                'school_id' => Model('Shop')->getSchoolIdByID($order_info['shop_id']),
+                'school_id' => $shop_info['school_id'],
                 'create_time' => time(),//商家接单时间
                 'expected_time' => time()+30*60,//预计送达时间
                 'user_address' => $order_info['address'],//收货地址
                 'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
             ];
-
-            $ret = Db::name('orders')->where('id',$order_info['id'])->setField('meal_sn',$takeout_info['meal_sn']);//更新主表取餐号
-            if (!$ret){
-                throw new Exception('主表取餐号更新失败');
-            }
 
             //外卖数据入库
             $ret = Db::name('takeout')->insert($takeout_info);
@@ -309,7 +305,7 @@ class Order extends MerchantsBase
                 throw new Exception('接单失败');
             }
 
-            $result = model('Orders')->where('orders_sn',$orders_sn)->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time()]);
+            $result = model('Orders')->where('id',$order_info['id'])->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time(),'meal_sn'=>$takeout_info['meal_sn']]);
             if (!$result){
                 throw new Exception('接单失败');
             }
@@ -323,17 +319,16 @@ class Order extends MerchantsBase
 
         //实例化socket
         $socket = model('PushEvent','service');
-        $school_id = model('ShopInfo')->where('id',$this->shop_id)->value('school_id');
 
         // 已成为骑手的情况
         $map1 = [
-            ['school_id', '=', $school_id],
+            ['school_id', '=', $shop_info['school_id']],
             ['open_status', '=', 1],
             ['status', '=', 3]
         ];
         // 暂未成为骑手的情况
         $map2 = [
-            ['school_id', '=', $school_id],
+            ['school_id', '=', $shop_info['school_id']],
             ['status', 'in', [0,1,2]]
         ];  
 
