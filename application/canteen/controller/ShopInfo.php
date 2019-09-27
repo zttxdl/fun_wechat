@@ -222,11 +222,11 @@ class ShopInfo extends Base
         // 搜索条件
         if($key_word)  $map[] = ['a.orders_sn','like',$key_word.'%'];
         if($trade_type == 1){
-            $map[] = ['a.status','=',8];
+            $map[] = ['a.status','in',[7,8]];
         }elseif($trade_type == 2) {
             $map[] = ['a.status','=',11];
         }else{
-            $map[] = ['a.status','in',[8,11]];
+            $map[] = ['a.status','in',[7,8,11]];
         }
 
         if($shop_id) {
