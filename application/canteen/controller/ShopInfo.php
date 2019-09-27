@@ -242,6 +242,7 @@ class ShopInfo extends Base
                     ->join('shopInfo b','a.shop_id = b.id')
                     ->field('a.id,a.orders_sn,a.status,a.money,b.shop_name,a.pay_mode,a.pay_time')
                     ->where($map)
+                    ->order('id','desc')
                     ->paginate($page_size)
                     ->toArray();
         // if(empty($result['data']['data']) && !isset($result['data']['data'])) {
