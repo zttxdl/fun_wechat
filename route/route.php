@@ -200,6 +200,12 @@ Route::group('a-node', function () {
 })->prefix('admin/node/')->middleware('IsLogin');
 
 
+// 看台
+Route::group('a-stand', function () {
+    Route::get('/investor', 'investorIndex'); // 合伙人看台
+    Route::get('/boss','BossIndex');    // 老板看台
+})->prefix('admin/Stand/')->middleware('IsLogin');
+
 /*************** 商家端 *********************************************************************************************/
 //商家登录注册用户组
 Route::group('merchants',function (){

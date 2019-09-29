@@ -19,8 +19,23 @@ class Stand extends Base
             $this->error('非法请求');
         }
 
+        
+
+
         $this->success('这就是合伙人看台的初始页面了');
 
     }
+
+
+    /**
+     * 老板看台 
+     * 
+     */
+    public function BossIndex()
+    {
+        $this->success('这就是老板看台的初始页面了');
+
+    }
+
      
 }
