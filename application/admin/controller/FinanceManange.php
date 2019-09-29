@@ -375,11 +375,176 @@ class FinanceManange extends Base
     }
 
     /**
-     * 财务流水
+     * 用户端财务流水
      */
-    public  function financeFlow()
+    public  function userFinanceFlow(Request $request)
     {
-        
+        $key_word = $request->param('keyword');
+        $trade_type = $request->param('tradeType','');//1:支付 2:退款
+        $page = $request->param('page');
+        $page_size = $request->param('pageSize');
+
+
+        // 搜索条件
+        if($key_word)  $where[] = ['orders_sn','like',$key_word.'%'];
+
+        $where[] = ['status','in',[7,8,11]];
+
+        if($trade_type == 1){
+            $where[] = ['status','in',[7,8]];
+        }
+        if($trade_type == 2){
+            $where[] = ['status','=',11];
+        }
+
+
+        $data = Db::name('Orders')->field('id,orders_sn,status,money,add_time,user_id')->where($where)->order('add_time DESC')->paginate($page_size)->toArray();
+
+//        dump($data);exit;
+
+        foreach ($data['data'] as &$row){
+            $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
+            $row['trade_type'] = in_array($row['status'],[7,8]) ? '支付' : '退款';
+            $row['trade_way'] = '微信支付';
+            $row['trade_status'] = '交易成功';
+        }
+        $this->success('获取成功',$data);
+
+
+    }
+
+    /**
+     * 骑手端财务流水
+     */
+    public  function riderFinanceFlow(Request $request)
+    {
+        $key_word = $request->param('keyword');
+        $trade_type = $request->param('tradeType','');//1:提现
+        $page = $request->param('page');
+        $page_size = $request->param('pageSize');
+
+        // 搜索条件
+        if($key_word)  $where[] = ['serial_number','like',$key_word.'%'];
+        if($trade_type)  $where[] = ['type','=',2];
+
+        $where[] = ['type','=',2];
+
+        $data = Db::name('rider_income_expend')->field('id,serial_number,current_money,add_time,rider_id,status')->where($where)->order('add_time DESC')->paginate($page_size)->toArray();
+
+        foreach ($data['data'] as &$row)
+        {
+            $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
+            $row['trade_type'] = '提现';
+            $row['trade_way'] = '微信支付';
+            $row['trade_status'] = $this->status[$row['status']];
+        }
+
+        $this->success('获取成功',$data);
+
+
+    }
+
+    /**
+     * 商家端财务流水
+     */
+    public  function shopFinanceFlow(Request $request)
+    {
+        $key_word = $request->param('keyword');
+        $trade_type = $request->param('tradeType','');//1:提现
+        $page = $request->param('page');
+        $page_size = $request->param('pageSize');
+
+        // 搜索条件
+        if($key_word)  $where[] = ['withdraw_sn','like',$key_word.'%'];
+        if($trade_type)  $where[] = ['type','=',2];
+
+        $where[] = ['type','=',2];
+
+        $data = Db::name('withdraw')->field('id,withdraw_sn,money,add_time,shop_id,status')->where($where)->order('add_time DESC')->paginate($page_size)->toArray();
+
+        foreach ($data['data'] as &$row)
+        {
+            $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
+            $row['trade_type'] = '提现';
+            $row['trade_way'] = '银行卡';
+            $row['trade_status'] = $this->status[$row['status']];
+        }
+
+        $this->success('获取成功',$data);
+    }
+
+    /**
+     * 流水详情
+     */
+    public function flowDetails(Request $request)
+    {
+        $id = $request->param('id');
+        $source = $request->param('source');//1:用户端 2:骑手端 3:商家端
+
+        if(empty($source)) {
+            $this->error('来源不能为空');
+        }
+
+        if(empty($id)) {
+            $this->error('ID不能为空');
+        }
+
+        //用户端
+        switch ($source) {
+            case 1 :
+                $data = Db::name('Orders')->where('id',$id)
+                    ->field('orders_sn,status,add_time,money,user_id,total_money,ping_fee,box_money,platform_choucheng,shitang_choucheng,hongbao_choucheng,shop_discounts_money')
+//            ->alias('a')
+//            ->leftJoin('user b','a.user_id = b.id')
+                    ->find();
+                $data['trade_type'] = in_array($data['status'],[7,8]) ? '支付' : '退款';
+                $data['trade_way'] = '支付成功';
+                $data['trade_status'] = '交易成功';
+                $data['user_type'] = '普通会员';
+                $shop_money = Db::name('withdraw')->where([['withdraw_sn','=',$data['orders_sn']],['type','=','1']])->value('money');
+                $data['shop_money'] = isset($shop_money) ? $shop_money : '0.00';
+                $this->success('获取成功',$data);
+                break;
+
+            case 2 :
+                $data = Db::name('rider_income_expend')->field('serial_number,add_time,current_money,status,rider_id')->where('id',$id)->find();
+                $data['add_time'] = date('Y-m-d H:i:s',$data['add_time']);
+                $data['trade_type'] = '提现';
+                $data['trade_way'] = '微信支付';
+                $data['trade_status'] = $this->status[$data['status']];
+                $data['user_type'] = '骑手';
+                $this->success('获取成功',$data);
+                break;
+
+            case 3 :
+                $data = Db::name('withdraw')->field('withdraw_sn,add_time,money,status,shop_id')->where('id',$id)->find();
+                $data['add_time'] = date('Y-m-d H:i:s',$data['add_time']);
+                $data['trade_type'] = '提现';
+                $data['trade_way'] = '微信支付';
+                $data['trade_status'] = $this->status[$data['status']];
+                $data['user_type'] = '商家';
+                $this->success('获取成功',$data);
+                break;
+        }
+
+    }
+
+    /**
+     *分账管理
+     */
+    public function payment()
+    {
+
+
+    }
+
+    /**
+     *对账管理
+     */
+    public function reconciliation()
+    {
+
+
     }
 }
 	
