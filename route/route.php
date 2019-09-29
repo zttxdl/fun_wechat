@@ -89,7 +89,7 @@ Route::group('admin',function (){
 // 首页模块
 Route::group('a-index',function (){
     Route::get('index','admin/Index/index');
-});
+})->middleware('IsLogin');
 
 
 // 企业打款给用户
