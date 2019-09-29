@@ -21,7 +21,7 @@ class Index extends Base
         $node_list = Db::name('node')->where('id','in',$role_info['node_ids'])->order('fid,sort')->select();
 
         foreach ($node_list as $k => &$v) {
-            if ($v['level'] == 2) {
+            if ($v['level'] == 1) {
                 $v['show'] = false;
             }
         }
