@@ -222,11 +222,11 @@ class ShopInfo extends Base
         // 搜索条件
         if($key_word)  $map[] = ['a.orders_sn','like',$key_word.'%'];
         if($trade_type == 1){
-            $map[] = ['a.status','=',8];
+            $map[] = ['a.status','in',[7,8]];
         }elseif($trade_type == 2) {
             $map[] = ['a.status','=',11];
         }else{
-            $map[] = ['a.status','in',[8,11]];
+            $map[] = ['a.status','in',[7,8,11]];
         }
 
         if($shop_id) {
@@ -242,6 +242,7 @@ class ShopInfo extends Base
                     ->join('shopInfo b','a.shop_id = b.id')
                     ->field('a.id,a.orders_sn,a.status,a.money,b.shop_name,a.pay_mode,a.pay_time')
                     ->where($map)
+                    ->order('id','desc')
                     ->paginate($page_size)
                     ->toArray();
         // if(empty($result['data']['data']) && !isset($result['data']['data'])) {

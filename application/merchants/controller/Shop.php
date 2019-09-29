@@ -192,7 +192,7 @@ class Shop extends MerchantsBase
         $data['run_type'] = '平台配送';
 
         // 更新数据
-        $result = ShopInfo::where('id','=',$this->shop_id)->update($data);;
+        $result = ShopInfo::where('id','=',$this->shop_id)->update($data);
 
         if (!$result) {
             $this->error('更新失败',201);
@@ -311,6 +311,22 @@ class Shop extends MerchantsBase
         $this->success('success');
     }
 
+
+
+    /**
+     * 设置商家自动接单 
+     * 
+     */
+    public function autoReceive(Request $request)
+    {
+        $auto_receive = $request->param('auto_receive');
+        $result = ShopInfo::where('id','=',$this->shop_id)->setField('auto_receive',$auto_receive);
+        if (!$result) {
+            $this->error('设置失败');
+        }
+        $this->success('设置成功');
+    }
+     
 
 
 

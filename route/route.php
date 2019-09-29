@@ -89,7 +89,7 @@ Route::group('admin',function (){
 // 首页模块
 Route::group('a-index',function (){
     Route::get('index','admin/Index/index');
-});
+})->middleware('IsLogin');
 
 
 // 企业打款给用户
@@ -207,6 +207,12 @@ Route::group('a-node', function () {
 
 
 
+// 看台
+Route::group('a-stand', function () {
+    Route::get('/investor', 'investorIndex'); // 合伙人看台
+    Route::get('/boss','BossIndex');    // 老板看台
+})->prefix('admin/Stand/')->middleware('IsLogin');
+
 
 /*************** 商家端 *********************************************************************************************/
 //商家登录注册用户组
@@ -253,6 +259,7 @@ Route::group('merchants',function (){
     Route::rule('updatePwd','merchants/Shop/updatePwd');//忘记密码
     Route::rule('loginOut','merchants/Shop/loginOut');//退出
     Route::rule('ShopInfo','merchants/Shop/ShopInfo');//关于我们
+    Route::get('autoReceive', 'merchants/Shop/autoReceive'); // 设置自动接单状态
     //评价
     Route::rule('getEvaluation','merchants/Merchants/getEvaluation');
 });
