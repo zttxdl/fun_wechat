@@ -29,6 +29,8 @@ class Index extends Base
             $arr[$k]['fid'] = $v['fid'];
             $arr[$k]['level'] = $v['level'];
             $arr[$k]['sort'] = $v['sort'];
+            $arr[$k]['sort'] = $v['sort'];
+            $arr[$k]['show'] = false;
 
             foreach ($node_list_2 as $kk => $vv) {
                 if ($v['id'] == $vv['fid']) {
