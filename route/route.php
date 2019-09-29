@@ -171,6 +171,12 @@ Route::group('financeManange', function () {
     Route::rule('/getCheck', 'getCheck');//查看不通过原因
     Route::rule('/getRemark', 'getRemark');//获取原因
     Route::rule('/getCardInfo', 'getCardInfo');//获取银行账户信息
+    Route::rule('/userFinanceFlow', 'userFinanceFlow');//用户端财务流水
+    Route::rule('/riderFinanceFlow', 'riderFinanceFlow');//骑手端财务流水
+    Route::rule('/shopFinanceFlow', 'shopFinanceFlow');//商家端财务流水
+    Route::rule('/flowDetails', 'flowDetails');//流水详情
+    Route::rule('/payment', 'payment');//分账管理
+    Route::rule('/reconciliation', 'reconciliation');//对账管理
 })->prefix('admin/financeManange/')->middleware('IsLogin');
 
 // 权限管理--管理员模块
@@ -200,11 +206,13 @@ Route::group('a-node', function () {
 })->prefix('admin/node/')->middleware('IsLogin');
 
 
+
 // 看台
 Route::group('a-stand', function () {
     Route::get('/investor', 'investorIndex'); // 合伙人看台
     Route::get('/boss','BossIndex');    // 老板看台
 })->prefix('admin/Stand/')->middleware('IsLogin');
+
 
 /*************** 商家端 *********************************************************************************************/
 //商家登录注册用户组
