@@ -16,7 +16,7 @@ class Index extends Base
     public function index(Request $request)
     {
         // 获取当前角色的记录
-        $role_info = Db::name('role')->where('id','=',session('admin_user.role_id'))->field('node_ids,name')->find();
+        $role_info = Db::name('role')->where('id','=',session('admin_user.role_id'))->field('name')->find();
         // 获取当前角色的所有权限信息
         $node_list_1 = Db::name('node')->where([['id','in',$role_info['node_ids']],['level','=',1]])->order('fid,sort')->select();
         $node_list_2 = Db::name('node')->where([['id','in',$role_info['node_ids']],['level','=',2]])->order('fid,sort')->select();
@@ -38,6 +38,7 @@ class Index extends Base
                 }
             }
         }
+        $role_info['id'] = session('admin_user.id');
         
         // var_dump($arr);die;
         // 记录登录日志【暂时不清楚日志的具体存储内容，此块功能先屏蔽】
