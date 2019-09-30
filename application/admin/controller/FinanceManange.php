@@ -532,9 +532,18 @@ class FinanceManange extends Base
     /**
      *分账管理
      */
-    public function payment()
+    public function payment(Request $request)
     {
+        $key_word = $request->param('keyword');
+        $trade_type = $request->param('tradeType','');//1:支付 2:提现 3:退款
+        $user_type = $request->param('UserType');
+        $page = $request->param('page');
+        $page_size = $request->param('pageSize');
 
+        //搜索条件
+        if($key_word)  $where[] = ['withdraw_sn','like',$key_word.'%'];
+        if($trade_type)  $where[] = ['withdraw_sn','like',$key_word.'%'];
+        if($user_type)  $where[] = ['withdraw_sn','like',$key_word.'%'];
 
     }
 
