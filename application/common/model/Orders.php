@@ -204,7 +204,7 @@ class Orders extends Model
         }
 
         $dis_money = $shop_dis_money + $plat_dis_money;
-        return $dis_money;
+        return sprintf("%.2f",$dis_money);
 
     }
 
