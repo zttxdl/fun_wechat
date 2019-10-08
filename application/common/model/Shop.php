@@ -145,14 +145,14 @@ class Shop extends Model
     }
 
     /**
-     * 获取店铺月订单量
+     * 获取店铺月订单量(统计30天以内的订单量)
      */
     public function getMonthNum($shop_id)
     {
         $data = Db::name('orders')
             ->where('status','notin',[1,4,9])
             ->where('shop_id',$shop_id)
-            ->whereTime('add_time', 'month')
+            ->whereTime('add_time', '-1 month')
             ->count('id');
 
         return $data;
