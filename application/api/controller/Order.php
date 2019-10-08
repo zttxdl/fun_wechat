@@ -533,12 +533,13 @@ class Order extends ApiBase
                 ];
 
                 //红包使用状态判断
-                $coupon_status = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$platform_discount['id']]])->value('status');
+                $my_coupon_id = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$platform_discount['id']]])->value('id');
+
+                $coupon_status = model('MyCoupon')->where([['user_id','=',$this->auth->id],['id','=',$my_coupon_id]])->value('status');
                 if($coupon_status == 2) {
                     throw new \Exception('红包已使用');
                 }
 
-                $my_coupon_id = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$platform_discount['id']]])->value('id');
 
                 $res = model('MyCoupon')->updateStatus($my_coupon_id,$data);
                 if(!$res) {
