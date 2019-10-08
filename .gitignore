@@ -7,3 +7,4 @@
 /public/uploads/*
 /public/log/*
 /composer.lock
+/logs/*

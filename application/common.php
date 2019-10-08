@@ -314,7 +314,7 @@ if (!function_exists('set_log')) {
             mkdir($path,0755);      
                  
         }
-        error_log($param.print_r($data,1),3,$path.$type.date('Y-m-d').".log");
+        error_log($param.print_r($data,1),3,$path.$type.".log.".date('Y-m-d'));
     }
 }
 

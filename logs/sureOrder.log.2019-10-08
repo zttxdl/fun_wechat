@@ -1,0 +1,169 @@
+order=Array
+(
+    [user_id] => 71
+    [shop_id] => 49
+    [money] => 86
+    [total_money] => 0.2
+    [box_money] => 5
+    [ping_fee] => 5
+    [pay_mode] => 1
+    [address] => Array
+        (
+            [school_name] => 南京医科大学
+            [address_detail] => 宿舍楼8栋202室
+            [phone] => 18758989988
+            [name] => 紫萱
+        )
+
+    [num] => 5
+)
+detail=Array
+(
+    [0] => Array
+        (
+            [product_id] => 325
+            [num] => 1
+            [total_money] => 13.2
+            [box_money] => 1
+            [price] => 13.2
+            [attr_ids] => 
+        )
+
+    [1] => Array
+        (
+            [product_id] => 325
+            [num] => 1
+            [total_money] => 15.4
+            [box_money] => 1
+            [price] => 15.4
+            [attr_ids] => 
+        )
+
+)
+platform_discount=shop_discount=order=Array
+(
+    [user_id] => 71
+    [shop_id] => 49
+    [money] => 86
+    [total_money] => 0.2
+    [box_money] => 5
+    [ping_fee] => 5
+    [pay_mode] => 1
+    [address] => Array
+        (
+            [school_name] => 南京医科大学
+            [address_detail] => 宿舍楼8栋202室
+            [phone] => 18758989988
+            [name] => 紫萱
+        )
+
+    [num] => 5
+)
+detail=Array
+(
+    [0] => Array
+        (
+            [product_id] => 325
+            [num] => 1
+            [total_money] => 13.2
+            [box_money] => 1
+            [price] => 13.2
+            [attr_ids] => 
+        )
+
+    [1] => Array
+        (
+            [product_id] => 325
+            [num] => 1
+            [total_money] => 15.4
+            [box_money] => 1
+            [price] => 15.4
+            [attr_ids] => 
+        )
+
+)
+platform_discount=shop_discount=order=Array
+(
+    [user_id] => 71
+    [shop_id] => 49
+    [money] => 86
+    [total_money] => 0.2
+    [box_money] => 5
+    [ping_fee] => 5
+    [pay_mode] => 1
+    [address] => Array
+        (
+            [school_name] => 南京医科大学
+            [address_detail] => 宿舍楼8栋202室
+            [phone] => 18758989988
+            [name] => 紫萱
+        )
+
+    [num] => 5
+)
+detail=Array
+(
+    [0] => Array
+        (
+            [product_id] => 325
+            [num] => 1
+            [total_money] => 13.2
+            [box_money] => 1
+            [price] => 13.2
+            [attr_ids] => 
+        )
+
+    [1] => Array
+        (
+            [product_id] => 325
+            [num] => 1
+            [total_money] => 15.4
+            [box_money] => 1
+            [price] => 15.4
+            [attr_ids] => 
+        )
+
+)
+platform_discount=shop_discount=order=Array
+(
+    [user_id] => 71
+    [shop_id] => 49
+    [money] => 86
+    [total_money] => 0.2
+    [box_money] => 5
+    [ping_fee] => 5
+    [pay_mode] => 1
+    [address] => Array
+        (
+            [school_name] => 南京医科大学
+            [address_detail] => 宿舍楼8栋202室
+            [phone] => 18758989988
+            [name] => 紫萱
+        )
+
+    [num] => 5
+)
+detail=Array
+(
+    [0] => Array
+        (
+            [product_id] => 325
+            [num] => 1
+            [total_money] => 13.2
+            [box_money] => 1
+            [price] => 13.2
+            [attr_ids] => 
+        )
+
+    [1] => Array
+        (
+            [product_id] => 325
+            [num] => 1
+            [total_money] => 15.4
+            [box_money] => 1
+            [price] => 15.4
+            [attr_ids] => 
+        )
+
+)
+platform_discount=shop_discount=
