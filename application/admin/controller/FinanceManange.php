@@ -535,15 +535,37 @@ class FinanceManange extends Base
     public function payment(Request $request)
     {
         $key_word = $request->param('keyword');
-        $trade_type = $request->param('tradeType','');//1:支付 2:提现 3:退款
-        $user_type = $request->param('UserType');
         $page = $request->param('page');
         $page_size = $request->param('pageSize');
 
         //搜索条件
         if($key_word)  $where[] = ['withdraw_sn','like',$key_word.'%'];
-        if($trade_type)  $where[] = ['withdraw_sn','like',$key_word.'%'];
-        if($user_type)  $where[] = ['withdraw_sn','like',$key_word.'%'];
+
+        //分成状态
+        $status = [];//待分帐
+        $status = [];//已经完成
+
+        $data = Db::name('Orders')->where('status','in',$status);
+
+
+
+        $data = [
+            'id' => '',
+            'order_sn' => '',
+            'add_time' => '',
+            'shop_name' => '',
+            'money' => '',
+            'shop_proportion' => '',
+            'shop_proportion_money' => '',
+            'canteen_proportion' => '',
+            'canteen_proportion_money' => '',
+            'ping_fee' => '',
+            'platform_money' => '',
+        ];
+
+        dump($data);
+
+
 
     }
 
@@ -555,6 +577,7 @@ class FinanceManange extends Base
 
 
     }
+
 }
 	
  ?>
