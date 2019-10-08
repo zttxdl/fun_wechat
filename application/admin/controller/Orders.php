@@ -19,17 +19,22 @@ class Orders extends Base
         $page = $request->param('page');
         $page_size = $request->param('pageSize',10);
         $search = $request->param('keyword');//搜索条件
+        $status = $request->param('status');//订单状态
 
         $map = [];
         if($search) {
             $map[] = ['a.orders_sn|b.nickname|b.phone|c.shop_name','like','%'.$search.'%'];
         }
 
+        if($status) {
+            $map[] = ['a.status','=',$status];
+        }
+
         $order_list = Db::name('orders')->alias('a')
             ->leftJoin('user b','a.user_id = b.id')
             ->leftJoin('shop_info c','a.shop_id = c.id')
             ->where($map)
-            ->field('a.id as id,a.orders_sn,b.nickname,b.phone,c.shop_name,a.money,a.add_time,a.status,a.pay_mode,a.source,a.platform_choucheng')
+            ->field('a.id as id,a.orders_sn,b.nickname,b.phone,c.shop_name,a.money,a.add_time,a.status,a.pay_mode,a.source,a.platform_choucheng,a.meal_sn')
             ->order('id','DESC')
             ->paginate($page_size)->toArray();
 
@@ -49,7 +54,8 @@ class Orders extends Base
                     'status' => $this->getOrdertStatus($row['status']),
                     'pay_mode' => $row['pay_mode']==1 ? '微信支付' : '支付宝支付',
                     'source' => $row['source']==1 ? '小程序' : 'H5',
-                    'platform_choucheng' => $row['platform_choucheng']
+                    'platform_choucheng' => $row['platform_choucheng'],
+                    'meal_sn' => isset($row['meal_sn']) ? '#'.$row['meal_sn'] : ''
                 ];
             }
         }
@@ -120,6 +126,7 @@ class Orders extends Base
                             a.box_money,
                             a.num,
                             a.message,
+                            a.meal_sn,
                             b.headimgurl,
                             b.nickname,
                             b.type,
@@ -161,7 +168,8 @@ class Orders extends Base
             'platform_choucheng' => $list['platform_choucheng'],
             'shitang_choucheng' => $list['shitang_choucheng'],
             'hongbao_choucheng' => $list['hongbao_choucheng'],
-            'shop_income_money' => $shop_income_money
+            'shop_income_money' => $shop_income_money,
+            'meal_sn' => isset($list['meal_sn']) ? '#'.$list['meal_sn'] : ''
         ];
 
         //会员信息

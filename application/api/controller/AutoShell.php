@@ -40,15 +40,6 @@ class AutoShell extends Controller
                 Db::name('platform_coupon')->where('id',$v['id'])->setField('status',5);
             }
         }
-
-        /***************** 更新广告的过期状态 ******************************************************************/
-        $advert_list = Db::name('advert')->where('status','in','1,2,0')->field('id,end_time,status')->select();
-        // 判断广告是否过期，并更新状态
-        foreach ($advert_list as $k => $v) {
-            if ($v['end_time'] < (time() - 10)) {  // 为防止网络延时，将时间延后10秒
-                Db::name('advert')->where('id',$v['id'])->setField('status',3);
-            }
-        }
                 
         /***************** 清除骑手提现申请的缓存记录  ******************************************************************/
         Cache::store('redis')->del('rider_tx_num');
@@ -121,6 +112,10 @@ class AutoShell extends Controller
         echo $num;
     }
 
+
+    /**
+     * 更新广告的状态
+     */
     public function updateAdvert()
     {
         $list = Db::name('advert')
@@ -129,18 +124,17 @@ class AutoShell extends Controller
             ->select();
 
         foreach ($list as $item) {
-            if ($item['start_time'] < time() && $item['status'] == 0){
-                //修改状态
-                Db::name('advert')->where('id',$item['id'])->update(['status'=>1]);
-            }elseif ($item['end_time'] < time() && $item['status'] !== 3){
-                Db::name('advert')->where('id',$item['id'])->update(['status'=>3]);
-
+            if ($item['start_time'] < time() && $item['status'] == 0){          // 设置广告已开启
+                Db::name('advert')->where('id','=',$item['id'])->update(['status'=>1]);
             }
-
+            if ($item['end_time'] < time()){
+                Db::name('advert')->where('id','=',$item['id'])->update(['status'=>3]);     // 设置广告已过期
+            }
         }
 
         echo 'success';
     }
+
 
     /**
      * 食堂余额更新
@@ -175,7 +169,7 @@ class AutoShell extends Controller
         //实例化socket
         $socket = model('PushEvent','service');
         // 订单返回到骑手抢单状态
-        $res = Db::name('takeout')->where('id','in',$takeout_ids)->update(['status'=>1,'single_time'=>0,'rider_id'=>0]);
+        $res = Db::name('takeout')->where('id','in',$takeout_ids)->update(['status'=>1,'single_time'=>0]);
 
         // 推送socket
         foreach ($school_ids as $kk => $vv) {
