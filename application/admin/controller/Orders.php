@@ -16,10 +16,10 @@ class Orders extends Base
      */
     public function getList(Request $request)
     {
-        $page = $request->param('page');
         $page_size = $request->param('pageSize',10);
         $search = $request->param('keyword');//搜索条件
         $status = $request->param('status');//订单状态
+        $school_id = $request->param('school_id/d');//学校ID
 
         $map = [];
         if($search) {
@@ -29,6 +29,13 @@ class Orders extends Base
         if($status) {
             $map[] = ['a.status','=',$status];
         }
+
+        if($school_id) {
+            $map[] = ['c.school_id','=',$school_id];
+        }
+
+        // 学校列表
+        $school_list = Model('school')->getSchoolList();
 
         $order_list = Db::name('orders')->alias('a')
             ->leftJoin('user b','a.user_id = b.id')
@@ -65,6 +72,7 @@ class Orders extends Base
         $result['count'] = $order_list['total'];
         $result['page'] = $order_list['current_page'];
         $result['pageSize'] = $order_list['per_page'];
+        $result['school_list'] = $school_list;
         $this->success('获取成功',$result);
 
     }
