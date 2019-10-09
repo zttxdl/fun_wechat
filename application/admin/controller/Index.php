@@ -15,9 +15,8 @@ class Index extends Base
      */
     public function index(Request $request)
     {
-        $info = session('admin_user');
         // 获取当前角色的记录
-        $role_info = Db::name('role')->where('id','=',$info['role_id'])->field('node_ids,name')->find();
+        $role_info = Db::name('role')->where('id','=',session('admin_user.role_id'))->field('node_ids,name')->find();
         // 获取当前角色的所有权限信息
         $node_list_1 = Db::name('node')->where([['id','in',$role_info['node_ids']],['level','=',1]])->order('fid,sort')->select();
         $node_list_2 = Db::name('node')->where([['id','in',$role_info['node_ids']],['level','=',2]])->order('fid,sort')->select();
@@ -39,14 +38,17 @@ class Index extends Base
                 }
             }
         }
-        $role_info['id'] = $info['id'];
+        $role_info['id'] = session('admin_user.id');
+        $role_info['last_login_time'] = session('admin_user.last_login_time');
+        $role_info['ip'] = session('admin_user.ip');
+        $role_info['login_count'] = session('admin_user.login_count');
         
         // var_dump($arr);die;
         // 记录登录日志【暂时不清楚日志的具体存储内容，此块功能先屏蔽】
         // $data = ['login_time' => time(), 'login_ip' => Request::instance()->ip(), 'name' => session('admin_user.name'), 'phone' => session('admin_user.phone'),'role_name' => $role_info['name']];
         // Db::name("login_log")->insert($data);
  
-        $this->success('获取权限成功',['role_info'=>$role_info,'node_list'=>$arr,'info'=>$info]);
+        $this->success('获取权限成功',['role_info'=>$role_info,'node_list'=>$arr]);
     }   
 
 }
