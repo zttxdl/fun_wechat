@@ -98,16 +98,4 @@ class User extends Model
     }
 
 
-    /**
-     * 获取相关时间搜索的新增用户量 
-     * 
-     */
-    public function getNewUsersCount($time)
-    {
-        $user_num = $this->whereTime('add_time',$time)->count();
-        return $user_num;
-    }
-     
-
-
 }
