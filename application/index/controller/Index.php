@@ -140,7 +140,8 @@ class Index extends Base
 
     public function test()
     {
-        phpinfo();
+        // phpinfo();
+        Cache::store('redis')->del('user_active_openid');
     }
 
 	 

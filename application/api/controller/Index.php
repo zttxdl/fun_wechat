@@ -5,6 +5,7 @@ namespace app\api\controller;
 use app\common\controller\ApiBase;
 use think\Request;
 use think\Db;
+use think\facade\Cache;
 
 class Index extends ApiBase
 {
@@ -49,6 +50,22 @@ class Index extends ApiBase
 
         if ($school_id) { // 如果有学校主键值，则直接获取学校信息
             $data['current_school'] = model('School')->field("id,name")->where('id','=',$school_id)->find();
+        }
+        // 记录用户活跃情况
+        $openid = $request->param('openid','0');
+        if ($openid) {
+            $redis = Cache::store('redis');
+            $key_user = "user_active_openid";
+            $date = date('Y-m-d');
+            if (!$redis->hExists($key_user,$openid)) {
+                $redis->hSet($key_user,$openid,1);
+                $res = model('UserActive')->where('save_time','=',$date)->count();
+                if ($res) {
+                    model('UserActive')->where('save_time','=',$date)->setInc('count');
+                } else {
+                    model('UserActive')->insert(['save_time'=>$date,'count'=>1]);
+                }
+            }
         }
 
         // 调用轮播图
