@@ -304,12 +304,14 @@ Route::group('u-member', function () {
 // 首页
 Route::group('u-index', function () {
     Route::rule('/index', 'index');
+    Route::rule('/user-active', 'userTodayActive');
     Route::rule('/special', 'getSpecial');
     Route::rule('/recommend', 'getRecommendList');
     Route::rule('/navigation', 'getNavigation');
     Route::rule('/special-list', 'getSpecialList');
     Route::rule('/exclusive', 'getExclusive');
     Route::rule('/more_exclusive', 'getMoreExclusive');
+    
 })->prefix('api/Index/');
 
 // 红包组
