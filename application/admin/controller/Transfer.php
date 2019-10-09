@@ -36,7 +36,7 @@ class Transfer extends Base
         // TODO  退款成功时回调处理
         if ($result['return_code']=='SUCCESS' && $result['result_code']=='SUCCESS') {
             // 更新提现表
-            $res = Db::name('rider_income_expend')->where('serial_number','=',$withdraw_sn)->setField('status',3);
+            $res = Db::name('rider_income_expend')->where('serial_number','=',$withdraw_sn)->setField(['status'=>3,'payment_time'=>time()]);
             if ($res) {
                 $str = '企业付款成功'; 
             } else {

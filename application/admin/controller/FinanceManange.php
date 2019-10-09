@@ -56,6 +56,7 @@ class FinanceManange extends Base
                             'money' => $row['current_money'],
                             'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                             'status' => $this->status[$row['status']],
+                            'complete_time' => isset($row['payment_time']) ? $row['payment_time'] : '',
                         ];
                     }
                 }else{
@@ -94,6 +95,7 @@ class FinanceManange extends Base
                             'money' => $row['money'],
                             'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                             'status' => $this->status[$row['status']],
+                            'complete_time' => isset($row['complete_time']) ? $row['complete_time'] : '',
                         ];
                     }
                 }else{
@@ -135,6 +137,7 @@ class FinanceManange extends Base
                             'money' => $row['money'],
                             'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                             'status' => $this->status[$row['status']],
+                            'complete_time' => isset($row['payment_time']) ? $row['payment_time'] : '',
                         ];
                     }
                 }else{
@@ -209,7 +212,7 @@ class FinanceManange extends Base
     public function shop_tx($status,$id,$remark='')
     {
     	if($status == 1){
-    		Db::name('withdraw')->where('id',$id)->setField('status',3);
+    		Db::name('withdraw')->where('id',$id)->setField(['status'=>3,'complete_time'=>time()]);
         	$this->success('审核通过');
     	}else{
     		Db::name('withdraw')->where('id',$id)->update([
@@ -231,9 +234,9 @@ class FinanceManange extends Base
     public function canteen_tx($status,$id,$remark='')
     {
         if($status == 1){
-            Db::name('canteen_income_expend')->where('id',$id)->setField('status',3);
+            Db::name('canteen_income_expend')->where('id',$id)->setField(['status'=>3,'payment_time'=>time()]);
             $this->success('审核通过');
-        }else{
+        }else{ 
             Db::name('canteen_income_expend')->where('id',$id)->update([
                     'status' => 2,
                     'remark' => $remark
