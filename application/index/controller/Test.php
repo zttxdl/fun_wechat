@@ -456,21 +456,24 @@ class Test extends Controller
 //        phpinfo();exit;
 //        $ret = Cache::store('redis')->get('list');
 //        dump($ret);
-        $data = [
-            [
-                'pid' => 320,
-                'price' => 1.00,
-            ],
-            [
-                'pid' => 320,
-                'price' => 2.00,
-            ],
-        ];
-        $data = array_column($data,'pid');
+        // $data = [
+        //     [
+        //         'pid' => 320,
+        //         'price' => 1.00,
+        //     ],
+        //     [
+        //         'pid' => 320,
+        //         'price' => 2.00,
+        //     ],
+        // ];
+        // $data = array_column($data,'pid');
 
-        $_data = array_count_values($data);
-        dump($_data['320']);
-
+        // $_data = array_count_values($data);
+        // dump($_data['320']);
+        $res = Db::name('canteen_income_expend')->where('id',1)->setField(['status'=>3,'payment_time'=>time()]);
+        
+        dump($res);
+        exit;
     }
 
     /**
