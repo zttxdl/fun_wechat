@@ -56,7 +56,7 @@ class FinanceManange extends Base
                             'money' => $row['current_money'],
                             'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                             'status' => $this->status[$row['status']],
-                            'complete_time' => isset($row['payment_time']) ? $row['payment_time'] : '',
+                            'complete_time' => isset($row['payment_time']) ? date('Y-m-d H:i:s',$row['payment_time']) : '',
                         ];
                     }
                 }else{
@@ -95,7 +95,7 @@ class FinanceManange extends Base
                             'money' => $row['money'],
                             'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                             'status' => $this->status[$row['status']],
-                            'complete_time' => isset($row['complete_time']) ? $row['complete_time'] : '',
+                            'complete_time' => isset($row['complete_time']) ? date('Y-m-d H:i:s',$row['complete_time']) : '',
                         ];
                     }
                 }else{
@@ -137,7 +137,7 @@ class FinanceManange extends Base
                             'money' => $row['money'],
                             'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                             'status' => $this->status[$row['status']],
-                            'complete_time' => isset($row['payment_time']) ? $row['payment_time'] : '',
+                            'complete_time' => isset($row['payment_time']) ? date('Y-m-d H:i:s',$row['payment_time']) : '',
                         ];
                     }
                 }else{
