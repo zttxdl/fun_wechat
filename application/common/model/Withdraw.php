@@ -345,6 +345,16 @@ class Withdraw extends Model
         return sprintf("%.2f",$data);
     }
 
+    /**
+     * @param $order_sn
+     * 获取订单商家所得收入
+     */
+    public function getMoneyByOrderSn($order_sn)
+    {
+        $shop_money = $this->where(['withdraw_sn'=>$order_sn,'type'=>1])->value('money');
+        return !empty($shop_money) ? $shop_money : '0.00';
+    }
+
 
 
 
