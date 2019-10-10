@@ -537,44 +537,81 @@ class FinanceManange extends Base
         $key_word = $request->param('keyword');
         $page = $request->param('page');
         $page_size = $request->param('pageSize');
+        $status = $request->param('status');//分成状态 1:待分成 2:已完成
 
         //搜索条件
         if($key_word)  $where[] = ['withdraw_sn','like',$key_word.'%'];
 
+
         //分成状态
-        $status = [];//待分帐
-        $status = [];//已经完成
+        if($status == 1) {
+            $account_status = [3,5];//待分帐 对应订单状态是商家接单到骑手取餐离店 3、5
+        }elseif($status == 2){
+            $account_status = [6,7,8];//已完成 对应订单状态是骑手取餐离店到订单已完成 6、7、8
+        }else{
+            $account_status = [3,5,6,7,8];//全部订单
+        }
 
-        $data = Db::name('Orders')->where('status','in',$status);
+        $data = Db::name('Orders')
+            ->alias('a')
+            ->leftJoin('ShopInfo b','a.shop_id = b.id')
+            ->leftJoin('canteen c','a.school_id = c.school_id')
+            ->field('a.id,a.orders_sn,a.send_time,a.add_time,b.shop_name,a.money,c.cut_proportion,a.shitang_choucheng,a.ping_fee,a.platform_choucheng,a.status')
+            ->where('a.status','in',$account_status)
+            ->order('a.id DESC')
+            ->paginate($page_size)
+            ->toArray();
+        foreach ($data['data'] as &$row){
+            $row['send_time'] = date('Y-m-d H:i:s',$row['send_time']);
+            $row['cut_proportion'] = '%'.$row['cut_proportion'];
+            $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
+            $row['status'] = in_array($row['status'],[3,5]) ? '待分账' : '已完成';
+            $row['shitang_choucheng'] = '-'.$row['shitang_choucheng'];
+            $row['ping_fee'] = '-'.$row['ping_fee'];
+            $row['platform_choucheng'] = '+'.$row['platform_choucheng'];
+            $row['shop_money'] = '-'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);
+        }
 
-
-
-        $data = [
-            'id' => '',
-            'order_sn' => '',
-            'add_time' => '',
-            'shop_name' => '',
-            'money' => '',
-            'shop_proportion' => '',
-            'shop_proportion_money' => '',
-            'canteen_proportion' => '',
-            'canteen_proportion_money' => '',
-            'ping_fee' => '',
-            'platform_money' => '',
-        ];
-
-        dump($data);
-
-
-
+        $this->success('200',$data);
     }
 
     /**
      *对账管理
      */
-    public function reconciliation()
+    public function reconciliation(Request $request)
     {
+        $key_word = $request->param('keyword');
+        $page = $request->param('page');
+        $page_size = $request->param('pageSize');
 
+        //搜索条件
+        if($key_word)  $where[] = ['withdraw_sn','like',$key_word.'%'];
+
+
+        //分成状态
+        $account_status = [3,5,6,7,8];//全部订单
+
+
+        $data = Db::name('Orders')
+            ->alias('a')
+            ->leftJoin('ShopInfo b','a.shop_id = b.id')
+            ->leftJoin('canteen c','a.school_id = c.school_id')
+            ->field('a.id,a.orders_sn,a.send_time,a.add_time,b.shop_name,a.money,c.cut_proportion,a.shitang_choucheng,a.ping_fee,a.platform_choucheng,a.status')
+            ->where('a.status','in',$account_status)
+            ->order('a.id DESC')
+            ->paginate($page_size)
+            ->toArray();
+
+        foreach ($data['data'] as &$row){
+            $row['send_time'] = date('Y-m-d H:i:s',$row['send_time']);
+            $row['cut_proportion'] = '%'.$row['cut_proportion'];
+            $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
+            $row['shitang_choucheng'] = '-'.$row['shitang_choucheng'];
+            $row['ping_fee'] = '-'.$row['ping_fee'];
+            $row['platform_choucheng'] = '+'.$row['platform_choucheng'];
+            $row['shop_money'] = '-'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);
+        }
+        $this->success('200',$data);
 
     }
 
