@@ -566,7 +566,7 @@ class FinanceManange extends Base
             ->paginate($page_size)
             ->toArray();
         foreach ($data['data'] as &$row){
-            $row['send_time'] = date('Y-m-d H:i:s',$row['send_time']);
+            $row['send_time'] = !empty($row['send_time']) ? date('Y-m-d H:i:s',$row['send_time']) : '';
             $row['cut_proportion'] = '%'.$row['cut_proportion'];
             $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
             $row['status'] = in_array($row['status'],[3,5]) ? '待分账' : '已完成';
@@ -607,7 +607,7 @@ class FinanceManange extends Base
             ->toArray();
 
         foreach ($data['data'] as &$row){
-            $row['send_time'] = date('Y-m-d H:i:s',$row['send_time']);
+            $row['send_time'] = !empty($row['send_time']) ? date('Y-m-d H:i:s',$row['send_time']) : '';
             $row['cut_proportion'] = '%'.$row['cut_proportion'];
             $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
             $row['shitang_choucheng'] = '-'.$row['shitang_choucheng'];
