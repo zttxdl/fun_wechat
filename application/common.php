@@ -445,3 +445,30 @@ if (!function_exists('qiniu_img_del')) {
     }
 
 }
+
+
+function conditions($time)
+    {
+        $temp_time = json_decode($time,true); //转化成数组 ["2019-10-1","2019-10-2"] 
+        // 计算两个日期之间的差值（多少天）
+        $startdate = strtotime($temp_time[0]);
+        $enddate = strtotime($temp_time[1]);
+        $days=round(($enddate - $startdate)/3600/24) + 1;
+
+        // 封装数组
+        $search_time[] = date('Y-m-d 00:00:00',strtotime($temp_time[0]));
+        $search_time[] = date('Y-m-d 23:59:59',strtotime($temp_time[1]));
+        for ($i = $days - 1; 0 <= $i; $i--) {
+            $res[] = date('Y-m-d', strtotime('-' . $i . ' day',strtotime($temp_time[1])));
+            $nums[] = 0;
+        }
+
+        $data = [
+            'res'=>$res,
+            'nums'=>$nums,
+            'search_time'=>$search_time,
+            'temp_time'=>$temp_time
+        ];
+
+        return $data;
+    }

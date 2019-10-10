@@ -219,7 +219,6 @@ class Orders extends Model
         // 获取销售额，退单额，销售量
         $data = $this->whereTime('save_time',$time)->where('status','in','2,3,5,6,7,8,10,11,12')->where('school_id','=',$school_id)
                     ->field('count(id) as count,sum(money) as money,save_time')->order('save_time')->group('save_time')->select()->toArray();
-        
 
         // 补零处理
         array_walk($data, function ($value, $key) use ($res, &$count_nums) {
@@ -262,7 +261,7 @@ class Orders extends Model
         // 补零处理
         array_walk($data, function ($value, $key) use ($res, &$nums) {
             $index = array_search($value['save_time'],$res);
-            $nums[$index] = $value['count'];
+            $nums[$index] = $value['money'];
         });
 
         $result = [];
