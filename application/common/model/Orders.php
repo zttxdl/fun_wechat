@@ -225,7 +225,9 @@ class Orders extends Model
             $index = array_search($value['save_time'],$res);
             $count_nums[$index] = $value['count'];
         });
-        
+        foreach ($res as $k => &$v) {
+            $v = substr($v,5);
+        }
         $result = [];
         $result['count']['x'] = $res;
         $result['count']['y'] = $count_nums;
@@ -264,6 +266,9 @@ class Orders extends Model
             $nums[$index] = $value['money'];
         });
 
+        foreach ($res as $k => &$v) {
+            $v = substr($v,5);
+        }
         $result = [];
         $result['x'] = $res;
         $result['y'] = $nums;

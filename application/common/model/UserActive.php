@@ -20,7 +20,9 @@ class UserActive extends Model
             $index = array_search($value['save_time'],$res);
             $nums[$index] = $value['count'];
         });
-
+        foreach ($res as $k => &$v) {
+            $v = substr($v,5);
+        }
         $result['x'] = $res;
         $result['y'] = $nums;
         $result['sum'] = array_sum($nums);
