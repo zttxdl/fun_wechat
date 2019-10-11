@@ -57,6 +57,7 @@ class Stand extends Base
         // 调取看台统计图表数据 
         $result = $this->statisticsReport($search_time,$res,$nums,$school_id);
         $result['school_name'] = model('School')->getNameById($school_id);
+        $result['school_id'] = $school_id;
         $result['time'] = implode('~',$temp_time);
         // 获取所有学校
         $result['school_list'] = model('School')->where('level',2)->field('id,name')->select()->toArray();
