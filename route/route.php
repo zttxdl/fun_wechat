@@ -214,6 +214,15 @@ Route::group('a-stand', function () {
 })->prefix('admin/Stand/')->middleware('IsLogin');
 
 
+// 数据统计
+Route::group('a-statistics', function () {
+    Route::get('/user', 'user'); // 用户活跃
+    Route::get('/order', 'order'); // 订单统计
+    Route::get('/finance', 'finance'); // 财务统计
+    Route::get('/coupon', 'coupon'); // 优惠券统计
+})->prefix('admin/Statistics/')->middleware('IsLogin');
+
+
 /*************** 商家端 *********************************************************************************************/
 //商家登录注册用户组
 Route::group('merchants',function (){
@@ -304,12 +313,14 @@ Route::group('u-member', function () {
 // 首页
 Route::group('u-index', function () {
     Route::rule('/index', 'index');
+    Route::rule('/user-active', 'userTodayActive');
     Route::rule('/special', 'getSpecial');
     Route::rule('/recommend', 'getRecommendList');
     Route::rule('/navigation', 'getNavigation');
     Route::rule('/special-list', 'getSpecialList');
     Route::rule('/exclusive', 'getExclusive');
     Route::rule('/more_exclusive', 'getMoreExclusive');
+    
 })->prefix('api/Index/');
 
 // 红包组

@@ -5,6 +5,7 @@ namespace app\api\controller;
 use app\common\controller\ApiBase;
 use think\Request;
 use think\Db;
+use think\facade\Cache;
 
 class Index extends ApiBase
 {
@@ -455,4 +456,34 @@ class Index extends ApiBase
         $this->success('success',$shop_list);
 
     }
+
+
+    /**
+     * 首页必加载此方法【用户活跃度】 
+     * 
+     */
+    public function userTodayActive(Request $request)
+    {
+        // 记录用户活跃情况
+        $openid = $request->param('openid','0');
+        if ($openid) {
+            $redis = Cache::store('redis');
+            $key_user = "user_active_openid";
+            $date = date('Y-m-d');
+            if (!$redis->hExists($key_user,$openid)) {
+                $redis->hSet($key_user,$openid,1);
+                $res = model('UserActive')->where('save_time','=',$date)->count();
+                if ($res) {
+                    model('UserActive')->where('save_time','=',$date)->setInc('count');
+                } else {
+                    model('UserActive')->insert(['save_time'=>$date,'count'=>1]);
+                }
+                $this->success('已活跃');
+            }
+        }
+        $this->error('还未授权呢');
+
+
+    }
+     
 }

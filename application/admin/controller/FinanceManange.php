@@ -56,6 +56,7 @@ class FinanceManange extends Base
                             'money' => $row['current_money'],
                             'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                             'status' => $this->status[$row['status']],
+                            'complete_time' => isset($row['payment_time']) ? date('Y-m-d H:i:s',$row['payment_time']) : '',
                         ];
                     }
                 }else{
@@ -94,6 +95,7 @@ class FinanceManange extends Base
                             'money' => $row['money'],
                             'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                             'status' => $this->status[$row['status']],
+                            'complete_time' => isset($row['complete_time']) ? date('Y-m-d H:i:s',$row['complete_time']) : '',
                         ];
                     }
                 }else{
@@ -135,6 +137,7 @@ class FinanceManange extends Base
                             'money' => $row['money'],
                             'add_time' => date('Y-m-d H:i:s',$row['add_time']),
                             'status' => $this->status[$row['status']],
+                            'complete_time' => isset($row['payment_time']) ? date('Y-m-d H:i:s',$row['payment_time']) : '',
                         ];
                     }
                 }else{
@@ -209,7 +212,7 @@ class FinanceManange extends Base
     public function shop_tx($status,$id,$remark='')
     {
     	if($status == 1){
-    		Db::name('withdraw')->where('id',$id)->setField('status',3);
+    		Db::name('withdraw')->where('id',$id)->setField(['status'=>3,'complete_time'=>time()]);
         	$this->success('审核通过');
     	}else{
     		Db::name('withdraw')->where('id',$id)->update([
@@ -231,9 +234,9 @@ class FinanceManange extends Base
     public function canteen_tx($status,$id,$remark='')
     {
         if($status == 1){
-            Db::name('canteen_income_expend')->where('id',$id)->setField('status',3);
+            Db::name('canteen_income_expend')->where('id',$id)->setField(['status'=>3,'payment_time'=>time()]);
             $this->success('审核通过');
-        }else{
+        }else{ 
             Db::name('canteen_income_expend')->where('id',$id)->update([
                     'status' => 2,
                     'remark' => $remark
@@ -540,7 +543,7 @@ class FinanceManange extends Base
         $status = $request->param('status');//分成状态 1:待分成 2:已完成
 
         //搜索条件
-        if($key_word)  $where[] = ['withdraw_sn','like',$key_word.'%'];
+        if($key_word)  $where[] = ['a.orders_sn','like',$key_word.'%'];
 
 
         //分成状态
@@ -552,17 +555,18 @@ class FinanceManange extends Base
             $account_status = [3,5,6,7,8];//全部订单
         }
 
+        $where[] = ['a.status','in',$account_status];
         $data = Db::name('Orders')
             ->alias('a')
             ->leftJoin('ShopInfo b','a.shop_id = b.id')
             ->leftJoin('canteen c','a.school_id = c.school_id')
             ->field('a.id,a.orders_sn,a.send_time,a.add_time,b.shop_name,a.money,c.cut_proportion,a.shitang_choucheng,a.ping_fee,a.platform_choucheng,a.status')
-            ->where('a.status','in',$account_status)
+            ->where($where)
             ->order('a.id DESC')
             ->paginate($page_size)
             ->toArray();
         foreach ($data['data'] as &$row){
-            $row['send_time'] = date('Y-m-d H:i:s',$row['send_time']);
+            $row['send_time'] = !empty($row['send_time']) ? date('Y-m-d H:i:s',$row['send_time']) : '';
             $row['cut_proportion'] = '%'.$row['cut_proportion'];
             $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
             $row['status'] = in_array($row['status'],[3,5]) ? '待分账' : '已完成';
@@ -585,8 +589,7 @@ class FinanceManange extends Base
         $page_size = $request->param('pageSize');
 
         //搜索条件
-        if($key_word)  $where[] = ['withdraw_sn','like',$key_word.'%'];
-
+        if($key_word)  $where[] = ['a.orders_sn','like',$key_word.'%'];
 
         //分成状态
         $account_status = [3,5,6,7,8];//全部订单
@@ -604,6 +607,31 @@ class FinanceManange extends Base
 
         foreach ($data['data'] as &$row){
             $row['send_time'] = date('Y-m-d H:i:s',$row['send_time']);
+            $row['cut_proportion'] = '%'.$row['cut_proportion'];
+            $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
+            $row['shitang_choucheng'] = '-'.$row['shitang_choucheng'];
+            $row['ping_fee'] = '-'.$row['ping_fee'];
+            $row['platform_choucheng'] = '+'.$row['platform_choucheng'];
+            $row['shop_money'] = '-'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);
+        }
+        $this->success('200',$data);
+
+        //分成状态
+        $account_status = [3,5,6,7,8];//全部订单
+        $where[] = ['a.status','in',$account_status];
+
+        $data = Db::name('Orders')
+            ->alias('a')
+            ->leftJoin('ShopInfo b','a.shop_id = b.id')
+            ->leftJoin('canteen c','a.school_id = c.school_id')
+            ->field('a.id,a.orders_sn,a.send_time,a.add_time,b.shop_name,a.money,c.cut_proportion,a.shitang_choucheng,a.ping_fee,a.platform_choucheng,a.status')
+            ->where($where)
+            ->order('a.id DESC')
+            ->paginate($page_size)
+            ->toArray();
+
+        foreach ($data['data'] as &$row){
+            $row['send_time'] = !empty($row['send_time']) ? date('Y-m-d H:i:s',$row['send_time']) : '';
             $row['cut_proportion'] = '%'.$row['cut_proportion'];
             $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
             $row['shitang_choucheng'] = '-'.$row['shitang_choucheng'];

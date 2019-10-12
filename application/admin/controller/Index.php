@@ -39,6 +39,9 @@ class Index extends Base
             }
         }
         $role_info['id'] = session('admin_user.id');
+        $role_info['last_login_time'] = session('admin_user.last_login_time');
+        $role_info['ip'] = session('admin_user.ip');
+        $role_info['login_count'] = session('admin_user.login_count');
         
         // var_dump($arr);die;
         // 记录登录日志【暂时不清楚日志的具体存储内容，此块功能先屏蔽】
@@ -46,8 +49,6 @@ class Index extends Base
         // Db::name("login_log")->insert($data);
  
         $this->success('获取权限成功',['role_info'=>$role_info,'node_list'=>$arr]);
-
-
-    }
+    }   
 
 }

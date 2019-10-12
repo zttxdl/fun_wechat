@@ -500,7 +500,7 @@ class Orders extends RiderBase
         $shop_address = $Takeout->shop_address->latitude.','.$Takeout->shop_address->longitude;
 
         $result = parameters($location,$shop_address);
-        if ($result[0]['elements'][0]['distance'] > 500) {
+        if ($result[0]['elements'][0]['distance'] > 1000) {
             $this->error('暂未到指定范围，还不可以点击哦');
         }
         // 启动事务
@@ -664,7 +664,7 @@ class Orders extends RiderBase
         $location = $latitude.','.$longitude;
         $user_address = $Takeout->user_address->latitude.','.$Takeout->user_address->longitude;
         $result = parameters($location,$user_address);
-        if ($result[0]['elements'][0]['distance'] > 300) {
+        if ($result[0]['elements'][0]['distance'] > 2000) {
             $this->error('暂未到指定范围，还不可以点击哦');
         }
         // 启动事务

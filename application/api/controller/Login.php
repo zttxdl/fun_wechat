@@ -55,6 +55,14 @@ class Login extends ApiBase
         }
         // 存入数据
         $result = User::create($list);
+        // 存入新用户
+        $date = date('Y-m-d');
+        $res = model('UserNew')->where('save_time','=',$date)->count();
+        if ($res) {
+            model('UserNew')->where('save_time','=',$date)->setInc('count');
+        } else {
+            model('UserNew')->insert(['save_time'=>$date,'count'=>1]);
+        }
         if(!$result) {
             $this->error('授权入表失败');
         }
