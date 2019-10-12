@@ -220,24 +220,25 @@ class Orders extends Model
         $data = $this->whereTime('save_time',$time)->where('status','in','2,3,5,6,7,8,10,11,12')->where('school_id','=',$school_id)
                     ->field('count(id) as count,sum(money) as money,save_time')->order('save_time')->group('save_time')->select()->toArray();
 
-        // 补零处理
+        // 销售量补零处理
         array_walk($data, function ($value, $key) use ($res, &$count_nums) {
             $index = array_search($value['save_time'],$res);
             $count_nums[$index] = $value['count'];
         });
-        foreach ($res as $k => &$v) {
-            $v = substr($v,5);
-        }
-        $result = [];
-        $result['count']['x'] = $res;
-        $result['count']['y'] = $count_nums;
-        $result['count']['sum'] = array_sum($count_nums);
 
-        // 补零处理
+        // 销售额补零处理
         array_walk($data, function ($value, $key) use ($res, &$order_nums) {
             $index = array_search($value['save_time'],$res);
             $order_nums[$index] = $value['money'];
         });
+        foreach ($res as $k => &$v) {
+            $v = substr($v,5);
+        }
+
+        $result = [];
+        $result['count']['x'] = $res;
+        $result['count']['y'] = $count_nums;
+        $result['count']['sum'] = array_sum($count_nums);
 
         $result['money']['x'] = $res;
         $result['money']['y'] = $order_nums;
