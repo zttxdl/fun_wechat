@@ -71,16 +71,16 @@ class Account extends Base
     {
         $canteen_id = session('canteen.id');
         $canteen = Canteen::get($canteen_id);
-        $income = $canteen->canteenIncomeExpend()->order('id','desc')->find();
-        
-        if (!$canteen) {
+        $balance = $canteen->getAcountMoney($canteen_id);//账户余额
+        $can_balance = $canteen->getAcountMoney($canteen_id,1);//可提现余额
+        if (!$balance) {
             $this->error('获取失败');
         }
 
         $data = [
             'account'=> $canteen->account,
-            'can_balance'=> $canteen->can_balance,
-            'balance'=> $income->balance,
+            'can_balance'=> $can_balance,
+            'balance'=> $balance,
         ];
 
         $this->success('success',$data);
@@ -93,7 +93,7 @@ class Account extends Base
     {
         $canteen_id = session('canteen.id');
         $money = $request->post('money');
-        $can_balance = model('Canteen')->where('id',$canteen_id)->value('can_balance');
+        $can_balance = model('canteen')->getAcountMoney($canteen_id,1);//可提现余额
         if ($money > $can_balance) {
             $this->error('提现金额不能大于可提现余额');
         }
@@ -112,12 +112,11 @@ class Account extends Base
             'add_time'=> time(),
             'status'=> 1,
         ];
-        $ret = model('Canteen')->where('id',$canteen_id)->update(['can_balance'=>$can_balance - $money]);
-        if (!$ret) {
+
+        $res = CanteenIncomeExpend::create($data);
+        if (!$res) {
             $this->error('提现失败');
         }
-        $res = CanteenIncomeExpend::create($data);
-
         $this->success('success',$res);
     }
 }
