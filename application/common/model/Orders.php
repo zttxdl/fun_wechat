@@ -292,7 +292,7 @@ class Orders extends Model
         // 获取学校列表
         $school_list = model('School')->where('level',2)->field('id,name as school_name')->select()->toArray();
         foreach ($school_list as $ko => &$vo) {
-            $vo['index'] = $ko;
+            $vo['index'] = $ko + 1;
             $refund = $this->whereTime('save_time',$time)->where('status','in','11')->where('school_id','=',$vo['id'])->sum('money');
             $vo['refund'] =  sprintf("%.2f",$refund);
             foreach ($data as $k => $v) {
