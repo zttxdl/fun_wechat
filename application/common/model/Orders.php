@@ -289,12 +289,21 @@ class Orders extends Model
         $data = $this->whereTime('save_time',$time)->where('status','in','2,3,5,6,7,8,10,11,12')
         ->field('sum(money) as money,count(id) as count,school_id')->group('school_id')->select()->toArray();
 
-        foreach ($data as $k => &$v) {
-            $v['school_name'] = model('School')->getNameById($v['school_id']);
-            $v['refund'] =  $this->whereTime('save_time',$time)->where('status','in','11')->sum('money');
+        // 获取学校列表
+        $school_list = model('School')->where('level',2)->field('id,name as school_name')->select()->toArray();
+        foreach ($school_list as $ko => &$vo) {
+            $vo['index'] = $ko;
+            $vo['refund'] =  $this->whereTime('save_time',$time)->where('status','in','11')->where('school_id','=',$vo['id'])->sum('money');
+            foreach ($data as $k => $v) {
+                if ($vo['id'] == $v['school_id']) {
+                    $vo['money'] = $v['money']; 
+                    $vo['count'] = $v['count']; 
+                    break;
+                }
+            }
         }
-
-        return $data;
+        
+        return $school_list;
     }
      
      
