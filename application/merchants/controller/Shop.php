@@ -180,9 +180,6 @@ class Shop extends MerchantsBase
     public function setInfo(Request $request)
     {
         $data = $request->post();
-
-        set_log('req==',$data,'setInfo');
-
         // 验证表单数据
         $check = $this->validate($data, 'ShopInfo');
         if ($check !== true) {

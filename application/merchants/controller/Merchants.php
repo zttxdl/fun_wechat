@@ -66,7 +66,6 @@ class Merchants extends MerchantsBase
 
         $token['token'] = $request->header('api-token');
         $token['id'] = $this->shop_id;
-        set_log('token',$token);
         Db::startTrans();
         try {
             $ret = model('ShopInfo')
