@@ -229,7 +229,7 @@ class Orders extends Model
         // 销售额补零处理
         array_walk($data, function ($value, $key) use ($res, &$order_nums) {
             $index = array_search($value['save_time'],$res);
-            $order_nums[$index] = $value['money'];
+            $order_nums[$index] = sprintf("%.2f",$value['money']);
         });
         foreach ($res as $k => &$v) {
             $v = substr($v,5);
@@ -242,9 +242,9 @@ class Orders extends Model
 
         $result['money']['x'] = $res;
         $result['money']['y'] = $order_nums;
-        $result['money']['sum'] = array_sum($order_nums);
-
-        $result['refund_money'] = $this->whereTime('save_time',$time)->where('school_id','=',$school_id)->where('status','=','11')->sum('money');
+        $result['money']['sum'] = sprintf("%.2f",array_sum($order_nums));
+        $refund = $this->whereTime('save_time',$time)->where('school_id','=',$school_id)->where('status','=','11')->sum('money');
+        $result['refund_money'] = sprintf("%.2f",$refund);
 
         return $result;
         
@@ -264,7 +264,7 @@ class Orders extends Model
         // 补零处理
         array_walk($data, function ($value, $key) use ($res, &$nums) {
             $index = array_search($value['save_time'],$res);
-            $nums[$index] = $value['money'];
+            $nums[$index] = sprintf("%.2f",$value['money']);
         });
 
         foreach ($res as $k => &$v) {
@@ -273,7 +273,7 @@ class Orders extends Model
         $result = [];
         $result['x'] = $res;
         $result['y'] = $nums;
-        $result['sum'] = array_sum($nums);
+        $result['sum'] = sprintf("%.2f",array_sum($nums));
 
         return $result;
     }
@@ -293,10 +293,11 @@ class Orders extends Model
         $school_list = model('School')->where('level',2)->field('id,name as school_name')->select()->toArray();
         foreach ($school_list as $ko => &$vo) {
             $vo['index'] = $ko;
-            $vo['refund'] =  $this->whereTime('save_time',$time)->where('status','in','11')->where('school_id','=',$vo['id'])->sum('money');
+            $refund = $this->whereTime('save_time',$time)->where('status','in','11')->where('school_id','=',$vo['id'])->sum('money');
+            $vo['refund'] =  sprintf("%.2f",$refund);
             foreach ($data as $k => $v) {
                 if ($vo['id'] == $v['school_id']) {
-                    $vo['money'] = $v['money']; 
+                    $vo['money'] = sprintf("%.2f",$v['money']); 
                     $vo['count'] = $v['count']; 
                     break;
                 }
