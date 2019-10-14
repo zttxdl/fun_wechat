@@ -154,14 +154,6 @@ class FinanceManange extends Base
                 break;
         }
 
-
-
-
-
-
-
-
-
         /*del by ztt 20180822 全部的数据暂时不展示
          * $data['info'] = array_merge($rider_result['info'],$shop_result['info']);
         $data['count'] = $rider_result['count'] + $shop_result['count'];
@@ -171,7 +163,7 @@ class FinanceManange extends Base
 	}
 
     /**
-     * 提现操作
+     * 提现审核操作
      * @param Request $request
      */
 	public function action(Request $request)
@@ -204,7 +196,7 @@ class FinanceManange extends Base
 
 
     /**
-     * 【商家提现 操作】
+     * 【商家提现审核操作】
      * @param $status 审核状态  1:审核成功 2:审核不成功
      * @param $id 提现ID
      * @param string $remark 审核不通过原因ID的集合 [1,2,3]
@@ -226,7 +218,7 @@ class FinanceManange extends Base
 
 
     /**
-     * 【食堂提现 操作】
+     * 【食堂提现审核操作】
      * @param $status 审核状态  1:审核成功 2:审核不成功
      * @param $id 提现ID
      * @param string $remark 审核不通过原因ID的集合 [1,2,3]
@@ -249,7 +241,7 @@ class FinanceManange extends Base
 
 
     /**
-     * 【骑手提现 操作】
+     * 【骑手提现审核操作】
      * @param $status 审核状态  1:审核成功 2:审核不成功
      * @param $id 提现ID
      * @param string $remark 审核不通过原因ID的集合 [1,2,3]

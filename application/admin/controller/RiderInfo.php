@@ -148,6 +148,15 @@ class RiderInfo extends Base
         !empty($request->get('name/s')) ? $where[] = ['name','like',$request->get('name/s').'%'] : null;
         !empty($request->get('status/d')) ? $where[] = ['status','=',$request->get('status/d')] : $where[] = ['status','notin','0,4'];
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
+        $where[] = ['status','in','1,2'];
+        $school_id = $request->get('school_id/d');//学校ID
+
+        if($school_id) {
+            $where[] = ['school_id','=',$school_id];
+        }
+
+        // 学校列表
+        $school_list = Model('school')->getSchoolList();
 
         $list = Db::name('rider_info')->where($where)->field('id,nickname,name,headimgurl,phone as link_tel,identity_num,hand_card_img,status')->order('id desc')->paginate($pagesize)
                 ->each(function ($item, $key) {
@@ -156,8 +165,7 @@ class RiderInfo extends Base
 
                     return $item;
                 });
-
-        $this->success('ok',['list'=>$list]);  
+        $this->success('ok',['list'=>$list,'school_list'=>$school_list]);
     }
 
 
