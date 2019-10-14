@@ -251,7 +251,7 @@ class ShopInfo extends Base
     
         foreach ($result['data'] as $key => $value) {
            $result['data'][$key]['pay_time'] = date('Y-m-d H:i:s',$value['pay_time']);
-           $result['data'][$key]['pay_mode'] = $value['status'] == 8 ? '支付' : '退款';
+           $result['data'][$key]['pay_mode'] = in_array($value['status'],[7,8]) ? '支付' : '退款';
            $result['data'][$key]['tradeWay'] = $value['pay_mode'] == 1 ? '微信支付' : '支付宝支付';
 
         }
