@@ -321,7 +321,7 @@ class Shop extends MerchantsBase
         if (!$result) {
             $this->error('设置失败');
         }
-        $this->success('设置成功');
+        $this->success('设置成功',['auto_receive'=>$auto_receive]);
     }
      
 
