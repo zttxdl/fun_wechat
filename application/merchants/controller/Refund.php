@@ -211,7 +211,7 @@ class Refund extends MerchantsBase
             'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
         ]);
 
-
+        set_log('result=',$result,'refund');
         return $result;
     }
 
