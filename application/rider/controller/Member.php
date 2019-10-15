@@ -173,7 +173,12 @@ class Member extends RiderBase
         if (!$result) {
             $this->error('申请失败',201);
         }
-        $this->success('申请成功');
+        
+        $rider_info = RiderInfo::where('id','=',$this->auth->id)->field('id,school_id,status,open_status')->find();
+        $jwtAuth = new JwtAuth();
+        $token = $jwtAuth->createToken($rider_info,31104000);
+
+        $this->success('申请成功',['token'=>$token]);
     }
 
 
