@@ -472,11 +472,11 @@ class Order extends ApiBase
         $total_money_cash = model('Orders')->getTotalMoney($order,$detail);//订单总价
         $order_discount_cash = model('Orders')->getDisMoney($shop_discount,$platform_discount);//订单优惠
 
-        if($total_money_cash != $total_money) {
+        if(bccomp($total_money_cash, $total_money, 4) != 0) {
             $this->error('订单总价不正确');
         }
 
-        if(($total_money_cash - $order_discount_cash)  != $money) {
+        if(bccomp($total_money_cash - $order_discount_cash, $money, 4) != 0) {
             $this->error('订单结算金额不正确');
         }
 
@@ -646,6 +646,10 @@ class Order extends ApiBase
 
         if($order_info['status'] == 3) {
             $this->error('商家已接单,无法退款,请去申请退款');
+        }
+
+        if(in_array($order_info['status'], [5,6,7,8])) {
+            $this->error('骑手取货、配货、已送达、已完成,无法退款,请去申请退款');
         }
 
         // 这块判断有问题， 状态值 2 跟 3 不能同时存在

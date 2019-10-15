@@ -470,10 +470,11 @@ class Test extends Controller
 
         // $_data = array_count_values($data);
         // dump($_data['320']);
-        $res = Db::name('canteen_income_expend')->where('id',1)->setField(['status'=>3,'payment_time'=>time()]);
-        
-        dump($res);
-        exit;
+        if(bccomp(15.7 - 10, 5.7, 4) != 0) {
+            $this->error('订单结算金额不正确');
+        }else{
+            echo 11;
+        }
     }
 
     /**

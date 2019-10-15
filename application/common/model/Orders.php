@@ -164,7 +164,7 @@ class Orders extends Model
         }
         //订单总价 = 商品总价 + 配送费
         $total_money = sprintf("%.2f",$goods_total_money + $shop_info['ping_fee']);
-
+        set_log('total_money=',$total_money,'sureOrder');
         return $total_money;
     }
 
@@ -204,6 +204,8 @@ class Orders extends Model
         }
 
         $dis_money = $shop_dis_money + $plat_dis_money;
+
+        set_log('dis_money=',$dis_money,'sureOrder');
         return sprintf("%.2f",$dis_money);
 
     }

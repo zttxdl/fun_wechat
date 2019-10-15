@@ -195,6 +195,14 @@ class Refund extends MerchantsBase
         //dump($pay_config);
         $app    = Factory::payment($pay_config);//pay_config 微信配置
 
+        $refundData = [
+            'total_fee' => $totalFee,
+            'refund_fee' => $refundFee,
+            'out_refund_no' => $refundNumber,
+            'number' => $number
+        ];
+        //退单数据查询
+        set_log('refundData=',$refundData,'refund');
 
         //根据商户订单号退款
         $result = $app->refund->byOutTradeNumber( $number, $refundNumber, $totalFee, $refundFee, $config = [
@@ -203,7 +211,7 @@ class Refund extends MerchantsBase
             'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
         ]);
 
-
+        set_log('result=',$result,'refund');
         return $result;
     }
 

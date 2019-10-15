@@ -45,6 +45,7 @@ class Login extends RiderBase
         $list['openid'] = $data['openid'];
         $list['sex'] = $data['gender'];
         $list['add_time'] = time();
+        $list['last_login_time'] = time();
 
         // 判断当前用户是否已授权
         $rid = Db::name('rider_info')->where('openid','=',$data['openid'])->value('id');
@@ -53,6 +54,8 @@ class Login extends RiderBase
             if(!$rid) {
                 $this->error('授权入表失败');
             }
+        } else {
+            Db::name('rider_info')->where('id','=',$rid)->setField('last_login_time',time());
         }
         $info = Db::name('rider_info')->where('openid','=',$data['openid'])->field('id,school_id,status,open_status')->find();
         $jwtAuth = new JwtAuth();
