@@ -648,6 +648,10 @@ class Order extends ApiBase
             $this->error('商家已接单,无法退款,请去申请退款');
         }
 
+        if(in_array($order_info['status'], [5,6,7,8])) {
+            $this->error('骑手取货、配货、已送达、已完成,无法退款,请去申请退款');
+        }
+
         // 这块判断有问题， 状态值 2 跟 3 不能同时存在
         if($order_info['status'] == 2) {//已经支付
             $this->refund($order_info['orders_sn']);//退款
