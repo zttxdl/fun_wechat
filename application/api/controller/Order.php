@@ -322,7 +322,7 @@ class Order extends ApiBase
             $this->success('success',$result);
         }else{
 
-             $this->error($result);
+             $this->error('下单失败'.$result['err_code_des']);
         }
 
     }
