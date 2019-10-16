@@ -4,6 +4,7 @@
 namespace app\merchants\controller;
 use app\common\controller\MerchantsBase;
 use EasyWeChat\Factory;
+use function GuzzleHttp\Psr7\str;
 use think\Request;
 use think\facade\Env;
 use think\Db;
@@ -186,8 +187,8 @@ class Refund extends MerchantsBase
             $this->error('退款金额不能大于订单总额');
         }
 
-        $totalFee = $find->total_fee * 100; //订单金额
-        $refundFee =  $find->refund_fee * 100;//退款金额
+        $totalFee = intval((string)($find->total_fee * 100)); //订单金额
+        $refundFee =  intval((string)($find->refund_fee * 100));//退款金额
         $refundNumber = $find->out_refund_no;//商户退款单号
 
         $pay_config = config('wx_pay');
