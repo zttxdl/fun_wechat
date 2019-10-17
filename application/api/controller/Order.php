@@ -663,7 +663,7 @@ class Order extends ApiBase
 
             $data['status'] = $hongbao_status;
             // Mike需调整
-            $my_coupon_id = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$order_info['platform_coupon_id']]])->value('id');
+            $my_coupon_id = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$order_info['platform_coupon_id']],['status','=','2']])->value('id');
             model('MyCoupon')->updateStatus($my_coupon_id,$data);
         }
 
