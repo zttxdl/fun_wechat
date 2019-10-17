@@ -148,8 +148,8 @@ return [
     'show_error_msg'         => false,
     // 异常处理handle类 留空使用 \think\exception\Handle
 
-    'exception_handle'       => '\app\common\exception\Http',
-    //'exception_handle'       => '',
+    // 'exception_handle'       => '\app\common\exception\Http',
+    'exception_handle'       => '',
     //jwt定义的key
     'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
     //阿里云sms
@@ -222,6 +222,14 @@ return [
         'length' => 4,
     ],
 
+
+    // 个推
+    'getui' => [
+        'appid' => 'eBbScERdWa55a1Aaf6VVJ5',
+        'appSecret' => 'HvKAZvuisj8W4S7c5V7Iy7',
+        'appkey' => 'kOjIFGbbyhAj5wOzEWggz5',
+        'mastersecret' => 'hE66od5XSS8vGvOcRG3Ii9',
+    ],
 
 
 ];

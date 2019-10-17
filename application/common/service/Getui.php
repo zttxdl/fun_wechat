@@ -1,17 +1,18 @@
 <?php
+/**
+ * Author: Postbird
+ * Date  : 2017/4/29
+ * time  : 11:11
+ * Site  : www.ptbird.cn
+ * There I am , in the world more exciting!
+ */
 namespace app\common\service;
 
-/**
- * author Mike
- * 参考网站 ：http://www.ptbird.cn/tp5-getui-restfulapi-model.html
- */
 use think\facade\Cache;
-use think\Config;
 use think\Model;
 
-// 这里继承model的意义是，方便在控制器端，通过model('Getui','service') 的方式进行调用， 其实完全可不继承model ，直接在控制器端通过 new Getui() 的方式进行调用
-class Getui  extends Model
-{
+class Getui extends Model{
+
     /**
      * 获取authtoken,从缓存中获取
      * 有效时间是1天，如果超时则重新获取
@@ -22,21 +23,24 @@ class Getui  extends Model
         $authToken=Cache::get('getui_auth_token');
         // 如果存在token参数,则说明没有过期
         if($authToken){
+            // 返回auth_token
             return $authToken;
         }else{
             // 刷新token，会返回数组格式
             $res=$this->refreshAuthToken();
+            // dump($res);die;
             // 返回的数组中 result=ok 代表获取成功
             if($res['result']=='ok'){
                 // 向缓存中存储 token,有效时间是23小时
                 Cache::set('getui_auth_token',$res['auth_token'],82800);
+                // 将结果存储到redis中
+                $this->cache_getui_res($res);
                 return $res['auth_token'];
-            }
+            }// 将结果存储到redis中
+            $this->cache_getui_res($res);
             return false;
         }
     }
-
-    
     /**
      * 刷新或者初次获取 authtoken
      * 通过 restAPI刷新
@@ -44,9 +48,9 @@ class Getui  extends Model
      */
     protected function refreshAuthToken(){
         // 从配置中获取相关的数据
-        $appKey=Config::get('getui.appkey');
-        $appId=Config::get('getui.appid');
-        $masterSecret=Config::get('getui.mastersecret');
+        $appKey=config('getui')['appkey'];
+        $appId=config('getui')['appid'];
+        $masterSecret=config('getui')['mastersecret'];
         // 获取毫秒数 秒数*1000
         $timestamp=time()*1000;
         // 构建sign
@@ -68,15 +72,15 @@ class Getui  extends Model
         $res=curl_post_json($url,$header,$content);
         $res=json_decode($res,true);
         // 返回数组格式,如果res.result是ok，说明没问题
+        // 将结果存储到redis中
+        $this->cache_getui_res($res);
         return $res;
     }
-
-
     /**
      * 关闭鉴权
      */
     public function closeAuthToken(){
-        $appId=Config::get('getui.appid');
+        $appId=config('getui')['appid'];
         // 获取auth_token,调用函数获取，如果超时则会自动刷新
         $authToken=$this->getAuthToken();
         if(!$authToken){
@@ -91,18 +95,24 @@ class Getui  extends Model
         $res=curl_post_json($url,$header);
         $res=json_decode($res,true);
         // 返回数组格式,如果res.result是ok，说明没问题
+        // 将结果存储到redis中
+        $this->cache_getui_res($res);
         return $res;
     }
-
-
     /**
      *  向某个用户推送消息
-     *  cid = fd98882bf6f1bade6bffc85574436db
+     *  cid = fd98882bef6f1bade6bffc85574436db
+     *  cid = 260cc489c1b6bb13b7cb933f89020ad0
+     *  - $content 是一个报刊在notification->style下的数组内容
+     *    其中包括了  title,text,logo,logourl,is_ring,is_vibrate,is_clearable
+     * @param $clientID string
+     * @param $content array
+     * @param $transmission_content string
      */
-    public function sendToClient($clientID,$title='',$text='',$transmission_content=''){
-        $appKey=Config::get('getui.appkey');
+    public function sendToClient($clientID,$content,$transmission_content=''){
+        $appKey=config('getui')['appkey'];
         $authToken=$this->getAuthToken();
-        $appId=Config::get('getui.appid');
+        $appId=config('getui')['appid'];
         $content=array(
             'message'=>[
                 "appkey"=>$appKey,
@@ -111,9 +121,13 @@ class Getui  extends Model
             ],
             'notification'=>[
                 'style'=>[
-                    'type'=>0,
-                    'text'=>$text,
-                    'title'=>$title
+                    'type'=>1,
+                    'title'=>$content['title'],
+                    'text'=>$content['text'],
+                    'logourl'=>$content['logourl'],
+                    'is_ring'=>$content['is_ring'],
+                    'is_vibrate'=>$content['is_vibrate'],
+                    'is_clearable'=>$content['is_clearable'],
                 ],
                 "transmission_type"=> true,
                 "transmission_content"=> $transmission_content
@@ -127,20 +141,23 @@ class Getui  extends Model
             'authtoken:'.$authToken
         );
         $url='https://restapi.getui.com/v1/'.$appId.'/push_single';
+        //
         $res=curl_post_json($url,$header,$content);
         $res=json_decode($res,true);
+        // 将结果存储到redis中
+        $this->cache_getui_res($res);
         return $res;
     }
-
-
     /**
      * 群发消息
      * - 向所有的app发送透传消息
+     * @param $message
+     * @return array
      */
     public function sendToAllTransmission($message){
-        $appKey=Config::get('getui.appkey');
+        $appKey=config('getui')['appkey'];
         $authToken=$this->getAuthToken();
-        $appId=Config::get('getui.appid');
+        $appId=config('getui')['appid'];
         $content=[
             'message'=>[
                 "appkey"=>$appKey,
@@ -169,11 +186,15 @@ class Getui  extends Model
     /**
      * 群发消息
      * - 向所有的app发送notification消息
+     * @param $content
+     * @param $transmission_content string
+     * @return array
      */
-    public function sendToAllNotification($title='',$text='',$transmission_content=''){
-        $appKey=Config::get('getui.appkey');
+    public function sendToAllNotification($content,$transmission_content=''){
+        $appKey=config('getui')['appkey'];
         $authToken=$this->getAuthToken();
-        $appId=Config::get('getui.appid');
+        // var_dump($authToken);die;
+        $appId=config('getui')['appid'];
         $content=[
             'message'=>[
                 "appkey"=>$appKey,
@@ -182,9 +203,13 @@ class Getui  extends Model
             ],
             'notification'=>[
                 'style'=>[
-                    'type'=>0,
-                    'text'=>$text,
-                    'title'=>$title
+                    'type'=>1,
+                    'text'=>$content['text'],
+                    'title'=>$content['title'],
+                    'logourl'=>$content['logourl'],
+                    'is_ring'=>$content['is_ring'],
+                    'is_vibrate'=>$content['is_vibrate'],
+                    'is_clearable'=>$content['is_clearable'],
                 ],
                 "transmission_type"=>true,
                 "transmission_content"=>$transmission_content
@@ -197,8 +222,98 @@ class Getui  extends Model
             'authtoken:'.$authToken
         ];
         $url='https://restapi.getui.com/v1/'.$appId.'/push_app';
+        //
         $res=curl_post_json($url,$header,$content);
         $res=json_decode($res,true);
+        // 将结果存储到redis中
+        $this->cache_getui_res($res);
         return $res;
+    }
+    /**
+     *  群发消息
+     *  - 向cidList中的cid发送消息
+     *  - 需要调用两次接口，分别是save_list_body 和 push_list
+     * @param $cidList array
+     * @param $content
+     * @param $transmission_content string
+     * @return array
+     */
+    public function sendToListNotification($cidList=[],$content,$transmission_content=''){
+        $appKey=config('getui')['appkey'];
+        $authToken=$this->getAuthToken();
+        $appId=config('getui')['appid'];
+        $content=array(
+            'message'=>[
+                "appkey"=>$appKey,
+                "is_offline"=>false,
+                "msgtype"=>"notification"
+            ],
+            'notification'=>[
+            'style'=>[
+                'type'=>1,
+                'text'=>$content['text'],
+                'title'=>$content['title'],
+                'logourl'=>$content['logourl'],
+                'is_ring'=>$content['is_ring'],
+                'is_vibrate'=>$content['is_vibrate'],
+                'is_clearable'=>$content['is_clearable'],
+                ],
+                "transmission_type"=> true,
+                "transmission_content"=> $transmission_content
+            ],
+        );
+        $content=json_encode($content);
+        $header=array(
+            'Content-Type: application/json',
+            'authtoken:'.$authToken
+        );
+        // 首先进行要发送的内容的保存
+        $url='https://restapi.getui.com/v1/'.$appId.'/save_list_body ';
+        // 成功之后获取taskid
+        $res=curl_post_json($url,$header,$content);
+        $res=json_decode($res,true);
+        // 将结果存储到redis中
+        $this->cache_getui_res($res);
+        if($res['result']=='ok'){
+            // 调用tolist接口
+            $toListContent=[
+                'cid'=>$cidList,
+                'taskid'=>$res['taskid'],
+                'need_detail'=>false,
+            ];
+            $toListContent=json_encode($toListContent);
+            $url='https://restapi.getui.com/v1/'.$appId.'/push_list ';
+            $res=curl_post_json($url,$header,$toListContent);
+            $res=json_decode($res,true);
+            // 将结果存储到redis中
+            $this->cache_getui_res($res);
+            return $res;
+        }else{
+            // 将结果存储到redis中
+            $this->cache_getui_res($res);
+            return $res;
+        }
+    }
+
+    /**
+     * 用于本地缓存个推API调用的结果
+     * - 可以用于查看API调用的具体情况
+     * - 本地缓存的key是 getui_res_list 
+     * @param $res
+     */
+    protected function cache_getui_res($res){
+        try{
+            $nowList=Cache::get('getui_res_list');
+            $arr=['res'=>$res,'time'=>date('Y-m-d H:i:s',time())];
+            if(is_array($nowList)){
+                array_push($nowList,$arr);
+                // 如果已经数组了 则世界array_push
+                Cache::set('getui_res_list',$nowList);
+            }else{
+                Cache::set('getui_res_list',[0=>$arr]);
+            }
+        }catch (\Exception $exception){
+
+        }
     }
 }
