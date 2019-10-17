@@ -2,13 +2,12 @@
 namespace app\Index\Controller;
 
 use app\common\controller\Base;
-
+use app\common\service\Getui;
 use GuzzleHttp\Client;
 use app\common\service\PushEvent;
 use think\facade\Cache;
 use think\Request;
 use think\Db;
-
 
 
 class Index extends Base
@@ -142,6 +141,35 @@ class Index extends Base
     {
         // phpinfo();
         Cache::store('redis')->del('user_active_openid');
+    }
+
+
+    public function getui($type = 0, $cid = '833a1bdd7100799c5d3a31d30ac10856'){
+        try{
+            $Getui=new Getui();
+            // 获取配置内容
+            // $configInfo=Config::get('apiserver.notification_cid');
+            // 拼接基本的content数组
+            $content=[
+                'title'=>'ttttt',
+                'text'=>'ssssss',
+                'logourl'=>'',
+                'is_ring'=>true,
+                'is_vibrate'=>true,
+                'is_clearable'=>true,
+            ];
+            // type=0 说明只发送一个
+            if($type==0){
+                $res=$Getui->sendToClient($cid,$content,'');
+            }else{
+                // 多个cid都需要发送
+                $res=$Getui->sendToListNotification($cid,$content,'');
+            }
+            return $res;
+        }catch (\Exception $exception){
+            $res=['res'=>$exception->getMessage(),'time'=>time()];
+            return $res;
+        }
     }
 
 	 
