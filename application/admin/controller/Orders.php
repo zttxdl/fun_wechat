@@ -229,7 +229,7 @@ class Orders extends Base
                 'name' => $row['name'],
                 'num' => $row['num'],
                 'class_name' => model('ProductsClassify')->where('id',$row['products_classify_id'])->value('name'),
-                'attr_name' => model('Shop')->getGoodsAttrName($row['attr_ids']),
+                'attr_name' => model('Shop')->getGoodsAttrSonName($row['attr_ids']),
                 'price' => $row['price'],
             ];
         }

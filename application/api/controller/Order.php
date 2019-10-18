@@ -206,7 +206,8 @@ class Order extends ApiBase
             'num' => $orders['num'],
             'status' => $orders['status'],
             'status_name' => $this->order_status[$orders['status']],
-            'is_refund' => $is_refund
+            'is_refund' => $is_refund,
+            'remark' => $orders['message']
         ];
 
         $shop_info = model('ShopInfo')->where('id',$orders['shop_id'])->field('id,shop_name,logo_img,run_type')->find();
