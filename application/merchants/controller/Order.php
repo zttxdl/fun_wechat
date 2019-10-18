@@ -382,7 +382,7 @@ class Order extends MerchantsBase
                 //如果使用红包 状态回滚
                 if($order_info['platform_coupon_money'] > 0){
                     $data['status'] = 1;//未使用
-                    $my_coupon_id = model('MyCoupon')->where([['user_id','=',$order_info['user_id']],['platform_coupon_id','=',$order_info['platform_coupon_id']]])->value('id');
+                    $my_coupon_id = model('MyCoupon')->where([['user_id','=',$order_info['user_id']],['platform_coupon_id','=',$order_info['platform_coupon_id']],['status','=','2']])->value('id');
                     Model('MyCoupon')->updateStatus($my_coupon_id,$data);
                 }
 
