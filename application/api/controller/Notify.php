@@ -80,7 +80,7 @@ class Notify extends Collection
         }
 
         // 向指定商家推送新订单消息
-        write_log('进来了'.$orders_sn,'log');
+        // write_log('进来了'.$orders_sn,'log');
 
         $push = new PushEvent();
         $push->setUser('s_'.$shop_id)->setContent($orders_sn)->push();
