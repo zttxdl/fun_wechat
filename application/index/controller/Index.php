@@ -8,7 +8,7 @@ use app\common\service\PushEvent;
 use think\facade\Cache;
 use think\Request;
 use think\Db;
-
+use JPush\Client as JPush;
 
 class Index extends Base
 {
@@ -171,6 +171,28 @@ class Index extends Base
             return $res;
         }
     }
+
+
+    /**
+     *  
+     * 
+     */
+    public function jiguang()
+    {
+        $app_key = 'fd8088ea1b361b77e0e83401';
+        $master_secret = '3a892c08bbc625761968e0e2';
+        $client = new JPush($app_key, $master_secret);
+        // var_dump($client);
+        $client->push()
+            ->setPlatform('all')
+            ->addAllAudience()
+            // ->addRegistrationId('1507bfd3f7ac9b283b3') 
+            // ->addRegistrationId('13065ffa4e6e0960368')   // 指定特定的用户推送
+            // ->setNotificationAlert('Hello, 张涛涛')  // 推送内容
+            ->addAndroidNotification('饭点送来新订单了','张涛涛提醒')  // 推送标题 + 内容
+            ->send();
+    }
+     
 
 	 
 
