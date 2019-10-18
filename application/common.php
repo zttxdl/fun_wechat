@@ -472,3 +472,32 @@ function conditions($time)
 
         return $data;
     }
+
+
+function curl_post_json($url, $header, $content='')
+{
+    $ch = curl_init();
+    if (substr($url, 0, 5) == 'https') {
+        // 跳过证书检查
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        // 从证书中检查SSL加密算法是否存在
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, true);
+    }
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+    // 设置允许查看请求头信息
+    // curl_setopt($ch,CURLINFO_HEADER_OUT,true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $content);
+    $response = curl_exec($ch);
+    // 查看请求头信息
+    // dump(curl_getinfo($ch,CURLINFO_HEADER_OUT));
+    if ($error = curl_error($ch)) {
+        curl_close($ch);
+        return $error;
+    } else {
+        curl_close($ch);
+        return $response;
+    }
+}

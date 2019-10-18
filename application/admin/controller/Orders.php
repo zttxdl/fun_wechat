@@ -217,7 +217,7 @@ class Orders extends Base
             ->alias('a')
             ->leftJoin('product b','a.product_id = b.id')
             ->where('a.orders_id',$order_id)
-            ->field('a.id,b.name,a.num,b.products_classify_id,b.attr_ids,b.price')
+            ->field('a.id,b.name,a.num,b.products_classify_id,a.attr_ids,b.price')
             ->select();
 
         //dump($goods_list);

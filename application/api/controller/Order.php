@@ -206,7 +206,8 @@ class Order extends ApiBase
             'num' => $orders['num'],
             'status' => $orders['status'],
             'status_name' => $this->order_status[$orders['status']],
-            'is_refund' => $is_refund
+            'is_refund' => $is_refund,
+            'remark' => $orders['message']
         ];
 
         $shop_info = model('ShopInfo')->where('id',$orders['shop_id'])->field('id,shop_name,logo_img,run_type')->find();
@@ -648,6 +649,10 @@ class Order extends ApiBase
             $this->error('商家已接单,无法退款,请去申请退款');
         }
 
+        if($order_info['status'] == 4) {
+            $this->error('商家已拒单!');
+        }
+
         if(in_array($order_info['status'], [5,6,7,8])) {
             $this->error('骑手取货、配货、已送达、已完成,无法退款,请去申请退款');
         }
@@ -663,7 +668,7 @@ class Order extends ApiBase
 
             $data['status'] = $hongbao_status;
             // Mike需调整
-            $my_coupon_id = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$order_info['platform_coupon_id']]])->value('id');
+            $my_coupon_id = model('MyCoupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$order_info['platform_coupon_id']],['status','=','2']])->value('id');
             model('MyCoupon')->updateStatus($my_coupon_id,$data);
         }
 
