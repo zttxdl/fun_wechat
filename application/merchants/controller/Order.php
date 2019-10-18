@@ -290,7 +290,6 @@ class Order extends MerchantsBase
                 'order_id' => $order_info['id'],
                 'shop_id' => $order_info['shop_id'],
                 'ping_fee' => $order_info['ping_fee'],//配送费
-                'meal_sn' => getMealSn('shop_id:'.$order_info['shop_id']),//取餐号
                 'school_id' => $shop_info['school_id'],
                 'create_time' => time(),//商家接单时间
                 'expected_time' => time()+30*60,//预计送达时间
@@ -302,13 +301,12 @@ class Order extends MerchantsBase
             $ret = Db::name('takeout')->insert($takeout_info);
 
             if (!$ret){
-                throw new Exception('接单失败');
+                throw new Exception('接单失败0');
+            } else {
+                $meal_sn = getMealSn('shop_id:'.$order_info['shop_id']);
+                Db::name('tackout')->where('order_id','=',$order_info['id'])->setField('meal_sn',$meal_sn);
             }
-
-            $result = model('Orders')->where('id',$order_info['id'])->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time(),'meal_sn'=>$takeout_info['meal_sn']]);
-            if (!$result){
-                throw new Exception('接单失败');
-            }
+            model('Orders')->where('id',$order_info['id'])->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time(),'meal_sn'=>$meal_sn]);
 
             Db::commit();
 

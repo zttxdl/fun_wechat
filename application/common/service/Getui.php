@@ -302,18 +302,15 @@ class Getui extends Model{
      * @param $res
      */
     protected function cache_getui_res($res){
-        try{
-            $nowList=Cache::get('getui_res_list');
-            $arr=['res'=>$res,'time'=>date('Y-m-d H:i:s',time())];
-            if(is_array($nowList)){
-                array_push($nowList,$arr);
-                // 如果已经数组了 则世界array_push
-                Cache::set('getui_res_list',$nowList);
-            }else{
-                Cache::set('getui_res_list',[0=>$arr]);
-            }
-        }catch (\Exception $exception){
-
+        $nowList=Cache::get('getui_res_list');
+        var_dump($nowList);die;
+        $arr=['res'=>$res,'time'=>date('Y-m-d H:i:s',time())];
+        if(is_array($nowList)){
+            array_push($nowList,$arr);
+            // 如果已经数组了 则世界array_push
+            Cache::set('getui_res_list',$nowList);
+        }else{
+            Cache::set('getui_res_list',[0=>$arr]);
         }
     }
 }
