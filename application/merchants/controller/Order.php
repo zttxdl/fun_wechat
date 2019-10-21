@@ -304,7 +304,7 @@ class Order extends MerchantsBase
                 throw new Exception('接单失败0');
             } else {
                 $meal_sn = getMealSn('shop_id:'.$order_info['shop_id']);
-                Db::name('tackout')->where('order_id','=',$order_info['id'])->setField('meal_sn',$meal_sn);
+                Db::name('takeout')->where('order_id','=',$order_info['id'])->setField('meal_sn',$meal_sn);
             }
             model('Orders')->where('id',$order_info['id'])->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time(),'meal_sn'=>$meal_sn]);
 
