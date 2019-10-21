@@ -154,6 +154,10 @@ Route::group('a-school', function () {
     Route::get('/show/:id', 'show');
     Route::post('/update', 'update');
     Route::get('/del/:id', 'delete');
+    Route::get('getHourse', 'getHourse');//楼栋展示
+    Route::rule('addHourse', 'addHourse', 'GET|POST');//新增楼栋
+    Route::rule('updateHourse', 'updateHourse', 'GET|POST');//编辑楼栋
+    Route::get('deleteHourse', 'deleteHourse');//删除楼栋
 })->prefix('admin/school/')->middleware('IsLogin');
 
 // 食堂管理模块
