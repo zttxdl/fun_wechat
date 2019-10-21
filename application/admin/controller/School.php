@@ -278,8 +278,9 @@ class School extends Base
             }
         } else {
             $arr = Db::name("Hourse")->field('id,fid,level,name')->select();
+            $info = Db::name('Hourse')->where('id',$data['id'])->find();
             $list = get_node($arr);
-            $this->success('楼栋列表获取成功',$list);
+            $this->success('楼栋列表获取成功',['list'=>$list,'info'=>$info]);
         }
     }
 
