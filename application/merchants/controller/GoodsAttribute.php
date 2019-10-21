@@ -40,8 +40,8 @@ class GoodsAttribute extends MerchantsBase
 
         if ($fid){
             $count = model('ProductAttrClassify')->where('pid',$fid)->count();
-            if ($count >= 3){
-                $this->error('最多添加三个属性');
+            if ($count >= 6){
+                $this->error('最多添加 6 个属性');
             }
 
         }

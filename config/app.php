@@ -232,5 +232,21 @@ return [
     ],
 
 
+    // 极光
+    'jiguang'   => [
+        'appkey'    => 'fd8088ea1b361b77e0e83401',
+        'master_secret'    => '3a892c08bbc625761968e0e2',
+    ],
+
+
+    // 信鸽
+    'xinge'=>   [
+        'appid'   => '5503065f63f3e',
+        'secretkey'   => 'bb9451081832338f917316becaa51ec5',
+        'accessid'   => '2100346254',
+        'accesskey'   => 'A972NKKD45QL',
+    ]
+
+
 ];
 

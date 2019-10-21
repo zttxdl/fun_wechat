@@ -174,7 +174,7 @@ class Index extends Base
 
 
     /**
-     *  
+     *  极光推送
      * 
      */
     public function jiguang()
@@ -192,6 +192,20 @@ class Index extends Base
             ->addAndroidNotification('饭点送来新订单了','张涛涛提醒')  // 推送标题 + 内容
             ->send();
     }
+
+
+
+    /**
+     * 信鸽推送 
+     * ---单个设备下发通知消息
+     * 
+     */
+
+    public function xinge()
+    {
+
+    }
+     
      
 
 	 
