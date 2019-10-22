@@ -3,6 +3,7 @@
 namespace app\common\model;
 
 use think\Model;
+use think\Db;
 
 class School extends Model
 {
@@ -82,6 +83,8 @@ class School extends Model
         return $school_list;
 
     }
+
+
 
     
 }

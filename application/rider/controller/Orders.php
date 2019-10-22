@@ -27,6 +27,8 @@ class Orders extends RiderBase
             $this->error('非法参数');
         }
         $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
+
+        
         if ($status_arr['status'] == 4) {
             $this->error('你账号已被禁用，无法接单',202);
         }
@@ -45,9 +47,11 @@ class Orders extends RiderBase
         $location = $latitude.','.$longitude;
 
 		if ($type == 1) {
+            $rider_id = $this->auth->id;
+            $hourse_ids = Db::name('RiderInfo')->where('id',$rider_id)->value('hourse_ids');
+            $where[] = ['hourse_id','in',$hourse_ids];
             $where[] = ['school_id','=',$this->auth->school_id];
-		    $where[] = ['status','=',1];
-
+            $where[] = ['status','=',1];
             $list = model('Takeout')
                 ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
                 ->where($where)
@@ -55,8 +59,8 @@ class Orders extends RiderBase
                 ->select();
 		}elseif($type == 2){
 			//获取已接单
-            $where[] = ['school_id','=',$this->auth->school_id];
             $where[] = ['rider_id','=',$this->auth->id];
+            $where[] = ['school_id','=',$this->auth->school_id];
             $count = model('Takeout')->where($where)->where('status','in','3,4,5')->count();
             $data['count'] = $count;
             $where[] = ['status','in','3,4,5'];
@@ -74,8 +78,8 @@ class Orders extends RiderBase
             }
 		}else{
 		    //获取已完成订单
-            $where[] = ['school_id','=',$this->auth->school_id];
             $where[] = ['rider_id','=',$this->auth->id];
+            $where[] = ['school_id','=',$this->auth->school_id];
             $count = model('Takeout')->where($where)->where('status','in','3,4,5')->count();
             $data['count'] = $count;
             $where[] = ['status','=','6'];
@@ -712,6 +716,54 @@ class Orders extends RiderBase
         }
 
         $this->success('确认送达');
+    }
+
+    /**
+     * 选择楼栋列表
+     */
+    public function getHourseList()
+    {
+        $rider_id = $this->auth->id;
+        $hourse_ids = Db::name('RiderInfo')->where('id',$rider_id)->value('hourse_ids');
+    
+        if(empty($hourse_ids)) {
+            $hourse_ids = [];
+        }else{
+            $hourse_ids = explode(',',$hourse_ids);
+        }
+        $list = model('Hourse')->getHourseList();
+
+        foreach($list as &$row) {
+            $row['isCheck'] = 0;
+            if(in_array($row['id'],$hourse_ids)) {
+                $row['isCheck'] = 1;
+            }
+
+            if(is_array($row['son'])) {
+                foreach($row['son'] as &$v) {
+                    $v['isCheck'] = 0;
+                    if(in_array($v['id'],$hourse_ids)) {
+                        $v['isCheck'] = 1;
+                    }
+                }
+            }
+        }
+        $this->success('获取成功',$list);
+    }
+
+    /**
+     * 保存楼栋设置(用于筛选订单))
+     */
+    public function save(Request $request)
+    {
+        $rider_id = $this->auth->id;
+        $hourse_ids = $request->param('hourse_ids');
+
+        $res = Db::name('RiderInfo')->where('id',$rider_id)->setField('hourse_ids',$hourse_ids);
+        if($res) {
+            $this->success('保存成功');
+        }
+        
     }
 
 
