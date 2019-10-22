@@ -44,6 +44,9 @@ class School extends Validate
         'name.max' => '楼栋名称不能超过30位', 
     ];
 
+    /**
+     * 定义方法
+     */
     protected $scene = [
         'update'  =>  ['name','longitude','latitude','completion_time','fetch_time'],
         'insert'  =>  ['name','longitude','latitude','completion_time','fetch_time'],
