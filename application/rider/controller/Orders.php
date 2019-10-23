@@ -725,7 +725,11 @@ class Orders extends RiderBase
     {
         $rider_id = $this->auth->id;
         $hourse_ids = Db::name('RiderInfo')->where('id',$rider_id)->value('hourse_ids');
-    
+
+        $info = Db::name('Hourse')->field('name')->where('id','in',$hourse_ids)->select();
+        
+        $info = implode(',',array_column($info,'name'));
+
         if(empty($hourse_ids)) {
             $hourse_ids = [];
         }else{
@@ -748,7 +752,7 @@ class Orders extends RiderBase
                 }
             }
         }
-        $this->success('获取成功',$list);
+        $this->success('获取成功',['list'=>$list,'info'=>$info]);
     }
 
     /**
