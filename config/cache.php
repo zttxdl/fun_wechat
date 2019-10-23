@@ -60,6 +60,7 @@ return [
         'prefix'=>  'rds',
         // 服务器地址
         'host'       => '127.0.0.1',
+        'select' => 1
     ],
     'runtime_path'  => '../runtime',
 ];
