@@ -23,6 +23,8 @@ class Orders extends RiderBase
 	{
         $data = [];
         $type = $request->param('type');
+        $rider_id = $this->auth->id;
+        $school_id = $this->auth->school_id;
         if (!$type) {
             $this->error('非法参数');
         }
@@ -47,10 +49,9 @@ class Orders extends RiderBase
         $location = $latitude.','.$longitude;
 
 		if ($type == 1) {
-            $rider_id = $this->auth->id;
             $hourse_ids = Db::name('RiderInfo')->where('id',$rider_id)->value('hourse_ids');
             $where[] = ['hourse_id','in',$hourse_ids];
-            $where[] = ['school_id','=',$this->auth->school_id];
+            $where[] = ['school_id','=',$school_id];
             $where[] = ['status','=',1];
             $list = model('Takeout')
                 ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
@@ -59,8 +60,8 @@ class Orders extends RiderBase
                 ->select();
 		}elseif($type == 2){
 			//获取已接单
-            $where[] = ['rider_id','=',$this->auth->id];
-            $where[] = ['school_id','=',$this->auth->school_id];
+            $where[] = ['rider_id','=',$rider_id];
+            $where[] = ['school_id','=',$school_id];
             $count = model('Takeout')->where($where)->where('status','in','3,4,5')->count();
             $data['count'] = $count;
             $where[] = ['status','in','3,4,5'];
@@ -78,8 +79,8 @@ class Orders extends RiderBase
             }
 		}else{
 		    //获取已完成订单
-            $where[] = ['rider_id','=',$this->auth->id];
-            $where[] = ['school_id','=',$this->auth->school_id];
+            $where[] = ['rider_id','=',$rider_id];
+            $where[] = ['school_id','=',$school_id];
             $count = model('Takeout')->where($where)->where('status','in','3,4,5')->count();
             $data['count'] = $count;
             $where[] = ['status','=','6'];
@@ -128,7 +129,12 @@ class Orders extends RiderBase
 
         }
 
+        $hourse_ids = Db::name('RiderInfo')->where('id',$rider_id)->value('hourse_ids');
+        $info = Db::name('Hourse')->field('name')->where('id','in',$hourse_ids)->select();
+        
+        $info = implode(',',array_column($info,'name'));
         $data['list'] = $list;
+        $data['info'] = $info;
 		$this->success('success',$data);
     }
     
@@ -726,10 +732,6 @@ class Orders extends RiderBase
         $rider_id = $this->auth->id;
         $hourse_ids = Db::name('RiderInfo')->where('id',$rider_id)->value('hourse_ids');
 
-        $info = Db::name('Hourse')->field('name')->where('id','in',$hourse_ids)->select();
-        
-        $info = implode(',',array_column($info,'name'));
-
         if(empty($hourse_ids)) {
             $hourse_ids = [];
         }else{
@@ -752,7 +754,7 @@ class Orders extends RiderBase
                 }
             }
         }
-        $this->success('获取成功',['list'=>$list,'info'=>$info]);
+        $this->success('获取成功',$list);
     }
 
     /**
