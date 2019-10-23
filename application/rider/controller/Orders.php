@@ -768,6 +768,8 @@ class Orders extends RiderBase
         $res = Db::name('RiderInfo')->where('id',$rider_id)->setField('hourse_ids',$hourse_ids);
         if($res) {
             $this->success('保存成功');
+        }else{
+            $this->error('保存失败');
         }
         
     }
