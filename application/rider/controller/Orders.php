@@ -773,7 +773,7 @@ class Orders extends RiderBase
         $rider_id = $this->auth->id;
         $hourse_ids = $request->param('hourse_ids');
 
-        $res = Db::name('RiderInfo')->where('id',$rider_id)->setField('hourse_ids',$hourse_ids);
+        $res = Db::name('RiderInfo')->where('id',$rider_id)->setField('hourse_ids','0,'.$hourse_ids);
         if($res !== false) {
             $this->success('保存成功');
         }else{
