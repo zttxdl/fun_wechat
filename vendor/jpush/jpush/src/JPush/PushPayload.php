@@ -49,6 +49,7 @@ class PushPayload {
         return $this;
     }
 
+    // 设置推送平台
     public function setPlatform($platform) {
         # $required_keys = array('all', 'android', 'ios', 'winphone');
         if (is_string($platform)) {
@@ -335,6 +336,7 @@ class PushPayload {
     }
 
     # new methods
+    // ios 消息通知
     public function iosNotification($alert = '', array $notification = array()) {
         $ios = array();
         $ios['alert'] = (is_string($alert) || is_array($alert)) ? $alert : '';
@@ -379,6 +381,7 @@ class PushPayload {
         return $this;
     }
 
+    // 安卓 消息通知
     public function androidNotification($alert = '', array $notification = array()) {
         $android = array();
         $android['alert'] = is_string($alert) ? $alert : '';
@@ -438,6 +441,7 @@ class PushPayload {
         return $this;
     }
 
+    // 消息【透传】
     public function message($msg_content, array $msg = array()) {
         # $required_keys = array('title', 'content_type', 'extras');
         if (is_string($msg_content)) {
@@ -561,6 +565,7 @@ class PushPayload {
         return $this;
     }
 
+    // 推送安卓消息通知【标题+内容】
     public function addAndroidNotification($alert=null, $title=null, $builderId=null, $extras=null) {
         $android = array();
 
@@ -604,6 +609,7 @@ class PushPayload {
         return $this;
     }
 
+    // 设置消息【透传】
     public function setMessage($msg_content, $title=null, $content_type=null, $extras=null) {
         $message = array();
 

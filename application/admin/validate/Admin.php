@@ -13,8 +13,8 @@ class Admin extends Validate
      * @var array
      */	
 	protected $rule = [
-        'name'                 => 'require|max:10|unique:admin', //  unique:表名
-        'phone'                => 'require|regex:/^1[3456789]{1}\d{9}$/|unique:admin',
+        'name'                 => 'require|max:10', 
+        'phone'                => 'require|regex:/^1[3456789]{1}\d{9}$/|unique:admin',//  unique:表名
         'role_id'               => 'require',
         'password'              => 'require|min:8|max:20|confirm',
         'password_confirm'      => 'require'
@@ -29,7 +29,6 @@ class Admin extends Validate
     protected $message = [
         'name.require'                  => '管理员名称必填',
         'name.max'                      => '管理员名称不能超过10位',
-        'name.unique'                   => '管理员名称不能重复',
         'phone.require'                 => '手机号必填',
         'phone.regex'                   => '手机号格式不对',
         'phone.unique'                  => '手机号不能重复',
