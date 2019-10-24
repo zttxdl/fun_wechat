@@ -150,9 +150,6 @@ class Order extends MerchantsBase
                 'issuing_status' => $row['issuing_status']//出餐状态 0:未出餐 1:已出餐
             ];
 
-
-
-
         }
         //写入缓存
         //Cache::store('redis')->set($key,$orders);
@@ -261,6 +258,9 @@ class Order extends MerchantsBase
 
         $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
 
+        if(empty($order_info)) {
+            $this->error('订单不存在');
+        }
 
         if($order_info['status'] == 3) {
             $this->error('商家已接单');
@@ -305,7 +305,7 @@ class Order extends MerchantsBase
                 throw new Exception('接单失败0');
             } else {
                 $meal_sn = getMealSn('shop_id:'.$order_info['shop_id']);
-                Db::name('tackout')->where('order_id','=',$order_info['id'])->setField('meal_sn',$meal_sn);
+                Db::name('takeout')->where('order_id','=',$order_info['id'])->setField('meal_sn',$meal_sn);
             }
             model('Orders')->where('id',$order_info['id'])->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time(),'meal_sn'=>$meal_sn]);
 
@@ -323,12 +323,14 @@ class Order extends MerchantsBase
         $map1 = [
             ['school_id', '=', $shop_info['school_id']],
             ['open_status', '=', 1],
-            ['status', '=', 3]
+            ['status', '=', 3],
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
         ];
         // 暂未成为骑手的情况
         $map2 = [
             ['school_id', '=', $shop_info['school_id']],
-            ['status', 'in', [0,1,2]]
+            ['status', 'in', [0,1,2]],
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
         ];  
 
         $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
