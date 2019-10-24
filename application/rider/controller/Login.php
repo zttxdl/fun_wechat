@@ -58,6 +58,7 @@ class Login extends RiderBase
             Db::name('rider_info')->where('id','=',$rid)->setField('last_login_time',time());
         }
         $info = Db::name('rider_info')->where('openid','=',$data['openid'])->field('id,school_id,status,open_status')->find();
+
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($info,31104000);   // 一年有效期
         $this->success('已授权',[
