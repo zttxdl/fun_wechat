@@ -133,6 +133,14 @@ class Member extends RiderBase
         }
         $rider_info = RiderInfo::where('id','=',$this->auth->id)->field('id,school_id,status,open_status')->find();
 
+        // 将该学校下的所有楼信息，存表
+        $school_id = $data['school_id'];
+        $hourse_ids_arr = Db::name('hourse')->where('school_id','=',$school_id)->column('id');
+        if ($hourse_ids_arr) {
+            $hourse_ids_str = implode(',',$hourse_ids_arr);
+            Db::name('rider_info')->where('id',$this->auth->id)->setField('hourse_ids','0,'.$hourse_ids_str);
+        }
+
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($rider_info,31104000);
 
@@ -175,6 +183,15 @@ class Member extends RiderBase
         }
         
         $rider_info = RiderInfo::where('id','=',$this->auth->id)->field('id,school_id,status,open_status')->find();
+
+        // 将该学校下的所有楼信息，存表
+        $school_id = $data['school_id'];
+        $hourse_ids_arr = Db::name('hourse')->where('school_id','=',$school_id)->column('id');
+        if ($hourse_ids_arr) {
+            $hourse_ids_str = implode(',',$hourse_ids_arr);
+            Db::name('rider_info')->where('id',$this->auth->id)->setField('hourse_ids','0,'.$hourse_ids_str);
+        }
+
         $jwtAuth = new JwtAuth();
         $token = $jwtAuth->createToken($rider_info,31104000);
 
