@@ -269,6 +269,7 @@ Route::group('merchants',function (){
     Route::rule('loginOut','merchants/Shop/loginOut');//退出
     Route::rule('ShopInfo','merchants/Shop/ShopInfo');//关于我们
     Route::get('autoReceive', 'merchants/Shop/autoReceive'); // 设置自动接单状态
+    Route::rule('setDeviceInfo','merchants/Merchants/setDeviceInfo'); // 存储当前商家的设备信息
     //评价
     Route::rule('getEvaluation','merchants/Merchants/getEvaluation');
 });

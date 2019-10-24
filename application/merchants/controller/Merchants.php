@@ -287,4 +287,40 @@ class Merchants extends MerchantsBase
         $this->success('success',$list);
     }
 
+
+    /**
+     * 存储当前商家的设备信息 
+     * 
+     */
+    public function setDeviceInfo(Request $request)
+    {
+        $data = $request->param();
+        $data['shop_id'] = $this->shop_id;
+        $data['update_time'] = date('Y-m-d H:i:s');
+        // 表单校验
+        $check = $this->validate($data, 'JgDevice');
+        if ($check !== true) {
+            $this->error($check,201);
+        }
+        $count = Db::name('jg_device')->where('shop_id','=',$this->shop_id)->count();
+        if ($count) {
+            // 更新
+            $res = Db::name('jg_device')->where('shop_id','=',$this->shop_id)->update($data);
+        } else {
+            // 添加
+            $res = Db::name('jg_device')->insert($data);
+        }
+
+        if ($res !== false) {
+            $this->success('存储设备信息成功');
+        }
+
+        $this->error('存储设备信息失败');
+
+
+
+
+    }
+     
+
 }
