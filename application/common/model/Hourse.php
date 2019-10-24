@@ -10,10 +10,10 @@ class Hourse extends Model
     /**
      * 获取宿舍楼地址列表
      */
-    public function getHourseList()
+    public function getHourseList($school_id)
     {
-        $list = Db::name('Hourse')->field('id,fid,name')->select();
-        $data = Db::name('Hourse')->where('fid','0')->field('id,fid,name')->select();
+        $list = Db::name('Hourse')->where('school_id',$school_id)->field('id,fid,name')->select();
+        $data = Db::name('Hourse')->where([['fid','=','0'],['school_id','=',$school_id]])->field('id,fid,name')->select();
         // dump($list);
         foreach($data as $k => &$v) {
             $v['son'] = [];

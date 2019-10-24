@@ -65,11 +65,13 @@ class School extends ApiBase
     }
 
     /**
-     * 获取楼号地址列表
+     * 获取学校楼号地址列表
      */
     public function getHourseList(Request $request)
     {
-        $list = model('Hourse')->getHourseList();
+        $school_id = $request->param('school_id');
+        if(empty($school_id)) $this->error('非法传参');
+        $list = model('Hourse')->getHourseList($school_id);
         $this->success('获取成功',$list);
     }
     

@@ -130,12 +130,20 @@ class Orders extends RiderBase
         }
 
         $hourse_ids = Db::name('RiderInfo')->where('id',$rider_id)->value('hourse_ids');
-        $info = Db::name('Hourse')->field('name')->where('id','in',$hourse_ids)->select();
-        
-        $info = implode(',',array_column($info,'name'));
-        $data['list'] = $list;
-        $data['info'] = $info;
-		$this->success('success',$data);
+
+        $info = Db::name('Hourse')->field('id,fid,name')->where('id','in',$hourse_ids)->select();
+        // $name_info = array_column($info,'name');
+
+        foreach($info as $key => &$row){
+            $fName = Db::name('Hourse')->where('id',$row['fid'])->value('name');
+            $row['name'] = $fName.','.$row['name'];
+        }
+
+        $info = ltrim(implode(',',array_column($info,'name','fName')),',');
+
+        $result['list'] = $list;
+        $result['info'] = $info;
+		$this->success('success',$result);
     }
     
 
@@ -730,14 +738,14 @@ class Orders extends RiderBase
     public function getHourseList()
     {
         $rider_id = $this->auth->id;
-        $hourse_ids = Db::name('RiderInfo')->where('id',$rider_id)->value('hourse_ids');
+        $data = Db::name('RiderInfo')->field('hourse_ids,school_id')->where('id',$rider_id)->find();
 
-        if(empty($hourse_ids)) {
+        if(empty($data['hourse_ids'])) {
             $hourse_ids = [];
         }else{
-            $hourse_ids = explode(',',$hourse_ids);
+            $hourse_ids = explode(',',$data['hourse_ids']);
         }
-        $list = model('Hourse')->getHourseList();
+        $list = model('Hourse')->getHourseList($data['school_id']);
 
         foreach($list as &$row) {
             $row['isCheck'] = 0;
