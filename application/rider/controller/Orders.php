@@ -136,7 +136,7 @@ class Orders extends RiderBase
 
         foreach($info as $key => &$row){
             $fName = Db::name('Hourse')->where('id',$row['fid'])->value('name');
-            $row['name'] = $fName.','.$row['name'];
+            $row['name'] = $fName.'-'.$row['name'];
         }
 
         $info = ltrim(implode(',',array_column($info,'name','fName')),',');
