@@ -139,7 +139,7 @@ class Orders extends RiderBase
             $row['name'] = $fName.'-'.$row['name'];
         }
 
-        $info = ltrim(implode(',',array_column($info,'name','fName')),',');
+        $info = ltrim(implode(',',array_column($info,'name','fName')),'-');
 
         $result['list'] = $list;
         $result['info'] = $info;
