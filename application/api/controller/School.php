@@ -70,7 +70,6 @@ class School extends ApiBase
     public function getHourseList(Request $request)
     {
         $school_id = $request->param('school_id');
-        if(empty($school_id)) $this->error('非法传参');
         $list = model('Hourse')->getHourseList($school_id);
         $this->success('获取成功',$list);
     }
