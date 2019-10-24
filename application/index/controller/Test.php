@@ -451,7 +451,7 @@ class Test extends Controller
     /**
      * 测试接口
      */
-    public function test()
+    public function test(Request $request)
     {
 //        phpinfo();exit;
 //        $ret = Cache::store('redis')->get('list');
@@ -470,11 +470,24 @@ class Test extends Controller
 
         // $_data = array_count_values($data);
         // dump($_data['320']);
-        if(bccomp(15.7 - 10, 5.7, 4) != 0) {
-            $this->error('订单结算金额不正确');
-        }else{
-            echo 11;
-        }
+        // if(bccomp(15.7 - 10, 5.7, 4) != 0) {
+        //     $this->error('订单结算金额不正确');
+        // }else{
+        //     $data = [
+        //         ['id'=>1,'fid'=>0,'name'=>'aa'],
+        //         ['id'=>2,'fid'=>0,'name'=>'bb'],
+        //         ['id'=>3,'fid'=>0,'name'=>'cc'],
+        //         ['id'=>4,'fid'=>1,'name'=>'dd'],
+        //         ['id'=>5,'fid'=>1,'name'=>'ee'],
+        //         ['id'=>6,'fid'=>2,'name'=>'ff'],
+        //         ['id'=>7,'fid'=>2,'name'=>'gg'],
+        //         ['id'=>8,'fid'=>4,'name'=>'hh'],
+        //     ];
+
+        //     $res = get_node($data);
+        //     $this->success($res);
+        // }
+        $http_server = swoole();
     }
 
     /**

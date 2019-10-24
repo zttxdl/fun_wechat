@@ -295,6 +295,7 @@ class Order extends MerchantsBase
                 'expected_time' => time()+30*60,//预计送达时间
                 'user_address' => $order_info['address'],//收货地址
                 'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
+                'hourse_id' => $order_info['hourse_id']//楼栋ID
             ];
 
             //外卖数据入库
@@ -380,7 +381,7 @@ class Order extends MerchantsBase
                 //如果使用红包 状态回滚
                 if($order_info['platform_coupon_money'] > 0){
                     $data['status'] = 1;//未使用
-                    $my_coupon_id = model('MyCoupon')->where([['user_id','=',$order_info['user_id']],['platform_coupon_id','=',$order_info['platform_coupon_id']]])->value('id');
+                    $my_coupon_id = model('MyCoupon')->where([['user_id','=',$order_info['user_id']],['platform_coupon_id','=',$order_info['platform_coupon_id']],['status','=','2']])->value('id');
                     Model('MyCoupon')->updateStatus($my_coupon_id,$data);
                 }
 

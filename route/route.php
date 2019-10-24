@@ -154,6 +154,10 @@ Route::group('a-school', function () {
     Route::get('/show/:id', 'show');
     Route::post('/update', 'update');
     Route::get('/del/:id', 'delete');
+    Route::get('getHourse', 'getHourse');//楼栋展示
+    Route::rule('addHourse', 'addHourse', 'GET|POST');//新增楼栋
+    Route::rule('updateHourse', 'updateHourse', 'GET|POST');//编辑楼栋
+    Route::get('deleteHourse', 'deleteHourse');//删除楼栋
 })->prefix('admin/school/')->middleware('IsLogin');
 
 // 食堂管理模块
@@ -343,6 +347,10 @@ Route::group('u-addr', function () {
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');
     Route::get('/del/:id', 'delete');
+    //新用户地址接口
+    Route::rule('/add', 'add');
+    Route::rule('/get', 'getAddressList');
+    Route::rule('/save', 'save', 'GET|POST');
 })->prefix('api/ReceivingAddr/');
 
 // 学校地区组
@@ -350,6 +358,7 @@ Route::group('u-school', function () {
     Route::get('/index', 'index');
     Route::get('/school-level2', 'schoolLevel2');
     Route::get('/choose-school', 'chooseSchool');
+    Route::get('/getHourseList', 'getHourseList');
 })->prefix('api/school/');
 
 // 经营品类组
@@ -457,6 +466,8 @@ Route::group('r-orders', function () {
     Route::rule('/arriveShop', 'arriveShop');
     Route::rule('/leaveShop', 'leaveShop');
     Route::rule('/confirmSend', 'confirmSend');
+    Route::rule('/getHourseList', 'getHourseList');//获取楼栋列表
+    Route::rule('/save', 'save');//保存楼栋设置
 
 })->prefix('rider/Orders/');
 

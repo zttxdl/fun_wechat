@@ -131,7 +131,7 @@ class School extends Base
         $canteen = $request->param('canteen');
 
         // 验证表单数据
-        $check = $this->validate($data, 'School');
+        $check = $this->validate($data, 'School.update');
         if ($check !== true) {
             $this->error($check,201);
         }
@@ -206,6 +206,99 @@ class School extends Base
             Db::rollback();
             $this->error("删除失败");
         }
+    }
+    /**
+     * 楼栋展示
+     */
+    public function getHourse(Request $request)
+    {
+        $page = $request->param('page');
+        $page_size = $request->param('pageSize');
+        $school_id = $request->param('schoolId');
+
+        $list = Db::name('Hourse')
+        ->field('id,fid,name,school_id')
+        ->where('school_id',$school_id)
+        ->order('id','DESC')
+        ->paginate($page_size)
+        ->toArray();
+
+        // $arr = Db::name("Hourse")->order('id')->paginate();
+        // $list = get_node($arr);
+        foreach ($list['data'] as $k => $v) {
+            if ($list['data'][$k]['fid'] == 0) {
+                $list['data'][$k]['fid'] = "无上级分类";
+            } else {
+                $list['data'][$k]['fid'] = Db::name("Hourse")->where("id",'=', $list['data'][$k]['fid'])->value("name");
+            }
+        }
+        $this->success('获取菜单成功', ['list' => $list]);
+    }
+    
+    /**
+     * 新增楼栋
+     */
+    public function addHourse(Request $request)
+    {
+        $data = $request->param();
+        if($request->isPost()){
+            // 验证表单数据
+            $check = $this->validate($data, 'School.addHourse');
+            if ($check !== true) {
+                $this->error($check,201);
+            }
+            if (Db::name("Hourse")->insert($data)) {
+                $this->success('添加成功');
+            } else {
+                $this->error('添加失败');
+            }
+        }else{
+            $arr = Db::name('Hourse')->field('id,fid,name,school_id')->select();  
+            $list = get_node($arr);
+            $this->success('楼栋列表获取成功',$list);
+        }
+    }
+
+    /**
+     * 编辑楼栋
+     */
+    public function updateHourse(Request $request)
+    {
+        $data = $request->param(); 
+        if ($request->isPost()) {
+            // 表单校验
+            $check = $this->validate($data, 'School.addHourse');
+            if ($check !== true) {
+                $this->error($check,201);
+            }
+            if (Db::name("Hourse")->where(['id' => $data['id']])->update($data)) {
+                $this->success('修改成功');
+            } else {
+                $this->error('修改失败');
+            }
+        } else {
+            $arr = Db::name("Hourse")->field('id,fid,level,name')->select();
+            $info = Db::name('Hourse')->where('id',$data['id'])->find();
+            $list = get_node($arr);
+            $this->success('楼栋列表获取成功',['list'=>$list,'info'=>$info]);
+        }
+    }
+
+    /**
+     * 删除楼栋
+     */
+    public function deleteHourse(Request $request)
+    {
+        $id = $request->param('id');
+        $count = Db::name('Hourse')->where('fid','=',$id)->count();
+        if ($count) {
+            $this->error('有子类无法删除!'); 
+        }
+        if (Db::name("Hourse")->where('id','=',$id)->delete()) {
+            $this->success('删除成功');
+        } else {
+            $this->error('删除失败');            
+        } 
     }
 
 }
