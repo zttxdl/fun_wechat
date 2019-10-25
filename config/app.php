@@ -154,8 +154,8 @@ return [
     'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
     //阿里云sms
     'aliyun_sms'              => [
-        'accessKeyId'        => 'LTAI0TdZqOBUjYc4',
-        'accessSecret'        => 'Mo5gW1xE90p25dVxPpfAxKiaQBXAk7',
+        'accessKeyId'        => 'LTAI4FoFCe1XQJdMAuJR1x3v',
+        'accessSecret'        => 'XgV15V2lSZVFpAPCuJG3s4xI6aP6Sg',
         'RegionId'       => 'scn-hangzhou',
         'SignName'     => '南京食聚荟',
         'SMSTemplateCode' => 'SMS_168116283',
@@ -251,7 +251,18 @@ return [
             'appid'   => '5b3c49afa83a1',
             'secretkey'   => '698196691d2f39c2b7059f8de2e2258f'
         ]
-    ]
+    ],
+
+
+    //阿里云vms
+    'aliyun_vms'              => [
+        'accessKeyId'        => 'LTAI4FoFCe1XQJdMAuJR1x3v',
+        'accessSecret'        => 'XgV15V2lSZVFpAPCuJG3s4xI6aP6Sg',
+        'RegionId'       => 'scn-hangzhou',
+        'CalledShowNumber'     => '4001112222',
+        'TtsCode' => 'TTS_10001',
+        //'SMS_141915147',
+    ],
 
 
 ];

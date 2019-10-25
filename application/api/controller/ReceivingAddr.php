@@ -150,7 +150,6 @@ class ReceivingAddr extends ApiBase
         $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
         // 获取学校名称
         foreach ($list as $k => $v) {
-            $list[$k]['area_detail'] = model('Hourse')->getNameById($list[$k]['hourse_id']);
             $list[$k]['school_name'] = model('school')->getNameById($list[$k]['school_id']);
             $list[$k]['hourse_name'] = model('Hourse')->getNameById($list[$k]['hourse_id']);
         }
@@ -190,8 +189,6 @@ class ReceivingAddr extends ApiBase
             $info = ReceiveAddr::get($data['id']);
             $info['school_name'] = model('school')->getNameById($info['school_id']);
             $info['hourse_name'] = model('Hourse')->getNameById($info['hourse_id']);
-            $info['area_detail'] = model('Hourse')->getNameById($info['hourse_id']);
-
             
             $this->success('获取地址信息成功',['info'=>$info]);
         }
