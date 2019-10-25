@@ -7,7 +7,7 @@
 	<strong id="count"></strong>
 
 	<h1 id="target"></h1>
-
+    <button onclick="test()">test</button>
     <div id="content">
         {{message}}}
     </div>
@@ -35,7 +35,22 @@
             $('#count').html(online_stat);
         });
 
+        function test(){
 
+            let options = {
+                      filters: [
+                        {namePrefix: 'BT'}
+                      ],
+                      optionalServices: []
+                    }
+                    navigator.bluetooth.requestDevice(options).then(function(device) {
+                      console.log('名称: ' + device.name);
+                      alert(device.name)
+                    })
+                    .catch(function(error) {
+                      console.log("出现错误： " + error);
+                    });
+        }
 
 </script>
 </html>
