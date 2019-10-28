@@ -501,143 +501,141 @@ function curl_post_json($url, $header, $content='')
         return $response;
     }
 
+}
+/**
+ * 打印机小票数据排版
+ * @param string $orders_sn
+ */
+function get_order_info_print($orders_sn,$A,$B,$C,$D)
+{
+    // 获取订单数据信息
+    $orderInfo = Model('Orders')->getOrder($orders_sn);
+    $order['add_time'] = date('Y-m-d H:i:s',$orderInfo['add_time']);
+    $order['message'] = $orderInfo['message'];
+    $order['money'] = $orderInfo['money'];
+    $order['orders_sn'] = $orderInfo['orders_sn'];
+    $order['user_address'] = $orderInfo['address'];
+    $order['shop_name'] = Db::name('shop_info')->where('id','=',$orderInfo['shop_id'])->value('shop_name');
+    $order['meal_sn'] = $orderInfo['meal_sn'];
+    $order['ping_fee'] = $orderInfo['ping_fee'];
+    $order['box_money'] = $orderInfo['box_money'];
+    $order['dis_money'] = $orderInfo['platform_coupon_money'] + $orderInfo['shop_discounts_money'];
+    $orderDetail = Model('Orders')->getOrderDetail($orderInfo['id']);
 
-    /**
-     * 打印机小票数据排版
-     * @param string $orders_sn
-     */
-    function get_order_info_print($orders_sn,$A,$B,$C,$D)
+    foreach ($orderDetail as $row)
     {
-        // 获取订单数据信息
-        $orderInfo = Model('Orders')->getOrder($orders_sn);
-        $order['add_time'] = date('Y-m-d H:i:s',$orderInfo['add_time']);
-        $order['message'] = $orderInfo['message'];
-        $order['money'] = $orderInfo['money'];
-        $order['orders_sn'] = $orderInfo['orders_sn'];
-        $order['user_address'] = $orderInfo['address'];
-        $order['shop_name'] = Db::name('shop_info')->where('id','=',$orderInfo['shop_id'])->value('shop_name');
-        $order['meal_sn'] = $orderInfo['meal_sn'];
-        $order['ping_fee'] = $orderInfo['ping_fee'];
-        $order['box_money'] = $orderInfo['box_money'];
-        $order['dis_money'] = $orderInfo['platform_coupon_money'] + $orderInfo['shop_discounts_money'];
-        $orderDetail = Model('Orders')->getOrderDetail($orderInfo['id']);
-
-        foreach ($orderDetail as $row)
-        {
-            $data['name'] = Model('Product')->getNameById($row['product_id']);
-            $data['num'] = $row['num'];
-            $data['old_price'] = Model('Product')->getGoodsOldPrice('product_id');
-            $data['price'] = $row['price'];
-            $order['goods_detail'][] = $data;
-        }
-
-        // 组装小票数据排版
-        $order_print_info = '<CB>饭点送 - 商家联 </CB><BR>';
-        $order_print_info .= '===============================<BR>';
-        $order_print_info .= '店铺名称：'.$order['shop_name'].'<BR>';
-        $order_print_info .= '取餐号：'.$order['meal_sn'].'<BR>';
-        $order_print_info .= '--------------------------------<BR>';
-        $order_print_info .= '名称           单价  数量 金额<BR>';
-        $order_print_info .= '--------------------------------<BR>';
-        foreach ($orderDetail as $k5 => $v5) {
-            $name = $v5['name'];
-            $price = $v5['price'];
-            $num = $v5['num'];
-            $prices = $v5['price']*$v5['num'];
-            $kw3 = '';
-            $kw1 = '';
-            $kw2 = '';
-            $kw4 = '';
-            $str = $name;
-            $blankNum = $A;//名称控制为14个字节
-            $lan = mb_strlen($str,'utf-8');
-            $m = 0;
-            $j=1;
-            $blankNum++;
-            $result = array();
-            if(strlen($price) < $B){
-                $k1 = $B - strlen($price);
-                for($q=0;$q<$k1;$q++){
-                        $kw1 .= ' ';
-                }
-                $price = $price.$kw1;
-            }
-            if(strlen($num) < $C){
-                $k2 = $C - strlen($num);
-                for($q=0;$q<$k2;$q++){
-                        $kw2 .= ' ';
-                }
-                $num = $num.$kw2;
-            }
-            if(strlen($prices) < $D){
-                $k3 = $D - strlen($prices);
-                for($q=0;$q<$k3;$q++){
-                        $kw4 .= ' ';
-                }
-                $prices = $prices.$kw4;
-            }
-            for ($i=0;$i<$lan;$i++){
-            $new = mb_substr($str,$m,$j,'utf-8');
-            $j++;
-            if(mb_strwidth($new,'utf-8')<$blankNum) {
-                if($m+$j>$lan) {
-                $m = $m+$j;
-                $tail = $new;
-                $lenght = iconv("UTF-8", "GBK//IGNORE", $new);
-                $k = $A - strlen($lenght);
-                for($q=0;$q<$k;$q++){
-                    $kw3 .= ' ';
-                }
-                if($m==$j){
-                    $tail .= $kw3.' '.$price.' '.$num.' '.$prices;
-                }else{
-                    $tail .= $kw3.'<BR>';
-                }
-                break;
-                }else{
-                $next_new = mb_substr($str,$m,$j,'utf-8');
-                if(mb_strwidth($next_new,'utf-8')<$blankNum) continue;
-                else{
-                    $m = $i+1;
-                    $result[] = $new;
-                    $j=1;
-                }
-                }
-            }
-            }
-            $head = '';
-            foreach ($result as $key=>$value) {
-            if($key < 1){
-                $v_lenght = iconv("UTF-8", "GBK//IGNORE", $value);
-                $v_lenght = strlen($v_lenght);
-                if($v_lenght == 13) $value = $value." ";
-                $head .= $value.' '.$price.' '.$num.' '.$prices;
-            }else{
-                $head .= $value.'<BR>';
-            } 
-            }
-            $order_print_info .= $head.$tail;
-        }
-        // 费用明细
-        $order_print_info .= '<BR>';
-        $order_print_info .= '费用明细============================<BR>';
-        $order_print_info .= '餐盒费：'.$order['box_money'].'<BR>';
-        $order_print_info .= '配送费：'.$order['ping_fee'].'<BR>';
-        $order_print_info .= '优惠：'.$order['dis_money'].'<BR>';
-        $order_print_info .= '--------------------------------<BR>';
-        $order_print_info .= '应付：'.$order['money'].'<BR>';
-        $order_print_info .= '--------------------------------<BR>';
-        $receive = json_decode($order['user_address'],true);
-        $order_print_info .= '客户信息============================<BR>';
-        $order_print_info .= '姓名：'.$receive['name'].'<BR>';
-        $order_print_info .= '电话：'.$receive['phone'].'<BR>';
-        $order_print_info .= '地址：'.$receive['school_name'].' '.$receive['area_detail'].' '.$receive['house_number'].'<BR>';
-        $order_print_info .= '其他信息============================<BR>';
-        $order_print_info .= '订单编号：'.$orderInfo['orders_sn'].'<BR>';
-        $order_print_info .= '订餐时间：'.$order['add_time'].'<BR>';
-        $order_print_info .= '备注：<B>'.$order['message'].'</B><BR><BR>';
-        $order_print_info .= '<QR>http://www.feieyun.com</QR>';//把解析后的二维码生成的字符串用标签套上即可自动生成二维码
-
-        return $order_print_info;
+        $data['name'] = Model('Product')->getNameById($row['product_id']);
+        $data['num'] = $row['num'];
+        $data['old_price'] = Model('Product')->getGoodsOldPrice('product_id');
+        $data['price'] = $row['price'];
+        $order['goods_detail'][] = $data;
     }
+    // dump($order);die;
+    // 组装小票数据排版
+    $order_print_info = '<CB>饭点送 - 商家联 </CB><BR><BR>';
+    $order_print_info .= '<B>取餐号：'.'# '.$order['meal_sn'].'</B><BR>';
+    $order_print_info .= '===============================<BR>';
+    $order_print_info .= '店铺名称：'.$order['shop_name'].'<BR>';
+    $order_print_info .= '订单编号：'.$orderInfo['orders_sn'].'<BR>';
+    $order_print_info .= '订餐时间：'.$order['add_time'].'<BR>';
+    $order_print_info .= '--------------------------------<BR>';
+    $order_print_info .= '名称           单价  数量 金额<BR>';
+    $order_print_info .= '--------------------------------<BR>';
+    foreach ($order['goods_detail'] as $k5 => $v5) {
+        $name = $v5['name'];
+        $price = $v5['price'];
+        $num = $v5['num'];
+        $prices = $v5['price']*$v5['num'];
+        $kw3 = '';
+        $kw1 = '';
+        $kw2 = '';
+        $kw4 = '';
+        $str = $name;
+        $blankNum = $A;//名称控制为14个字节
+        $lan = mb_strlen($str,'utf-8');
+        $m = 0;
+        $j=1;
+        $blankNum++;
+        $result = array();
+        if(strlen($price) < $B){
+            $k1 = $B - strlen($price);
+            for($q=0;$q<$k1;$q++){
+                    $kw1 .= ' ';
+            }
+            $price = $price.$kw1;
+        }
+        if(strlen($num) < $C){
+            $k2 = $C - strlen($num);
+            for($q=0;$q<$k2;$q++){
+                    $kw2 .= ' ';
+            }
+            $num = $num.$kw2;
+        }
+        if(strlen($prices) < $D){
+            $k3 = $D - strlen($prices);
+            for($q=0;$q<$k3;$q++){
+                    $kw4 .= ' ';
+            }
+            $prices = $prices.$kw4;
+        }
+        for ($i=0;$i<$lan;$i++){
+        $new = mb_substr($str,$m,$j,'utf-8');
+        $j++;
+        if(mb_strwidth($new,'utf-8')<$blankNum) {
+            if($m+$j>$lan) {
+            $m = $m+$j;
+            $tail = $new;
+            $lenght = iconv("UTF-8", "GBK//IGNORE", $new);
+            $k = $A - strlen($lenght);
+            for($q=0;$q<$k;$q++){
+                $kw3 .= ' ';
+            }
+            if($m==$j){
+                $tail .= $kw3.' '.$price.' '.$num.' '.$prices;
+            }else{
+                $tail .= $kw3.'<BR>';
+            }
+            break;
+            }else{
+            $next_new = mb_substr($str,$m,$j,'utf-8');
+            if(mb_strwidth($next_new,'utf-8')<$blankNum) continue;
+            else{
+                $m = $i+1;
+                $result[] = $new;
+                $j=1;
+            }
+            }
+        }
+        }
+        $head = '';
+        foreach ($result as $key=>$value) {
+        if($key < 1){
+            $v_lenght = iconv("UTF-8", "GBK//IGNORE", $value);
+            $v_lenght = strlen($v_lenght);
+            if($v_lenght == 13) $value = $value." ";
+            $head .= $value.' '.$price.' '.$num.' '.$prices;
+        }else{
+            $head .= $value.'<BR>';
+        } 
+        }
+        $order_print_info .= $head.$tail;
+    }
+    // 费用明细
+    $order_print_info .= '<BR><BR>';
+    $order_print_info .= '费用明细 =======================<BR>';
+    $order_print_info .= '餐盒费：'.$order['box_money'].'<BR>';
+    $order_print_info .= '配送费：'.$order['ping_fee'].'<BR>';
+    $order_print_info .= '优惠：'.$order['dis_money'].'<BR>';
+    $order_print_info .= '--------------------------------<BR>';
+    $order_print_info .= '实付：'.$order['money'].'<BR>';
+    $order_print_info .= '--------------------------------<BR><BR>';
+    $order_print_info .= '客户信息 =======================<BR>';
+    $order_print_info .= '姓名：'.$order['user_address']->name.'<BR>';
+    $order_print_info .= '电话：'.$order['user_address']->phone.'<BR>';
+    $order_print_info .= '地址：'.$order['user_address']->school_name.' '. $order['user_address']->area_detail.' '. $order['user_address']->house_number .'<BR>';
+    $order_print_info .= '--------------------------------<BR>';
+    $order_print_info .= '<B>备注：'.$order['message'].'</B><BR><BR><BR>';
+    // $order_print_info .= '<QR>http://www.feieyun.com</QR>';//把解析后的二维码生成的字符串用标签套上即可自动生成二维码
+
+    return $order_print_info;
 }
