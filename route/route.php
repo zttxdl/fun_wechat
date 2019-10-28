@@ -290,6 +290,7 @@ Route::group('merchants',function (){
     Route::post('wxRefund','merchants/refund/wxRefund');//微信退款
     Route::post('refundQuery','merchants/refund/refundQuery');//查询退款
     Route::post('orderIndex','merchants/Order/index');//订单管理
+    Route::post('printFeieOrder','merchants/Order/printFeieOrder');//手动打印订单小票【飞鹅】
 
 });
 

@@ -17,7 +17,7 @@ use think\Db;
 class PrintReceipt extends MerchantsBase
 {
     /**
-     * 商家联
+     * 商家联 - 对接完飞鹅云打印机之后，此方法将被删除
      */
     public function getShopReceipt(Request $request)
     {
@@ -67,7 +67,7 @@ class PrintReceipt extends MerchantsBase
     }
 
     /**
-     * 客户联
+     * 客户联 - 对接完飞鹅云打印机之后，此方法将被删除
      */
     public function getCustomerReceipt(Request $request)
     {
@@ -108,7 +108,7 @@ class PrintReceipt extends MerchantsBase
             $data['num'] = $row['num'];
             $data['old_price'] = Model('Product')->getGoodsOldPrice('product_id');
             $data['price'] = $row['price'];
-            
+
             $result['goods_detail'][] = $data;
         }
 
