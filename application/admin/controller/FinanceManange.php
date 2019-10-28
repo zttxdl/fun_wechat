@@ -559,13 +559,13 @@ class FinanceManange extends Base
             ->toArray();
         foreach ($data['data'] as &$row){
             $row['send_time'] = !empty($row['send_time']) ? date('Y-m-d H:i:s',$row['send_time']) : '';
-            $row['cut_proportion'] = '%'.$row['cut_proportion'];
+            $row['cut_proportion'] = $row['cut_proportion'].'%';
             $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
             $row['status'] = in_array($row['status'],[3,5]) ? '待分账' : '已完成';
-            $row['shitang_choucheng'] = '-'.$row['shitang_choucheng'];
-            $row['ping_fee'] = '-'.$row['ping_fee'];
-            $row['platform_choucheng'] = '+'.$row['platform_choucheng'];
-            $row['shop_money'] = '-'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);
+            $row['shitang_choucheng'] = $row['shitang_choucheng'];
+            $row['ping_fee'] = $row['ping_fee'];
+            $row['shop_money'] = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
+            $row['platform_choucheng'] = sprintf('%.2f',$row['money'] - $row['shop_money'] - $row['ping_fee'] - $row['shitang_choucheng']);//平台实际收入 = 订单金额 - 商户实际收入 - 配送费 - 食堂抽成
         }
 
         $this->success('200',$data);
@@ -585,6 +585,7 @@ class FinanceManange extends Base
 
         //分成状态
         $account_status = [3,5,6,7,8];//全部订单
+        $where[] = ['a.status','in',$account_status];
 
 
         $data = Db::name('Orders')
@@ -599,37 +600,12 @@ class FinanceManange extends Base
 
         foreach ($data['data'] as &$row){
             $row['send_time'] = date('Y-m-d H:i:s',$row['send_time']);
-            $row['cut_proportion'] = '%'.$row['cut_proportion'];
+            $row['cut_proportion'] = $row['cut_proportion'].'%';
             $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
-            $row['shitang_choucheng'] = '-'.$row['shitang_choucheng'];
-            $row['ping_fee'] = '-'.$row['ping_fee'];
-            $row['platform_choucheng'] = '+'.$row['platform_choucheng'];
-            $row['shop_money'] = '-'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);
-        }
-        $this->success('200',$data);
-
-        //分成状态
-        $account_status = [3,5,6,7,8];//全部订单
-        $where[] = ['a.status','in',$account_status];
-
-        $data = Db::name('Orders')
-            ->alias('a')
-            ->leftJoin('ShopInfo b','a.shop_id = b.id')
-            ->leftJoin('canteen c','a.school_id = c.school_id')
-            ->field('a.id,a.orders_sn,a.send_time,a.add_time,b.shop_name,a.money,c.cut_proportion,a.shitang_choucheng,a.ping_fee,a.platform_choucheng,a.status')
-            ->where($where)
-            ->order('a.id DESC')
-            ->paginate($page_size)
-            ->toArray();
-
-        foreach ($data['data'] as &$row){
-            $row['send_time'] = !empty($row['send_time']) ? date('Y-m-d H:i:s',$row['send_time']) : '';
-            $row['cut_proportion'] = '%'.$row['cut_proportion'];
-            $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
-            $row['shitang_choucheng'] = '-'.$row['shitang_choucheng'];
-            $row['ping_fee'] = '-'.$row['ping_fee'];
-            $row['platform_choucheng'] = '+'.$row['platform_choucheng'];
-            $row['shop_money'] = '-'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);
+            $row['shitang_choucheng'] = $row['shitang_choucheng'];
+            $row['ping_fee'] = $row['ping_fee'];
+            $row['shop_money'] = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
+            $row['platform_choucheng'] = sprintf('%.2f',$row['money'] - $row['shop_money'] - $row['ping_fee'] - $row['shitang_choucheng']);//平台实际收入 = 订单金额 - 商户实际收入 - 配送费 - 食堂抽成
         }
         $this->success('200',$data);
 
