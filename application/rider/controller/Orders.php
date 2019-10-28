@@ -141,9 +141,9 @@ class Orders extends RiderBase
 
         $info = ltrim(implode(',',array_column($info,'name','fName')),'-');
 
-        $result['list'] = $list;
-        $result['info'] = $info;
-		$this->success('success',$result);
+        $data['list'] = $list;
+        $data['info'] = $info;
+		$this->success('success',$data);
     }
     
 
