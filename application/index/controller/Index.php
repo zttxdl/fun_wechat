@@ -2,6 +2,7 @@
 namespace app\Index\Controller;
 
 use app\common\controller\Base;
+use app\common\service\FeieYun;
 use app\common\service\Getui;
 use GuzzleHttp\Client;
 use app\common\service\PushEvent;
@@ -13,6 +14,60 @@ use JPush\Client as JPush;
 
 class Index extends Base
 {
+
+    /**
+     * print 
+     * 
+     */
+    public function print()
+    {
+        $printer_sn = '550514925';
+        $orders_sn = 'D191028256643030470';
+        $orderInfo = get_order_info_print($orders_sn,14,6,3,6);
+        $times = 1;
+        $result = $this->feieyunPrint($printer_sn,$orderInfo,$times);
+
+        return $result;
+
+    }
+     
+
+
+    /**
+     * 飞鹅云打印 
+     * 
+     */
+    public function feieyunPrint($printer_sn,$orderInfo,$times)
+    {
+        $user = config('feieyun')['user'];
+        $ukey = config('feieyun')['ukey'];
+        $ip = config('feieyun')['ip'];
+        $port = config('feieyun')['port'];
+        $path = config('feieyun')['path'];
+
+        $time = time();			    //请求时间
+		$content = array(			
+			'user'=>$user,
+			'stime'=>$time,
+			'sig'=>sha1($user.$ukey.$time),
+			'apiname'=>'Open_printMsg',
+			'sn'=>$printer_sn,
+			'content'=>$orderInfo,
+		    'times'=>$times//打印次数
+		);
+        
+        $client = new FeieYun($ip,$port);
+        if(!$client->post($path,$content)){
+            return false;
+        }
+        else{
+            //服务器返回的JSON字符串，建议要当做日志记录起来
+            return $client->getContent();
+        }
+    }
+
+
+
 
     //提现时间规则当天可提现七天之前的结算金额
     protected $startTime;
@@ -314,6 +369,8 @@ class Index extends Base
         }
         dump($message_res);die;
     }
+
+     
 
     
 
