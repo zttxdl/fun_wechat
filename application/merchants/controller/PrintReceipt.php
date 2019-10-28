@@ -108,7 +108,7 @@ class PrintReceipt extends MerchantsBase
             $data['num'] = $row['num'];
             $data['old_price'] = Model('Product')->getGoodsOldPrice('product_id');
             $data['price'] = $row['price'];
-
+            
             $result['goods_detail'][] = $data;
         }
 

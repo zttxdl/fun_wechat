@@ -265,5 +265,16 @@ return [
     ],
 
 
+    // 飞鹅云打印
+    'feieyun'   =>[
+        'user'  =>  '18252010962@163.com',
+        'ukey'  =>  'dnTcvnYNhzm3AjFF',
+        'ip'  =>  'api.feieyun.cn',  // 接口IP或域名
+        'port'  =>  80,              // 接口IP端口
+        'path'  =>  '/Api/Open/'     // 接口路径
+
+    ]
+
+
 ];
 
