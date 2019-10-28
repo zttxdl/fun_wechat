@@ -15,6 +15,7 @@ use EasyWeChat\Factory;
 use think\Exception;
 use think\Request;
 use think\Db;
+use think\Model;
 
 class Order extends MerchantsBase
 {
@@ -510,7 +511,7 @@ class Order extends MerchantsBase
 			'apiname'=>'Open_printMsg',
 			'sn'=>$printer_sn,
 			'content'=>$orderInfo,
-		    'times'=>$times//打印次数
+		    'times'=>$times // 打印次数
 		);
         // 调用飞鹅云打印类
         $client = new FeieYun($ip,$port);
@@ -523,6 +524,27 @@ class Order extends MerchantsBase
             return true;
         }
     }
+
+
+    /**
+     * 单独调用打印小票【飞鹅云打印】 
+     * 
+     */
+    public function printFeieOrder(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+        $print_device_sn = Db::name('shop_info')->where('id','=',$this->shop_id)->value('print_device_sn');
+        // 调用打印
+        $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
+
+        $res = $this->feieyunPrint($print_device_sn,$printOrderInfo,1);
+        if ($res) {
+            $this->success('打印小票成功');
+        } else {
+            $this->error('打印小票出错',205);
+        }
+    }
+     
 
 
 }

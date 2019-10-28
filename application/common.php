@@ -530,15 +530,15 @@ function get_order_info_print($orders_sn,$A,$B,$C,$D)
         $data['price'] = $row['price'];
         $order['goods_detail'][] = $data;
     }
-    // dump($order);die;
+
     // 组装小票数据排版
     $order_print_info = '<CB>饭点送 - 商家联 </CB><BR><BR>';
     $order_print_info .= '<B>取餐号：'.'# '.$order['meal_sn'].'</B><BR>';
     $order_print_info .= '===============================<BR>';
     $order_print_info .= '店铺名称：'.$order['shop_name'].'<BR>';
     $order_print_info .= '订单编号：'.$orderInfo['orders_sn'].'<BR>';
-    $order_print_info .= '订餐时间：'.$order['add_time'].'<BR>';
-    $order_print_info .= '--------------------------------<BR>';
+    $order_print_info .= '订餐时间：'.$order['add_time'].'<BR><BR>';
+    $order_print_info .= '----------- 商品信息 -----------<BR>';
     $order_print_info .= '名称           单价  数量 金额<BR>';
     $order_print_info .= '--------------------------------<BR>';
     foreach ($order['goods_detail'] as $k5 => $v5) {
@@ -622,14 +622,14 @@ function get_order_info_print($orders_sn,$A,$B,$C,$D)
     }
     // 费用明细
     $order_print_info .= '<BR><BR>';
-    $order_print_info .= '费用明细 =======================<BR>';
+    $order_print_info .= '----------- 费用明细 -----------<BR>';
     $order_print_info .= '餐盒费：'.$order['box_money'].'<BR>';
     $order_print_info .= '配送费：'.$order['ping_fee'].'<BR>';
     $order_print_info .= '优惠：'.$order['dis_money'].'<BR>';
     $order_print_info .= '--------------------------------<BR>';
     $order_print_info .= '实付：'.$order['money'].'<BR>';
     $order_print_info .= '--------------------------------<BR><BR>';
-    $order_print_info .= '客户信息 =======================<BR>';
+    $order_print_info .= '----------- 客户信息 -----------<BR>';
     $order_print_info .= '姓名：'.$order['user_address']->name.'<BR>';
     $order_print_info .= '电话：'.$order['user_address']->phone.'<BR>';
     $order_print_info .= '地址：'.$order['user_address']->school_name.' '. $order['user_address']->area_detail.' '. $order['user_address']->house_number .'<BR>';
