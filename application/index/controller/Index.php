@@ -22,8 +22,8 @@ class Index extends Base
     public function print()
     {
         $printer_sn = '550514925';
-        $orders_sn = 'D191029178060219425';
-        $orderInfo = get_order_info_print($orders_sn,14,6,3,6);
+        $orders_sn = 'D191029195306682793';
+        $orderInfo = get_order_info_print($orders_sn,15,6,3,6);
         $times = 1;
         $result = $this->feieyunPrint($printer_sn,$orderInfo,$times);
 

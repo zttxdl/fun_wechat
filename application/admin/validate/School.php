@@ -20,6 +20,7 @@ class School extends Validate
         'fetch_time'      => 'require|number',
         'fid'      => 'require|number',
         'name'      => 'require|max:30',
+        'school_id'      => 'require',
 
     ];
     
@@ -42,6 +43,7 @@ class School extends Validate
         'fid.number' => '上级楼栋ID必须为正整数', 
         'name.require' => '楼栋名称不能为空', 
         'name.max' => '楼栋名称不能超过30位', 
+        'school_id.require' => '学校ID必传', 
     ];
 
     /**
@@ -50,6 +52,6 @@ class School extends Validate
     protected $scene = [
         'update'  =>  ['name','longitude','latitude','completion_time','fetch_time'],
         'insert'  =>  ['name','longitude','latitude','completion_time','fetch_time'],
-        'addHourse'  =>  ['fid','name'],
+        'addHourse'  =>  ['fid','name','school_id'],
     ];
 }
