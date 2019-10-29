@@ -545,7 +545,7 @@ function get_order_info_print($orders_sn,$A,$B,$C,$D)
     foreach ($order['goods_detail'] as $k5 => $v5) {
         $name = $v5['name'];
         if (!empty($v5['attr_name'])) {
-            $name = $v5['name'].'<b>【'.$v5['attr_name'].'】<b>';
+            $name = $v5['name'].'【'.$v5['attr_name'].'】';
         }
         $price = $v5['price'];
         $num = $v5['num'];
