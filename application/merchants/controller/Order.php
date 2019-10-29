@@ -20,7 +20,7 @@ use think\Model;
 class Order extends MerchantsBase
 {
 
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['notifyAccept'];
 
     /**
      * 订单管理
