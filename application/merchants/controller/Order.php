@@ -549,6 +549,7 @@ class Order extends MerchantsBase
 
     public function notifyAccept($orders_sn)
     {
+        write_log('进来回调接单了','log');
         $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
         $shop_info = Model('Shop')->getShopDetail($order_info['shop_id']);
         $shop_address = [
@@ -578,6 +579,7 @@ class Order extends MerchantsBase
 
             //外卖数据入库
             $ret = Db::name('takeout')->insert($takeout_info);
+            write_log('写入外卖表返回状态'.$ret,'log');
 
             if (!$ret){
                 throw new Exception('接单失败0');
@@ -593,9 +595,11 @@ class Order extends MerchantsBase
             Db::rollback();
             throw new Exception($e->getMessage());
         }
+        write_log('走到这里了么','log');
 
         //实例化socket
         $socket = model('PushEvent','service');
+        write_log($socket,'log');
 
         // 已成为骑手的情况
         $map1 = [
