@@ -82,17 +82,14 @@ class Notify extends Collection
         }
 
         // 向指定商家推送新订单消息
-        // write_log('进来了'.$orders_sn,'log');
-
         $push = new PushEvent();
         $push->setUser('s_'.$shop_id)->setContent($orders_sn)->push();
 
         // 获取当前商家的自动接单情况
-        // $auto_receive_status = model('ShopInfo')->getAutoReceiveStatus($shop_id);
-        // if ($auto_receive_status) {
-        //     $result = $this->notifyAccept($orders_sn);
-        //     write_log('自动接单了'.$orders_sn.$result,'log');
-        // }
+        $auto_receive_status = model('ShopInfo')->getAutoReceiveStatus($shop_id);
+        if ($auto_receive_status) {
+            $this->notifyAccept($orders_sn);
+        }
         return true;
     }
 
@@ -168,7 +165,6 @@ class Notify extends Collection
 
             //外卖数据入库
             $ret = Db::name('takeout')->insert($takeout_info);
-            write_log('写入外卖表返回状态'.$ret,'log');
 
             if (!$ret){
                 throw new Exception('接单失败0');
@@ -214,9 +210,9 @@ class Notify extends Collection
         $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
 
         if ($res) {
-            return 1;
+            return true;
         } else {
-            return 2;
+            return false;
         }
     }
 
@@ -227,7 +223,6 @@ class Notify extends Collection
      */
     public function feieyunPrint($printer_sn,$orderInfo,$times)
     {
-        write_log('进来飞鹅打印了','log');
         $user = config('feieyun')['user'];
         $ukey = config('feieyun')['ukey'];
         $ip = config('feieyun')['ip'];
