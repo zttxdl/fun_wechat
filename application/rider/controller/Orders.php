@@ -666,11 +666,12 @@ class Orders extends RiderBase
     public function confirmSend(Request $request)
     {
         $orderId = $request->param('order_id');
-        $latitude = $request->param('latitude');
-        $longitude = $request->param('longitude');
-        if (!$latitude || !$longitude) {
-            $this->error('坐标不能为空');
-        }
+        // 去除经纬度
+        // $latitude = $request->param('latitude');
+        // $longitude = $request->param('longitude');
+        // if (!$latitude || !$longitude) {
+        //     $this->error('坐标不能为空');
+        // }
         
         $Order = \app\common\model\Orders::get($orderId);
         $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
@@ -679,12 +680,13 @@ class Orders extends RiderBase
         if ($Takeout->status == 6) {
             $this->error('您已送达，请勿重新点击');
         }
-        $location = $latitude.','.$longitude;
-        $user_address = $Takeout->user_address->latitude.','.$Takeout->user_address->longitude;
-        $result = parameters($location,$user_address);
-        if ($result[0]['elements'][0]['distance'] > 2000) {
-            $this->error('暂未到指定范围，还不可以点击哦');
-        }
+        // 去除经纬度
+        // $location = $latitude.','.$longitude;
+        // $user_address = $Takeout->user_address->latitude.','.$Takeout->user_address->longitude;
+        // $result = parameters($location,$user_address);
+        // if ($result[0]['elements'][0]['distance'] > 2000) {
+        //     $this->error('暂未到指定范围，还不可以点击哦');
+        // }
         // 启动事务
         Db::startTrans();
         try {
