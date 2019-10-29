@@ -389,6 +389,10 @@ class Shop extends Model
      */
     public function getGoodsAttrName($attr_ids = '')
     {
+        $attr_names = '';
+        if(empty($attr_ids)) {
+            return $attr_names;
+        }
         $res = Db::name('product_attr_classify')->field('name')->whereIn('id',$attr_ids)->select();
         $res = array_column($res,'name');
         $attr_names = implode(",",$res);
