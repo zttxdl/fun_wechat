@@ -606,13 +606,6 @@ function get_order_info_print($orders_sn, $A, $B, $C, $D)
                     break;
                 } else {
                     $next_new = mb_substr($str, $m, $j, 'utf-8');
-                    // echo $next_new.'<br>';
-                    if (strstr($new,'【')) {
-                        $m = $i + 1;
-                        $result[] = $new;
-                        $j = 1;
-                        continue;
-                    }
                     if (mb_strwidth($next_new, 'utf-8') < $blankNum) continue;
                     else {
                         $m = $i + 1;
