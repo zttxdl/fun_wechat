@@ -90,6 +90,7 @@ class Notify extends Collection
         $auto_receive_status = model('ShopInfo')->getAutoReceiveStatus($shop_id);
         write_log('商家状态'.$auto_receive_status,'log');
         if ($auto_receive_status) {
+            write_log('商家状态a'.$auto_receive_status,'log');
             $orderModel = new Order();
             $result = $orderModel->notifyAccept($orders_sn);
             write_log('自动接单了'.$orders_sn.$result,'log');
