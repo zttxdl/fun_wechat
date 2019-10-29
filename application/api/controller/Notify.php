@@ -13,6 +13,7 @@ use think\Collection;
 use think\Db;
 use think\Request;
 use app\common\service\PushEvent;
+use app\merchants\controller\Order;
 
 class Notify extends Collection
 {
@@ -82,9 +83,16 @@ class Notify extends Collection
         // 向指定商家推送新订单消息
         // write_log('进来了'.$orders_sn,'log');
 
-        $push = new PushEvent();
-        $push->setUser('s_'.$shop_id)->setContent($orders_sn)->push();
+        // $push = new PushEvent();
+        // $push->setUser('s_'.$shop_id)->setContent($orders_sn)->push();
 
+        // 获取当前商家的自动接单情况
+        $auto_receive_status = model('ShopInfo')->getAutoReceiveStatus($shop_id);
+        if ($auto_receive_status) {
+            $orderModel = new Order();
+            $result = $orderModel->notifyAccept($orders_sn);
+            write_log('自动接单了'.$orders_sn.$result,'log');
+        }
         return true;
     }
 
