@@ -185,7 +185,6 @@ class Notify extends Collection
 
         //实例化socket
         $socket = model('PushEvent','service');
-        write_log($socket,'log');
 
         // 已成为骑手的情况
         $map1 = [
@@ -210,8 +209,8 @@ class Notify extends Collection
 
         // 调用打印
         $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
-        write_log('商家打印设备号：'.$shop_info['print_device_sn'],'log');
-        write_log('打印信息内容：'.$printOrderInfo,'log');
+        // write_log('商家打印设备号：'.$shop_info['print_device_sn'],'log');
+        // write_log('打印信息内容：'.$printOrderInfo,'log');
         $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
 
         if ($res) {
@@ -222,12 +221,13 @@ class Notify extends Collection
     }
 
 
-        /**
+    /**
      * 飞鹅云打印 
      * 
      */
     public function feieyunPrint($printer_sn,$orderInfo,$times)
     {
+        write_log('进来飞鹅打印了','log');
         $user = config('feieyun')['user'];
         $ukey = config('feieyun')['ukey'];
         $ip = config('feieyun')['ip'];
@@ -243,14 +243,16 @@ class Notify extends Collection
 			'sn'=>$printer_sn,
 			'content'=>$orderInfo,
 		    'times'=>$times // 打印次数
-		);
+        );
+        write_log($content,'log');
         // 调用飞鹅云打印类
         $client = new FeieYun($ip,$port);
         if(!$client->post($path,$content)){
+            write_log('打印失败了','log');
             return false;
-        }
-        else{
+        }else{
             //服务器返回的JSON字符串，建议要当做日志记录起来
+            write_log('打印成功了','log');
             write_log($client->getContent(),'log');
             return true;
         }
