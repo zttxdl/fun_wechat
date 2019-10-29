@@ -519,12 +519,13 @@ function get_order_info_print($orders_sn,$A,$B,$C,$D)
     $order['meal_sn'] = $orderInfo['meal_sn'];
     $order['ping_fee'] = $orderInfo['ping_fee'];
     $order['box_money'] = $orderInfo['box_money'];
-    $order['dis_money'] = $orderInfo['platform_coupon_money'] + $orderInfo['shop_discounts_money'];
+    $order['dis_money'] = sprintf("%.2f", $orderInfo['platform_coupon_money'] + $orderInfo['shop_discounts_money']);
     $orderDetail = Model('Orders')->getOrderDetail($orderInfo['id']);
 
     foreach ($orderDetail as $row)
     {
         $data['name'] = Model('Product')->getNameById($row['product_id']);
+        $data['attr_name'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
         $data['num'] = $row['num'];
         $data['old_price'] = Model('Product')->getGoodsOldPrice('product_id');
         $data['price'] = $row['price'];
@@ -543,6 +544,9 @@ function get_order_info_print($orders_sn,$A,$B,$C,$D)
     $order_print_info .= '--------------------------------<BR>';
     foreach ($order['goods_detail'] as $k5 => $v5) {
         $name = $v5['name'];
+        if (!empty($v5['attr_name'])) {
+            $name = $v5['name'].'【'.$v5['attr_name'].'】';
+        }
         $price = $v5['price'];
         $num = $v5['num'];
         $prices = $v5['price']*$v5['num'];
@@ -623,11 +627,11 @@ function get_order_info_print($orders_sn,$A,$B,$C,$D)
     // 费用明细
     $order_print_info .= '<BR><BR>';
     $order_print_info .= '----------- 费用明细 -----------<BR>';
-    $order_print_info .= '餐盒费：'.$order['box_money'].'<BR>';
-    $order_print_info .= '配送费：'.$order['ping_fee'].'<BR>';
-    $order_print_info .= '优惠：'.$order['dis_money'].'<BR>';
+    $order_print_info .= '餐盒费：                  '.$order['box_money'].'<BR>';
+    $order_print_info .= '配送费：                  '.$order['ping_fee'].'<BR>';
+    $order_print_info .= '优惠：                    '.$order['dis_money'].'<BR>';
     $order_print_info .= '--------------------------------<BR>';
-    $order_print_info .= '实付：'.$order['money'].'<BR>';
+    $order_print_info .= '实付：                    '.$order['money'].'<BR>';
     $order_print_info .= '--------------------------------<BR><BR>';
     $order_print_info .= '----------- 客户信息 -----------<BR>';
     $order_print_info .= '姓名：'.$order['user_address']->name.'<BR>';
