@@ -620,6 +620,8 @@ class Order extends MerchantsBase
 
         // 调用打印
         $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
+        write_log('商家打印设备号：'.$shop_info['print_device_sn'],'log');
+        write_log('打印信息内容：'.$printOrderInfo,'log');
         $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
 
         if ($res) {
