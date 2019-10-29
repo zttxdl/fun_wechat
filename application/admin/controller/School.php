@@ -253,7 +253,7 @@ class School extends Base
                 $this->error('添加失败');
             }
         }else{
-            $arr = Db::name('Hourse')->field('id,fid,name,school_id')->select();  
+            $arr = Db::name('Hourse')->where('school_id',$data['school_id'])->field('id,fid,name,school_id')->select();  
             $list = get_node($arr);
             $this->success('楼栋列表获取成功',$list);
         }
@@ -277,7 +277,7 @@ class School extends Base
                 $this->error('修改失败');
             }
         } else {
-            $arr = Db::name("Hourse")->field('id,fid,level,name')->select();
+            $arr = Db::name("Hourse")->where('school_id',$data['school_id'])->field('id,fid,level,name')->select();
             $info = Db::name('Hourse')->where('id',$data['id'])->find();
             $list = get_node($arr);
             $this->success('楼栋列表获取成功',['list'=>$list,'info'=>$info]);

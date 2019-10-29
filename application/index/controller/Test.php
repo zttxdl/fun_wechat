@@ -487,7 +487,10 @@ class Test extends Controller
         //     $res = get_node($data);
         //     $this->success($res);
         // }
-        $http_server = swoole();
+        // $http_server = swoole();
+        $order_sn = 'D191029195306682793';
+        $data = get_order_info_print($order_sn,14,6,3,6);
+        dump($data);
     }
 
     /**
