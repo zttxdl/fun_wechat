@@ -10,10 +10,12 @@ namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
 use app\common\model\Orders;
+use app\common\service\FeieYun;
 use EasyWeChat\Factory;
 use think\Exception;
 use think\Request;
 use think\Db;
+use think\Model;
 
 class Order extends MerchantsBase
 {
@@ -340,7 +342,14 @@ class Order extends MerchantsBase
             $socket->setUser($rid)->setContent('new')->push();
         }
 
-        $this->success('接单成功');
+        // 调用打印
+        $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
+        $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
+        if ($res) {
+            $this->success('接单成功');
+        } else {
+            $this->error('打印小票出错',205);
+        }
     }
 
     /**
@@ -480,6 +489,62 @@ class Order extends MerchantsBase
         }
         $this->error('fail',201,['issuing_status'=>0]);
     }
+
+
+    /**
+     * 飞鹅云打印 
+     * 
+     */
+    public function feieyunPrint($printer_sn,$orderInfo,$times)
+    {
+        $user = config('feieyun')['user'];
+        $ukey = config('feieyun')['ukey'];
+        $ip = config('feieyun')['ip'];
+        $port = config('feieyun')['port'];
+        $path = config('feieyun')['path'];
+
+        $time = time();			    //请求时间
+		$content = array(			
+			'user'=>$user,
+			'stime'=>$time,
+			'sig'=>sha1($user.$ukey.$time),
+			'apiname'=>'Open_printMsg',
+			'sn'=>$printer_sn,
+			'content'=>$orderInfo,
+		    'times'=>$times // 打印次数
+		);
+        // 调用飞鹅云打印类
+        $client = new FeieYun($ip,$port);
+        if(!$client->post($path,$content)){
+            return false;
+        }
+        else{
+            //服务器返回的JSON字符串，建议要当做日志记录起来
+            write_log($client->getContent(),'log');
+            return true;
+        }
+    }
+
+
+    /**
+     * 单独调用打印小票【飞鹅云打印】 
+     * 
+     */
+    public function printFeieOrder(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+        $print_device_sn = Db::name('shop_info')->where('id','=',$this->shop_id)->value('print_device_sn');
+        // 调用打印
+        $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
+
+        $res = $this->feieyunPrint($print_device_sn,$printOrderInfo,1);
+        if ($res) {
+            $this->success('打印小票成功');
+        } else {
+            $this->error('打印小票出错',205);
+        }
+    }
+     
 
 
 }
