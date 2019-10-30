@@ -86,8 +86,9 @@ class Notify extends Collection
         $push->setUser('s_'.$shop_id)->setContent($orders_sn)->push();
 
         // 获取当前商家的自动接单情况
-        $auto_receive_status = model('ShopInfo')->getAutoReceiveStatus($shop_id);
-        if ($auto_receive_status) {
+        $auto_print_info = model('ShopInfo')->getAutoPrintInfo($shop_id);
+        // 当是云打印机 以及 设置了自动接单、打印功能
+        if ($auto_print_info['print_device_sn'] && $auto_print_info['auto_receive']) {
             $this->notifyAccept($orders_sn);
         }
         return true;
