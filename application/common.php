@@ -128,12 +128,31 @@ if (!function_exists('curl_post')) {
 }
 
 
+/**
+ * 模拟 get 请求
+ * @param $url 
+ */
+if (!function_exists('curl_get')) {
+    function curl_get($url)
+    {
+        $ch = curl_init ();
+        curl_setopt ( $ch, CURLOPT_URL, $url );
+        curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
+        curl_setopt ( $ch, CURLOPT_CUSTOMREQUEST, 'GET' );
+        curl_setopt ( $ch, CURLOPT_TIMEOUT, 20 );
+        $result = curl_exec ( $ch );
+        curl_close ( $ch );
+
+        return $result;
+    }
+}
+
+
+/**
+ * 生成唯一订单号
+ * @param $letter 订单号标识（举例说明：创建订单号 D ，退款订单号 R ，某种活动的订单号，例如团购订单号 T ，秒杀订单号 S ，等等，依据项目实际场景来区分）
+ */
 if (!function_exists('build_order_no')) {
-
-    /**
-     * $letter 可作为订单类型标识 也可以不用 假如你的项目有多种订单类型
-     */
-
     function build_order_no($letter = '')
     {
         return $letter . date('ymd') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf('%02d', rand(0, 99));
@@ -170,7 +189,7 @@ if (!function_exists('get_location')) {
         $key = config('lbs_map')['key'];
         // 仅学校地址信息，无法解析经纬度，目前需加上当前城市
         $url = "https://apis.map.qq.com/ws/geocoder/v1/?address=" . $address . "&key=" . $key . "&region=南京";
-        $jsondata = json_decode(file_get_contents($url), true);
+        $jsondata = json_decode(file_get_contents($url), true);   // 尽量不要使用file_get_contents() ，建议使用curl模拟请求，curl请求更快
         $data = [];
         if ($jsondata['message'] == '查询无结果') {
             return $data;
@@ -193,7 +212,7 @@ if (!function_exists('get_baidu_location')) {
         $result = array();
         $ak = '2DnX1SRN72z9rnLAGBSDvFEZvnhyVbZV'; //您的百度地图ak，可以去百度开发者中心去免费申请
         $url = "http://api.map.baidu.com/geocoding/v3/?address=" . $address . "&ret_coordtype=gcj02ll&output=json&ak=" . $ak;
-        $data = file_get_contents($url);
+        $data = file_get_contents($url);  // 尽量不要使用file_get_contents() ，建议使用curl模拟请求，curl请求更快
         $data = str_replace('renderOption&&renderOption(', '', $data);
         $data = str_replace(')', '', $data);
         $data = json_decode($data, true);
@@ -221,7 +240,7 @@ if (!function_exists('Convert_BD09_To_GCJ02')) {
     {
         $key = config('lbs_map')['key'];
         $url = "https://apis.map.qq.com/ws/coord/v1/translate?locations={$lat},{$lng}&type=3&key=" . $key;
-        $jsondata = json_decode(file_get_contents($url), true);
+        $jsondata = json_decode(curl_get($url), true);  // 尽量不要使用file_get_contents() ，建议使用curl模拟请求，curl请求更快
         if ($jsondata['status'] != 0) {
             return false;
         }
@@ -243,7 +262,7 @@ if (!function_exists('parameters')) {
     {
         $key = config('lbs_map')['key'];
         $url = "https://apis.map.qq.com/ws/distance/v1/matrix/?mode=bicycling&from={$from}&to={$to}&key=" . $key;
-        $jsondata = json_decode(file_get_contents($url), true);
+        $jsondata = json_decode(curl_get($url), true);  // 尽量不要使用file_get_contents() ，建议使用curl模拟请求，curl请求更快
         $data = $jsondata['result']['rows'];
         return $data;
     }
@@ -261,7 +280,7 @@ if (!function_exists('one_to_more_distance')) {
     {
         $key = config('lbs_map')['key'];
         $url = "https://apis.map.qq.com/ws/distance/v1/?mode=walking&from={$from}&to={$to}&key=" . $key;
-        $jsondata = json_decode(file_get_contents($url), true);
+        $jsondata = json_decode(curl_get($url), true);  // 尽量不要使用file_get_contents() ，建议使用curl模拟请求，curl请求更快
         $distance = $jsondata['result']['elements'][0]['distance'];
         return $distance;
     }
@@ -524,6 +543,8 @@ function curl_post_json($url, $header, $content = '')
         return $response;
     }
 }
+
+
 /**
  * 打印机小票数据排版
  * @param string $orders_sn

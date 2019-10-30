@@ -124,6 +124,7 @@ class Orders extends RiderBase
             $fName = Db::name('Hourse')->where('id',$row['fid'])->value('name');
             $row['name'] = $fName.'-'.$row['name'];
         }
+        unset($row);  // 加引用的for循环，循环执行完之后，建议手动清除引用
 
         $info = ltrim(implode(',',array_column($info,'name','fName')),'-');
 
