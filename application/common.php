@@ -233,7 +233,7 @@ if (!function_exists('Convert_BD09_To_GCJ02')) {
 }
 
 /**
- * 距离计算
+ * 距离计算【多点对多点】
  * @param double $from 起点坐标
  * @param double $lng 终点坐标
  * @return array();
@@ -248,6 +248,25 @@ if (!function_exists('parameters')) {
         return $data;
     }
 }
+
+
+/**
+ * 距离计算【一点对多点】
+ * @param double $from 起点坐标
+ * @param double $lng 终点坐标
+ * @return string;
+ */
+if (!function_exists('one_to_more_distance')) {
+    function one_to_more_distance($from, $to)
+    {
+        $key = config('lbs_map')['key'];
+        $url = "https://apis.map.qq.com/ws/distance/v1/?mode=walking&from={$from}&to={$to}&key=" . $key;
+        $jsondata = json_decode(file_get_contents($url), true);
+        $distance = $jsondata['result']['elements']['distance'];
+        return $distance;
+    }
+}
+
 
 /**
  *  写日志
