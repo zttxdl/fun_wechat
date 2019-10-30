@@ -262,7 +262,7 @@ if (!function_exists('one_to_more_distance')) {
         $key = config('lbs_map')['key'];
         $url = "https://apis.map.qq.com/ws/distance/v1/?mode=walking&from={$from}&to={$to}&key=" . $key;
         $jsondata = json_decode(file_get_contents($url), true);
-        $distance = $jsondata['result']['elements']['distance'];
+        $distance = $jsondata['result']['elements'][0]['distance'];
         return $distance;
     }
 }
