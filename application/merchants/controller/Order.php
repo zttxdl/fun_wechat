@@ -83,11 +83,12 @@ class Order extends MerchantsBase
             ];
         }
 
-
-        $auto_receive = Db::name('shop_info')->where('id','=',$this->shop_id)->value('auto_receive');
+        // 获取当前商家的自动接单情况
+        $auto_print_info = model('ShopInfo')->getAutoPrintInfo($shop_id);
 
         $result['list'] = $data;
-        $result['auto_receive'] = $auto_receive;
+        $result['auto_receive'] = $auto_print_info['auto_receive'];
+        $result['print_device_sn'] = $auto_print_info['print_device_sn'];
         $result['count'] = $orders['total'];
         $result['page'] = $orders['current_page'];
         $result['pageSize'] = $orders['per_page'];
@@ -252,7 +253,7 @@ class Order extends MerchantsBase
     }
 
     /**
-     * 商家接单
+     * 商家接单【云打印设备接入】
      */
     public function accept(Request $request)
     {
@@ -352,10 +353,106 @@ class Order extends MerchantsBase
         }
     }
 
+
+    /**
+     * 商家接单【蓝牙打印设备接入】
+     */
+    public function bluetoothAccept(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+
+        $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
+
+        if(empty($order_info)) {
+            $this->error('订单不存在');
+        }
+
+        if($order_info['status'] == 3) {
+            $this->error('商家已接单');
+        }
+
+        if($order_info['status'] == 9) {
+            $this->error('订单已取消!');
+        }
+
+        $shop_info = Model('Shop')->getShopDetail($order_info['shop_id']);
+
+
+        $shop_address = [
+            'shop_name' => $shop_info['shop_name'],
+            'address_detail' => $shop_info['address'],
+            'phone' => $shop_info['link_tel'],
+            'name' => $shop_info['link_name'],
+            'longitude' => $shop_info['longitude'],
+            'latitude' => $shop_info['latitude'],
+        ];
+
+        //启动事务
+        Db::startTrans();
+        try{
+            //封装外卖数据
+            $takeout_info = [
+                'order_id' => $order_info['id'],
+                'shop_id' => $order_info['shop_id'],
+                'ping_fee' => $order_info['ping_fee'],//配送费
+                'school_id' => $shop_info['school_id'],
+                'create_time' => time(),//商家接单时间
+                'expected_time' => time()+30*60,//预计送达时间
+                'user_address' => $order_info['address'],//收货地址
+                'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
+                'hourse_id' => $order_info['hourse_id']//楼栋ID
+            ];
+
+            //外卖数据入库
+            $ret = Db::name('takeout')->insert($takeout_info);
+
+            if (!$ret){
+                throw new Exception('接单失败0');
+            } else {
+                $meal_sn = getMealSn('shop_id:'.$order_info['shop_id']);
+                Db::name('takeout')->where('order_id','=',$order_info['id'])->setField('meal_sn',$meal_sn);
+            }
+            model('Orders')->where('id',$order_info['id'])->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time(),'meal_sn'=>$meal_sn]);
+
+            Db::commit();
+
+        }catch (\Exception $e) {
+            Db::rollback();
+            $this->error($e->getMessage());
+        }
+
+        //实例化socket
+        $socket = model('PushEvent','service');
+
+        // 已成为骑手的情况
+        $map1 = [
+            ['school_id', '=', $shop_info['school_id']],
+            ['open_status', '=', 1],
+            ['status', '=', 3],
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
+        ];
+        // 暂未成为骑手的情况
+        $map2 = [
+            ['school_id', '=', $shop_info['school_id']],
+            ['status', 'in', [0,1,2]],
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
+        ];  
+
+        $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
+
+        foreach ($r_list as $item) {
+            $rid = 'r'.$item->id;
+            $socket->setUser($rid)->setContent('new')->push();
+        }
+
+        $this->success('接单成功');
+    }
+
+
     /**
      * 商家拒单
      */
-    public function refuse(Request $request)
+    public function refuse(Request $request)      
     {
         $orders_sn = $request->param('orders_sn');
         $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
@@ -454,7 +551,7 @@ class Order extends MerchantsBase
             // 可在此处传入其他参数，详细参数见微信支付文档
 
             'refund_desc' => '取消订单退款',
-//            'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+            // 'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
 
         ]);
 

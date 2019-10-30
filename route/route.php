@@ -283,7 +283,8 @@ Route::group('merchants',function (){
     Route::post('orderQuery','merchants/Order/query');//订单管理
     Route::post('orderDetail','merchants/Order/orderDetail');//订单详情
     Route::post('orderDel','merchants/Order/del');//订单删除
-    Route::post('orderAccept','merchants/Order/accept');//商家接单
+    Route::post('orderAccept','merchants/Order/accept');//商家接单【云打印】
+    Route::post('bluetoothOrderAccept','merchants/Order/bluetoothAccept');//商家接单【蓝牙打印】
     Route::post('orderRefuse','merchants/Order/refuse');//商家拒单
     Route::post('refund','merchants/refund/refund');//退款
     Route::post('refuse','merchants/refund/refuse');//拒绝退款

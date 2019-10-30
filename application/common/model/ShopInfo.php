@@ -102,9 +102,9 @@ class ShopInfo extends Model
     /**
      * 获取商家的自动接单状态
      */
-    public function getAutoReceiveStatus($id)
+    public function getAutoPrintInfo($id)
     {
-        $auto_receive = $this->where('id',$id)->value('auto_receive');
-        return $auto_receive;
+        $data = $this->where('id',$id)->field('print_device_sn,auto_receive')->find();
+        return $data;
     }
 }

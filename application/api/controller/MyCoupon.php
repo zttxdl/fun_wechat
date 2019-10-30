@@ -111,15 +111,19 @@ class MyCoupon extends ApiBase
     public function getCoupon(Request $request)
     {
         $coupon_id = $request->get('coupon_id');
+        // 判断当前红包是否已有领取
+        $res = Db::name('my_coupon')->where([['user_id','=',$this->auth->id],['platform_coupon_id','=',$coupon_id]])->count('id');
+        if ($res) {
+            $this->error('您已领过本红包，不可重复领取');  
+        }
         $info = PlatformCoupon::get($coupon_id);
-
         $data['user_id'] = $this->auth->id;
-        $data['platform_coupon_id'] = $info->id;
+        $data['platform_coupon_id'] = $coupon_id;
         $data['indate'] = date('Y.m.d',time()).'-'.date('Y.m.d',time()+3600*24*$info->other_time);
         $data['add_time'] = time();
         $data['phone'] = $this->auth->phone;
 
-        $count = Db::name('platform_coupon')->where('id',$info->id)->value('surplus_num');
+        $count = Db::name('platform_coupon')->where('id',$coupon_id)->value('surplus_num');
         if ($count < 1) {
             $this->error('该红包已被领取完了');            
         }
@@ -128,7 +132,7 @@ class MyCoupon extends ApiBase
         Db::startTrans();
         try {
            $res_add =  Db::name('my_coupon')->insert($data);
-           $res_dec =  Db::name('platform_coupon')->where('id',$info->id)->setDec('surplus_num');
+           $res_dec =  Db::name('platform_coupon')->where('id',$coupon_id)->setDec('surplus_num');
             // 提交事务
             Db::commit();
             

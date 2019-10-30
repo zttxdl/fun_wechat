@@ -138,8 +138,9 @@ if (!function_exists('curl_get')) {
         $ch = curl_init ();
         curl_setopt ( $ch, CURLOPT_URL, $url );
         curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
-        curl_setopt ( $ch, CURLOPT_CUSTOMREQUEST, 'GET' );
-        curl_setopt ( $ch, CURLOPT_TIMEOUT, 20 );
+        curl_setopt ( $ch, CURLOPT_CUSTOMREQUEST, 'GET' ); 
+        curl_setopt ( $ch, CURLOPT_CONNECTTIMEOUT, 20 ); // 表示如果服务器20秒内没有响应，脚本就会断开连接
+        curl_setopt ( $ch, CURLOPT_TIMEOUT, 60 ); // 表示如果服务器60秒内没有请求完成，脚本将会断开连接
         $result = curl_exec ( $ch );
         curl_close ( $ch );
 
