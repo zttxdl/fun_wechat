@@ -293,18 +293,13 @@ class Order extends ApiBase
 
         // 判断该商家是否已歇业
         $shop_info = model('ShopInfo')->where('id','=',$shop_id)->field('id,open_status as business,run_time')->find();
+        write_log('shopid:'.$shop_id,'log');
         write_log($shop_info,'log');
         if ($shop_info['business'] == 1 && !empty($shop_info['run_time'])) {
-        write_log('cc','log');
-            
             $shop_open = model('ShopInfo')->getBusiness($shop_info['run_time']);
         } else {
-        write_log('dd','log');
-
             $shop_open = 0;
         }
-        write_log($shop_open,'log');
-
         if (!$shop_open) {
             $this->error('该商家已休息');
         }
