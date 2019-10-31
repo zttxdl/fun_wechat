@@ -66,7 +66,7 @@ class Property extends MerchantsBase
         $time = $request->param('time',0);
 
         $start_time = date('Y-m-01',strtotime($time)).' 00:00:00';
-        $end_time = date('Y-m-30',strtotime($time)).' 23:59:59';
+        $end_time = date('Y-m-31',strtotime($time)).' 23:59:59';
 
         // 获取本月收入支出集合
         $res = Db::name('withdraw')

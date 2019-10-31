@@ -80,7 +80,7 @@ class Index extends Base
     }
 
     //推送连接
-	public function index($id)
+	public function index($id = 1)
 	{
 		return view('index/index',['uid'=>$id]);
 
