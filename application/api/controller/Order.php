@@ -263,17 +263,18 @@ class Order extends ApiBase
     public function orderPayment(Request $request)
     {
         $orders_sn = $request->param('orders_sn');
-        $shop_id = $request->param('shop_id');
         $openid = $this->auth->openid;
         $user_id = $this->auth->id;
-        $this->isDisable($shop_id);
         
         if(!$orders_sn){
-
+            
             $this->error('订单号不能为空');
         }
-
+        
         $order = model('Orders')->getOrder($orders_sn);
+        
+        $shop_id = $order->shop_id;
+        $this->isDisable($shop_id);
 
         if(!$order){
             $this->error('订单id错误');
