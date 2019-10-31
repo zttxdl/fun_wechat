@@ -291,6 +291,17 @@ class Order extends ApiBase
             $this->error('订单已支付');
         }
 
+        // 判断该商家是否已歇业
+        $shop_info = model('ShopInfo')->where('id','=',$shop_id)->field('id,open_status as business,run_time')->find();
+        if ($shop_info['business'] == 1 && !empty($shop_info['run_time'])) {
+            $shop_open = model('ShopInfo')->getBusiness($shop_info['run_time']);
+        } else {
+            $shop_open = 0;
+        }
+        if (!$shop_open) {
+            $this->error('该商家已休息');
+        }
+
         $data['price'] = $order['money'];
 
         if($data['price'] == 0) {
