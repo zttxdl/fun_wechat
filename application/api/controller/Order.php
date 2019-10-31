@@ -263,17 +263,18 @@ class Order extends ApiBase
     public function orderPayment(Request $request)
     {
         $orders_sn = $request->param('orders_sn');
-        $shop_id = $request->param('shop_id');
         $openid = $this->auth->openid;
         $user_id = $this->auth->id;
-        $this->isDisable($shop_id);
         
         if(!$orders_sn){
-
+            
             $this->error('订单号不能为空');
         }
-
+        
         $order = model('Orders')->getOrder($orders_sn);
+        
+        $shop_id = $order->shop_id;
+        $this->isDisable($shop_id);
 
         if(!$order){
             $this->error('订单id错误');
@@ -293,8 +294,6 @@ class Order extends ApiBase
 
         // 判断该商家是否已歇业
         $shop_info = model('ShopInfo')->where('id','=',$shop_id)->field('id,open_status as business,run_time')->find();
-        write_log('shopid:'.$shop_id,'log');
-        write_log($shop_info,'log');
         if ($shop_info['business'] == 1 && !empty($shop_info['run_time'])) {
             $shop_open = model('ShopInfo')->getBusiness($shop_info['run_time']);
         } else {
