@@ -501,6 +501,7 @@ class Order extends ApiBase
             'user_id' => $this->auth->id,
             'shop_id' => isset($order['shop_id']) ? $order['shop_id'] : 0,
             'school_id' => $school_id,
+            'hourse_id' => !empty($order['hourse_id']) ? $order['hourse_id'] : 0,//宿舍楼ID
             'save_time' => date('Y-m-d'),
             'money' => isset($order['money']) ? (float)$order['money'] : 0.00,//实付金额
             'total_money' => isset($order['total_money']) ? (float)$order['total_money'] : 0.00,//订单总价

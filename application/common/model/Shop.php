@@ -309,7 +309,7 @@ class Shop extends Model
      */
     public function getShopDetail($shop_id)
     {
-        $data = $this->field('shop_name,logo_img,link_name,link_tel,manage_category_id,school_id,address,latitude,longitude')
+        $data = $this->field('shop_name,logo_img,link_name,link_tel,manage_category_id,school_id,address,latitude,longitude,print_device_sn')
             ->where('id',$shop_id)->find();
         return $data;
     }
@@ -319,7 +319,7 @@ class Shop extends Model
      */
     public function getInformation($shop_id)
     {
-        $data = $this->field('sort,segmentation,price_hike,hike_type,withdraw_cycle')->where('id',$shop_id)->find();
+        $data = $this->field('sort,segmentation,price_hike,hike_type,withdraw_cycle,print_device_sn')->where('id',$shop_id)->find();
         return $data;
 
     }
@@ -389,6 +389,10 @@ class Shop extends Model
      */
     public function getGoodsAttrName($attr_ids = '')
     {
+        $attr_names = '';
+        if(empty($attr_ids)) {
+            return $attr_names;
+        }
         $res = Db::name('product_attr_classify')->field('name')->whereIn('id',$attr_ids)->select();
         $res = array_column($res,'name');
         $attr_names = implode(",",$res);

@@ -7,6 +7,7 @@ use app\common\controller\ApiBase;
 use think\Request;
 
 
+
 class School extends ApiBase
 {
     protected  $noNeedLogin = ['*'];
@@ -61,6 +62,16 @@ class School extends ApiBase
         }
 
         $this->success('获取学校地区列表成功',['school_list'=>$school_list,'current_school'=>$current_school]);
+    }
+
+    /**
+     * 获取学校楼号地址列表
+     */
+    public function getHourseList(Request $request)
+    {
+        $school_id = $request->param('school_id');
+        $list = model('Hourse')->getHourseList($school_id);
+        $this->success('获取成功',$list);
     }
     
 

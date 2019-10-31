@@ -13,6 +13,8 @@ use think\Collection;
 use think\Db;
 use think\Request;
 use app\common\service\PushEvent;
+use app\merchants\controller\Order;
+use app\common\service\FeieYun;
 
 class Notify extends Collection
 {
@@ -80,11 +82,15 @@ class Notify extends Collection
         }
 
         // 向指定商家推送新订单消息
-        // write_log('进来了'.$orders_sn,'log');
-
         $push = new PushEvent();
         $push->setUser('s_'.$shop_id)->setContent($orders_sn)->push();
 
+        // 获取当前商家的自动接单情况
+        $auto_print_info = model('ShopInfo')->getAutoPrintInfo($shop_id);
+        // 当是云打印机 以及 设置了自动接单、打印功能
+        if ($auto_print_info['print_device_sn'] && $auto_print_info['auto_receive']) {
+            $this->notifyAccept($orders_sn);
+        }
         return true;
     }
 
@@ -124,6 +130,126 @@ class Notify extends Collection
         });
 
         $response->send();
+    }
+
+    /**
+     * 自动接单
+     */
+    public function notifyAccept($orders_sn)
+    {
+        $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
+        $shop_info = Model('Shop')->getShopDetail($order_info['shop_id']);
+        $shop_address = [
+            'shop_name' => $shop_info['shop_name'],
+            'address_detail' => $shop_info['address'],
+            'phone' => $shop_info['link_tel'],
+            'name' => $shop_info['link_name'],
+            'longitude' => $shop_info['longitude'],
+            'latitude' => $shop_info['latitude'],
+        ];
+
+        //启动事务
+        Db::startTrans();
+        try{
+            //封装外卖数据
+            $takeout_info = [
+                'order_id' => $order_info['id'],
+                'shop_id' => $order_info['shop_id'],
+                'ping_fee' => $order_info['ping_fee'],//配送费
+                'school_id' => $shop_info['school_id'],
+                'create_time' => time(),//商家接单时间
+                'expected_time' => time()+30*60,//预计送达时间
+                'user_address' => $order_info['address'],//收货地址
+                'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
+                'hourse_id' => $order_info['hourse_id']//楼栋ID
+            ];
+
+            //外卖数据入库
+            $ret = Db::name('takeout')->insert($takeout_info);
+
+            if (!$ret){
+                throw new Exception('接单失败0');
+            } else {
+                $meal_sn = getMealSn('shop_id:'.$order_info['shop_id']);
+                Db::name('takeout')->where('order_id','=',$order_info['id'])->setField('meal_sn',$meal_sn);
+            }
+            model('Orders')->where('id',$order_info['id'])->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time(),'meal_sn'=>$meal_sn]);
+
+            Db::commit();
+
+        }catch (\Exception $e) {
+            Db::rollback();
+            throw new Exception($e->getMessage());
+        }
+
+        //实例化socket
+        $socket = model('PushEvent','service');
+
+        // 已成为骑手的情况
+        $map1 = [
+            ['school_id', '=', $shop_info['school_id']],
+            ['open_status', '=', 1],
+            ['status', '=', 3],
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
+        ];
+        // 暂未成为骑手的情况
+        $map2 = [
+            ['school_id', '=', $shop_info['school_id']],
+            ['status', 'in', [0,1,2]],
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
+        ];  
+
+        $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
+
+        foreach ($r_list as $item) {
+            $rid = 'r'.$item->id;
+            $socket->setUser($rid)->setContent('new')->push();
+        }
+
+        // 调用打印
+        $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
+        $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
+
+        if ($res) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * 飞鹅云打印 
+     * 
+     */
+    public function feieyunPrint($printer_sn,$orderInfo,$times)
+    {
+        $user = config('feieyun')['user'];
+        $ukey = config('feieyun')['ukey'];
+        $ip = config('feieyun')['ip'];
+        $port = config('feieyun')['port'];
+        $path = config('feieyun')['path'];
+
+        $time = time();			    //请求时间
+		$content = array(			
+			'user'=>$user,
+			'stime'=>$time,
+			'sig'=>sha1($user.$ukey.$time),
+			'apiname'=>'Open_printMsg',
+			'sn'=>$printer_sn,
+			'content'=>$orderInfo,
+		    'times'=>$times // 打印次数
+        );
+
+        // 调用飞鹅云打印类
+        $client = new FeieYun($ip,$port);
+        if(!$client->post($path,$content)){
+            return false;
+        }else{
+            //服务器返回的JSON字符串，建议要当做日志记录起来
+            write_log($client->getContent(),'log');
+            return true;
+        }
     }
 
 }

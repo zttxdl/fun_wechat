@@ -118,5 +118,81 @@ class ReceivingAddr extends ApiBase
     }
      
      
+    /**
+     * 保存新增收获地址 (新))
+     */
+    public function add(Request $request)
+    {
+        $data = $request->param();
+        $data['user_id'] = $this->auth->id;
+        $data['add_time'] = time();
+        $check = $this->validate($data,'ReceivingAddr.add');
+        if($check !== true) {
+            $this->error($check,201);
+        }
+
+        // 提交新增表单
+        $result = model('ReceivingAddr')->insert($data);
+        if (!$result) {
+            $this->error('添加失败',201);
+        }
+
+        $this->success('添加成功');
+
+    }
+
+    /**
+     * 新地址列表(新)
+     */
+    public function getAddressList(Request $request)
+    {
+        $school_id = $request->param('school_id','');
+        $list = model('ReceivingAddr')->getReceivingAddrList($this->auth->id);
+        // 获取学校名称
+        foreach ($list as $k => $v) {
+            $list[$k]['school_name'] = model('school')->getNameById($list[$k]['school_id']);
+            $list[$k]['hourse_name'] = model('Hourse')->getNameById($list[$k]['hourse_id']);
+        }
+        // 判断是否从下单处获取的地址列表
+        if ($school_id){
+            foreach ($list as &$value) {
+                $value['beyond'] = 0;
+                if ( $value['school_id'] == $school_id){
+                    $value['beyond'] = 1;
+                }
+            }
+        }
+        $this->success('获取收货地址成功',['list'=>$list]);
+    }
+
+    /**
+     * 保存修改的地址(新)
+     */
+    public function save(Request $request)
+    {
+        $data = $request->param();
+        if($request->isPost()){
+            // 验证表单数据
+            $check = $this->validate($data, 'ReceivingAddr.save');
+            if ($check !== true) {
+                $this->error($check,201);
+            }
+
+            // 提交表单
+            $result = ReceiveAddr::update($data);
+            if (!$result) {
+                $this->error('修改失败',201);
+            }
+            
+            $this->success('修改成功');
+        }else{
+            $info = ReceiveAddr::get($data['id']);
+            $info['school_name'] = model('school')->getNameById($info['school_id']);
+            $info['hourse_name'] = model('Hourse')->getNameById($info['hourse_id']);
+            
+            $this->success('获取地址信息成功',['info'=>$info]);
+        }
+        
+    }
      
 }

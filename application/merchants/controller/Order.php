@@ -10,10 +10,12 @@ namespace app\merchants\controller;
 
 use app\common\controller\MerchantsBase;
 use app\common\model\Orders;
+use app\common\service\FeieYun;
 use EasyWeChat\Factory;
 use think\Exception;
 use think\Request;
 use think\Db;
+use think\Model;
 
 class Order extends MerchantsBase
 {
@@ -81,11 +83,12 @@ class Order extends MerchantsBase
             ];
         }
 
-
-        $auto_receive = Db::name('shop_info')->where('id','=',$this->shop_id)->value('auto_receive');
+        // 获取当前商家的自动接单情况
+        $auto_print_info = model('ShopInfo')->getAutoPrintInfo($shop_id);
 
         $result['list'] = $data;
-        $result['auto_receive'] = $auto_receive;
+        $result['auto_receive'] = $auto_print_info['auto_receive'];
+        $result['print_device_sn'] = $auto_print_info['print_device_sn'];
         $result['count'] = $orders['total'];
         $result['page'] = $orders['current_page'];
         $result['pageSize'] = $orders['per_page'];
@@ -149,9 +152,6 @@ class Order extends MerchantsBase
                 'rider_tel'=> Model('RiderInfo')->getPhoneById($row['rider_id']),
                 'issuing_status' => $row['issuing_status']//出餐状态 0:未出餐 1:已出餐
             ];
-
-
-
 
         }
         //写入缓存
@@ -253,7 +253,7 @@ class Order extends MerchantsBase
     }
 
     /**
-     * 商家接单
+     * 商家接单【云打印设备接入】
      */
     public function accept(Request $request)
     {
@@ -261,6 +261,9 @@ class Order extends MerchantsBase
 
         $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
 
+        if(empty($order_info)) {
+            $this->error('订单不存在');
+        }
 
         if($order_info['status'] == 3) {
             $this->error('商家已接单');
@@ -290,25 +293,24 @@ class Order extends MerchantsBase
                 'order_id' => $order_info['id'],
                 'shop_id' => $order_info['shop_id'],
                 'ping_fee' => $order_info['ping_fee'],//配送费
-                'meal_sn' => getMealSn('shop_id:'.$order_info['shop_id']),//取餐号
                 'school_id' => $shop_info['school_id'],
                 'create_time' => time(),//商家接单时间
                 'expected_time' => time()+30*60,//预计送达时间
                 'user_address' => $order_info['address'],//收货地址
                 'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
+                'hourse_id' => $order_info['hourse_id']//楼栋ID
             ];
 
             //外卖数据入库
             $ret = Db::name('takeout')->insert($takeout_info);
 
             if (!$ret){
-                throw new Exception('接单失败');
+                throw new Exception('接单失败0');
+            } else {
+                $meal_sn = getMealSn('shop_id:'.$order_info['shop_id']);
+                Db::name('takeout')->where('order_id','=',$order_info['id'])->setField('meal_sn',$meal_sn);
             }
-
-            $result = model('Orders')->where('id',$order_info['id'])->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time(),'meal_sn'=>$takeout_info['meal_sn']]);
-            if (!$result){
-                throw new Exception('接单失败');
-            }
+            model('Orders')->where('id',$order_info['id'])->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time(),'meal_sn'=>$meal_sn]);
 
             Db::commit();
 
@@ -324,12 +326,116 @@ class Order extends MerchantsBase
         $map1 = [
             ['school_id', '=', $shop_info['school_id']],
             ['open_status', '=', 1],
-            ['status', '=', 3]
+            ['status', '=', 3],
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
         ];
         // 暂未成为骑手的情况
         $map2 = [
             ['school_id', '=', $shop_info['school_id']],
-            ['status', 'in', [0,1,2]]
+            ['status', 'in', [0,1,2]],
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
+        ];  
+
+        $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
+
+        foreach ($r_list as $item) {
+            $rid = 'r'.$item->id;
+            $socket->setUser($rid)->setContent('new')->push();
+        }
+
+        // 调用打印
+        $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
+        $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
+        if ($res) {
+            $this->success('接单成功');
+        } else {
+            $this->error('打印小票出错',205);
+        }
+    }
+
+
+    /**
+     * 商家接单【蓝牙打印设备接入】
+     */
+    public function bluetoothAccept(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+
+        $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
+
+        if(empty($order_info)) {
+            $this->error('订单不存在');
+        }
+
+        if($order_info['status'] == 3) {
+            $this->error('商家已接单');
+        }
+
+        if($order_info['status'] == 9) {
+            $this->error('订单已取消!');
+        }
+
+        $shop_info = Model('Shop')->getShopDetail($order_info['shop_id']);
+
+
+        $shop_address = [
+            'shop_name' => $shop_info['shop_name'],
+            'address_detail' => $shop_info['address'],
+            'phone' => $shop_info['link_tel'],
+            'name' => $shop_info['link_name'],
+            'longitude' => $shop_info['longitude'],
+            'latitude' => $shop_info['latitude'],
+        ];
+
+        //启动事务
+        Db::startTrans();
+        try{
+            //封装外卖数据
+            $takeout_info = [
+                'order_id' => $order_info['id'],
+                'shop_id' => $order_info['shop_id'],
+                'ping_fee' => $order_info['ping_fee'],//配送费
+                'school_id' => $shop_info['school_id'],
+                'create_time' => time(),//商家接单时间
+                'expected_time' => time()+30*60,//预计送达时间
+                'user_address' => $order_info['address'],//收货地址
+                'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
+                'hourse_id' => $order_info['hourse_id']//楼栋ID
+            ];
+
+            //外卖数据入库
+            $ret = Db::name('takeout')->insert($takeout_info);
+
+            if (!$ret){
+                throw new Exception('接单失败0');
+            } else {
+                $meal_sn = getMealSn('shop_id:'.$order_info['shop_id']);
+                Db::name('takeout')->where('order_id','=',$order_info['id'])->setField('meal_sn',$meal_sn);
+            }
+            model('Orders')->where('id',$order_info['id'])->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time(),'meal_sn'=>$meal_sn]);
+
+            Db::commit();
+
+        }catch (\Exception $e) {
+            Db::rollback();
+            $this->error($e->getMessage());
+        }
+
+        //实例化socket
+        $socket = model('PushEvent','service');
+
+        // 已成为骑手的情况
+        $map1 = [
+            ['school_id', '=', $shop_info['school_id']],
+            ['open_status', '=', 1],
+            ['status', '=', 3],
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
+        ];
+        // 暂未成为骑手的情况
+        $map2 = [
+            ['school_id', '=', $shop_info['school_id']],
+            ['status', 'in', [0,1,2]],
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
         ];  
 
         $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
@@ -342,10 +448,11 @@ class Order extends MerchantsBase
         $this->success('接单成功');
     }
 
+
     /**
      * 商家拒单
      */
-    public function refuse(Request $request)
+    public function refuse(Request $request)      
     {
         $orders_sn = $request->param('orders_sn');
         $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
@@ -444,7 +551,7 @@ class Order extends MerchantsBase
             // 可在此处传入其他参数，详细参数见微信支付文档
 
             'refund_desc' => '取消订单退款',
-//            'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
+            // 'notify_url'    => 'https' . "://" . $_SERVER['HTTP_HOST'].'/api/notify/refundBack',
 
         ]);
 
@@ -480,5 +587,60 @@ class Order extends MerchantsBase
         $this->error('fail',201,['issuing_status'=>0]);
     }
 
+
+    /**
+     * 飞鹅云打印 
+     * 
+     */
+    public function feieyunPrint($printer_sn,$orderInfo,$times)
+    {
+        $user = config('feieyun')['user'];
+        $ukey = config('feieyun')['ukey'];
+        $ip = config('feieyun')['ip'];
+        $port = config('feieyun')['port'];
+        $path = config('feieyun')['path'];
+
+        $time = time();			    //请求时间
+		$content = array(			
+			'user'=>$user,
+			'stime'=>$time,
+			'sig'=>sha1($user.$ukey.$time),
+			'apiname'=>'Open_printMsg',
+			'sn'=>$printer_sn,
+			'content'=>$orderInfo,
+		    'times'=>$times // 打印次数
+		);
+        // 调用飞鹅云打印类
+        $client = new FeieYun($ip,$port);
+        if(!$client->post($path,$content)){
+            return false;
+        }
+        else{
+            //服务器返回的JSON字符串，建议要当做日志记录起来
+            write_log($client->getContent(),'log');
+            return true;
+        }
+    }
+
+
+
+    /**
+     * 单独调用打印小票【飞鹅云打印】 
+     * 
+     */
+    public function printFeieOrder(Request $request)
+    {
+        $orders_sn = $request->param('orders_sn');
+        $print_device_sn = Db::name('shop_info')->where('id','=',$this->shop_id)->value('print_device_sn');
+        // 调用打印
+        $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
+
+        $res = $this->feieyunPrint($print_device_sn,$printOrderInfo,1);
+        if ($res) {
+            $this->success('打印小票成功');
+        } else {
+            $this->error('打印小票出错',205);
+        }
+    }
 
 }

@@ -154,6 +154,10 @@ Route::group('a-school', function () {
     Route::get('/show/:id', 'show');
     Route::post('/update', 'update');
     Route::get('/del/:id', 'delete');
+    Route::get('getHourse', 'getHourse');//楼栋展示
+    Route::rule('addHourse', 'addHourse', 'GET|POST');//新增楼栋
+    Route::rule('updateHourse', 'updateHourse', 'GET|POST');//编辑楼栋
+    Route::get('deleteHourse', 'deleteHourse');//删除楼栋
 })->prefix('admin/school/')->middleware('IsLogin');
 
 // 食堂管理模块
@@ -269,6 +273,7 @@ Route::group('merchants',function (){
     Route::rule('loginOut','merchants/Shop/loginOut');//退出
     Route::rule('ShopInfo','merchants/Shop/ShopInfo');//关于我们
     Route::get('autoReceive', 'merchants/Shop/autoReceive'); // 设置自动接单状态
+    Route::rule('setDeviceInfo','merchants/Merchants/setDeviceInfo'); // 存储当前商家的设备信息
     //评价
     Route::rule('getEvaluation','merchants/Merchants/getEvaluation');
 });
@@ -278,13 +283,15 @@ Route::group('merchants',function (){
     Route::post('orderQuery','merchants/Order/query');//订单管理
     Route::post('orderDetail','merchants/Order/orderDetail');//订单详情
     Route::post('orderDel','merchants/Order/del');//订单删除
-    Route::post('orderAccept','merchants/Order/accept');//商家接单
+    Route::post('orderAccept','merchants/Order/accept');//商家接单【云打印】
+    Route::post('bluetoothOrderAccept','merchants/Order/bluetoothAccept');//商家接单【蓝牙打印】
     Route::post('orderRefuse','merchants/Order/refuse');//商家拒单
     Route::post('refund','merchants/refund/refund');//退款
     Route::post('refuse','merchants/refund/refuse');//拒绝退款
     Route::post('wxRefund','merchants/refund/wxRefund');//微信退款
     Route::post('refundQuery','merchants/refund/refundQuery');//查询退款
     Route::post('orderIndex','merchants/Order/index');//订单管理
+    Route::post('printFeieOrder','merchants/Order/printFeieOrder');//手动打印订单小票【飞鹅】
 
 });
 
@@ -342,6 +349,10 @@ Route::group('u-addr', function () {
     Route::get('/edit/:id', 'edit');
     Route::post('/update', 'update');
     Route::get('/del/:id', 'delete');
+    //新用户地址接口
+    Route::rule('/add', 'add');
+    Route::rule('/get', 'getAddressList');
+    Route::rule('/save', 'save', 'GET|POST');
 })->prefix('api/ReceivingAddr/');
 
 // 学校地区组
@@ -349,6 +360,7 @@ Route::group('u-school', function () {
     Route::get('/index', 'index');
     Route::get('/school-level2', 'schoolLevel2');
     Route::get('/choose-school', 'chooseSchool');
+    Route::get('/getHourseList', 'getHourseList');
 })->prefix('api/school/');
 
 // 经营品类组
@@ -449,6 +461,7 @@ Route::group('r-member', function () {
 
 // 骑手订单组
 Route::group('r-orders', function () {
+    Route::rule('/index_new', 'index_new');
     Route::rule('/index', 'index');
     Route::rule('/details', 'details');
     Route::rule('/grabSingle', 'grabSingle');
@@ -456,6 +469,8 @@ Route::group('r-orders', function () {
     Route::rule('/arriveShop', 'arriveShop');
     Route::rule('/leaveShop', 'leaveShop');
     Route::rule('/confirmSend', 'confirmSend');
+    Route::rule('/getHourseList', 'getHourseList');//获取楼栋列表
+    Route::rule('/save', 'save');//保存楼栋设置
 
 })->prefix('rider/Orders/');
 

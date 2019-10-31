@@ -23,10 +23,14 @@ class Orders extends RiderBase
 	{
         $data = [];
         $type = $request->param('type');
+        $rider_id = $this->auth->id;
+        $school_id = $this->auth->school_id;
         if (!$type) {
             $this->error('非法参数');
         }
         $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
+
+        
         if ($status_arr['status'] == 4) {
             $this->error('你账号已被禁用，无法接单',202);
         }
@@ -45,9 +49,8 @@ class Orders extends RiderBase
         $location = $latitude.','.$longitude;
 
 		if ($type == 1) {
-            $where[] = ['school_id','=',$this->auth->school_id];
-		    $where[] = ['status','=',1];
-
+            $where[] = ['school_id','=',$school_id];
+            $where[] = ['status','=',1];
             $list = model('Takeout')
                 ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
                 ->where($where)
@@ -55,8 +58,8 @@ class Orders extends RiderBase
                 ->select();
 		}elseif($type == 2){
 			//获取已接单
-            $where[] = ['school_id','=',$this->auth->school_id];
-            $where[] = ['rider_id','=',$this->auth->id];
+            $where[] = ['rider_id','=',$rider_id];
+            $where[] = ['school_id','=',$school_id];
             $count = model('Takeout')->where($where)->where('status','in','3,4,5')->count();
             $data['count'] = $count;
             $where[] = ['status','in','3,4,5'];
@@ -74,8 +77,8 @@ class Orders extends RiderBase
             }
 		}else{
 		    //获取已完成订单
-            $where[] = ['school_id','=',$this->auth->school_id];
-            $where[] = ['rider_id','=',$this->auth->id];
+            $where[] = ['rider_id','=',$rider_id];
+            $where[] = ['school_id','=',$school_id];
             $count = model('Takeout')->where($where)->where('status','in','3,4,5')->count();
             $data['count'] = $count;
             $where[] = ['status','=','6'];
@@ -125,6 +128,123 @@ class Orders extends RiderBase
         }
 
         $data['list'] = $list;
+		$this->success('success',$data);
+    }
+
+    /**
+	 * 获取订单列表(新)
+	 */
+	public function index_new(Request $request)
+	{
+        $data = [];
+        $type = $request->param('type');
+        $rider_id = $this->auth->id;
+        $school_id = $this->auth->school_id;
+        if (!$type) {
+            $this->error('非法参数');
+        }
+        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
+
+        
+        if ($status_arr['status'] == 4) {
+            $this->error('你账号已被禁用，无法接单',202);
+        }
+        
+        $data['type'] = $status_arr['status'] == 0 ? 0 : 1;
+
+		if ($status_arr['open_status'] == 2) {
+			$this->error('你还没开工，无法接单',204);
+		}
+
+        $latitude = $request->param('latitude');
+        $longitude = $request->param('longitude');
+        if (!$latitude || !$longitude) {
+            $this->error('坐标不能为空');
+        }
+        $location = $latitude.','.$longitude;
+
+		if ($type == 1) {
+            $hourse_ids = Db::name('RiderInfo')->where('id',$rider_id)->value('hourse_ids');
+            $where[] = ['hourse_id','in',$hourse_ids];
+            $where[] = ['school_id','=',$school_id];
+            $where[] = ['status','=',1];
+            $list = model('Takeout')
+                ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
+                ->where($where)
+                ->order('create_time desc')
+                ->select();
+		}elseif($type == 2){
+			//获取已接单
+            $where[] = ['rider_id','=',$rider_id];
+            $where[] = ['school_id','=',$school_id];
+            $count = model('Takeout')->where($where)->where('status','in','3,4,5')->count();
+            $data['count'] = $count;
+            $where[] = ['status','in','3,4,5'];
+            $list = model('Takeout')
+                ->field('order_id,fetch_time,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
+                ->where($where)
+                ->order('single_time desc')
+                ->select();
+
+            foreach ($list as $key => $item) {
+                $item->rest_time = round(($item->expected_time - time()) / 60);
+                if ($item->status == 3) {
+                    $item->fetch_time = round(($item->fetch_time - time()) / 60);
+                }
+            }
+		}else{
+		    //获取已完成订单
+            $where[] = ['rider_id','=',$rider_id];
+            $where[] = ['school_id','=',$school_id];
+            $count = model('Takeout')->where($where)->where('status','in','3,4,5')->count();
+            $data['count'] = $count;
+            $where[] = ['status','=','6'];
+            $list = model('Takeout')
+                ->field('order_id,accomplish_time,fetch_time,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
+                ->where($where)
+                ->order('accomplish_time desc')
+                ->select();
+        }
+
+        foreach ($list as $item) {
+            if ($item->status != 6 && $item->status != 2) {
+                $shop_address = $item->shop_address->latitude.','.$item->shop_address->longitude;
+                $from = $location;
+                $to = $shop_address;
+                // 骑手到商家的距离
+                $s_distance = one_to_more_distance($from,$to);
+                if ($s_distance >= 100) {
+                    $item->s_distance = round($s_distance / 1000,1).'km';
+                }else{
+                    $item->s_distance = $s_distance.'m';
+                }
+            }
+
+            //已完成订单 送达时间超过两小时不展示用户联系方式
+            if($item->status == 6 && (time() - $item->accomplish_time) > 7200) {
+                $item->user_address->name = '';
+                $item->user_address->phone = '';
+            }
+
+            $item->expected_time = date('H:i',$item->expected_time);
+
+        }
+
+        $hourse_ids = Db::name('RiderInfo')->where('id',$rider_id)->value('hourse_ids');
+
+        $info = Db::name('Hourse')->field('id,fid,name')->where('id','in',$hourse_ids)->select();
+        // $name_info = array_column($info,'name');
+
+        foreach($info as $key => &$row){
+            $fName = Db::name('Hourse')->where('id',$row['fid'])->value('name');
+            $row['name'] = $fName.'-'.$row['name'];
+        }
+        unset($row);  // 加引用的for循环，循环执行完之后，建议手动清除引用
+
+        $info = ltrim(implode(',',array_column($info,'name','fName')),'-');
+
+        $data['list'] = $list;
+        $data['info'] = $info;
 		$this->success('success',$data);
     }
     
@@ -219,89 +339,89 @@ class Orders extends RiderBase
     /**
      * 改变订单状态【此功能后续会删除，已将该方法拆分为多个方法】
      */
-	public function statusUpdate(Request $request)
-    {
-        $type = $request->param('type');
-        $orderId = $request->param('order_id');
-        $latitude = $request->param('latitude');
-        $longitude = $request->param('longitude');
-        if (!$latitude || !$longitude) {
-            $this->error('坐标不能为空');
-        }
+	// public function statusUpdate(Request $request)
+    // {
+    //     $type = $request->param('type');
+    //     $orderId = $request->param('order_id');
+    //     $latitude = $request->param('latitude');
+    //     $longitude = $request->param('longitude');
+    //     if (!$latitude || !$longitude) {
+    //         $this->error('坐标不能为空');
+    //     }
 
-        $Order = \app\common\model\Orders::get($orderId);
-        $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
+    //     $Order = \app\common\model\Orders::get($orderId);
+    //     $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
         
-        $location = $latitude.','.$longitude;
-        $shop_address = $Takeout->shop_address->latitude.','.$Takeout->shop_address->longitude;
-        $user_address = $Takeout->user_address->latitude.','.$Takeout->user_address->longitude;
+    //     $location = $latitude.','.$longitude;
+    //     $shop_address = $Takeout->shop_address->latitude.','.$Takeout->shop_address->longitude;
+    //     $user_address = $Takeout->user_address->latitude.','.$Takeout->user_address->longitude;
         
-        if ($type == 1){//我已到店
-            $result = parameters($location,$shop_address);
-            if ($result[0]['elements'][0]['distance'] > 500) {
-                $this->error('暂未到指定范围，还不可以点击哦');
-            }
-            $Order->status = 5;
-            $Takeout->status = 4;
-            $Takeout->toda_time = time();
+    //     if ($type == 1){//我已到店
+    //         $result = parameters($location,$shop_address);
+    //         if ($result[0]['elements'][0]['distance'] > 500) {
+    //             $this->error('暂未到指定范围，还不可以点击哦');
+    //         }
+    //         $Order->status = 5;
+    //         $Takeout->status = 4;
+    //         $Takeout->toda_time = time();
 
-        }elseif ($type == 2){//取餐离店
-            $Order->status = 6;
-            $Takeout->status = 5;
-            $Order->send_time = time();
-            // 判断当前订单是否已取餐离店
-            $res = model('withdraw')->where([['withdraw_sn','=',$Order->orders_sn],['type','=',1]])->count();
-            if ($res) {
-                $this->error('您已取餐离店，请勿重新点击');
-            }
-            //取餐离店 计算商家收入、食堂收入
-            $result = model('Withdraw')->income($orderId);
-            if (!$result) {
-                // 计算商家收入存表、食堂收入存表有误，造成写入回滚
-                // 记录到异常订单中 【待更新。。。】
-            }
+    //     }elseif ($type == 2){//取餐离店
+    //         $Order->status = 6;
+    //         $Takeout->status = 5;
+    //         $Order->send_time = time();
+    //         // 判断当前订单是否已取餐离店
+    //         $res = model('withdraw')->where([['withdraw_sn','=',$Order->orders_sn],['type','=',1]])->count();
+    //         if ($res) {
+    //             $this->error('您已取餐离店，请勿重新点击');
+    //         }
+    //         //取餐离店 计算商家收入、食堂收入
+    //         $result = model('Withdraw')->income($orderId);
+    //         if (!$result) {
+    //             // 计算商家收入存表、食堂收入存表有误，造成写入回滚
+    //             // 记录到异常订单中 【待更新。。。】
+    //         }
 
-        }elseif ($type ==3){//确认送达
-            $result = parameters($location,$user_address);
-            if ($result[0]['elements'][0]['distance'] > 300) {
-                $this->error('暂未到指定范围，还不可以点击哦');
-            }
+    //     }elseif ($type ==3){//确认送达
+    //         $result = parameters($location,$user_address);
+    //         if ($result[0]['elements'][0]['distance'] > 300) {
+    //             $this->error('暂未到指定范围，还不可以点击哦');
+    //         }
 
-            $Order->arrive_time = time();
-            $Order->status = 7;
-            $Takeout->status = 6;
-            $Takeout->accomplish_time = time();
-            $Takeout->update_time = time();
+    //         $Order->arrive_time = time();
+    //         $Order->status = 7;
+    //         $Takeout->status = 6;
+    //         $Takeout->accomplish_time = time();
+    //         $Takeout->update_time = time();
 
-            //订单完成插入明细
-            $data = [
-                'rider_id' => $this->auth->id,
-                'name' => $Takeout->shop_address->shop_name,
-                'current_money' => $Takeout->ping_fee,
-                'type' => 1,
-                'serial_number' => $Order->orders_sn,
-                'add_time' => time(),
-            ];
-            Db::name('rider_income_expend')->insert($data);
-            $user = model('User')->field('phone,invitation_id')->where('id',$Order->user_id)->find();
-            // 判断当前用户的订单数量【只要付款之后都算数量】
-            $count = model('Orders')->where([['user_id','=',$Order->user_id],['status','notin',1]])->count('id');
-            if ($count == 1 && $user->invitation_id){
-                // 调用邀请红包
-                $this->inviteGiving($user->invitation_id);
-            }
+    //         //订单完成插入明细
+    //         $data = [
+    //             'rider_id' => $this->auth->id,
+    //             'name' => $Takeout->shop_address->shop_name,
+    //             'current_money' => $Takeout->ping_fee,
+    //             'type' => 1,
+    //             'serial_number' => $Order->orders_sn,
+    //             'add_time' => time(),
+    //         ];
+    //         Db::name('rider_income_expend')->insert($data);
+    //         $user = model('User')->field('phone,invitation_id')->where('id',$Order->user_id)->find();
+    //         // 判断当前用户的订单数量【只要付款之后都算数量】
+    //         $count = model('Orders')->where([['user_id','=',$Order->user_id],['status','notin',1]])->count('id');
+    //         if ($count == 1 && $user->invitation_id){
+    //             // 调用邀请红包
+    //             $this->inviteGiving($user->invitation_id);
+    //         }
             
-            // 调用消费赠送红包
-            $this->consumptionGiving($Order->user_id,$Takeout->school_id,$Order->money,$user->phone);
-            // 调用添加商品销量
-            $this->addProductSales($orderId,$Order->shop_id);
-        }
+    //         // 调用消费赠送红包
+    //         $this->consumptionGiving($Order->user_id,$Takeout->school_id,$Order->money,$user->phone);
+    //         // 调用添加商品销量
+    //         $this->addProductSales($orderId,$Order->shop_id);
+    //     }
 
-        $Takeout->save();
-        $Order->save();
+    //     $Takeout->save();
+    //     $Order->save();
 
-        $this->success('success');
-    }
+    //     $this->success('success');
+    // }
 
 	/**
 	 * 订单详情
@@ -648,11 +768,12 @@ class Orders extends RiderBase
     public function confirmSend(Request $request)
     {
         $orderId = $request->param('order_id');
-        $latitude = $request->param('latitude');
-        $longitude = $request->param('longitude');
-        if (!$latitude || !$longitude) {
-            $this->error('坐标不能为空');
-        }
+        // 去除经纬度
+        // $latitude = $request->param('latitude');
+        // $longitude = $request->param('longitude');
+        // if (!$latitude || !$longitude) {
+        //     $this->error('坐标不能为空');
+        // }
         
         $Order = \app\common\model\Orders::get($orderId);
         $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
@@ -661,12 +782,13 @@ class Orders extends RiderBase
         if ($Takeout->status == 6) {
             $this->error('您已送达，请勿重新点击');
         }
-        $location = $latitude.','.$longitude;
-        $user_address = $Takeout->user_address->latitude.','.$Takeout->user_address->longitude;
-        $result = parameters($location,$user_address);
-        if ($result[0]['elements'][0]['distance'] > 2000) {
-            $this->error('暂未到指定范围，还不可以点击哦');
-        }
+        // 去除经纬度
+        // $location = $latitude.','.$longitude;
+        // $user_address = $Takeout->user_address->latitude.','.$Takeout->user_address->longitude;
+        // $result = parameters($location,$user_address);
+        // if ($result[0]['elements'][0]['distance'] > 2000) {
+        //     $this->error('暂未到指定范围，还不可以点击哦');
+        // }
         // 启动事务
         Db::startTrans();
         try {
@@ -712,6 +834,56 @@ class Orders extends RiderBase
         }
 
         $this->success('确认送达');
+    }
+
+    /**
+     * 选择楼栋列表
+     */
+    public function getHourseList()
+    {
+        $rider_id = $this->auth->id;
+        $data = Db::name('RiderInfo')->field('hourse_ids,school_id')->where('id',$rider_id)->find();
+
+        if(empty($data['hourse_ids'])) {
+            $hourse_ids = [];
+        }else{
+            $hourse_ids = explode(',',$data['hourse_ids']);
+        }
+        $list = model('Hourse')->getHourseList($data['school_id']);
+
+        foreach($list as &$row) {
+            $row['isCheck'] = 0;
+            if(in_array($row['id'],$hourse_ids)) {
+                $row['isCheck'] = 1;
+            }
+
+            if(is_array($row['son'])) {
+                foreach($row['son'] as &$v) {
+                    $v['isCheck'] = 0;
+                    if(in_array($v['id'],$hourse_ids)) {
+                        $v['isCheck'] = 1;
+                    }
+                }
+            }
+        }
+        $this->success('获取成功',$list);
+    }
+
+    /**
+     * 保存楼栋设置(用于筛选订单))
+     */
+    public function save(Request $request)
+    {
+        $rider_id = $this->auth->id;
+        $hourse_ids = $request->param('hourse_ids');
+
+        $res = Db::name('RiderInfo')->where('id',$rider_id)->setField('hourse_ids','0,'.$hourse_ids);
+        if($res !== false) {
+            $this->success('保存成功');
+        }else{
+            $this->error('保存失败');
+        }
+        
     }
 
 

@@ -97,4 +97,14 @@ class ShopInfo extends Model
         $price_hike = $this->where('id',$id)->value('price_hike');
         return $price_hike;
     }
+
+
+    /**
+     * 获取商家的自动接单状态
+     */
+    public function getAutoPrintInfo($id)
+    {
+        $data = $this->where('id',$id)->field('print_device_sn,auto_receive')->find();
+        return $data;
+    }
 }

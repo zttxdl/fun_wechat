@@ -154,8 +154,8 @@ return [
     'token_key'       => 'jfseo!68q4*jkksf89tr#$^n,fs',
     //阿里云sms
     'aliyun_sms'              => [
-        'accessKeyId'        => 'LTAI0TdZqOBUjYc4',
-        'accessSecret'        => 'Mo5gW1xE90p25dVxPpfAxKiaQBXAk7',
+        'accessKeyId'        => 'LTAI4FoFCe1XQJdMAuJR1x3v',
+        'accessSecret'        => 'XgV15V2lSZVFpAPCuJG3s4xI6aP6Sg',
         'RegionId'       => 'scn-hangzhou',
         'SignName'     => '南京食聚荟',
         'SMSTemplateCode' => 'SMS_168116283',
@@ -230,6 +230,50 @@ return [
         'appkey' => 'kOjIFGbbyhAj5wOzEWggz5',
         'mastersecret' => 'hE66od5XSS8vGvOcRG3Ii9',
     ],
+
+
+    // 极光
+    'jiguang'   => [
+        'appkey'    => 'fd8088ea1b361b77e0e83401',
+        'master_secret'    => '3a892c08bbc625761968e0e2',
+    ],
+
+
+    // 信鸽
+    'xinge'=>   [
+        'android'   =>[
+            'appid'   => '5503065f63f3e',
+            'secretkey'   => 'bb9451081832338f917316becaa51ec5',
+            'accessid'   => '2100346254',
+            'accesskey'   => 'A972NKKD45QL'
+        ],
+        'ios'   =>  [
+            'appid'   => '5b3c49afa83a1',
+            'secretkey'   => '698196691d2f39c2b7059f8de2e2258f'
+        ]
+    ],
+
+
+    //阿里云vms
+    'aliyun_vms'              => [
+        'accessKeyId'        => 'LTAI4FoFCe1XQJdMAuJR1x3v',
+        'accessSecret'        => 'XgV15V2lSZVFpAPCuJG3s4xI6aP6Sg',
+        'RegionId'       => 'scn-hangzhou',
+        'CalledShowNumber'     => '4001112222',
+        'TtsCode' => 'TTS_10001',
+        //'SMS_141915147',
+    ],
+
+
+    // 飞鹅云打印
+    'feieyun'   =>[
+        'user'  =>  '18252010962@163.com',
+        'ukey'  =>  'dnTcvnYNhzm3AjFF',
+        'ip'  =>  'api.feieyun.cn',  // 接口IP或域名
+        'port'  =>  80,              // 接口IP端口
+        'path'  =>  '/Api/Open/'     // 接口路径
+
+    ]
 
 
 ];
