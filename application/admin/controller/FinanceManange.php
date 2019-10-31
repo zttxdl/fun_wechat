@@ -580,7 +580,8 @@ class FinanceManange extends Base
                 'shitang_choucheng' => '¥'.$row['shitang_choucheng'],
                 'ping_fee' => '¥'.$row['ping_fee'],
                 'platform_choucheng' => '¥'.sprintf('%.2f',$row['money'] - $row['shop_money'] - $row['ping_fee'] - $row['shitang_choucheng']),
-                'shop_money' => '¥'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn'])//商家实际收入 = 商家收支明细表money字段
+                'shop_money' => '¥'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']),//商家实际收入 = 商家收支明细表money字段
+                'status' => in_array($row['status'],[3,5]) ? '待分账' : '已完成'
             ];
         }
 
@@ -642,7 +643,8 @@ class FinanceManange extends Base
                     'shitang_choucheng' => '¥'.$row['shitang_choucheng'],
                     'ping_fee' => '¥'.$row['ping_fee'],
                     'platform_choucheng' => '¥'.sprintf('%.2f',$row['money'] - $row['shop_money'] - $row['ping_fee'] - $row['shitang_choucheng']),
-                    'shop_money' => '¥'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn'])//商家实际收入 = 商家收支明细表money字段
+                    'shop_money' => '¥'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']),//商家实际收入 = 商家收支明细表money字段
+                    'status' => in_array($row['status'],[3,5]) ? '待分账' : '已完成'
                 ];
             }
     
