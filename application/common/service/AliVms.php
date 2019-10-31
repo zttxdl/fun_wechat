@@ -11,6 +11,13 @@ use think\Model;
 // 这里继承model的意义是，方便在控制器端，通过model('AliCall','service') 的方式进行调用， 其实完全可不继承model ，直接在控制器端通过 new Alisms() 的方式进行调用
 class AliVms extends Model
 {
+    public function send() 
+    {
+        $key = 'send_times';
+        $redis = Cache::store('redis')->get($key);
+        $redis->rpop();
+    }
+
     public function sendCall($phone)
     {
         $accessKeyId = config('aliyun_vms')['accessKeyId'];

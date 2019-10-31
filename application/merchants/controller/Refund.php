@@ -40,7 +40,7 @@ class Refund extends MerchantsBase
             $row['refund_time'] = date('m-d H:i',$row['refund_time']);//退款完成时间
             $row['imgs'] = explode(',',$row['imgs']);
             $detail = $this->detail($row['orders_id']);
-            $row['box_money'] = $detail['box_money'];
+            $row['box_money'] = sprintf('%.2f',$detail['box_money']);
             $row['phone'] = $detail['phone'];
             $row['detail'] = $detail['detail'];
         }
@@ -56,8 +56,12 @@ class Refund extends MerchantsBase
     {
         $box_money = 0;
         $detail = model('OrdersInfo')
+            // ->alias('a')
+            // ->leftJoin('Orders b','a.orders_id = b.id')
             ->field('id,orders_id,product_id,num,ping_fee,box_money,attr_ids,total_money,old_money')
             ->where('orders_id','=',$id)
+            // ->field('a.id,a.orders_id,a.product_id,a.num,a.ping_fee,a.box_money,a.attr_ids,a.total_money,a.old_money,b.address')
+            // ->where('a.orders_id','=',$id)
             ->select();
 
         $data = model('Orders')->field('address')->where('id',$id)->find();
