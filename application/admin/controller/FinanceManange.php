@@ -542,9 +542,9 @@ class FinanceManange extends Base
         if($status == 1) {
             $account_status = [3,5];//待分帐 对应订单状态是商家接单到骑手取餐离店 3、5
         }elseif($status == 2){
-            $account_status = [6,7,8];//已完成 对应订单状态是骑手取餐离店到订单已完成 6、7、8
+            $account_status = [6,7,8,12];//已完成 对应订单状态是骑手取餐离店到订单已完成 6、7、8
         }else{
-            $account_status = [3,5,6,7,8];//全部订单
+            $account_status = [3,5,6,7,8,12];//全部订单
         }
 
         $where[] = ['a.status','in',$account_status];
@@ -584,7 +584,7 @@ class FinanceManange extends Base
         if($key_word)  $where[] = ['a.orders_sn','like',$key_word.'%'];
 
         //分成状态
-        $account_status = [3,5,6,7,8];//全部订单
+        $account_status = [3,5,6,7,8,12];//全部订单
         $where[] = ['a.status','in',$account_status];
 
 
