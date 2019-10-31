@@ -44,11 +44,13 @@ class Index extends ApiBase
             }
             
             if (!$data['current_school']) {
-                $school_id = 14; // 默认南京财经大学仙林学院
+                $school_id = 15; // 默认南京信息工程大学
+            } else {
+                $school_id = $data['current_school']['id'];
             }
         }
 
-        if ($school_id) { // 如果有学校主键值，则直接获取学校信息
+        if (!$data['current_school']) { 
             $data['current_school'] = model('School')->field("id,name")->where('id','=',$school_id)->find();
         }
 
