@@ -461,6 +461,7 @@ Route::group('r-member', function () {
 
 // 骑手订单组
 Route::group('r-orders', function () {
+    Route::rule('/index_new', 'index_new');
     Route::rule('/index', 'index');
     Route::rule('/details', 'details');
     Route::rule('/grabSingle', 'grabSingle');
