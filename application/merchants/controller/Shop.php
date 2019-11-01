@@ -53,6 +53,7 @@ class Shop extends MerchantsBase
             'day_uv' => !empty($day_uv) ? $day_uv : 0,//今日访客数
             'logo_img'=>$result['logo_img'],
             'order_cancel_num' => $day_cancel_order,//订单取消数量
+            'print_device_sn' => $$result['print_device_sn'],//打印设备编号
         ];
 
 
