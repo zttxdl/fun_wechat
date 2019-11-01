@@ -50,6 +50,10 @@ class Orders extends Base
         if($order_list) {
             foreach ($order_list['data'] as $row)
             {
+                $shop_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
+                    
+                $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng']);//平台抽成
+                
                 $result['info'][] = [
                     'id' => $row['id'],
                     'orders_sn' => $row['orders_sn'],
@@ -61,7 +65,7 @@ class Orders extends Base
                     'status' => $this->getOrdertStatus($row['status']),
                     'pay_mode' => $row['pay_mode']==1 ? '微信支付' : '支付宝支付',
                     'source' => $row['source']==1 ? '小程序' : 'H5',
-                    'platform_choucheng' => $row['platform_choucheng'],
+                    'platform_choucheng' => $platform_choucheng,
                     'meal_sn' => isset($row['meal_sn']) ? '#'.$row['meal_sn'] : ''
                 ];
             }
@@ -154,7 +158,9 @@ class Orders extends Base
             )->find();
 
         // 获取商家实际收入
-        $shop_income_money = model('withdraw')->where([['withdraw_sn','=',$list['orders_sn']],['type','=',1]])->value('money');
+        $shop_income_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
+        //获取平台收入
+        $platform_choucheng = sprintf('%.2f',$list['money'] - $shop_income_money - $list['ping_fee'] - $list['shitang_choucheng']);
 
         //订单信息 
         $result['order_info'] = [
@@ -173,7 +179,7 @@ class Orders extends Base
             'num' => $list['num'],
             'box_money' => $list['box_money'],
             'remark' => $list['message'],
-            'platform_choucheng' => $list['platform_choucheng'],
+            'platform_choucheng' => $platform_choucheng,
             'shitang_choucheng' => $list['shitang_choucheng'],
             'hongbao_choucheng' => $list['hongbao_choucheng'],
             'shop_income_money' => $shop_income_money,
