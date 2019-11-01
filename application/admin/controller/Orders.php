@@ -50,9 +50,6 @@ class Orders extends Base
         if($order_list) {
             foreach ($order_list['data'] as $row)
             {
-                $shop_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
-                    
-                $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng']);//平台抽成
                 
                 $result['info'][] = [
                     'id' => $row['id'],
@@ -65,7 +62,7 @@ class Orders extends Base
                     'status' => $this->getOrdertStatus($row['status']),
                     'pay_mode' => $row['pay_mode']==1 ? '微信支付' : '支付宝支付',
                     'source' => $row['source']==1 ? '小程序' : 'H5',
-                    'platform_choucheng' => $platform_choucheng,
+                    'platform_choucheng' => $row['platform_choucheng'],
                     'meal_sn' => isset($row['meal_sn']) ? '#'.$row['meal_sn'] : ''
                 ];
             }
