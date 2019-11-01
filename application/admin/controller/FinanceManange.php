@@ -567,19 +567,11 @@ class FinanceManange extends Base
             ->toArray();
 
             $info = [];
-            $platform_total_money = '0.00';
-            
             if($data['data']) {
                 foreach ($data['data'] as &$row){
                     $shop_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
                     
                     $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng']);//平台抽成
-
-                    //商家已完成分账计算平台收入
-                    if(in_array($row['status'],[6,7,8,12])) {
-                        $platform_total_money += $platform_choucheng;//平台总收入
-                        
-                    }
 
                     $info['data'][] = [
                         'id' => $row['id'],
@@ -597,9 +589,39 @@ class FinanceManange extends Base
                     ];
                 }
             }
+        // //方法二 按时间计算平台总收入
+        // $platform_total_money = '0.00';
+        // $total_money = Db::name('Orders')->alias('a')->field('a.orders_sn,a.money,a.ping_fee,a.shitang_choucheng,a.status')->where($where)->select();
+        // foreach($total_money as $row) {
+        //     $shop_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
+        //     $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng']);//平台抽成
+            
+        //     //商家已完成分账计算平台收入
+        //     if(in_array($row['status'],[6,7,8,12])) {
+        //         $platform_total_money += $platform_choucheng;//平台总收入
+        //     }
+        // }
+        // $platform_total_money = sprintf('%.2f',$platform_total_money);
+        
+        
+        //搜索条件
+        $map[] = ['a.status','in',[6,7,8,12]];
+        if($key_word)  $map[] = ['a.orders_sn','like',$key_word.'%'];
+        if($school_id)  $map[] = ['a.school_id','=',$school_id];
+        if($time)  $map[] = ['a.add_time', 'between time', [$start_time, $end_time]];
 
-        $platform_total_money = sprintf('%.2f',$platform_total_money);
+        $total_money = Db::name('Orders')->alias('a')->field('SUM(a.money) as order_money,SUM(a.ping_fee) as fee_money,SUM(a.shitang_choucheng) as shitang_money')->where($map)->find();
+        $order_info = Db::name('Orders')->alias('a')->field('a.orders_sn,a.status')->where($map)->select();
+    
+        $order_sn_arr = [];
+        foreach($order_info as $row) {
+            if(in_array($row['status'],[6,7,8,12])) {
+                $order_sn_arr[] = $row['orders_sn'];
+            }
+        }
+        $shop_total_money = Db::name('Withdraw')->where([['withdraw_sn','in',$order_sn_arr],['type','=','1']])->sum('money');
 
+        $platform_total_money = sprintf('%.2f',$total_money['order_money']  - $shop_total_money - $total_money['fee_money'] - $total_money['shitang_money']);
         // 学校列表
         $school_list = Model('school')->getSchoolList();
         //分页参数
@@ -645,18 +667,12 @@ class FinanceManange extends Base
             ->toArray();
 
             $info = [];
-            $platform_total_money = '0.00';
 
             if($data['data']) {
                 foreach ($data['data'] as &$row){
                     $shop_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
 
                     $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng']);//平台抽成
-                    
-                    //商家已完成分账计算平台收入
-                    if(in_array($row['status'],[6,7,8,12])) {
-                        $platform_total_money += $platform_choucheng;//平台总收入
-                    }
 
                     $info['data'][] = [
                         'id' => $row['id'],
@@ -674,9 +690,37 @@ class FinanceManange extends Base
                     ];
                 }
             }
+
+        // 方法一 按时间计算平台总收入
+        // $platform_total_money = '0.00';
+        // $totao_money = Db::name('Orders')->alias('a')->field('a.orders_sn,a.money,a.ping_fee,a.shitang_choucheng,a.status')->where($where)->select();
+        // foreach($totao_money as $row) {
+        //     $shop_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
+        //     $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng']);//平台抽成
             
-    
-        $platform_total_money = sprintf('%.2f',$platform_total_money);
+        //     //商家已完成分账计算平台收入
+        //     if(in_array($row['status'],[6,7,8,12])) {
+        //         $platform_total_money += $platform_choucheng;//平台总收入
+        //     }
+        // }      
+        // $platform_total_money = sprintf('%.2f',$platform_total_money);
+        $map[] = ['a.status','in',[6,7,8,12]];
+        if($key_word)  $map[] = ['a.orders_sn','like',$key_word.'%'];
+        if($school_id)  $map[] = ['a.school_id','=',$school_id];
+        if($time)  $map[] = ['a.add_time', 'between time', [$start_time, $end_time]];
+        
+        $total_money = Db::name('Orders')->alias('a')->field('SUM(a.money) as order_money,SUM(a.ping_fee) as fee_money,SUM(a.shitang_choucheng) as shitang_money')->where($map)->find();
+        $order_info = Db::name('Orders')->alias('a')->field('a.orders_sn,a.status')->where($map)->select();
+
+        $order_sn_arr = [];
+        foreach($order_info as $row) {
+            if(in_array($row['status'],[6,7,8,12])) {
+                $order_sn_arr[] = $row['orders_sn'];
+            }
+        }
+        $shop_total_money = Db::name('Withdraw')->where([['withdraw_sn','in',$order_sn_arr],['type','=','1']])->sum('money');
+
+        $platform_total_money = sprintf('%.2f',$total_money['order_money']  - $shop_total_money - $total_money['fee_money'] - $total_money['shitang_money']);
 
         // 学校列表
         $school_list = Model('school')->getSchoolList();
