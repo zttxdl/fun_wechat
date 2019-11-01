@@ -63,8 +63,6 @@ class Notify extends Collection
     //微信支付回调处理业务
     public function returnResult($orders_sn,$wx_id,$shop_id,$user_id)
     {
-        write_log('进来支付了','log');
-
         Db::startTrans();
         try {
             //处理的业务逻辑，更新订单
@@ -83,15 +81,12 @@ class Notify extends Collection
             trace($e->getMessage(),'error');
         }
 
-        write_log('$orders_sn：'.$orders_sn.'  $wx_id：'.$wx_id. '   $shop_id：'.$shop_id.'  $user_id：'.$user_id ,'log');
-
         // 向指定商家推送新订单消息
         $push = new PushEvent();
         $push->setUser('s_'.$shop_id)->setContent($orders_sn)->push();
 
         // 获取当前商家的自动接单情况
         $auto_print_info = model('ShopInfo')->getAutoPrintInfo($shop_id);
-        write_log($auto_print_info,'log');
         // 当是云打印机 以及 设置了自动接单、打印功能
         if ($auto_print_info['print_device_sn'] && $auto_print_info['auto_receive']) {
             $this->notifyAccept($orders_sn);
@@ -142,7 +137,6 @@ class Notify extends Collection
      */
     public function notifyAccept($orders_sn)
     {
-        write_log('进来自动接单了','log');
         $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
         $shop_info = Model('Shop')->getShopDetail($order_info['shop_id']);
         $shop_address = [
@@ -196,13 +190,13 @@ class Notify extends Collection
             ['school_id', '=', $shop_info['school_id']],
             ['open_status', '=', 1],
             ['status', '=', 3],
-            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
+            // ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
         ];
         // 暂未成为骑手的情况
         $map2 = [
             ['school_id', '=', $shop_info['school_id']],
             ['status', 'in', [0,1,2]],
-            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
+            // ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
         ];  
 
         $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
@@ -214,7 +208,6 @@ class Notify extends Collection
 
         // 调用打印
         $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
-        write_log($printOrderInfo,'log');
         $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
 
         if ($res) {
@@ -231,8 +224,6 @@ class Notify extends Collection
      */
     public function feieyunPrint($printer_sn,$orderInfo,$times)
     {
-        write_log('进来飞鹅云打印了','log');
-
         $user = config('feieyun')['user'];
         $ukey = config('feieyun')['ukey'];
         $ip = config('feieyun')['ip'];
