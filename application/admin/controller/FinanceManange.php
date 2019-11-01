@@ -565,16 +565,22 @@ class FinanceManange extends Base
             ->order('a.id DESC')
             ->paginate($page_size)
             ->toArray();
-        
+
             $info = [];
+            $platform_total_money = '0.00';
+            
             if($data['data']) {
                 foreach ($data['data'] as &$row){
                     $shop_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
                     
                     $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng']);//平台抽成
-                    
-                    $platform_total_money += $platform_choucheng;//平台总收入
-        
+
+                    //商家已完成分账计算平台收入
+                    if(in_array($row['status'],[6,7,8,12])) {
+                        $platform_total_money += $platform_choucheng;//平台总收入
+                        
+                    }
+
                     $info['data'][] = [
                         'id' => $row['id'],
                         'orders_sn' => $row['orders_sn'],
@@ -637,15 +643,21 @@ class FinanceManange extends Base
             ->order('a.id DESC')
             ->paginate($page_size)
             ->toArray();
+
             $info = [];
+            $platform_total_money = '0.00';
+
             if($data['data']) {
                 foreach ($data['data'] as &$row){
                     $shop_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
-                    
+
                     $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng']);//平台抽成
                     
-                    $platform_total_money += $platform_choucheng;//平台总收入
-        
+                    //商家已完成分账计算平台收入
+                    if(in_array($row['status'],[6,7,8,12])) {
+                        $platform_total_money += $platform_choucheng;//平台总收入
+                    }
+
                     $info['data'][] = [
                         'id' => $row['id'],
                         'orders_sn' => $row['orders_sn'],
