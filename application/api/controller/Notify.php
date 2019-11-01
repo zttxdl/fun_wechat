@@ -87,6 +87,7 @@ class Notify extends Collection
 
         // 获取当前商家的自动接单情况
         $auto_print_info = model('ShopInfo')->getAutoPrintInfo($shop_id);
+        write_log($auto_print_info,'log');
         // 当是云打印机 以及 设置了自动接单、打印功能
         if ($auto_print_info['print_device_sn'] && $auto_print_info['auto_receive']) {
             $this->notifyAccept($orders_sn);
@@ -137,6 +138,8 @@ class Notify extends Collection
      */
     public function notifyAccept($orders_sn)
     {
+        write_log('进来自动接单了','log');
+
         $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
         $shop_info = Model('Shop')->getShopDetail($order_info['shop_id']);
         $shop_address = [
@@ -208,6 +211,7 @@ class Notify extends Collection
 
         // 调用打印
         $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
+        write_log($printOrderInfo,'log');
         $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
 
         if ($res) {
@@ -224,6 +228,8 @@ class Notify extends Collection
      */
     public function feieyunPrint($printer_sn,$orderInfo,$times)
     {
+        write_log('进来飞鹅云打印了','log');
+
         $user = config('feieyun')['user'];
         $ukey = config('feieyun')['ukey'];
         $ip = config('feieyun')['ip'];
