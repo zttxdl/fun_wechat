@@ -63,6 +63,8 @@ class Notify extends Collection
     //微信支付回调处理业务
     public function returnResult($orders_sn,$wx_id,$shop_id,$user_id)
     {
+        write_log('进来支付了','log');
+
         Db::startTrans();
         try {
             //处理的业务逻辑，更新订单
@@ -80,6 +82,8 @@ class Notify extends Collection
             Db::rollback();
             trace($e->getMessage(),'error');
         }
+
+        write_log('$orders_sn：'.$orders_sn.'  $wx_id：'.$wx_id. '   $shop_id：'.$shop_id.'  $user_id：'.$user_id ,'log');
 
         // 向指定商家推送新订单消息
         $push = new PushEvent();
@@ -139,7 +143,6 @@ class Notify extends Collection
     public function notifyAccept($orders_sn)
     {
         write_log('进来自动接单了','log');
-
         $order_info = Db::name('orders')->where('orders_sn',$orders_sn)->find();
         $shop_info = Model('Shop')->getShopDetail($order_info['shop_id']);
         $shop_address = [
