@@ -86,8 +86,8 @@ class Notify extends Collection
         write_log('$orders_sn：'.$orders_sn.'  $wx_id：'.$wx_id. '   $shop_id：'.$shop_id.'  $user_id：'.$user_id ,'log');
 
         // 向指定商家推送新订单消息
-        // $push = new PushEvent();
-        // $push->setUser('s_'.$shop_id)->setContent($orders_sn)->push();
+        $push = new PushEvent();
+        $push->setUser('s_'.$shop_id)->setContent($orders_sn)->push();
 
         // 获取当前商家的自动接单情况
         $auto_print_info = model('ShopInfo')->getAutoPrintInfo($shop_id);
