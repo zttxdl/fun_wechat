@@ -25,7 +25,7 @@ class Orders extends RiderBase
         $type = $request->param('type');
         $rider_id = $this->auth->id;
         $school_id = $this->auth->school_id;
-        write_log($this->auth,'log');
+        write_log('rider_id:'.$this->auth->id.'     school_id:'.$this->auth->school_id,'log');
         if (!$type) {
             $this->error('非法参数');
         }
