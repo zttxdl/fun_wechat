@@ -80,21 +80,21 @@ class Index extends Base
     }
 
     //推送连接
-	public function index($shop_id = 49)
+	public function index($id = 49)
 	{
-        // return view('index/index',['uid'=>$id]);
+        return view('index/index',['uid'=>$id]);
         
-        // 判断该商家是否已歇业
-        $shop_info = model('ShopInfo')->where('id','=',$shop_id)->field('id,open_status as business,run_time')->find();
-        if ($shop_info['business'] == 1 && !empty($shop_info['run_time'])) {
-            $shop_open = model('ShopInfo')->getBusiness($shop_info['run_time']);
-        } else {
-            $shop_open = 0;
-        }
-        // echo $shop_open;die;
-        if (!$shop_open) {
-            $this->error('该商家已休息');
-        }
+        // // 判断该商家是否已歇业
+        // $shop_info = model('ShopInfo')->where('id','=',$shop_id)->field('id,open_status as business,run_time')->find();
+        // if ($shop_info['business'] == 1 && !empty($shop_info['run_time'])) {
+        //     $shop_open = model('ShopInfo')->getBusiness($shop_info['run_time']);
+        // } else {
+        //     $shop_open = 0;
+        // }
+        // // echo $shop_open;die;
+        // if (!$shop_open) {
+        //     $this->error('该商家已休息');
+        // }
 
     }
     
