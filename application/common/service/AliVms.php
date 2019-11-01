@@ -15,7 +15,8 @@ class AliVms extends Model
     {
         $key = 'send_times';
         $redis = Cache::store('redis')->get($key);
-        $redis->rpop();
+        $redis->rpop($key);
+        $redis->rpush($key);
     }
 
     public function sendCall($phone)

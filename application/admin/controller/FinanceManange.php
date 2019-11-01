@@ -566,31 +566,36 @@ class FinanceManange extends Base
             ->paginate($page_size)
             ->toArray();
         
-        foreach ($data['data'] as &$row){
-            $platform_total_money += $row['platform_choucheng'];//平台总收入
-
-            $info[] = [
-                'id' => $row['id'],
-                'orders_sn' => $row['orders_sn'],
-                'send_time' => !empty($row['send_time']) ? date('Y-m-d H:i:s',$row['send_time']) : '',
-                'add_time' => date('Y-m-d H:i:s',$row['add_time']),
-                'shop_name' => $row['shop_name'],
-                'money' => '¥'.$row['money'],
-                'cut_proportion' => $row['cut_proportion'].'%',
-                'shitang_choucheng' => '¥'.$row['shitang_choucheng'],
-                'ping_fee' => '¥'.$row['ping_fee'],
-                'platform_choucheng' => '¥'.sprintf('%.2f',$row['money'] - $row['shop_money'] - $row['ping_fee'] - $row['shitang_choucheng']),
-                'shop_money' => '¥'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']),//商家实际收入 = 商家收支明细表money字段
-                'status' => in_array($row['status'],[3,5]) ? '待分账' : '已完成'
-            ];
-        }
+            $info = [];
+            if($data['data']) {
+                foreach ($data['data'] as &$row){
+                    $platform_total_money += $row['platform_choucheng'];//平台总收入
+        
+                    $info['data'][] = [
+                        'id' => $row['id'],
+                        'orders_sn' => $row['orders_sn'],
+                        'send_time' => !empty($row['send_time']) ? date('Y-m-d H:i:s',$row['send_time']) : '',
+                        'add_time' => date('Y-m-d H:i:s',$row['add_time']),
+                        'shop_name' => $row['shop_name'],
+                        'money' => '¥'.$row['money'],
+                        'cut_proportion' => $row['cut_proportion'].'%',
+                        'shitang_choucheng' => '¥'.$row['shitang_choucheng'],
+                        'ping_fee' => '¥'.$row['ping_fee'],
+                        'platform_choucheng' => '¥'.sprintf('%.2f',$row['money'] - $row['shop_money'] - $row['ping_fee'] - $row['shitang_choucheng']),
+                        'shop_money' => '¥'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']),//商家实际收入 = 商家收支明细表money字段
+                        'status' => in_array($row['status'],[3,5]) ? '待分账' : '已完成'
+                    ];
+                }
+            }
 
         $platform_total_money = sprintf('%.2f',$platform_total_money);
 
-        
-
         // 学校列表
         $school_list = Model('school')->getSchoolList();
+        //分页参数
+        $info['page_size'] = $data['per_page'];
+        $info['page'] = $data['current_page'];
+        $info['count'] = $data['total'];
 
         $this->success('200',['platform_total_money'=>$platform_total_money,'info'=>$info,'school_list'=>$school_list]);
     }
@@ -628,31 +633,37 @@ class FinanceManange extends Base
             ->order('a.id DESC')
             ->paginate($page_size)
             ->toArray();
-
-            foreach ($data['data'] as &$row){
-                $platform_total_money += $row['platform_choucheng'];//平台总收入
-    
-                $info[] = [
-                    'id' => $row['id'],
-                    'orders_sn' => $row['orders_sn'],
-                    'send_time' => !empty($row['send_time']) ? date('Y-m-d H:i:s',$row['send_time']) : '',
-                    'add_time' => date('Y-m-d H:i:s',$row['add_time']),
-                    'shop_name' => $row['shop_name'],
-                    'money' => '¥'.$row['money'],
-                    'cut_proportion' => $row['cut_proportion'].'%',
-                    'shitang_choucheng' => '¥'.$row['shitang_choucheng'],
-                    'ping_fee' => '¥'.$row['ping_fee'],
-                    'platform_choucheng' => '¥'.sprintf('%.2f',$row['money'] - $row['shop_money'] - $row['ping_fee'] - $row['shitang_choucheng']),
-                    'shop_money' => '¥'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']),//商家实际收入 = 商家收支明细表money字段
-                    'status' => in_array($row['status'],[3,5]) ? '待分账' : '已完成'
-                ];
+            $info = [];
+            if($data['data']) {
+                foreach ($data['data'] as &$row){
+                    $platform_total_money += $row['platform_choucheng'];//平台总收入
+        
+                    $info['data'][] = [
+                        'id' => $row['id'],
+                        'orders_sn' => $row['orders_sn'],
+                        'send_time' => !empty($row['send_time']) ? date('Y-m-d H:i:s',$row['send_time']) : '',
+                        'add_time' => date('Y-m-d H:i:s',$row['add_time']),
+                        'shop_name' => $row['shop_name'],
+                        'money' => '¥'.$row['money'],
+                        'cut_proportion' => $row['cut_proportion'].'%',
+                        'shitang_choucheng' => '¥'.$row['shitang_choucheng'],
+                        'ping_fee' => '¥'.$row['ping_fee'],
+                        'platform_choucheng' => '¥'.sprintf('%.2f',$row['money'] - $row['shop_money'] - $row['ping_fee'] - $row['shitang_choucheng']),
+                        'shop_money' => '¥'.model('Withdraw')->getMoneyByOrderSn($row['orders_sn']),//商家实际收入 = 商家收支明细表money字段
+                        'status' => in_array($row['status'],[3,5]) ? '待分账' : '已完成'
+                    ];
+                }
             }
+            
     
         $platform_total_money = sprintf('%.2f',$platform_total_money);
 
         // 学校列表
         $school_list = Model('school')->getSchoolList();
-
+        //分页参数
+        $info['page_size'] = $data['per_page'];
+        $info['page'] = $data['current_page'];
+        $info['count'] = $data['total'];
         $this->success('200',['platform_total_money'=>$platform_total_money,'info'=>$info,'school_list'=>$school_list]);
 
     }
