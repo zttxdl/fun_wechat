@@ -633,7 +633,7 @@ class FinanceManange extends Base
             ->leftJoin('ShopInfo b','a.shop_id = b.id')
             ->leftJoin('canteen c','a.school_id = c.school_id')
             ->field('a.id,a.orders_sn,a.send_time,a.add_time,b.shop_name,a.money,c.cut_proportion,a.shitang_choucheng,a.ping_fee,a.platform_choucheng,a.status')
-            ->where('a.status','in',$account_status)
+            ->where($where)
             ->order('a.id DESC')
             ->paginate($page_size)
             ->toArray();
