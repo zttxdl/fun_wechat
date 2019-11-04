@@ -220,6 +220,7 @@ class School extends Base
         ->field('id,fid,name,school_id')
         ->where('school_id',$school_id)
         ->select();
+        $list = get_node($list);
         foreach ($list as $k => $v) {
             if ($list[$k]['fid'] == 0) {
                 $list[$k]['fid'] = "无上级分类";
