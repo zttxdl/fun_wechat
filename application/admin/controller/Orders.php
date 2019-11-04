@@ -50,6 +50,7 @@ class Orders extends Base
         if($order_list) {
             foreach ($order_list['data'] as $row)
             {
+                
                 $result['info'][] = [
                     'id' => $row['id'],
                     'orders_sn' => $row['orders_sn'],
@@ -154,7 +155,9 @@ class Orders extends Base
             )->find();
 
         // 获取商家实际收入
-        $shop_income_money = model('withdraw')->where([['withdraw_sn','=',$list['orders_sn']],['type','=',1]])->value('money');
+        $shop_income_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
+        //获取平台收入
+        $platform_choucheng = sprintf('%.2f',$list['money'] - $shop_income_money - $list['ping_fee'] - $list['shitang_choucheng']);
 
         //订单信息 
         $result['order_info'] = [
@@ -173,7 +176,7 @@ class Orders extends Base
             'num' => $list['num'],
             'box_money' => $list['box_money'],
             'remark' => $list['message'],
-            'platform_choucheng' => $list['platform_choucheng'],
+            'platform_choucheng' => $platform_choucheng,
             'shitang_choucheng' => $list['shitang_choucheng'],
             'hongbao_choucheng' => $list['hongbao_choucheng'],
             'shop_income_money' => $shop_income_money,
