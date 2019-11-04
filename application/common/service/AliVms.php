@@ -19,8 +19,14 @@ class AliVms extends Model
         $redis->rpush($key);
     }
 
-    public function sendCall($phone)
+
+    public function sendCall($shopid,$phone)
     {
+        // 订单提醒
+        // ${shop_name}您好,饭点送提醒您，您有一笔或多笔订单已超时3分钟还未接单，请及时处理。
+        // $cache_key = 'alivms_'.$shopid;
+        // Cache::store('redis')->set($cache_key, true, 180);
+
         $accessKeyId = config('aliyun_vms')['accessKeyId'];
         $accessSecret = config('aliyun_vms')['accessSecret'];
         $CalledShowNumber = config('aliyun_vms')['CalledShowNumber'];
