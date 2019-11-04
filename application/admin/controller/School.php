@@ -219,17 +219,13 @@ class School extends Base
         $list = Db::name('Hourse')
         ->field('id,fid,name,school_id')
         ->where('school_id',$school_id)
-        ->order('id','DESC')
-        ->paginate($page_size)
-        ->toArray();
-
-        // $arr = Db::name("Hourse")->order('id')->paginate();
-        // $list = get_node($arr);
-        foreach ($list['data'] as $k => $v) {
-            if ($list['data'][$k]['fid'] == 0) {
-                $list['data'][$k]['fid'] = "无上级分类";
+        ->select();
+        $list = get_node($list);
+        foreach ($list as $k => $v) {
+            if ($list[$k]['fid'] == 0) {
+                $list[$k]['fid'] = "无上级分类";
             } else {
-                $list['data'][$k]['fid'] = Db::name("Hourse")->where("id",'=', $list['data'][$k]['fid'])->value("name");
+                $list[$k]['fid'] = Db::name("Hourse")->where("id",'=', $list[$k]['fid'])->value("name");
             }
         }
         $this->success('获取菜单成功', ['list' => $list]);
@@ -267,7 +263,7 @@ class School extends Base
         $data = $request->param(); 
         if ($request->isPost()) {
             // 表单校验
-            $check = $this->validate($data, 'School.addHourse');
+            $check = $this->validate($data, 'School.updateHourse');
             if ($check !== true) {
                 $this->error($check,201);
             }

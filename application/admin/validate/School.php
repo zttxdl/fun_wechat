@@ -53,5 +53,6 @@ class School extends Validate
         'update'  =>  ['name','longitude','latitude','completion_time','fetch_time'],
         'insert'  =>  ['name','longitude','latitude','completion_time','fetch_time'],
         'addHourse'  =>  ['fid','name','school_id'],
+        'updateHourse'  =>  ['fid','name'],
     ];
 }
