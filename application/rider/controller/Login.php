@@ -59,7 +59,10 @@ class Login extends RiderBase
         }
         $info = Db::name('rider_info')->where('openid','=',$data['openid'])->field('id,school_id,status,open_status')->find();
         if ($info['school_id']) {
+            // 记录日志
+            write_log($info,'log');
             $hourse_ids_arr = Db::name('hourse')->where('school_id','=',$info['school_id'])->column('id');
+            write_log($hourse_ids_arr,'log');
             if ($hourse_ids_arr) {
                 $hourse_ids_str = implode(',',$hourse_ids_arr);
                 Db::name('rider_info')->where('id',$this->auth->id)->setField('hourse_ids','0,'.$hourse_ids_str);
