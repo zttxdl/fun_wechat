@@ -65,7 +65,9 @@ class Login extends RiderBase
             write_log($hourse_ids_arr,'log');
             if ($hourse_ids_arr) {
                 $hourse_ids_str = implode(',',$hourse_ids_arr);
-                Db::name('rider_info')->where('id',$this->auth->id)->setField('hourse_ids','0,'.$hourse_ids_str);
+                // Db::name('rider_info')->where('id',$this->auth->id)->setField('hourse_ids','0,'.$hourse_ids_str);
+                $res = Db::name('rider_info')->where('id',$this->auth->id)->fetchSql()->setField('hourse_ids','0,'.$hourse_ids_str);
+                write_log($res,'log');
             }
         }
         $jwtAuth = new JwtAuth();
