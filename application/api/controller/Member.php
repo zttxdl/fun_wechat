@@ -5,6 +5,7 @@ namespace app\api\controller;
 use think\Request;
 use app\common\model\User;
 use app\common\controller\ApiBase;
+use think\Db;
 
 /**
  * 用户个人中心控制器
@@ -82,4 +83,22 @@ class Member extends ApiBase
         $this->success('更换成功');
         
     }
+
+
+    /**
+     * 更新用户数据信息 
+     * 
+     */
+    public function updateUserInfo(Request $request)
+    {
+        $uid = $this->auth->id;
+        $data = $request->param();
+
+        $res = Db::name('user')->where('id','=',$uid)->update($data);
+        if ($res !== false) {
+            $this->success('更新用户数据信息成功');
+        }
+        $this->error('更新用户数据信息失败');
+    }
+     
 }
