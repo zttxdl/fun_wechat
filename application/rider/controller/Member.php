@@ -291,9 +291,9 @@ class Member extends RiderBase
 
         $res = Db::name('rider_info')->where('id','=',$rider_id)->update($data);
         if ($res !== false) {
-            $this->success('更新用户数据信息成功');
+            $this->success('更新骑手数据信息成功');
         }
-        $this->error('更新用户数据信息失败');
+        $this->error('更新骑手数据信息失败');
     }
      
      
