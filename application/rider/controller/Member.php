@@ -278,6 +278,23 @@ class Member extends RiderBase
 
         $this->success('获取成功',['info'=>$info]);
     }
+
+
+    /**
+     * 更新用户数据信息 
+     * 
+     */
+    public function updateRiderInfo(Request $request)
+    {
+        $rider_id = $this->auth->id;
+        $data = $request->param();
+
+        $res = Db::name('rider_info')->where('id','=',$rider_id)->update($data);
+        if ($res !== false) {
+            $this->success('更新用户数据信息成功');
+        }
+        $this->error('更新用户数据信息失败');
+    }
      
      
      
