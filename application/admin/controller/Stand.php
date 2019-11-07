@@ -89,6 +89,8 @@ class Stand extends Base
         $result['refund_money'] = $order_list['refund_money'];
         $result['new_user'] = $user_new_list;
         $result['active_user'] = $user_active_list;
+        //添加订单额和红包使使用额 add by ztt 20191107
+
 
         return $result;
     }
