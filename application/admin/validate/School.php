@@ -17,10 +17,7 @@ class School extends Validate
         'longitude'      => 'require',
         'latitude'      => 'require',
         'completion_time'      => 'require|number',
-        'fetch_time'      => 'require|number',
-        'fid'      => 'require|number',
-        'name'      => 'require|max:30',
-        'school_id'      => 'require',
+        'fetch_time'      => 'require|number'
 
     ];
     
@@ -38,21 +35,7 @@ class School extends Validate
         'completion_time.require'  => '订单预估送达时间必传',
         'completion_time.number'  => '订单预估送达时间必须为正整数',
         'fetch_time.require'  => '骑手约定取餐时间值必传',
-        'completion_time.number'  => '骑手约定取餐时间值必须为正整数',
-        'fid.require' => '上级楼栋名不能为空', 
-        'fid.number' => '上级楼栋ID必须为正整数', 
-        'name.require' => '楼栋名称不能为空', 
-        'name.max' => '楼栋名称不能超过30位', 
-        'school_id.require' => '学校ID必传', 
+        'fetch_time.number'  => '骑手约定取餐时间值必须为正整数',
     ];
 
-    /**
-     * 定义方法
-     */
-    protected $scene = [
-        'update'  =>  ['name','longitude','latitude','completion_time','fetch_time'],
-        'insert'  =>  ['name','longitude','latitude','completion_time','fetch_time'],
-        'addHourse'  =>  ['fid','name','school_id'],
-        'updateHourse'  =>  ['fid','name'],
-    ];
 }
