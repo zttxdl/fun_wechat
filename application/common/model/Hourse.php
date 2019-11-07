@@ -12,14 +12,19 @@ class Hourse extends Model
      */
     public function getHourseList($school_id)
     {
-        $list = Db::name('Hourse')->where('school_id',$school_id)->field('id,fid,name')->select();
-        $data = Db::name('Hourse')->where([['fid','=','0'],['school_id','=',$school_id]])->field('id,fid,name')->select();
-        // dump($list);
-        foreach($data as $k => &$v) {
+        // 当前学校有楼栋二级数据的楼栋一级id值
+        $ids = $this->where('fid','<>',0)->where('school_id','=',$school_id)->distinct(true)->column('fid');
+        // 当前学校的所有楼栋一级列表
+        $data = $this->where('id','in',$ids)->field('id,fid,name')->select()->toArray();
+
+        // 当前学校的所有楼栋列表
+        $list = $this->where('fid','<>',0)->where('school_id','=',$school_id)->field('id,fid,name')->select()->toArray();
+        // 组装三维数组
+        foreach ($data as $k => &$v) {
             $v['son'] = [];
-            foreach($list as $kk => $vv) {
-                if($v['id'] == $vv['fid']) {
-                    $v['son'][] = $vv;
+            foreach ($list as $ko => $vo) {
+                if ($v['id'] == $vo['fid']) {
+                    $v['son'][] = $vo;
                 }
             }
         }

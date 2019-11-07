@@ -220,7 +220,7 @@ class Orders extends Model
     {
         // 获取销售额，退单额，销售量
         $data = $this->whereTime('save_time',$time)->where('status','in','2,3,5,6,7,8,10,11,12')->where('school_id','=',$school_id)
-                    ->field('count(id) as count,sum(money) as money,save_time')->order('save_time')->group('save_time')->select()->toArray();
+                    ->field('count(id) as count,sum(money) as money,save_time,sum(total_money) as total_money,sum(platform_coupon_money) as coupon_total_money')->order('save_time')->group('save_time')->select()->toArray();
 
         // 销售量补零处理
         array_walk($data, function ($value, $key) use ($res, &$count_nums) {
@@ -233,6 +233,14 @@ class Orders extends Model
             $index = array_search($value['save_time'],$res);
             $order_nums[$index] = sprintf("%.2f",$value['money']);
         });
+
+        // 订单额 红包额处理
+        $total_money = 0.00;
+        $coupon_total_money = 0.00;
+        foreach ($data as $row) {
+            $total_money += $row['total_money'];
+            $coupon_total_money += $row['coupon_total_money'];
+        }
         foreach ($res as $k => &$v) {
             $v = substr($v,5);
         }
@@ -247,6 +255,8 @@ class Orders extends Model
         $result['money']['sum'] = sprintf("%.2f",array_sum($order_nums));
         $refund = $this->whereTime('save_time',$time)->where('school_id','=',$school_id)->where('status','=','11')->sum('money');
         $result['refund_money'] = sprintf("%.2f",$refund);
+        $result['total_money'] = sprintf("%.2f",$total_money);
+        $result['coupon_total_money'] = sprintf("%.2f",$coupon_total_money);
 
         return $result;
         
