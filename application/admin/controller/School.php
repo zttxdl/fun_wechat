@@ -131,7 +131,7 @@ class School extends Base
         $canteen = $request->param('canteen');
 
         // 验证表单数据
-        $check = $this->validate($data, 'School.update');
+        $check = $this->validate($data, 'School');
         if ($check !== true) {
             $this->error($check,201);
         }
