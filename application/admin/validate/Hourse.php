@@ -4,7 +4,9 @@
 namespace app\admin\validate;
 
 
-class Hourse
+use think\Validate;
+
+class Hourse extends Validate
 {
     /**
      * 定义验证规则
