@@ -30,6 +30,17 @@ class Index extends Base
         return $result;
 
     }
+
+
+    /**
+     * 查看sql执行时间 
+     * 
+     */
+    public function count_num()
+    {
+        
+    }
+     
      
 
 

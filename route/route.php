@@ -315,6 +315,7 @@ Route::group('u-member', function () {
     Route::get('/index', 'index');
     Route::post('/update-tel', 'setUserPhone');
     Route::post('/bind-tel', 'BindUserPhone');
+    Route::post('/updateUserInfo', 'updateUserInfo');
 })->prefix('api/Member/');
 
 // 首页
@@ -457,6 +458,7 @@ Route::group('r-member', function () {
     Route::post('/tojoin', 'toJoin');
     Route::rule('/getEvaluation', 'getEvaluation');
     Route::get('/getSchoolLatLong', 'getSchoolLatLong');
+    Route::post('/updateRiderInfo', 'updateRiderInfo');
 })->prefix('rider/Member/');
 
 // 骑手订单组
