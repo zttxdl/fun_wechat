@@ -50,6 +50,7 @@ class Stand extends Base
         $time = $request->param('times'); 
         // 调取条件
         $data = conditions($time);
+        dump($data);exit;
         $search_time = $data['search_time'];
         $res = $data['res'];
         $nums = $data['nums'];
@@ -90,7 +91,8 @@ class Stand extends Base
         $result['new_user'] = $user_new_list;
         $result['active_user'] = $user_active_list;
         //添加订单额和红包使使用额 add by ztt 20191107
-
+        $result['order_total_money'] = '';//订单额
+        $result['coupon_total_money'] = '';//红包使用额
 
         return $result;
     }
