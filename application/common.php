@@ -667,7 +667,7 @@ function get_order_info_print($orders_sn, $A, $B, $C, $D)
                 $head .= '<BOLD>'.$value .'</BOLD>' . '<BR>';
             }
         }
-        $order_print_info .= $head . $tail;
+        $order_print_info .= $head . '<BOLD>'.$tail.'</BOLD>';
     }
     
 
