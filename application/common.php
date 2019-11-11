@@ -662,12 +662,12 @@ function get_order_info_print($orders_sn, $A, $B, $C, $D)
                 $v_lenght = iconv("UTF-8", "GBK//IGNORE", $value);
                 $v_lenght = strlen($v_lenght);
                 if ($v_lenght == 13) $value = $value . " ";
-                $head .= '<BOLD>'.$value .'</BOLD>'. ' ' . $price . ' ' . $num . ' ' . $prices;
+                $head .= '<BOLD><L>'.$value .'</L></BOLD>'. ' ' . $price . ' ' . $num . ' ' . $prices;
             } else {
-                $head .= '<BOLD>'.$value .'</BOLD>' . '<BR>';
+                $head .= '<BOLD><L>'.$value .'</L></BOLD>' . '<BR>';
             }
         }
-        $order_print_info .= $head . '<BOLD>'.$tail.'</BOLD>';
+        $order_print_info .= $head . '<BOLD><L>'.$tail.'</L></BOLD>';
     }
     
 
