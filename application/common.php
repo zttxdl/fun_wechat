@@ -662,12 +662,12 @@ function get_order_info_print($orders_sn, $A, $B, $C, $D)
                 $v_lenght = iconv("UTF-8", "GBK//IGNORE", $value);
                 $v_lenght = strlen($v_lenght);
                 if ($v_lenght == 13) $value = $value . " ";
-                $head .= $value . ' ' . $price . ' ' . $num . ' ' . $prices;
+                $head .= '<L>'.$value .'</L>'. ' ' . $price . ' ' . $num . ' ' . $prices;
             } else {
-                $head .= $value . '<BR>';
+                $head .= '<L>'.$value .'</L>' . '<BR>';
             }
         }
-        $order_print_info .= $head . $tail;
+        $order_print_info .= $head . '<L>'.$tail.'</L>';
     }
     
 
@@ -682,7 +682,7 @@ function get_order_info_print($orders_sn, $A, $B, $C, $D)
     $order_print_info .= '--------------------------------<BR><BR>';
     $order_print_info .= '----------- 客户信息 -----------<BR>';
     $order_print_info .= '姓名：' . $order['user_address']->name . '<BR>';
-    $order_print_info .= '电话：' . $order['user_address']->phone . '<BR>';
+    $order_print_info .= '<L>电话：' . $order['user_address']->phone . '</L><BR>';
     $order_print_info .= '地址：' . $order['user_address']->school_name . ' ' . $order['user_address']->area_detail . ' ' . $order['user_address']->house_number . '<BR>';
     $order_print_info .= '--------------------------------<BR>';
     $order_print_info .= '<B>备注：' . $order['message'] . '</B><BR><BR><BR>';
