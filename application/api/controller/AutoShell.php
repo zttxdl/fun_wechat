@@ -122,10 +122,10 @@ class AutoShell extends Controller
     public function cancelOrders()
     {
         $redis = Cache::store('redis');
-        $key = "order_cacle";
+        $redis_key = "order_cacle";
 
-        $order_cancel = $redis->hGETALL($key);
-
+        $order_cancel = $redis->hGETALL($redis_key);
+        write_log($order_cancel,'log');
         // 如果存在订单缓存，进行下一步的时间判断
         if($order_cancel) { 
            foreach ($order_cancel as $k => $v) {
@@ -154,7 +154,7 @@ class AutoShell extends Controller
                     }
 
                    # 删除该redis记录
-                   $redis->hDel($key,$k);
+                   $redis->hDel($redis_key,$k);
                }
            }
         }
