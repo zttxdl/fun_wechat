@@ -131,7 +131,7 @@ class AutoShell extends Controller
            foreach ($order_cancel as $k => $v) {
                if (time() > $v) {
                    // TODO 逻辑
-                   $info = Db::name('orders')->where('id','=',$k)->find();
+                   $info = Db::name('orders')->where('orders_sn','=',$k)->find();
                    
                    # 修改该订单的状态【由未支付改为订单已取消】
                    Db::name('orders')->where('id',$info['id'])->update(['trading_closed_time'=>time(),'status'=>9]);
