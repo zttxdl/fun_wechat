@@ -628,7 +628,7 @@ class Order extends ApiBase
             $redis = Cache::store('redis');
             $key = "order_cacle";
             $time = time() + 5*60; // 订单超时时间
-            $redis->hSet($key, $orders_id, $time);
+            $redis->hSet($key, $orders_sn, $time);
 
             return json_success('提交成功',$result);
 

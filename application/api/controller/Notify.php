@@ -75,6 +75,13 @@ class Notify extends Collection
             if ($id) {
                 model('MyCoupon')->where('id',$id)->setField('status',3);
             }
+            # redis 删除
+            $redis = Cache::store('redis');
+            $key = "order_cacle";
+            if ($redis->hExists($key,$orders_sn)) {
+                $redis->hDel($key,$orders_sn);
+            }
+            
             Db::commit();
         } catch (\Throwable $e) {
             Db::rollback();
@@ -174,14 +181,6 @@ class Notify extends Collection
                 Db::name('takeout')->where('order_id','=',$order_info['id'])->setField('meal_sn',$meal_sn);
             }
             model('Orders')->where('id',$order_info['id'])->update(['status'=>3,'plan_arrive_time'=>$takeout_info['expected_time'],'shop_receive_time'=>time(),'meal_sn'=>$meal_sn]);
-            
-            # redis 删除
-            $redis = Cache::store('redis');
-            $key = "order_cacle";
-            if ($redis->hExists($key,$order_info['id'])) {
-                $redis->hDel($key,$order_info['id']);
-            }
-
             Db::commit();
 
         }catch (\Exception $e) {
