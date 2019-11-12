@@ -15,6 +15,7 @@ use think\Request;
 use app\common\service\PushEvent;
 use app\merchants\controller\Order;
 use app\common\service\FeieYun;
+use think\facade\Cache;
 
 class Notify extends Collection
 {
