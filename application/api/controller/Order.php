@@ -10,6 +10,7 @@ namespace app\api\controller;
 use app\common\controller\ApiBase;
 use EasyWeChat\Factory;
 use think\Db;
+use think\facade\Cache;
 use think\Request;
 
 
@@ -622,6 +623,13 @@ class Order extends ApiBase
             Db::commit();
             $result['orders_id'] = $orders_id;
             $result['orders_sn'] = $orders_sn;
+
+            // redis 存储
+            $redis = Cache::store('redis');
+            $key = "order_cacle";
+            $time = time() + 5*60; // 订单超时时间
+            $redis->hSet($key, $orders_id, $time);
+
             return json_success('提交成功',$result);
 
         } catch (\Exception $e) {

@@ -84,7 +84,7 @@ class AutoShell extends Controller
     /**
      * 超时订单自动取消 付款减库存需要加上库存（每分钟/次）
      */
-    public function cancelOrders()
+    public function cancelOrders_mysql()
     {
         $orderlist=Db::table('fun_orders')->where('add_time','<',time()-15*60)->where('pay_status',0)->where('status',1)->select();
 
@@ -115,6 +115,50 @@ class AutoShell extends Controller
         echo $num;
     }
 
+
+    /**
+     * 测试redis 超时15分钟取消订单
+     */
+    public function cancelOrders()
+    {
+        $redis = Cache::store('redis');
+        $key = "order_cacle";
+
+        $order_cancel = $redis->hGETALL($key);
+
+        // 如果存在订单缓存，进行下一步的时间判断
+        if($order_cancel) { 
+           foreach ($order_cancel as $k => $v) {
+               if (time() > $v) {
+                   // TODO 逻辑
+                   $info = Db::name('orders')->where('id','=',$k)->find();
+                   
+                   # 修改该订单的状态【由未支付改为订单已取消】
+                   Db::name('orders')->where('id',$info['id'])->update(['trading_closed_time'=>time(),'status'=>9]);
+
+                   // 红包状态回滚【如果使用】
+                   if($info['platform_coupon_money'] > 0){
+                       $my_coupon_id = Db::name('my_coupon')->where([['user_id','=',$info['user_id']],['platform_coupon_id','=',$info['platform_coupon_id']]])->value('id');
+                       Db::name('my_coupon')->where('id',$my_coupon_id)->setField('status',1);
+                    }
+                    
+                    # 商品的库存回滚【限今日特价商品（今日特价商品存在库存）】
+                    $goodslist=Db::name('orders_info')->where('orders_id',$info['id'])->field('product_id,num')->select();
+                    foreach ($goodslist as $key => $value) {
+                       $today = date('Y-m-d',time());
+                       // 加库存
+                       Db::name('today_deals')
+                           ->where('product_id',$value['product_id'])
+                           ->where('today',$today)
+                           ->setInc('num',$value['num']);
+                    }
+
+                   # 删除该redis记录
+                   $redis->hDel($key,$k);
+               }
+           }
+        }
+    }
 
     /**
      * 更新广告的状态
