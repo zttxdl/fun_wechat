@@ -687,7 +687,5 @@ function get_order_info_print($orders_sn, $A, $B, $C, $D)
     $order_print_info .= '--------------------------------<BR>';
     $order_print_info .= '<B>备注：' . $order['message'] . '</B><BR><BR><BR>';
     // $order_print_info .= '<QR>http://www.feieyun.com</QR>';//把解析后的二维码生成的字符串用标签套上即可自动生成二维码
-    // echo $order_print_info;
-    // die;
     return $order_print_info;
 }
