@@ -117,7 +117,7 @@ class AutoShell extends Controller
 
 
     /**
-     * 测试redis 超时15分钟取消订单
+     * 测试redis 超时15分钟取消订单 【2019-11-14更新】
      */
     public function cancelOrders()
     {

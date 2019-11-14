@@ -624,10 +624,10 @@ class Order extends ApiBase
             $result['orders_id'] = $orders_id;
             $result['orders_sn'] = $orders_sn;
 
-            // redis 存储
+            // redis 存储  【2019-11-14更新】
             $redis = Cache::store('redis');
             $key = "order_cacle";
-            $time = time() + 5*60; // 订单超时时间
+            $time = time() + 15*60; // 订单超时时间
             $redis->hSet($key, $orders_sn, $time);
 
             return json_success('提交成功',$result);
