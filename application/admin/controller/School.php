@@ -239,7 +239,7 @@ class School extends Base
         $data = $request->param();
         if($request->isPost()){
             // 验证表单数据
-            $check = $this->validate($data, 'School.addHourse');
+            $check = $this->validate($data, 'Hourse.addHourse');
             if ($check !== true) {
                 $this->error($check,201);
             }
@@ -263,7 +263,7 @@ class School extends Base
         $data = $request->param(); 
         if ($request->isPost()) {
             // 表单校验
-            $check = $this->validate($data, 'School.updateHourse');
+            $check = $this->validate($data, 'Hourse.updateHourse');
             if ($check !== true) {
                 $this->error($check,201);
             }
