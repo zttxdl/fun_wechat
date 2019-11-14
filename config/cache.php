@@ -61,9 +61,7 @@ return [
         // 服务器地址
         'host'       => '127.0.0.1',
         // 数据库
-        'select' => 1,
-        // 密码
-        'password'  =>'niumo888'
+        'select' => 1
     ],
     'runtime_path'  => '../runtime',
 ];
