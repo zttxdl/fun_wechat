@@ -682,8 +682,8 @@ function get_order_info_print($orders_sn, $A, $B, $C, $D)
     $order_print_info .= '--------------------------------<BR><BR>';
     $order_print_info .= '----------- 客户信息 -----------<BR>';
     $order_print_info .= '姓名：' . $order['user_address']->name . '<BR>';
-    $order_print_info .= '<L>电话：' . $order['user_address']->phone . '</L><BR>';
-    $order_print_info .= '地址：' . $order['user_address']->school_name . ' ' . $order['user_address']->area_detail . ' ' . $order['user_address']->house_number . '<BR>';
+    $order_print_info .= '<LBOLD>电话：' . $order['user_address']->phone . '</LBOLD><BR>';
+    $order_print_info .= '<LBOLD>地址：' . $order['user_address']->school_name . ' ' . $order['user_address']->area_detail . ' ' . $order['user_address']->house_number . '</LBOLD><BR>';
     $order_print_info .= '--------------------------------<BR>';
     $order_print_info .= '<B>备注：' . $order['message'] . '</B><BR><BR><BR>';
     // $order_print_info .= '<QR>http://www.feieyun.com</QR>';//把解析后的二维码生成的字符串用标签套上即可自动生成二维码
