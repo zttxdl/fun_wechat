@@ -76,12 +76,12 @@ class Notify extends Collection
             if ($id) {
                 model('MyCoupon')->where('id',$id)->setField('status',3);
             }
-            # redis 删除 【2019-11-14暂时不发布】
-            // $redis = Cache::store('redis');
-            // $key = "order_cacle";
-            // if ($redis->hExists($key,$orders_sn)) {
-            //     $redis->hDel($key,$orders_sn);
-            // }
+            # redis 删除 【2019-11-14更新】
+            $redis = Cache::store('redis');
+            $key = "order_cacle";
+            if ($redis->hExists($key,$orders_sn)) {
+                $redis->hDel($key,$orders_sn);
+            }
             
             Db::commit();
         } catch (\Throwable $e) {
