@@ -84,7 +84,7 @@ class AutoShell extends Controller
     /**
      * 超时订单自动取消 付款减库存需要加上库存（每分钟/次）
      */
-    public function cancelOrders_mysql()
+    public function cancelOrders()
     {
         $orderlist=Db::table('fun_orders')->where('add_time','<',time()-15*60)->where('pay_status',0)->where('status',1)->select();
 
@@ -117,9 +117,9 @@ class AutoShell extends Controller
 
 
     /**
-     * 测试redis 超时15分钟取消订单
+     * 测试redis 超时15分钟取消订单 【2019-11-14暂时不发布】
      */
-    public function cancelOrders()
+    public function cancelOrders_redis()
     {
         $redis = Cache::store('redis');
         $redis_key = "order_cacle";
