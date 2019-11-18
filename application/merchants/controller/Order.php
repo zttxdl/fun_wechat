@@ -390,6 +390,10 @@ class Order extends MerchantsBase
             'latitude' => $shop_info['latitude'],
         ];
 
+        // 预计送达时间
+        $time = model('School')->where('id',$shop_info['school_id'])->value('completion_time');
+        $expected_time = time() + 60 * $time;
+
         //启动事务
         Db::startTrans();
         try{
@@ -400,7 +404,7 @@ class Order extends MerchantsBase
                 'ping_fee' => $order_info['ping_fee'],//配送费
                 'school_id' => $shop_info['school_id'],
                 'create_time' => time(),//商家接单时间
-                'expected_time' => time()+30*60,//预计送达时间
+                'expected_time' => $expected_time,//预计送达时间
                 'user_address' => $order_info['address'],//收货地址
                 'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
                 'hourse_id' => $order_info['hourse_id']//楼栋ID
