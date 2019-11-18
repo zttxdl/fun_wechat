@@ -169,7 +169,7 @@ class Orders extends RiderBase
             $where[] = ['school_id','=',$school_id];
             $where[] = ['status','=',1];
             $list = model('Takeout')
-                ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
+                ->field('id,order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address,take_meals_status')
                 ->where($where)
                 ->order('create_time desc')
                 ->select();
@@ -811,9 +811,9 @@ class Orders extends RiderBase
             $this->error('您没有权限操作');
         }
         $id = $request->param('id');
-        $order_pick_status = $request->param('order_pick_status');
+        $take_meals_status = $request->param('take_meals_status');
 
-        $res = Db::name('takeout')->where('id','=',$id)->update(['order_pick_status'=>$order_pick_status]);
+        $res = Db::name('takeout')->where('id','=',$id)->update(['take_meals_status'=>$take_meals_status]);
         if ($res) {
             $this->success('操作成功');
         }
