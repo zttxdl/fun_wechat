@@ -90,32 +90,32 @@ class Orders extends RiderBase
         }
 
         foreach ($list as $item) {
-            if ($item->status != 6 && $item->status != 2) {
-                $shop_address = $item->shop_address->latitude.','.$item->shop_address->longitude;
-                $user_address = $item->user_address->latitude.','.$item->user_address->longitude;
-                $from = $location.';'.$shop_address;
-                $to = $shop_address.';'.$user_address;
-                $result = parameters($from,$to);
-                $s_distance = $result[0]['elements'][0]['distance'];
+            // if ($item->status != 6 && $item->status != 2) {
+            //     $shop_address = $item->shop_address->latitude.','.$item->shop_address->longitude;
+            //     $user_address = $item->user_address->latitude.','.$item->user_address->longitude;
+            //     $from = $location.';'.$shop_address;
+            //     $to = $shop_address.';'.$user_address;
+            //     $result = parameters($from,$to);
+            //     $s_distance = $result[0]['elements'][0]['distance'];
                 
-                if (in_array($item->status, [4,5])) {
-                    $u_distance = $result[0]['elements'][1]['distance'];
-                }else{
-                    $u_distance = $result[1]['elements'][1]['distance'];
-                }
+            //     if (in_array($item->status, [4,5])) {
+            //         $u_distance = $result[0]['elements'][1]['distance'];
+            //     }else{
+            //         $u_distance = $result[1]['elements'][1]['distance'];
+            //     }
                 
-                if ($s_distance >= 100) {
-                    $item->s_distance = round($s_distance / 1000,1).'km';
-                }else{
-                    $item->s_distance = $s_distance.'m';
-                }
+            //     if ($s_distance >= 100) {
+            //         $item->s_distance = round($s_distance / 1000,1).'km';
+            //     }else{
+            //         $item->s_distance = $s_distance.'m';
+            //     }
 
-                if ($u_distance >= 100) {
-                    $item->u_distance = round($u_distance / 1000,1).'km';
-                }else{
-                    $item->u_distance = $u_distance.'m';
-                }
-            }
+            //     if ($u_distance >= 100) {
+            //         $item->u_distance = round($u_distance / 1000,1).'km';
+            //     }else{
+            //         $item->u_distance = $u_distance.'m';
+            //     }
+            // }
 
             //已完成订单 送达时间超过两小时不展示用户联系方式
             if($item->status == 6 && (time() - $item->accomplish_time) > 7200) {
