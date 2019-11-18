@@ -52,7 +52,7 @@ class Orders extends RiderBase
             $where[] = ['school_id','=',$school_id];
             $where[] = ['status','=',1];
             $list = model('Takeout')
-                ->field('order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address')
+                ->field('id,order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address,take_meals_status')
                 ->where($where)
                 ->order('create_time desc')
                 ->select();
