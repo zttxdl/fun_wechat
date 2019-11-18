@@ -336,93 +336,6 @@ class Orders extends RiderBase
 
 	}
 
-    /**
-     * 改变订单状态【此功能后续会删除，已将该方法拆分为多个方法】
-     */
-	// public function statusUpdate(Request $request)
-    // {
-    //     $type = $request->param('type');
-    //     $orderId = $request->param('order_id');
-    //     $latitude = $request->param('latitude');
-    //     $longitude = $request->param('longitude');
-    //     if (!$latitude || !$longitude) {
-    //         $this->error('坐标不能为空');
-    //     }
-
-    //     $Order = \app\common\model\Orders::get($orderId);
-    //     $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
-        
-    //     $location = $latitude.','.$longitude;
-    //     $shop_address = $Takeout->shop_address->latitude.','.$Takeout->shop_address->longitude;
-    //     $user_address = $Takeout->user_address->latitude.','.$Takeout->user_address->longitude;
-        
-    //     if ($type == 1){//我已到店
-    //         $result = parameters($location,$shop_address);
-    //         if ($result[0]['elements'][0]['distance'] > 500) {
-    //             $this->error('暂未到指定范围，还不可以点击哦');
-    //         }
-    //         $Order->status = 5;
-    //         $Takeout->status = 4;
-    //         $Takeout->toda_time = time();
-
-    //     }elseif ($type == 2){//取餐离店
-    //         $Order->status = 6;
-    //         $Takeout->status = 5;
-    //         $Order->send_time = time();
-    //         // 判断当前订单是否已取餐离店
-    //         $res = model('withdraw')->where([['withdraw_sn','=',$Order->orders_sn],['type','=',1]])->count();
-    //         if ($res) {
-    //             $this->error('您已取餐离店，请勿重新点击');
-    //         }
-    //         //取餐离店 计算商家收入、食堂收入
-    //         $result = model('Withdraw')->income($orderId);
-    //         if (!$result) {
-    //             // 计算商家收入存表、食堂收入存表有误，造成写入回滚
-    //             // 记录到异常订单中 【待更新。。。】
-    //         }
-
-    //     }elseif ($type ==3){//确认送达
-    //         $result = parameters($location,$user_address);
-    //         if ($result[0]['elements'][0]['distance'] > 300) {
-    //             $this->error('暂未到指定范围，还不可以点击哦');
-    //         }
-
-    //         $Order->arrive_time = time();
-    //         $Order->status = 7;
-    //         $Takeout->status = 6;
-    //         $Takeout->accomplish_time = time();
-    //         $Takeout->update_time = time();
-
-    //         //订单完成插入明细
-    //         $data = [
-    //             'rider_id' => $this->auth->id,
-    //             'name' => $Takeout->shop_address->shop_name,
-    //             'current_money' => $Takeout->ping_fee,
-    //             'type' => 1,
-    //             'serial_number' => $Order->orders_sn,
-    //             'add_time' => time(),
-    //         ];
-    //         Db::name('rider_income_expend')->insert($data);
-    //         $user = model('User')->field('phone,invitation_id')->where('id',$Order->user_id)->find();
-    //         // 判断当前用户的订单数量【只要付款之后都算数量】
-    //         $count = model('Orders')->where([['user_id','=',$Order->user_id],['status','notin',1]])->count('id');
-    //         if ($count == 1 && $user->invitation_id){
-    //             // 调用邀请红包
-    //             $this->inviteGiving($user->invitation_id);
-    //         }
-            
-    //         // 调用消费赠送红包
-    //         $this->consumptionGiving($Order->user_id,$Takeout->school_id,$Order->money,$user->phone);
-    //         // 调用添加商品销量
-    //         $this->addProductSales($orderId,$Order->shop_id);
-    //     }
-
-    //     $Takeout->save();
-    //     $Order->save();
-
-    //     $this->success('success');
-    // }
-
 	/**
 	 * 订单详情
 	 */
@@ -887,6 +800,28 @@ class Orders extends RiderBase
     }
 
 
+    /**
+     * 设定取餐员取餐状态状态 
+     * 
+     */
+    public function setTakeMealsStatus(Request $request)
+    {
+        $type = $this->auth->type;
+        if ($type == 1) {
+            $this->error('您没有权限操作');
+        }
+        $id = $request->param('id');
+        $order_pick_status = $request->param('order_pick_status');
+
+        $res = Db::name('takeout')->where('id','=',$id)->update(['order_pick_status'=>$order_pick_status]);
+        if ($res) {
+            $this->success('操作成功');
+        }
+        $this->error('操作失败');
+
+
+    }
+     
 
 
 

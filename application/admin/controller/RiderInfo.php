@@ -30,7 +30,7 @@ class RiderInfo extends Base
         $school_list = Model('school')->getSchoolList();
 
 
-        $list = Db::name('rider_info')->where($where)->field('id,name,phone as link_tel,status,add_time,last_login_time')->order('id desc')
+        $list = Db::name('rider_info')->where($where)->field('id,name,phone as link_tel,status,add_time,last_login_time,type')->order('id desc')
                 ->paginate($pagesize)->each(function ($item, $key) {
                     // 当前骑手的送餐信息
                     $temp = Db::name('rider_income_expend')->where('rider_id','=',$item['id'])->where('type','=',1)->field('count(id) as order_nums, sum(current_money) as earnings')->find();
@@ -43,6 +43,7 @@ class RiderInfo extends Base
                     // 最近登录时间
                     $item['last_login_time'] = date('Y-m-d H:i:s',$item['last_login_time']);
                     $item['mb_status'] = $item['status'] == 3 ? '禁用' : '启用';
+                    $item['mb_type'] = config('rider_type')[$item['type']];
 
                     return $item;
                 });
@@ -72,6 +73,25 @@ class RiderInfo extends Base
         }
         $this->success('设置成功');
     }
+
+
+
+    /**
+     * 设置取餐员/送餐员/自配送员 
+     * 
+     */
+    public function setRiderType(Request $request)
+    {
+        $id = $request->param('id');
+        $type = $request->param('type');
+
+        $res = Db::name('rider_info')->where('id','=',$id)->update(['type'=>$type]);
+        if ($res) {
+            $this->success('设置成功');
+        }
+        $this->error('设置失败');
+    }
+     
 
 
     /**

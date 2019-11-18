@@ -131,7 +131,7 @@ class Member extends RiderBase
         if (!$result) {
             $this->error('加入失败',201);
         }
-        $rider_info = RiderInfo::where('id','=',$this->auth->id)->field('id,school_id,status,open_status')->find();
+        $rider_info = RiderInfo::where('id','=',$this->auth->id)->field('id,school_id,status,open_status,type')->find();
 
         // 将该学校下的所有楼信息，存表
         $school_id = $data['school_id'];
@@ -175,14 +175,15 @@ class Member extends RiderBase
         if ($check !== true) {
             $this->error($check,201);
         }
-
+        
         // 更新数据
+        unset($data['type']);
         $result = RiderInfo::where('id','=',$this->auth->id)->update($data);
         if (!$result) {
             $this->error('申请失败',201);
         }
         
-        $rider_info = RiderInfo::where('id','=',$this->auth->id)->field('id,school_id,status,open_status')->find();
+        $rider_info = RiderInfo::where('id','=',$this->auth->id)->field('id,school_id,status,open_status,type')->find();
 
         // 将该学校下的所有楼信息，存表
         $school_id = $data['school_id'];
