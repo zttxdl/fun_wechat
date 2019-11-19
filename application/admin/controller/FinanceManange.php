@@ -37,7 +37,7 @@ class FinanceManange extends Base
                     ->leftJoin('rider_info b','a.rider_id = b.id')
                     ->field('a.*,b.name')
                     ->where($map)
-                    ->where('type','=','2')
+                    ->where('a.type','=','2')
                     ->order('a.id DESC')
                     ->paginate($page_size)
                     ->toArray();
@@ -77,7 +77,7 @@ class FinanceManange extends Base
                     ->leftJoin('shop_info b','a.shop_id = b.id')
                     ->field('a.*,b.shop_name')
                     ->where($map)
-                    ->where('type','=','2')
+                    ->where('a.type','=','2')
                     ->order('a.id DESC')
                     ->paginate($page_size)
                     ->toArray();
@@ -118,7 +118,7 @@ class FinanceManange extends Base
                     ->leftJoin('canteen_account c','a.canteen_id = c.canteen_id')
                     ->field('a.*,b.name,c.back_num')
                     ->where($map)
-                    ->where('type','=','2')
+                    ->where('a.type','=','2')
                     ->order('a.id DESC')
                     ->paginate($page_size)
                     ->toArray();
