@@ -25,13 +25,19 @@ class Promotion extends MerchantsBase
         $shop_id = $this->shop_id;
 
 
-        $id = model('ShopDiscounts')
-            ->field('id,face_value,threshold')
+        $list = model('ShopDiscounts')
+            ->field('id,face_value,threshold,platform_assume')
             ->where('shop_id',$shop_id)
             ->where('delete',0)
             ->select();
 
-        $this->success('success',$id);
+        foreach ($list as $k => &$v) {
+            if ($v['platform_assume']) {
+                $v['face_value'] = $v['face_value'] - $v['platform_assume'];
+            }
+        }
+        
+        $this->success('success',$list);
     }
 
     /**
