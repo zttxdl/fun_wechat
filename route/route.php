@@ -67,6 +67,7 @@ Route::group('a-rider', function () {
     Route::get('/index', 'admin/RiderInfo/index');
     Route::get('/info/:id', 'admin/RiderInfo/show');
     Route::get('/status/:id/:status', 'admin/RiderInfo/status');
+    Route::post('/setRiderType', 'admin/RiderInfo/setRiderType');  
     // 骑手审核组
     Route::get('/c-index', 'admin/RiderInfo/checkRiderList');
     Route::get('/c-info/:id', 'admin/RiderInfo/checkShow');
@@ -472,7 +473,8 @@ Route::group('r-orders', function () {
     Route::rule('/leaveShop', 'leaveShop');
     Route::rule('/confirmSend', 'confirmSend');
     Route::rule('/getHourseList', 'getHourseList');//获取楼栋列表
-    Route::rule('/save', 'save');//保存楼栋设置
+    Route::rule('/save', 'save');//保存楼栋设置   
+    Route::rule('/settakemeals', 'setTakeMealsStatus');// 设置取餐员取餐状态  
 
 })->prefix('rider/Orders/');
 
