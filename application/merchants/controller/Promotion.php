@@ -82,6 +82,7 @@ class Promotion extends MerchantsBase
         if(!$id) {
             $this->error('参数不能空');
         }
+
         $open_status = Db::name('shop_info')->where('id','=',$this->shop_id)->value('open_status');
         if (!$open_status) {
             $this->error('营业状态下不可删除活动');
@@ -90,7 +91,7 @@ class Promotion extends MerchantsBase
             ->where('id',$id)
             ->update(['delete'=>1]);
         if($id) {
-            $this->success('success');
+            $this->success('success',['open_status'=>$open_status,'shop_id'=>$this->shop_id]);
         }
         $this->error('fail');
     }
