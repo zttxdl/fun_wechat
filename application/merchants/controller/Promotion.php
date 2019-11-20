@@ -10,6 +10,7 @@ namespace app\merchants\controller;
 
 
 use app\common\controller\MerchantsBase;
+use think\Db;
 use think\Request;
 
 class Promotion extends MerchantsBase
@@ -80,6 +81,10 @@ class Promotion extends MerchantsBase
         $id = $request->param('id');
         if(!$id) {
             $this->error('参数不能空');
+        }
+        $open_status = Db::name('shop_info')->where('id','=',$this->shop_id)->value('open_status');
+        if (!$open_status) {
+            $this->error('营业状态下不可删除活动');
         }
         $id = model('ShopDiscounts')
             ->where('id',$id)
