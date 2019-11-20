@@ -91,9 +91,9 @@ class Promotion extends MerchantsBase
             ->where('id',$id)
             ->update(['delete'=>1]);
         if($id) {
-            $this->success('success');
+            $this->success('删除成功');
         }
-        $this->error('fail');
+        $this->error('删除失败');
     }
 
 }
