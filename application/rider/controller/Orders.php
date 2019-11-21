@@ -24,12 +24,11 @@ class Orders extends RiderBase
         $data = [];
         $type = $request->param('type');
         $rider_id = $this->auth->id;
-        $school_id = $this->auth->school_id;
         if (!$type) {
             $this->error('非法参数');
         }
-        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
-
+        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status,school_id')->find();
+        $school_id = $status_arr['school_id'];
         
         if ($status_arr['status'] == 4) {
             $this->error('你账号已被禁用，无法接单',202);
@@ -140,12 +139,11 @@ class Orders extends RiderBase
         $data = [];
         $type = $request->param('type');
         $rider_id = $this->auth->id;
-        $school_id = $this->auth->school_id;
         if (!$type) {
             $this->error('非法参数');
         }
-        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
-
+        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status,school_id')->find();
+        $school_id = $status_arr['school_id'];
         
         if ($status_arr['status'] == 4) {
             $this->error('你账号已被禁用，无法接单',202);
