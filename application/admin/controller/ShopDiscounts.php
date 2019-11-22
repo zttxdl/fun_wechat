@@ -36,6 +36,10 @@ class ShopDiscounts extends Base
             $this->error($check,201);
         }
 
+        // 判断数量不得大于3个
+        if (Db::name('shop_discounts')->where([['shop_id','=',$data['shop_id']],['delete','=',0]])->count() >= 3) {
+            $this->error('满减活动不可超过3个');
+        }
         $data['create_time'] = time();
 
         $ret = Db::name('shop_discounts')->insert($data);
