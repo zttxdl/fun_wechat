@@ -278,15 +278,15 @@ class Orders extends RiderBase
             $this->error('手慢了，被人抢走了');
         }
 
-        // 骑手两次超时15分钟未取餐，今日将不可接单
-        $redis = Cache::store('redis');
-        $key = "rider_overtime_number";
-        if ($redis->hExists($key,$this->auth->id)) {
-            $count = $redis->hGet($key,$this->auth->id);
-            if ($count > 1) {
-                $this->error('您今天存在多次超时未取餐状况，今天不可再抢单',206);
-            }
-        }
+        // 骑手两次超时15分钟未取餐，今日将不可接单【2019-11-25 此功能暂时去除】
+        // $redis = Cache::store('redis');
+        // $key = "rider_overtime_number";
+        // if ($redis->hExists($key,$this->auth->id)) {
+        //     $count = $redis->hGet($key,$this->auth->id);
+        //     if ($count > 1) {
+        //         $this->error('您今天存在多次超时未取餐状况，今天不可再抢单',206);
+        //     }
+        // }
 
         // 当骑手目前存在五单以上的未完成订单，提示骑手暂时不可接单
         $count = Db::name('takeout')->where([['status','in',[3,4,5]],['rider_id','=',$this->auth->id]])->count('id');

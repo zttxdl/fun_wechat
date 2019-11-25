@@ -240,16 +240,16 @@ class AutoShell extends Controller
             }
         }
 
-        // 存入缓存，每个骑手最多两次取消接单情况
-        $redis = Cache::store('redis');
-        $key = "rider_overtime_number";
-        foreach ($rider_ids as $k => $v) {
-            if ($redis->hExists($key,$v)) {
-                $redis->hIncrby($key,$v,1);
-            } else {
-                $redis->hSet($key,$v,1);
-            }
-        }
+        // 存入缓存，每个骑手最多两次取消接单情况【2019-11-25 此功能暂时去除】
+        // $redis = Cache::store('redis');
+        // $key = "rider_overtime_number";
+        // foreach ($rider_ids as $k => $v) {
+        //     if ($redis->hExists($key,$v)) {
+        //         $redis->hIncrby($key,$v,1);
+        //     } else {
+        //         $redis->hSet($key,$v,1);
+        //     }
+        // }
 
     }
 }
