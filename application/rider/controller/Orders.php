@@ -24,12 +24,11 @@ class Orders extends RiderBase
         $data = [];
         $type = $request->param('type');
         $rider_id = $this->auth->id;
-        $school_id = $this->auth->school_id;
         if (!$type) {
             $this->error('非法参数');
         }
-        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
-
+        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status,school_id')->find();
+        $school_id = $status_arr['school_id'];
         
         if ($status_arr['status'] == 4) {
             $this->error('你账号已被禁用，无法接单',202);
@@ -140,12 +139,11 @@ class Orders extends RiderBase
         $data = [];
         $type = $request->param('type');
         $rider_id = $this->auth->id;
-        $school_id = $this->auth->school_id;
         if (!$type) {
             $this->error('非法参数');
         }
-        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status')->find();
-
+        $status_arr = model('RiderInfo')->where('id','=',$this->auth->id)->field('status,open_status,school_id')->find();
+        $school_id = $status_arr['school_id'];
         
         if ($status_arr['status'] == 4) {
             $this->error('你账号已被禁用，无法接单',202);
@@ -280,15 +278,15 @@ class Orders extends RiderBase
             $this->error('手慢了，被人抢走了');
         }
 
-        // 骑手两次超时15分钟未取餐，今日将不可接单
-        $redis = Cache::store('redis');
-        $key = "rider_overtime_number";
-        if ($redis->hExists($key,$this->auth->id)) {
-            $count = $redis->hGet($key,$this->auth->id);
-            if ($count > 1) {
-                $this->error('您今天存在多次超时未取餐状况，今天不可再抢单',206);
-            }
-        }
+        // 骑手两次超时15分钟未取餐，今日将不可接单【2019-11-25 此功能暂时去除】
+        // $redis = Cache::store('redis');
+        // $key = "rider_overtime_number";
+        // if ($redis->hExists($key,$this->auth->id)) {
+        //     $count = $redis->hGet($key,$this->auth->id);
+        //     if ($count > 1) {
+        //         $this->error('您今天存在多次超时未取餐状况，今天不可再抢单',206);
+        //     }
+        // }
 
         // 当骑手目前存在五单以上的未完成订单，提示骑手暂时不可接单
         $count = Db::name('takeout')->where([['status','in',[3,4,5]],['rider_id','=',$this->auth->id]])->count('id');
@@ -599,14 +597,21 @@ class Orders extends RiderBase
         try {
             // 商品原价 = 订单总价 - 配送费 - 餐盒费 - 提价
             $original_money = $Order->total_money - $Order->ping_fee - $Order->box_money - $total_hike_price;
+            // 商家承担的优惠金额
+            if ($Order->shop_discounts_id) {
+                $shop_discounts_info = Db::name('shop_discounts')->where('id','=',$Order->shop_discounts_id)->field('face_value,platform_assume')->find();
+                $shop_discounts_money = $shop_discounts_info['face_value'] - $shop_discounts_info['platform_assume'];
+            } else {
+                $shop_discounts_money = 0;
+            }
              /** 商家各种抽成支出*********************************/ 
-            //平台抽成 = （商品原价 - 优惠金额）* 抽成比例 <==> 平台抽成 = （订单总价 - 配送费 - 餐盒费 - 提价  - 平台优惠 - 商家活动优惠）* 抽成比例 
-            $ptExpenditure = ($original_money - $Order->platform_coupon_money - $Order->shop_discounts_money) * ($shop_info['segmentation'] / 100);
+            //平台抽成 = （商品原价 - 优惠金额）* 抽成比例 <==> 平台抽成 = （订单总价 - 配送费 - 餐盒费 - 提价  - 平台优惠 - 商家活动优惠[商家承担部分]）* 抽成比例 
+            $ptExpenditure = ($original_money - $Order->platform_coupon_money - $shop_discounts_money) * ($shop_info['segmentation'] / 100);
 
-            //食堂抽成 = (商品原价 - 商家活动优惠) * 食堂抽成比例 《==》 （订单总价 - 配送费 - 餐盒费 - 提价 - 商家活动优惠）*食堂抽成比例
+            //食堂抽成 = (商品原价 - 商家活动优惠) * 食堂抽成比例 《==》 （订单总价 - 配送费 - 餐盒费 - 提价 - 商家活动优惠[商家承担部分]）*食堂抽成比例
             $stExpenditure = 0;
             if ($cut_proportion) {
-                $stExpenditure = ($original_money - $Order->shop_discounts_money) * ($cut_proportion / 100);
+                $stExpenditure = ($original_money - $shop_discounts_money) * ($cut_proportion / 100);
             }
             
             //红包抽成 = 红包总金额 * 商家承担比列
@@ -630,8 +635,8 @@ class Orders extends RiderBase
             $Takeout->status = 5;
             $Takeout->save();
 
-            // 商家订单实际收入 = 商品原价 - 商家满减支出 - 抽成支出 《==》 订单总价 - 餐盒费 - 配送费 - 加价 - 抽成支出 - 商家满减支出
-            $shop_money = $original_money - $totalExpenditure - $Order->shop_discounts_money;
+            // 商家订单实际收入 = 商品原价 - 商家满减支出 - 抽成支出 《==》 订单总价 - 餐盒费 - 配送费 - 加价 - 抽成支出 - 商家满减支出[商家承担部分]
+            $shop_money = $original_money - $totalExpenditure - $shop_discounts_money;
             /** 商家用户下单收入*********************************/ 
             $data = [
                 'withdraw_sn' => $Order->orders_sn,

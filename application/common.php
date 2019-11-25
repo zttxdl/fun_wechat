@@ -466,26 +466,26 @@ if (!function_exists('qiniu_img_del')) {
             return false;
         }
     }
+}
 
 
-    /**
-     * 无限分类函数
-     * @param   array  $data  传入的待处理数组
-     * @param   int    $fid   分类初始级别
-     * @return  array
-     */
-    if (!function_exists('get_node')) {
-        function get_node($data, $fid = 0)
-        {
-            static $result = [];
-            foreach ($data as $key => $vo) {
-                if ($vo['fid'] == $fid) {
-                    $result[] = $vo;
-                    get_node($data, $vo['id']);
-                }
+/**
+ * 无限分类函数
+ * @param   array  $data  传入的待处理数组
+ * @param   int    $fid   分类初始级别
+ * @return  array
+ */
+if (!function_exists('get_node')) {
+    function get_node($data, $fid = 0)
+    {
+        static $result = [];
+        foreach ($data as $key => $vo) {
+            if ($vo['fid'] == $fid) {
+                $result[] = $vo;
+                get_node($data, $vo['id']);
             }
-            return $result;
         }
+        return $result;
     }
 }
 

@@ -10,6 +10,7 @@ namespace app\merchants\controller;
 
 
 use app\common\controller\MerchantsBase;
+use think\Db;
 use think\Request;
 
 class Promotion extends MerchantsBase
@@ -25,13 +26,19 @@ class Promotion extends MerchantsBase
         $shop_id = $this->shop_id;
 
 
-        $id = model('ShopDiscounts')
-            ->field('id,face_value,threshold')
+        $list = model('ShopDiscounts')
+            ->field('id,face_value,threshold,platform_assume')
             ->where('shop_id',$shop_id)
             ->where('delete',0)
             ->select();
 
-        $this->success('success',$id);
+        foreach ($list as $k => &$v) {
+            if ($v['platform_assume']) {
+                $v['face_value'] = $v['face_value'] - $v['platform_assume'];
+            }
+        }
+        
+        $this->success('success',$list);
     }
 
     /**
@@ -75,13 +82,18 @@ class Promotion extends MerchantsBase
         if(!$id) {
             $this->error('参数不能空');
         }
+
+        $open_status = Db::name('shop_info')->where('id','=',$this->shop_id)->value('open_status');
+        if ($open_status) {
+            $this->error('营业状态下不可删除活动');
+        }
         $id = model('ShopDiscounts')
             ->where('id',$id)
             ->update(['delete'=>1]);
         if($id) {
-            $this->success('success');
+            $this->success('删除成功');
         }
-        $this->error('fail');
+        $this->error('删除失败');
     }
 
 }

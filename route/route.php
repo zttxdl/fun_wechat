@@ -228,6 +228,18 @@ Route::group('a-statistics', function () {
 })->prefix('admin/Statistics/')->middleware('IsLogin');
 
 
+
+// 商家满减活动
+Route::group('a-shopdiscounts', function () {
+    Route::get('/index/:id', 'index');
+    Route::post('/insert','insert');   
+    Route::get('/edit/:id','edit');   
+    Route::post('/update/:id','update');   
+    Route::get('/delete/:id','delete');   
+})->prefix('admin/ShopDiscounts/')->middleware('IsLogin');
+
+
+
 /*************** 商家端 *********************************************************************************************/
 //商家登录注册用户组
 Route::group('merchants',function (){
