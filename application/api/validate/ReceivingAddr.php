@@ -48,7 +48,7 @@ class ReceivingAddr extends Validate
      * 定义方法
      */
     protected $scene = [
-        'add'  =>  ['name','phone','school_id','area_detail'],
-        'save'  =>  ['name','phone','school_id','area_detail'],
+        'add'  =>  ['name','phone','school_id','area_detail','house_number'],
+        'save'  =>  ['name','phone','school_id','area_detail','house_number'],
     ];
 }
