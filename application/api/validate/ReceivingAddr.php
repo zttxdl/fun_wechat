@@ -19,6 +19,7 @@ class ReceivingAddr extends Validate
         'area_detail'   => 'require',
         'longitude'   => 'require',
         'latitude'   => 'require',
+        'hourse_number'   => 'require',
         // 'hourse_id'   => 'require',
 
     ];
@@ -38,6 +39,7 @@ class ReceivingAddr extends Validate
         'area_detail.require'   => '请填写楼栋详细地址',
         'longitude.require'   => '经度必传',
         'latitude.require'   => '纬度必传',
+        'hourse_number.require'   => '宿舍号必填',
         // 'hourse_id.require'   => '楼号必传',
     ];
 
