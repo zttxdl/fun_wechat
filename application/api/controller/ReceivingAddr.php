@@ -13,7 +13,7 @@ class ReceivingAddr extends ApiBase
 
 
     /**
-     * 地址列表 
+     * 地址列表 (旧，带有选择地图的)
      * 
      */
     public function index(Request $request)
@@ -38,7 +38,7 @@ class ReceivingAddr extends ApiBase
 
 
     /**
-     * 保存新增收货地址 
+     * 保存新增收货地址 (旧，带有选择地图的)
      * 
      */
     public function create(Request $request)
@@ -78,7 +78,7 @@ class ReceivingAddr extends ApiBase
 
 
     /**
-     * 保存修改收货地址
+     * 保存修改收货地址(旧，带有选择地图的)
      * 
      */
     public function update(Request $request)
