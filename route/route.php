@@ -472,6 +472,8 @@ Route::group('r-member', function () {
     Route::rule('/getEvaluation', 'getEvaluation');
     Route::get('/getSchoolLatLong', 'getSchoolLatLong');
     Route::post('/updateRiderInfo', 'updateRiderInfo');
+    Route::get('/getDayOrderNum', 'getDayOrderNum');
+    
 })->prefix('rider/Member/');
 
 // 骑手订单组
