@@ -482,7 +482,7 @@ class Index extends ApiBase
                 }
                 $this->success('已活跃');
             } else {
-                $this->error('还未授权呢111',['openid'=>$openid]);
+                $this->success('已活跃');
             }
         }
         $this->error('还未授权呢',['openid'=>$openid]);
