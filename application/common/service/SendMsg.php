@@ -39,7 +39,7 @@ class SendMsg
             // 组装模板消息数据
             $postData = array(
                 "touser" => $riderInfo['openid'],                            // 用户openid
-                "template_id" => 'HHujXg7ul804vPu6i1WAh6IQGuvIfVuOujE3HKXsB1s',      // 模板消息ID
+                "template_id" => 'ecrDQ5hR7yj-r6IIx3VlMzn6xSzFGyc0p_7aiPOISIA',      // 模板消息ID
                 "page" => 'pages/my/my',                  // 跳转的页面
                 "form_id" => $riderInfo['formid'],
                 "data" => array(
