@@ -194,7 +194,9 @@ class RiderInfo extends Base
      * 
      */
     public function setCheckStatus(Request $request)
-    {
+    {        
+        write_log('进来审核操作了','txt');
+
         $data = $request->post();
         $data['pass_time'] = time();
         if ($data['status'] == 3) {
@@ -208,8 +210,9 @@ class RiderInfo extends Base
 
         // 推送微信模板消息
         $sendMsg = new sendMsg();
-        $sendMsg->passCheckSend($data['id']);
-
+        $res = $sendMsg->passCheckSend($data['id']);
+        write_log($res,'txt');
+        write_log('推送的返回结果','txt');
         $this->success('设置成功');
     }
 
