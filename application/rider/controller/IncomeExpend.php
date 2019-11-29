@@ -52,20 +52,22 @@ class IncomeExpend extends RiderBase
         $where[] = ['rider_id','=',$this->auth->id];
         !empty($request->get('type/d')) ? $where[] = ['type','=',$request->get('type/d')] : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
-
+    
         $list = Db::name('rider_income_expend')->where($where)->order('id desc')->field('name,add_time,current_money money,type,status')
                 ->paginate($pagesize)->each(function ($item, $key) {
+                    // 收入
                     if ($item['type'] == 1) {
                         $item['money'] = '+'.$item['money'];
                     }
-                    if ($item['type'] == 2 && $item['status'] == 1) {
-                        $item['money'] = '-'.$item['money'].'（审核中）';
-                    }
-                    if ($item['type'] == 2 && $item['status'] == 2) {
-                        $item['money'] = '-'.$item['money'].'（审核失败）';
-                    }
-                    if ($item['type'] == 2 && $item['status'] == 3) {
-                        $item['money'] = '-'.$item['money'];
+                    // 支出
+                    if ($item['type'] == 2) {
+                        if ($item['status'] == 1) {
+                            $item['money'] = '-'.$item['money'].'（审核中）';
+                        } else if ($item['status'] == 2) {
+                            $item['money'] = '-'.$item['money'].'（审核失败）';
+                        } else {
+                            $item['money'] = '-'.$item['money'];
+                        }
                     }
                     $item['add_time'] = date('Y-m-d H:i:s',$item['add_time']);
                     return $item;
