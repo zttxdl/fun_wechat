@@ -125,7 +125,6 @@ class AutoShell extends Controller
         $redis_key = "order_cacle";
 
         $order_cancel = $redis->hGETALL($redis_key);
-        write_log($order_cancel,'log');
         // 如果存在订单缓存，进行下一步的时间判断
         if($order_cancel) { 
            foreach ($order_cancel as $k => $v) {
