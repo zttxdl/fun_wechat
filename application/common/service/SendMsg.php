@@ -30,8 +30,6 @@ class SendMsg
         if ($riderInfo['status'] == 3) {
             $check = '您的申请已通过';
         }
-        write_log('进来了','txt');
-        write_log($riderInfo,'txt');
         // 判断form_id是否失效,当不失效的时候,去获取并推送
         if ($riderInfo['overtime'] > time()) {
             // 这是获取的小程序accessToken方法
