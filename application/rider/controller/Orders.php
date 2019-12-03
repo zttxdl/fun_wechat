@@ -714,11 +714,10 @@ class Orders extends RiderBase
     {
         $order_id = $request->param('order_id');
         $school_id = Db::name('takeout')->where('order_id','=',$order_id)->value('school_id');
-        $id = $this->auth->id;
         //实例化socket
         $socket = model('PushEvent','service');
         // 订单返回到骑手抢单状态
-        $res = Db::name('takeout')->where('id','=',$id)->update(['status'=>1,'single_time'=>0]);
+        $res = Db::name('takeout')->where('order_id','=',$order_id)->update(['status'=>1,'single_time'=>0]);
 
         // 推送socket
         // 已成为骑手的情况
@@ -739,6 +738,10 @@ class Orders extends RiderBase
             $rid = 'r'.$item->id;
             $socket->setUser($rid)->setContent('refresh')->push();
         }
+        if ($res) {
+            $this->success('取消成功');
+        }
+        $this->error('取消失败');
     }
      
 
