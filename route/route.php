@@ -485,6 +485,7 @@ Route::group('r-orders', function () {
     Route::rule('/statusUpdate', 'statusUpdate');
     Route::rule('/arriveShop', 'arriveShop');
     Route::rule('/leaveShop', 'leaveShop');
+    Route::rule('/cancelOrder', 'cancelOrder');
     Route::rule('/confirmSend', 'confirmSend');
     Route::rule('/getHourseList', 'getHourseList');//获取楼栋列表
     Route::rule('/save', 'save');//保存楼栋设置   
