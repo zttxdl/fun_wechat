@@ -19,6 +19,7 @@ class ReceivingAddr extends Validate
         'area_detail'   => 'require',
         'longitude'   => 'require',
         'latitude'   => 'require',
+        'house_number'   => 'require',
         // 'hourse_id'   => 'require',
 
     ];
@@ -38,6 +39,7 @@ class ReceivingAddr extends Validate
         'area_detail.require'   => '请填写楼栋详细地址',
         'longitude.require'   => '经度必传',
         'latitude.require'   => '纬度必传',
+        'house_number.require'   => '宿舍号必填',
         // 'hourse_id.require'   => '楼号必传',
     ];
 
@@ -46,7 +48,7 @@ class ReceivingAddr extends Validate
      * 定义方法
      */
     protected $scene = [
-        'add'  =>  ['name','phone','school_id','area_detail'],
-        'save'  =>  ['name','phone','school_id','area_detail'],
+        'add'  =>  ['name','phone','school_id','area_detail','house_number'],
+        'save'  =>  ['name','phone','school_id','area_detail','house_number'],
     ];
 }

@@ -481,9 +481,11 @@ class Index extends ApiBase
                     model('UserActive')->insert(['save_time'=>$date,'count'=>1]);
                 }
                 $this->success('已活跃');
+            } else {
+                $this->success('已活跃');
             }
         }
-        $this->error('还未授权呢');
+        $this->error('还未授权呢',['openid'=>$openid]);
 
 
     }

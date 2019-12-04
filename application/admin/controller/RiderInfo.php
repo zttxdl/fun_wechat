@@ -208,8 +208,7 @@ class RiderInfo extends Base
 
         // 推送微信模板消息
         $sendMsg = new sendMsg();
-        $sendMsg->passCheckSend($data['id']);
-
+        $res = $sendMsg->passCheckSend($data['id']);
         $this->success('设置成功');
     }
 

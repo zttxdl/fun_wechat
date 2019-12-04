@@ -297,6 +297,27 @@ class Member extends RiderBase
         $this->error('更新骑手数据信息失败');
     }
      
+
+/**
+ * 查看骑手每天上下午的订单量 
+ * 
+ */
+public function getDayOrderNum()
+{
+    $rider_id = $this->auth->id;
+    $info['at_order_num'] = Db::name('takeout')
+                            ->where('single_time','between',[strtotime(date('Y-m-d')),strtotime(date('Y-m-d 13:00:00'))])
+                            ->where('status','=',6)
+                            ->where('rider_id','=',$rider_id)
+                            ->count();
+    $info['pt_order_num'] = Db::name('takeout')
+                            ->where('single_time','>',strtotime(date('Y-m-d 13:00:00')))
+                            ->where('status','=',6)
+                            ->where('rider_id','=',$rider_id)
+                            ->count();
+    $this->success('获取今日订单量成功',['info'=>$info]);
+}
+ 
      
      
 }

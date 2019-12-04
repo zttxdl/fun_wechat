@@ -472,6 +472,8 @@ Route::group('r-member', function () {
     Route::rule('/getEvaluation', 'getEvaluation');
     Route::get('/getSchoolLatLong', 'getSchoolLatLong');
     Route::post('/updateRiderInfo', 'updateRiderInfo');
+    Route::get('/getDayOrderNum', 'getDayOrderNum');
+    
 })->prefix('rider/Member/');
 
 // 骑手订单组
@@ -483,6 +485,7 @@ Route::group('r-orders', function () {
     Route::rule('/statusUpdate', 'statusUpdate');
     Route::rule('/arriveShop', 'arriveShop');
     Route::rule('/leaveShop', 'leaveShop');
+    Route::rule('/cancelOrder', 'cancelOrder');
     Route::rule('/confirmSend', 'confirmSend');
     Route::rule('/getHourseList', 'getHourseList');//获取楼栋列表
     Route::rule('/save', 'save');//保存楼栋设置   

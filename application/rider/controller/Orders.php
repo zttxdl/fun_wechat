@@ -40,14 +40,6 @@ class Orders extends RiderBase
 			$this->error('你还没开工，无法接单',204);
 		}
 
-        /** mike 注释 经纬度计算距离功能 */
-        // $latitude = $request->param('latitude');
-        // $longitude = $request->param('longitude');
-        // if (!$latitude || !$longitude) {
-        //     $this->error('坐标不能为空');
-        // }
-        // $location = $latitude.','.$longitude;
-
 		if ($type == 1) {
             $where[] = ['school_id','=',$school_id];
             $where[] = ['status','=',1];
@@ -90,33 +82,6 @@ class Orders extends RiderBase
         }
 
         foreach ($list as $item) {
-            // if ($item->status != 6 && $item->status != 2) {
-            //     $shop_address = $item->shop_address->latitude.','.$item->shop_address->longitude;
-            //     $user_address = $item->user_address->latitude.','.$item->user_address->longitude;
-            //     $from = $location.';'.$shop_address;
-            //     $to = $shop_address.';'.$user_address;
-            //     $result = parameters($from,$to);
-            //     $s_distance = $result[0]['elements'][0]['distance'];
-                
-            //     if (in_array($item->status, [4,5])) {
-            //         $u_distance = $result[0]['elements'][1]['distance'];
-            //     }else{
-            //         $u_distance = $result[1]['elements'][1]['distance'];
-            //     }
-                
-            //     if ($s_distance >= 100) {
-            //         $item->s_distance = round($s_distance / 1000,1).'km';
-            //     }else{
-            //         $item->s_distance = $s_distance.'m';
-            //     }
-
-            //     if ($u_distance >= 100) {
-            //         $item->u_distance = round($u_distance / 1000,1).'km';
-            //     }else{
-            //         $item->u_distance = $u_distance.'m';
-            //     }
-            // }
-
             //已完成订单 送达时间超过两小时不展示用户联系方式
             if($item->status == 6 && (time() - $item->accomplish_time) > 7200) {
                 $item->user_address->name = '';
@@ -154,13 +119,6 @@ class Orders extends RiderBase
 		if ($status_arr['open_status'] == 2) {
 			$this->error('你还没开工，无法接单',204);
 		}
-        /** mike 注释 经纬度计算距离功能 */
-        // $latitude = $request->param('latitude');
-        // $longitude = $request->param('longitude');
-        // if (!$latitude || !$longitude) {
-        //     $this->error('坐标不能为空');
-        // }
-        // $location = $latitude.','.$longitude;
 
 		if ($type == 1) {
             $hourse_ids = Db::name('RiderInfo')->where('id',$rider_id)->value('hourse_ids');
@@ -206,19 +164,6 @@ class Orders extends RiderBase
         }
 
         foreach ($list as $item) {
-            /** mike 注释 经纬度计算距离功能 */
-            // if ($item->status != 6 && $item->status != 2) {
-            //     $shop_address = $item->shop_address->latitude.','.$item->shop_address->longitude;
-            //     $from = $location;
-            //     $to = $shop_address;
-            //     // 骑手到商家的距离
-            //     $s_distance = one_to_more_distance($from,$to);
-            //     if ($s_distance >= 100) {
-            //         $item->s_distance = round($s_distance / 1000,1).'km';
-            //     }else{
-            //         $item->s_distance = $s_distance.'m';
-            //     }
-            // }
 
             //已完成订单 送达时间超过两小时不展示用户联系方式
             if($item->status == 6 && (time() - $item->accomplish_time) > 7200) {
@@ -278,15 +223,6 @@ class Orders extends RiderBase
             $this->error('手慢了，被人抢走了');
         }
 
-        // 骑手两次超时15分钟未取餐，今日将不可接单【2019-11-25 此功能暂时去除】
-        // $redis = Cache::store('redis');
-        // $key = "rider_overtime_number";
-        // if ($redis->hExists($key,$this->auth->id)) {
-        //     $count = $redis->hGet($key,$this->auth->id);
-        //     if ($count > 1) {
-        //         $this->error('您今天存在多次超时未取餐状况，今天不可再抢单',206);
-        //     }
-        // }
 
         // 当骑手目前存在五单以上的未完成订单，提示骑手暂时不可接单
         $count = Db::name('takeout')->where([['status','in',[3,4,5]],['rider_id','=',$this->auth->id]])->count('id');
@@ -342,45 +278,10 @@ class Orders extends RiderBase
 	public function details(Request $request)
 	{
         $orderId = $request->param('order_id');
-        /** mike 注释 经纬度计算距离功能 */
-        // $latitude = $request->param('latitude');
-        // $longitude = $request->param('longitude');
-        // if (!$latitude || !$longitude) {
-        //     $this->error('坐标不能为空');
-        // }
 
         $data = model('Takeout')
             ->field('order_id,ping_fee,meal_sn,single_time,shop_address,accomplish_time,expected_time,user_address,status,fetch_time,toda_time,cancel_desc,cancel_time')
             ->where('order_id',$orderId)->find();
-        /** mike 注释 经纬度计算距离功能 */
-        // if ($data->status !== 6 && $data->status !== 2) {
-        //         $location = $latitude.','.$longitude;
-        //         $shop_address = $data->shop_address->latitude.','.$data->shop_address->longitude;
-        //         $user_address = $data->user_address->latitude.','.$data->user_address->longitude;
-        //         $from = $location.';'.$shop_address;
-        //         $to = $shop_address.';'.$user_address;
-        //         $result = parameters($from,$to);
-        //         $s_distance = $result[0]['elements'][0]['distance'];
-                
-        //         if (in_array($data->status, [4,5])) {
-        //             $u_distance = $result[0]['elements'][1]['distance'];
-        //         }else{
-        //             $u_distance = $result[1]['elements'][1]['distance'];
-        //         }
-                
-        //         if ($s_distance >= 100) {
-        //             $data->s_distance = round($s_distance / 1000,1).'km';
-        //         }else{
-        //             $data->s_distance = $s_distance.'m';
-        //         }
-
-        //         if ($u_distance >= 100) {
-        //             $data->u_distance = round($u_distance / 1000,1).'km';
-        //         }else{
-        //             $data->u_distance = $u_distance.'m';
-        //         }
-        // }
-
         //已完成订单 送达时间超过两小时不展示用户联系方式
         if($data->status == 6 && (time() - $data->accomplish_time) > 7200) {
             $data->user_address->name = '';
@@ -516,12 +417,6 @@ class Orders extends RiderBase
     public function arriveShop(Request $request)
     {
         $orderId = $request->param('order_id');
-        /** mike 注释 经纬度计算距离功能 */
-        // $latitude = $request->param('latitude');
-        // $longitude = $request->param('longitude');
-        // if (!$latitude || !$longitude) {
-        //     $this->error('坐标不能为空');
-        // }
 
         $Order = \app\common\model\Orders::get($orderId);
         $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
@@ -530,14 +425,7 @@ class Orders extends RiderBase
         if ($Takeout->status == 1) {
             $this->error('该订单已失效，请重新抢单');
         }
-        /** mike 注释 经纬度计算距离功能 */
-        // $location = $latitude.','.$longitude;
-        // $shop_address = $Takeout->shop_address->latitude.','.$Takeout->shop_address->longitude;
 
-        // $result = parameters($location,$shop_address);
-        // if ($result[0]['elements'][0]['distance'] > 5000) {
-        //     $this->error('暂未到指定范围，还不可以点击哦');
-        // }
         // 启动事务
         Db::startTrans();
         try {
@@ -690,13 +578,6 @@ class Orders extends RiderBase
     public function confirmSend(Request $request)
     {
         $orderId = $request->param('order_id');
-        // 去除经纬度
-        // $latitude = $request->param('latitude');
-        // $longitude = $request->param('longitude');
-        // if (!$latitude || !$longitude) {
-        //     $this->error('坐标不能为空');
-        // }
-        
         $Order = \app\common\model\Orders::get($orderId);
         $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
         $user = model('User')->field('phone,invitation_id')->where('id',$Order->user_id)->find();
@@ -704,13 +585,6 @@ class Orders extends RiderBase
         if ($Takeout->status == 6) {
             $this->error('您已送达，请勿重新点击');
         }
-        // 去除经纬度
-        // $location = $latitude.','.$longitude;
-        // $user_address = $Takeout->user_address->latitude.','.$Takeout->user_address->longitude;
-        // $result = parameters($location,$user_address);
-        // if ($result[0]['elements'][0]['distance'] > 2000) {
-        //     $this->error('暂未到指定范围，还不可以点击哦');
-        // }
         // 启动事务
         Db::startTrans();
         try {
@@ -832,6 +706,44 @@ class Orders extends RiderBase
     }
      
 
+    /**
+     * 取消接单
+     * 
+     */
+    public function cancelOrder(Request $request)
+    {
+        $order_id = $request->param('order_id');
+        $school_id = Db::name('takeout')->where('order_id','=',$order_id)->value('school_id');
+        //实例化socket
+        $socket = model('PushEvent','service');
+        // 订单返回到骑手抢单状态
+        $res = Db::name('takeout')->where('order_id','=',$order_id)->update(['status'=>1,'single_time'=>0]);
+
+        // 推送socket
+        // 已成为骑手的情况
+        $map1 = [
+            ['school_id', '=', $school_id],
+            ['open_status', '=', 1],
+            ['status', '=', 3]
+        ];
+        // 暂未成为骑手的情况
+        $map2 = [
+            ['school_id', '=', $school_id],
+            ['status', 'in', [0,1,2]]
+        ];  
+
+        $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
+
+        foreach ($r_list as $item) {
+            $rid = 'r'.$item->id;
+            $socket->setUser($rid)->setContent('refresh')->push();
+        }
+        if ($res) {
+            $this->success('取消成功');
+        }
+        $this->error('取消失败');
+    }
+     
 
 
 

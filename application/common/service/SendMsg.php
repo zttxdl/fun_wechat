@@ -30,7 +30,6 @@ class SendMsg
         if ($riderInfo['status'] == 3) {
             $check = '您的申请已通过';
         }
-
         // 判断form_id是否失效,当不失效的时候,去获取并推送
         if ($riderInfo['overtime'] > time()) {
             // 这是获取的小程序accessToken方法
@@ -38,7 +37,7 @@ class SendMsg
             // 组装模板消息数据
             $postData = array(
                 "touser" => $riderInfo['openid'],                            // 用户openid
-                "template_id" => '42ftJgSgo5fXw7B22_EmXaTScUKCIKk6EdwH3tauo0w',      // 模板消息ID
+                "template_id" => 'ecrDQ5hR7yj-r6IIx3VlMzn6xSzFGyc0p_7aiPOISIA',      // 模板消息ID
                 "page" => 'pages/my/my',                  // 跳转的页面
                 "form_id" => $riderInfo['formid'],
                 "data" => array(
