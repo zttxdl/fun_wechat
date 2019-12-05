@@ -211,11 +211,6 @@ class Notify extends Collection
             ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
         ];  
 
-        // 调试开始
-        $sql = model('RiderInfo')->whereOr([$map1, $map2])->fetchSql(true)->select();
-        write_log($sql,'sql');
-        // 调试结束
-
         $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
 
         foreach ($r_list as $item) {
