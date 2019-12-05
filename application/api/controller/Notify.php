@@ -15,6 +15,7 @@ use think\Request;
 use app\common\service\PushEvent;
 use app\merchants\controller\Order;
 use app\common\service\FeieYun;
+use think\Exception;
 use think\facade\Cache;
 
 class Notify extends Collection
@@ -201,14 +202,19 @@ class Notify extends Collection
             ['school_id', '=', $shop_info['school_id']],
             ['open_status', '=', 1],
             ['status', '=', 3],
-            // ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
         ];
         // 暂未成为骑手的情况
         $map2 = [
             ['school_id', '=', $shop_info['school_id']],
             ['status', 'in', [0,1,2]],
-            // ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
+            ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
         ];  
+
+        // 调试开始
+        $sql = model('RiderInfo')->whereOr([$map1, $map2])->fetchSql(true)->select();
+        write_log($sql,'sql');
+        // 调试结束
 
         $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
 
