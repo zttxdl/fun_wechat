@@ -63,7 +63,7 @@ class Advert extends Base
                 if ($val->id == $join_us_count['advert_id']) {
                     $val->join_us_counts = $join_us_count['nums'];
                 } else {
-                    $val->join_us_counts = 0;
+                    $val->join_us_counts = '-';
                 }
 
             }
