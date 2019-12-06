@@ -485,9 +485,34 @@ class Index extends ApiBase
                 $this->success('已活跃');
             }
         }
-        $this->error('还未授权呢',['openid'=>$openid]);
+        $this->error('还未授权呢');
 
 
     }
+
+
+    /**
+     * 创业加盟页面的点击统计 
+     * 
+     */
+    public function setJoinUsCount(Request $request)
+    {
+        // 记录用户活跃情况
+        $openid = $request->param('openid','0');
+        if ($openid) {
+            $redis = Cache::store('redis');
+            $key_user = "user_join_us_count";
+            $date = date('Y-m-d');
+            if (!$redis->hExists($key_user,$openid)) {
+                $redis->hSet($key_user,$openid,1);
+                Db::name('join_us_count')->where('save_time','=',$date)->setInc('nums');
+                $this->success('点击量记录成功');
+            } else {
+                $this->success('已点击');
+            }
+        }
+        $this->error('还未授权呢，不记录点击');
+    }
+     
      
 }
