@@ -505,7 +505,11 @@ class Index extends ApiBase
             $date = date('Y-m-d');
             if (!$redis->hExists($key_user,$openid)) {
                 $redis->hSet($key_user,$openid,1);
-                Db::name('join_us_count')->where('save_time','=',$date)->setInc('nums');
+                if (Db::name('join_us_count')->where('save_time','=',$date)->count()) {
+                    Db::name('join_us_count')->where('save_time','=',$date)->setInc('nums');
+                } else {
+                    Db::name('join_us_count')->insert(['save_time'=>$date,'nums'=>1]);
+                }
                 $this->success('点击量记录成功');
             } else {
                 $this->success('已点击');
