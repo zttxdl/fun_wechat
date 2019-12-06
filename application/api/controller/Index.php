@@ -499,16 +499,17 @@ class Index extends ApiBase
     {
         // 记录用户活跃情况
         $openid = $request->param('openid','0');
+        $id = $request->param('id');
         if ($openid) {
             $redis = Cache::store('redis');
             $key_user = "user_join_us_count";
             $date = date('Y-m-d');
             if (!$redis->hExists($key_user,$openid)) {
                 $redis->hSet($key_user,$openid,1);
-                if (Db::name('join_us_count')->where('save_time','=',$date)->count()) {
-                    Db::name('join_us_count')->where('save_time','=',$date)->setInc('nums');
+                if (Db::name('join_us_count')->where([['save_time','=',$date],['advert_id','=',$id]])->count()) {
+                    Db::name('join_us_count')->where([['save_time','=',$date],['advert_id','=',$id]])->setInc('nums');
                 } else {
-                    Db::name('join_us_count')->insert(['save_time'=>$date,'nums'=>1]);
+                    Db::name('join_us_count')->insert(['save_time'=>$date,'nums'=>1,'advert_id'=>$id]);
                 }
                 $this->success('点击量记录成功');
             } else {
