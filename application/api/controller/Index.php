@@ -161,7 +161,7 @@ class Index extends ApiBase
 
 
         // 依据商家排序获取推荐商家
-        $shop_list = model('ShopInfo')->where($where)->field('id,shop_name,logo_img,marks,ping_fee,up_to_send_money,open_status as business,run_time')->order('sort','asc')->paginate($pagesize)->each(function ($item) {
+        $shop_list = model('ShopInfo')->where($where)->order('open_status','desc')->field('id,shop_name,logo_img,marks,ping_fee,up_to_send_money,open_status as business,run_time')->order('sort','asc')->paginate($pagesize)->each(function ($item) {
 
             // 判断是否休息中
             if ($item->business == 1 && !empty($item->run_time)) {
