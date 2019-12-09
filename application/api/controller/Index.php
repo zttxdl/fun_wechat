@@ -161,7 +161,7 @@ class Index extends ApiBase
 
 
         // 依据商家排序获取推荐商家
-        $shop_list = model('ShopInfo')->where($where)->field('id,shop_name,logo_img,marks,ping_fee,up_to_send_money,open_status as business,run_time')->order('sort','asc')->paginate($pagesize)->each(function ($item) {
+        $shop_list = model('ShopInfo')->where($where)->order('open_status','desc')->field('id,shop_name,logo_img,marks,ping_fee,up_to_send_money,open_status as business,run_time')->order('sort','asc')->paginate($pagesize)->each(function ($item) {
 
             // 判断是否休息中
             if ($item->business == 1 && !empty($item->run_time)) {
@@ -485,9 +485,39 @@ class Index extends ApiBase
                 $this->success('已活跃');
             }
         }
-        $this->error('还未授权呢',['openid'=>$openid]);
+        $this->error('还未授权呢');
 
 
     }
+
+
+    /**
+     * 创业加盟页面的点击统计 
+     * 
+     */
+    public function setJoinUsCount(Request $request)
+    {
+        // 记录用户活跃情况
+        $openid = $request->param('openid','0');
+        $id = $request->param('id');
+        if ($openid) {
+            $redis = Cache::store('redis');
+            $key_user = "user_join_us_count";
+            $date = date('Y-m-d');
+            if (!$redis->hExists($key_user,$openid)) {
+                $redis->hSet($key_user,$openid,1);
+                if (Db::name('join_us_count')->where([['save_time','=',$date],['advert_id','=',$id]])->count()) {
+                    Db::name('join_us_count')->where([['save_time','=',$date],['advert_id','=',$id]])->setInc('nums');
+                } else {
+                    Db::name('join_us_count')->insert(['save_time'=>$date,'nums'=>1,'advert_id'=>$id]);
+                }
+                $this->success('点击量记录成功');
+            } else {
+                $this->success('已点击');
+            }
+        }
+        $this->error('还未授权呢，不记录点击');
+    }
+     
      
 }

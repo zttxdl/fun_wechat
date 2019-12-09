@@ -341,6 +341,7 @@ Route::group('u-index', function () {
     Route::rule('/special-list', 'getSpecialList');
     Route::rule('/exclusive', 'getExclusive');
     Route::rule('/more_exclusive', 'getMoreExclusive');
+    Route::rule('/setJoinUsCount', 'setJoinUsCount');
     
 })->prefix('api/Index/');
 

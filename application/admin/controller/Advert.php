@@ -3,6 +3,7 @@
 namespace app\admin\controller;
 
 use app\common\controller\Base;
+use think\Db;
 use think\Request;
 
 /**
@@ -45,6 +46,9 @@ class Advert extends Base
             ->order('id', 'desc')
             ->paginate($pagesize);
 
+        // 获取创业广告点击量
+        $date = date('Y-m-d');
+        $join_us_count = Db::name('join_us_count')->where('save_time','=',$date)->find();
         if ($list){
             foreach ($list as $val) {
                 $val->time =  date('Y/m/d',$val->start_time).'-'.date('Y/m/d',$val->end_time);
@@ -55,6 +59,13 @@ class Advert extends Base
                 }else{
                     $val->rest = 0 ;
                 }
+                // 获取创业广告点击量
+                if ($val->id == $join_us_count['advert_id']) {
+                    $val->join_us_counts = $join_us_count['nums'];
+                } else {
+                    $val->join_us_counts = '-';
+                }
+
             }
         }
 
