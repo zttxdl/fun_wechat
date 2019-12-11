@@ -713,7 +713,7 @@ class Orders extends RiderBase
     public function cancelOrder(Request $request)
     {
         $order_id = $request->param('order_id');
-        $school_id = Db::name('takeout')->where('order_id','=',$order_id)->value('school_id');
+        $takeout = Db::name('takeout')->where('order_id','=',$order_id)->field('school_id,hourse_id')->find();
         //实例化socket
         $socket = model('PushEvent','service');
         // 订单返回到骑手抢单状态
@@ -722,14 +722,16 @@ class Orders extends RiderBase
         // 推送socket
         // 已成为骑手的情况
         $map1 = [
-            ['school_id', '=', $school_id],
+            ['school_id', '=', $takeout['school_id']],
             ['open_status', '=', 1],
-            ['status', '=', 3]
+            ['status', '=', 3],
+            ['','exp',Db::raw("FIND_IN_SET(".$takeout['hourse_id'].",hourse_ids)")]
         ];
         // 暂未成为骑手的情况
         $map2 = [
-            ['school_id', '=', $school_id],
-            ['status', 'in', [0,1,2]]
+            ['school_id', '=', $takeout['school_id']],
+            ['status', 'in', [0,1,2]],
+            ['','exp',Db::raw("FIND_IN_SET(".$takeout['hourse_id'].",hourse_ids)")]
         ];  
 
         $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
