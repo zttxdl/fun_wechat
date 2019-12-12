@@ -16,8 +16,8 @@ class School extends Validate
         'name'      => 'require|max:30',
         'longitude'      => 'require',
         'latitude'      => 'require',
-        'completion_time'      => 'require|number',
-        'fetch_time'      => 'require|number'
+        'completion_time'      => 'require|number',  
+        'rider_extract'      => 'require',
 
     ];
     
@@ -36,6 +36,7 @@ class School extends Validate
         'completion_time.number'  => '订单预估送达时间必须为正整数',
         'fetch_time.require'  => '骑手约定取餐时间值必传',
         'fetch_time.number'  => '骑手约定取餐时间值必须为正整数',
+        'rider_extract.require'  => '骑手配送费抽成必填',
     ];
 
 }
