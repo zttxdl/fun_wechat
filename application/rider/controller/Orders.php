@@ -603,7 +603,7 @@ class Orders extends RiderBase
             $data = [
                 'rider_id' => $this->auth->id,
                 'name' => $Takeout->shop_address->shop_name,
-                'current_money' => $Takeout->ping_fee - $Takeout->rider_extract,
+                'current_money' => sprintf('%.2f',$Takeout->ping_fee - $Takeout->rider_extract),
                 'type' => 1,
                 'serial_number' => $Order->orders_sn,
                 'add_time' => time(),
