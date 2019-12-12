@@ -44,7 +44,7 @@ class Orders extends RiderBase
             $where[] = ['school_id','=',$school_id];
             $where[] = ['status','=',1];
             $list = model('Takeout')
-                ->field('id,order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address,take_meals_status')
+                ->field('id,order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address,take_meals_status,rider_extract')
                 ->where($where)
                 ->order('create_time desc')
                 ->select();
@@ -126,7 +126,7 @@ class Orders extends RiderBase
             $where[] = ['school_id','=',$school_id];
             $where[] = ['status','=',1];
             $list = model('Takeout')
-                ->field('id,order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address,take_meals_status')
+                ->field('id,order_id,ping_fee,meal_sn,shop_address,expected_time,status,user_address,take_meals_status,rider_extract')
                 ->where($where)
                 ->order('create_time desc')
                 ->select();
@@ -603,7 +603,7 @@ class Orders extends RiderBase
             $data = [
                 'rider_id' => $this->auth->id,
                 'name' => $Takeout->shop_address->shop_name,
-                'current_money' => $Takeout->ping_fee,
+                'current_money' => $Takeout->ping_fee - $Takeout->rider_extract,
                 'type' => 1,
                 'serial_number' => $Order->orders_sn,
                 'add_time' => time(),

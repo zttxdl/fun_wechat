@@ -301,7 +301,8 @@ class Order extends MerchantsBase
                 'expected_time' => $expected_time,//预计送达时间
                 'user_address' => $order_info['address'],//收货地址
                 'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
-                'hourse_id' => $order_info['hourse_id']//楼栋ID
+                'hourse_id' => $order_info['hourse_id'],//楼栋ID
+                'rider_extract' => Db::name('school')->where('id','=',$shop_info['school_id'])->value('rider_extract')
             ];
 
             //外卖数据入库
@@ -407,7 +408,8 @@ class Order extends MerchantsBase
                 'expected_time' => $expected_time,//预计送达时间
                 'user_address' => $order_info['address'],//收货地址
                 'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
-                'hourse_id' => $order_info['hourse_id']//楼栋ID
+                'hourse_id' => $order_info['hourse_id'],//楼栋ID
+                'rider_extract' => Db::name('school')->where('id','=',$shop_info['school_id'])->value('rider_extract')
             ];
 
             //外卖数据入库
