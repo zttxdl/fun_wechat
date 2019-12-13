@@ -560,7 +560,7 @@ class FinanceManange extends Base
             ->alias('a')
             ->leftJoin('ShopInfo b','a.shop_id = b.id')
             ->leftJoin('canteen c','a.school_id = c.school_id')
-            ->field('a.id,a.orders_sn,a.send_time,a.add_time,b.shop_name,a.money,c.cut_proportion,a.shitang_choucheng,a.ping_fee,a.platform_choucheng,a.status')
+            ->field('a.id,a.orders_sn,a.send_time,a.add_time,b.shop_name,a.money,c.cut_proportion,a.shitang_choucheng,a.ping_fee,a.platform_choucheng,a.status,a.rider_extract')
             ->where($where)
             ->order('a.id DESC')
             ->paginate($page_size)
@@ -571,7 +571,7 @@ class FinanceManange extends Base
                 foreach ($data['data'] as &$row){
                     $shop_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
                     
-                    $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng']);//平台抽成
+                    $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng'] + $row['rider_extract']);//平台抽成
 
                     $info['data'][] = [
                         'id' => $row['id'],
@@ -582,7 +582,7 @@ class FinanceManange extends Base
                         'money' => '¥'.$row['money'],
                         'cut_proportion' => $row['cut_proportion'].'%',
                         'shitang_choucheng' => '¥'.$row['shitang_choucheng'],
-                        'ping_fee' => '¥'.$row['ping_fee'],
+                        'ping_fee' => '¥'.sprintf('%.2f',$row['ping_fee'] - $row['rider_extract']),
                         'platform_choucheng' => '¥'.$platform_choucheng,
                         'shop_money' => '¥'.$shop_money,
                         'status' => in_array($row['status'],[3,5]) ? '待分账' : '已完成'

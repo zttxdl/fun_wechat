@@ -609,6 +609,7 @@ class Orders extends RiderBase
                 'add_time' => time(),
             ];
             Db::name('rider_income_expend')->insert($data);
+            Db::name('orders')->where('orders_sn',$Order->orders_sn)->update(['rider_extract'=>$Takeout->rider_extract]);
             // 判断当前用户的订单数量【只要付款之后都算数量】
             $count = model('Orders')->where([['user_id','=',$Order->user_id],['status','notin',1]])->count('id');
             if ($count == 1 && $user->invitation_id){
