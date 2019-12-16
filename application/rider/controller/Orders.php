@@ -288,6 +288,19 @@ class Orders extends RiderBase
             $data->user_address->phone = '';
         }
 
+        // 获取订单详情
+        $productlist = Db::name('orders')->where('id',$orderId)->field('box_money,message')->find();
+        $orderDetail = Db::name('orders_info')->where('order_id',$orderId)->select();
+       
+        foreach ($orderDetail as $row) {
+            $item = [];
+            $item['name'] = Model('Product')->getNameById($row['product_id']);
+            $item['attr_name'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
+            $item['num'] = $row['num'];
+            $item['price'] = Model('Product')->getPriceById($row['product_id']);
+            $productlist['children'][] = $item;
+        }
+
         if (in_array($data->status,[3,4,5])){
             $data->rest_time = round(($data->expected_time - time()) / 60) ;
         }
@@ -299,11 +312,12 @@ class Orders extends RiderBase
         $data->cancel_time = $data->cancel_time ? date('H:i',$data->cancel_time) : '';
         $data->expected_time = $data->expected_time ? date('H:i',$data->expected_time) : '';
         $data->toda_time = $data->toda_time ? date('H:i',$data->toda_time) : '';
+        $data->productlist = $productlist;
 
         $this->success('success',$data);
     }
 
-    
+
     /**
      * 消费赠送红包
      */
