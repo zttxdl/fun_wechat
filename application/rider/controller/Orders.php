@@ -720,7 +720,7 @@ class Orders extends RiderBase
             }
 
             // 骑手代付金额 = 商品原价 + 餐盒费 =  订单总价 - 配送费 - 提价
-            $money = $Order->total_money - $Order->ping_fee - $Order->box_money - $total_hike_price;
+            $money = $Order->total_money - $Order->ping_fee - $total_hike_price;
             // 骑手代付信息
             $riderPayment = [
                 'order_id'  => $Order->id,
