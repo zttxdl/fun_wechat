@@ -302,7 +302,7 @@ class Orders extends RiderBase
             $productlist['children'][] = $item;
         }
 
-        $productlist['payment'] = array_sum(array_column($productlist['children'],'sigle_price'));
+        $productlist['payment'] = sprintf('%.2f',array_sum(array_column($productlist['children'],'sigle_price')) + $productlist['box_money']);
 
         if (in_array($data->status,[3,4,5])){
             $data->rest_time = round(($data->expected_time - time()) / 60) ;
