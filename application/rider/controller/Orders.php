@@ -298,8 +298,11 @@ class Orders extends RiderBase
             $item['attr_name'] = model('Shop')->getGoodsAttrName($row['attr_ids']);
             $item['num'] = $row['num'];
             $item['price'] = Model('Product')->getPriceById($row['product_id']);
+            $item['sigle_price'] = $item['num'] * $item['price'];
             $productlist['children'][] = $item;
         }
+
+        $productlist['payment'] = array_sum(array_column($productlist,'sigle_price'));
 
         if (in_array($data->status,[3,4,5])){
             $data->rest_time = round(($data->expected_time - time()) / 60) ;
