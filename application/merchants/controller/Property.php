@@ -38,18 +38,19 @@ class Property extends MerchantsBase
         if(!isset($shop_id)) {
             $this->error('shop_id 不能为空!');
         }
+        # 【饭点送外卖 -- 暂停 开始位置】
+        // $acount_money = model('Withdraw')->getAcountMoney($shop_id);
+        // Cache::store('redis')->hSet($this->shop_balance_key,$shop_id,$acount_money);
 
-        $acount_money = model('Withdraw')->getAcountMoney($shop_id);
-        Cache::store('redis')->hSet($this->shop_balance_key,$shop_id,$acount_money);
-
-        $totalMoney = model('Withdraw')->getCountSales($shop_id);
-        $monthMoney = model("Withdraw")->getMonthSales($shop_id);
+        // $totalMoney = model('Withdraw')->getCountSales($shop_id);
+        // $monthMoney = model("Withdraw")->getMonthSales($shop_id);
+        # 【饭点送外卖 -- 暂停 结束位置】
         $card = model('shop_more_info')->where('shop_id',$shop_id)->value('back_card_num');
 
         $data = [
-            'balanceMoney' => !empty($acount_money) ? $acount_money : 0,//可提现余额
-            'totalMoney' => !empty($totalMoney) ? $totalMoney: 0,//总收入
-            'monthMoney' => !empty($monthMoney) ? $totalMoney: 0,//本月收入
+            'balanceMoney' => $acount_money ?? 0,//可提现余额
+            'totalMoney' => $totalMoney ?? 0,//总收入
+            'monthMoney' => $totalMoney ?? 0,//本月收入
             'card' => !empty($card) ? $card: '',//银行卡号
         ];
 
@@ -58,7 +59,7 @@ class Property extends MerchantsBase
     }
 
     /**
-     * 收支明细
+     * 收支明细 【饭点送外卖 -- 暂停】
      */
     public function receiptPay(Request $request)
     {
@@ -131,7 +132,7 @@ class Property extends MerchantsBase
     }
 
     /**
-     * 提现
+     * 提现 【饭点送外卖 -- 暂停】
      */
     public function withdraw(Request $request)
     {
@@ -194,7 +195,7 @@ class Property extends MerchantsBase
 
 
     /**
-     * 收支详情 
+     * 收支详情  【饭点送外卖 -- 暂停】
      * mike 已调整
      * 
      */

@@ -69,8 +69,12 @@ class Shop extends Base
                         'school_name' =>  Model('School')->getNameById($row['school_id']),
                         'shop_stock' =>  Model('Shop')->getShopStock($row['id']),
                         'status' => config('shop_check_status')[$row['status']],
-                        'month_sales' => model('Withdraw')->getMonthSales($row['id']),
-                        'count_sales' => model('Withdraw')->getCountSales($row['id']),
+                        # 【饭点送外卖 -- 暂停 起始位置】
+                        // 'month_sales' => model('Withdraw')->getMonthSales($row['id']),
+                        // 'count_sales' => model('Withdraw')->getCountSales($row['id']),
+                        'month_sales' => '',
+                        'count_sales' => '',
+                        # 【饭点送外卖 -- 暂停 结束位置】
                     ];
                 }
             }

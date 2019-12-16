@@ -283,19 +283,20 @@ class Shop extends Model
         $total_num = $this->getOrderNum($shop_id);//总订单量
         $month_order_num = $this->getMonthNum($shop_id);//月订单量
         $day_order_num = $this->getDayNum($shop_id);//日均订单量
-        $settlement_money = model('Withdraw')->getAcountMoney($shop_id); //结算金额
-        $settlement_wait_money =  model('Withdraw')->getNotJsMoney($shop_id); //待结算金额
-        $month_money = model('Withdraw')->getMonthSales($shop_id);//月销售额
-        $total_money = model('Withdraw')->getCountSales($shop_id);//总销售额
-
+        # 【饭点送外卖 -- 暂停 起始位置】
+        // $settlement_money = model('Withdraw')->getAcountMoney($shop_id); //结算金额
+        // $settlement_wait_money =  model('Withdraw')->getNotJsMoney($shop_id); //待结算金额
+        // $month_money = model('Withdraw')->getMonthSales($shop_id);//月销售额
+        // $total_money = model('Withdraw')->getCountSales($shop_id);//总销售额
+        # 【饭点送外卖 -- 暂停 结束位置】
         return [
             'total_num' => $total_num,
             'month_order_num' => $month_order_num,
             'day_order_num' => $day_order_num,
-            'settlement_money' => $settlement_money,
-            'settlement_wait_money' => $settlement_wait_money,
-            'month_money' => $month_money,
-            'total_money' => $total_money,
+            'settlement_money' => $settlement_money ?? 0,
+            'settlement_wait_money' => $settlement_wait_money ?? 0,
+            'month_money' => $month_money ?? 0,
+            'total_money' => $total_money ?? 0,
         ];
 
 
