@@ -447,10 +447,135 @@ class Orders extends RiderBase
 
 
     /**
-     * 取餐离店
+     * 取餐离店 【饭点送外卖 -- 暂停】
      * 
      */
-    public function leaveShop(Request $request)
+    // public function leaveShop(Request $request)
+    // {
+    //     $orderId = $request->param('order_id');
+    //     $Order = \app\common\model\Orders::get($orderId);
+    //     $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
+    //     // 判断当前订单是否已取餐离店
+    //     if ($Takeout->status == 5) {
+    //         $this->error('您已取餐离店，请勿重新点击');
+    //     }
+
+    //     // 食堂主键值 + 平台抽成 + 平台对商家的提价金额
+    //     $shop_info = Db::name('shop_info')->where('id',$Order->shop_id)->field('canteen_id,segmentation,price_hike,hike_type')->find();
+    //     // 食堂抽成比例（百分制）
+    //     $cut_proportion = '';
+    //     if ($shop_info['canteen_id']) {
+    //         $cut_proportion = Db::name('canteen')->where('id',$shop_info['canteen_id'])->value('cut_proportion');
+    //     }
+    //     // 平台红包抽成比例（百分制）
+    //     $assume_ratio = '';
+    //     if ($Order->platform_coupon_id) {
+    //         $assume_ratio = Db::name('platform_coupon')->where('id',$Order->platform_coupon_id)->value('assume_ratio');
+    //     }
+
+    //     // 商品提价金额
+    //     if ($shop_info['hike_type'] == 1) {
+    //         $total_hike_price = $Order->num * $shop_info['price_hike'];
+    //     } else {
+    //         $total_hike_price = (($Order['total_money'] - $Order['box_money'] - $Order['ping_fee']) / (1 + $shop_info['price_hike'] * 0.01)) * $shop_info['price_hike'] * 0.01;
+    //     }
+
+    //     // 启动事务
+    //     Db::startTrans();
+    //     try {
+    //         // 商品原价 = 订单总价 - 配送费 - 餐盒费 - 提价
+    //         $original_money = $Order->total_money - $Order->ping_fee - $Order->box_money - $total_hike_price;
+    //         // 商家承担的优惠金额
+    //         if ($Order->shop_discounts_id) {
+    //             $shop_discounts_info = Db::name('shop_discounts')->where('id','=',$Order->shop_discounts_id)->field('face_value,platform_assume')->find();
+    //             $shop_discounts_money = $shop_discounts_info['face_value'] - $shop_discounts_info['platform_assume'];
+    //         } else {
+    //             $shop_discounts_money = 0;
+    //         }
+    //          /** 商家各种抽成支出*********************************/ 
+    //         //平台抽成 = （商品原价 - 优惠金额）* 抽成比例 <==> 平台抽成 = （订单总价 - 配送费 - 餐盒费 - 提价  - 平台优惠 - 商家活动优惠[商家承担部分]）* 抽成比例 
+    //         $ptExpenditure = ($original_money - $Order->platform_coupon_money - $shop_discounts_money) * ($shop_info['segmentation'] / 100);
+
+    //         //食堂抽成 = (商品原价 - 商家活动优惠) * 食堂抽成比例 《==》 （订单总价 - 配送费 - 餐盒费 - 提价 - 商家活动优惠[商家承担部分]）*食堂抽成比例
+    //         $stExpenditure = 0;
+    //         if ($cut_proportion) {
+    //             $stExpenditure = ($original_money - $shop_discounts_money) * ($cut_proportion / 100);
+    //         }
+            
+    //         //红包抽成 = 红包总金额 * 商家承担比列
+    //         $hbExpenditure = 0;
+    //         if ($assume_ratio) {
+    //             $hbExpenditure = $Order->platform_coupon_money * ($assume_ratio / 100);
+    //         }
+
+    //         // 总抽成
+    //         $totalExpenditure = $ptExpenditure + $stExpenditure + $hbExpenditure;
+
+    //         // 更新订单表【写入平台抽成、食堂抽成、红包抽成、订单状态】
+    //         $Order->platform_choucheng = isset($ptExpenditure) ? $ptExpenditure : 0.00;
+    //         $Order->shitang_choucheng = isset($stExpenditure) ? $stExpenditure : 0.00;
+    //         $Order->hongbao_choucheng = isset($hbExpenditure) ? $hbExpenditure : 0.00;
+    //         $Order->status = 6;
+    //         $Order->send_time = time();
+    //         $Order->save();
+
+    //         // 更新外卖表【写入订单状态】
+    //         $Takeout->status = 5;
+    //         $Takeout->save();
+
+    //         // 商家订单实际收入 = 商品原价 - 商家满减支出 - 抽成支出 《==》 订单总价 - 餐盒费 - 配送费 - 加价 - 抽成支出 - 商家满减支出[商家承担部分]
+    //         $shop_money = $original_money - $totalExpenditure - $shop_discounts_money;
+    //         /** 商家用户下单收入*********************************/ 
+    //         $data = [
+    //             'withdraw_sn' => $Order->orders_sn,
+    //             'shop_id' => $Order->shop_id,
+    //             // 商家实际订单收入
+    //             'money' => sprintf('%.2f',$shop_money),
+    //             'type' => 1,
+    //             'title' => '用户下单',
+    //             'add_time' => time()
+    //         ];
+    //         Db::name('withdraw')->insert($data);
+
+    //         /** 食堂收入 *************************************/
+    //         if ($shop_info['canteen_id']) {
+    //             // 获取最新的食堂账户余额信息
+    //             $balance = Db::name('canteen_income_expend')->where('canteen_id','=',$shop_info['canteen_id'])->order('id','desc')->value('balance');
+    //             if (!$balance) {
+    //                 $balance = 0;
+    //             }
+    //             $canteen = [
+    //                 'canteen_id' => $shop_info['canteen_id'],
+    //                 'name' => '收入',
+    //                 'balance' => sprintf('%.2f',$stExpenditure + $balance),
+    //                 'money' => sprintf('%.2f',$stExpenditure),
+    //                 'type' => 1,
+    //                 'serial_number' => $Order->orders_sn,
+    //                 // 食堂收入
+    //                 'add_time' => time()
+    //             ];
+    //             Db::name('canteen_income_expend')->insert($canteen);
+    //         }
+
+    //         //统计店铺日订单量
+    //         model('Shop')->setDayNum($Order->shop_id);
+    //         // 提交事务
+    //         Db::commit();
+            
+    //     } catch (\think\Exception\DbException $e) {
+    //         // 回滚事务
+    //         Db::rollback();
+    //         $this->error('骑手取餐离店回写失败');            
+    //     }
+    //     $this->success('骑手取餐离店成功');
+    // }
+
+
+    /**
+     * 取餐离店 【饭点送跑腿】
+     * 
+     */
+    public function leaveShop(Request $request) 
     {
         $orderId = $request->param('order_id');
         $Order = \app\common\model\Orders::get($orderId);
@@ -460,61 +585,10 @@ class Orders extends RiderBase
             $this->error('您已取餐离店，请勿重新点击');
         }
 
-        // 食堂主键值 + 平台抽成 + 平台对商家的提价金额
-        $shop_info = Db::name('shop_info')->where('id',$Order->shop_id)->field('canteen_id,segmentation,price_hike,hike_type')->find();
-        // 食堂抽成比例（百分制）
-        $cut_proportion = '';
-        if ($shop_info['canteen_id']) {
-            $cut_proportion = Db::name('canteen')->where('id',$shop_info['canteen_id'])->value('cut_proportion');
-        }
-        // 平台红包抽成比例（百分制）
-        $assume_ratio = '';
-        if ($Order->platform_coupon_id) {
-            $assume_ratio = Db::name('platform_coupon')->where('id',$Order->platform_coupon_id)->value('assume_ratio');
-        }
-
-        // 商品提价金额
-        if ($shop_info['hike_type'] == 1) {
-            $total_hike_price = $Order->num * $shop_info['price_hike'];
-        } else {
-            $total_hike_price = (($Order['total_money'] - $Order['box_money'] - $Order['ping_fee']) / (1 + $shop_info['price_hike'] * 0.01)) * $shop_info['price_hike'] * 0.01;
-        }
-
         // 启动事务
         Db::startTrans();
         try {
-            // 商品原价 = 订单总价 - 配送费 - 餐盒费 - 提价
-            $original_money = $Order->total_money - $Order->ping_fee - $Order->box_money - $total_hike_price;
-            // 商家承担的优惠金额
-            if ($Order->shop_discounts_id) {
-                $shop_discounts_info = Db::name('shop_discounts')->where('id','=',$Order->shop_discounts_id)->field('face_value,platform_assume')->find();
-                $shop_discounts_money = $shop_discounts_info['face_value'] - $shop_discounts_info['platform_assume'];
-            } else {
-                $shop_discounts_money = 0;
-            }
-             /** 商家各种抽成支出*********************************/ 
-            //平台抽成 = （商品原价 - 优惠金额）* 抽成比例 <==> 平台抽成 = （订单总价 - 配送费 - 餐盒费 - 提价  - 平台优惠 - 商家活动优惠[商家承担部分]）* 抽成比例 
-            $ptExpenditure = ($original_money - $Order->platform_coupon_money - $shop_discounts_money) * ($shop_info['segmentation'] / 100);
-
-            //食堂抽成 = (商品原价 - 商家活动优惠) * 食堂抽成比例 《==》 （订单总价 - 配送费 - 餐盒费 - 提价 - 商家活动优惠[商家承担部分]）*食堂抽成比例
-            $stExpenditure = 0;
-            if ($cut_proportion) {
-                $stExpenditure = ($original_money - $shop_discounts_money) * ($cut_proportion / 100);
-            }
-            
-            //红包抽成 = 红包总金额 * 商家承担比列
-            $hbExpenditure = 0;
-            if ($assume_ratio) {
-                $hbExpenditure = $Order->platform_coupon_money * ($assume_ratio / 100);
-            }
-
-            // 总抽成
-            $totalExpenditure = $ptExpenditure + $stExpenditure + $hbExpenditure;
-
-            // 更新订单表【写入平台抽成、食堂抽成、红包抽成、订单状态】
-            $Order->platform_choucheng = isset($ptExpenditure) ? $ptExpenditure : 0.00;
-            $Order->shitang_choucheng = isset($stExpenditure) ? $stExpenditure : 0.00;
-            $Order->hongbao_choucheng = isset($hbExpenditure) ? $hbExpenditure : 0.00;
+            // 更新订单表【写入订单状态】
             $Order->status = 6;
             $Order->send_time = time();
             $Order->save();
@@ -523,45 +597,6 @@ class Orders extends RiderBase
             $Takeout->status = 5;
             $Takeout->save();
 
-            // 商家订单实际收入 = 商品原价 - 商家满减支出 - 抽成支出 《==》 订单总价 - 餐盒费 - 配送费 - 加价 - 抽成支出 - 商家满减支出[商家承担部分]
-            $shop_money = $original_money - $totalExpenditure - $shop_discounts_money;
-            /** 商家用户下单收入*********************************/ 
-            $data = [
-                'withdraw_sn' => $Order->orders_sn,
-                'shop_id' => $Order->shop_id,
-                // 商家实际订单收入
-                'money' => sprintf('%.2f',$shop_money),
-                'type' => 1,
-                'title' => '用户下单',
-                'add_time' => time()
-            ];
-            Db::name('withdraw')->insert($data);
-
-            /** 食堂收入 *************************************/
-            if ($shop_info['canteen_id']) {
-                // 获取最新的食堂账户余额信息
-                $balance = Db::name('canteen_income_expend')->where('canteen_id','=',$shop_info['canteen_id'])->order('id','desc')->value('balance');
-                if (!$balance) {
-                    $balance = 0;
-                }
-                $canteen = [
-                    'canteen_id' => $shop_info['canteen_id'],
-                    'name' => '收入',
-                    'balance' => sprintf('%.2f',$stExpenditure + $balance),
-                    'money' => sprintf('%.2f',$stExpenditure),
-                    'type' => 1,
-                    'serial_number' => $Order->orders_sn,
-                    // 食堂收入
-                    'add_time' => time()
-                ];
-                Db::name('canteen_income_expend')->insert($canteen);
-            }
-
-            //统计店铺日订单量
-            model('Shop')->setDayNum($Order->shop_id);
-            // 提交事务
-            Db::commit();
-            
         } catch (\think\Exception\DbException $e) {
             // 回滚事务
             Db::rollback();
@@ -572,8 +607,70 @@ class Orders extends RiderBase
 
 
     /**
-     * 确认送达
+     * 确认送达 【饭点送外卖 -- 暂停】
      * 
+     */
+    // public function confirmSend(Request $request)
+    // {
+    //     $orderId = $request->param('order_id');
+    //     $Order = \app\common\model\Orders::get($orderId);
+    //     $Takeout = \app\common\model\Takeout::get(['order_id'=>$orderId]);
+    //     $user = model('User')->field('phone,invitation_id')->where('id',$Order->user_id)->find();
+    //     // 判断当前订单是否已送达
+    //     if ($Takeout->status == 6) {
+    //         $this->error('您已送达，请勿重新点击');
+    //     }
+    //     // 启动事务
+    //     Db::startTrans();
+    //     try {
+    //         // 更新订单表
+    //         $Order->arrive_time = time();
+    //         $Order->status = 7;
+    //         $Order->save();
+            
+    //         // 更新外卖表
+    //         $Takeout->status = 6;
+    //         $Takeout->update_time = time();
+    //         $Takeout->accomplish_time = time();
+    //         $Takeout->save();
+
+    //         //订单完成插入明细
+    //         $data = [
+    //             'rider_id' => $this->auth->id,
+    //             'name' => $Takeout->shop_address->shop_name,
+    //             'current_money' => sprintf('%.2f',$Takeout->ping_fee - $Takeout->rider_extract),
+    //             'type' => 1,
+    //             'serial_number' => $Order->orders_sn,
+    //             'add_time' => time(),
+    //         ];
+    //         Db::name('rider_income_expend')->insert($data);
+    //         Db::name('orders')->where('orders_sn',$Order->orders_sn)->update(['rider_extract'=>$Takeout->rider_extract]);
+    //         // 判断当前用户的订单数量【只要付款之后都算数量】
+    //         $count = model('Orders')->where([['user_id','=',$Order->user_id],['status','notin',1]])->count('id');
+    //         if ($count == 1 && $user->invitation_id){
+    //             // 调用邀请红包
+    //             $this->inviteGiving($user->invitation_id);
+    //         }
+            
+    //         // 调用消费赠送红包
+    //         $this->consumptionGiving($Order->user_id,$Takeout->school_id,$Order->money,$user->phone);
+    //         // 调用添加商品销量
+    //         $this->addProductSales($orderId,$Order->shop_id);
+
+    //         // 提交事务
+    //         Db::commit();
+    //     } catch (\think\Exception\DbException $e) {
+    //         // 回滚事务
+    //         Db::rollback();
+    //         $this->error('确认送达回写失败');            
+    //     }
+
+    //     $this->success('确认送达');
+    // }
+
+
+    /**
+     * 确认送达  【饭点送跑腿】
      */
     public function confirmSend(Request $request)
     {
@@ -599,6 +696,7 @@ class Orders extends RiderBase
             $Takeout->accomplish_time = time();
             $Takeout->save();
 
+            /**************** 【骑手配送费收入 入表操作】**********************/
             //订单完成插入明细
             $data = [
                 'rider_id' => $this->auth->id,
@@ -609,6 +707,29 @@ class Orders extends RiderBase
                 'add_time' => time(),
             ];
             Db::name('rider_income_expend')->insert($data);
+
+            /**************** 【骑手代付 入表操作】**********************/
+            // 商家的提价方式
+            $shop_info = Db::name('shop_info')->where('id',$Order->shop_id)->field('price_hike,hike_type')->find();
+            // 商品提价金额
+            if ($shop_info['hike_type'] == 1) {
+                $total_hike_price = $Order->num * $shop_info['price_hike'];
+            } else {
+                $total_hike_price = (($Order['total_money'] - $Order['box_money'] - $Order['ping_fee']) / (1 + $shop_info['price_hike'] * 0.01)) * $shop_info['price_hike'] * 0.01;
+            }
+
+            // 骑手代付金额 = 商品原价 + 餐盒费 =  订单总价 - 配送费 - 提价
+            $money = $Order->total_money - $Order->ping_fee - $Order->box_money - $total_hike_price;
+            // 骑手代付信息
+            $riderPayment = [
+                'order_id'  => $Order->id,
+                'rider_id'  => $this->auth->id,
+                'money'     => $money,
+                'create_time' => time()
+            ];
+            Db::name('rider_payment')->insert($riderPayment);
+
+            /*************** 更新订单表，关于骑手配送费抽成的字段值 *******************/
             Db::name('orders')->where('orders_sn',$Order->orders_sn)->update(['rider_extract'=>$Takeout->rider_extract]);
             // 判断当前用户的订单数量【只要付款之后都算数量】
             $count = model('Orders')->where([['user_id','=',$Order->user_id],['status','notin',1]])->count('id');
@@ -617,6 +738,9 @@ class Orders extends RiderBase
                 $this->inviteGiving($user->invitation_id);
             }
             
+            // 统计店铺日订单量
+            model('Shop')->setDayNum($Order->shop_id);
+
             // 调用消费赠送红包
             $this->consumptionGiving($Order->user_id,$Takeout->school_id,$Order->money,$user->phone);
             // 调用添加商品销量
@@ -632,6 +756,7 @@ class Orders extends RiderBase
 
         $this->success('确认送达');
     }
+
 
     /**
      * 选择楼栋列表
