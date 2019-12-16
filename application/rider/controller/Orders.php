@@ -596,7 +596,8 @@ class Orders extends RiderBase
             // 更新外卖表【写入订单状态】
             $Takeout->status = 5;
             $Takeout->save();
-
+            // 提交事务
+            Db::commit();
         } catch (\think\Exception\DbException $e) {
             // 回滚事务
             Db::rollback();
