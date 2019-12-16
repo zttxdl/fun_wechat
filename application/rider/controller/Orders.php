@@ -290,7 +290,7 @@ class Orders extends RiderBase
 
         // 获取订单详情
         $productlist = Db::name('orders')->where('id',$orderId)->field('box_money,message')->find();
-        $orderDetail = Db::name('orders_info')->where('order_id',$orderId)->select();
+        $orderDetail = Db::name('orders_info')->where('orders_id',$orderId)->select();
        
         foreach ($orderDetail as $row) {
             $item = [];
