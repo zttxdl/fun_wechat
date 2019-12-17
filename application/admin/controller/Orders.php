@@ -154,10 +154,8 @@ class Orders extends Base
                             '
             )->find();
 
-        # 【饭点送外卖 -- 暂停 起始位置】
         // 获取商家实际收入
-        // $shop_income_money = model('Withdraw')->getMoneyByOrderSn($list['orders_sn']);//商家实际收入 = 商家收支明细表money字段
-        # 【饭点送外卖 -- 暂停 结束位置】
+        $shop_income_money = model('Withdraw')->getMoneyByOrderSn($list['orders_sn']);//商家实际收入 = 商家收支明细表money字段
         //订单信息 
         $result['order_info'] = [
             'orders_sn' => $list['orders_sn'],
@@ -178,7 +176,7 @@ class Orders extends Base
             'platform_choucheng' => $list['platform_choucheng'],
             'shitang_choucheng' => $list['shitang_choucheng'],
             'hongbao_choucheng' => $list['hongbao_choucheng'],
-            'shop_income_money' => $shop_income_money ?? 0,
+            'shop_income_money' => $shop_income_money,
             'meal_sn' => isset($list['meal_sn']) ? '#'.$list['meal_sn'] : ''
         ];
 
