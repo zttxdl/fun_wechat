@@ -44,6 +44,7 @@ class Property extends MerchantsBase
 
         $totalMoney = model('Withdraw')->getCountSales($shop_id);
         $monthMoney = model("Withdraw")->getMonthSales($shop_id);
+
         $card = model('shop_more_info')->where('shop_id',$shop_id)->value('back_card_num');
 
         $data = [
@@ -194,7 +195,7 @@ class Property extends MerchantsBase
 
 
     /**
-     * 收支详情 
+     * 收支详情
      * mike 已调整
      * 
      */

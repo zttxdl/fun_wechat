@@ -525,7 +525,7 @@ class FinanceManange extends Base
     }
 
     /**
-     *分账管理
+     *分账管理 【饭点送外卖 -- 暂停】
      */
     public function payment(Request $request)
     {
@@ -560,7 +560,7 @@ class FinanceManange extends Base
             ->alias('a')
             ->leftJoin('ShopInfo b','a.shop_id = b.id')
             ->leftJoin('canteen c','a.school_id = c.school_id')
-            ->field('a.id,a.orders_sn,a.send_time,a.add_time,b.shop_name,a.money,c.cut_proportion,a.shitang_choucheng,a.ping_fee,a.platform_choucheng,a.status')
+            ->field('a.id,a.orders_sn,a.send_time,a.add_time,b.shop_name,a.money,c.cut_proportion,a.shitang_choucheng,a.ping_fee,a.platform_choucheng,a.status,a.rider_extract')
             ->where($where)
             ->order('a.id DESC')
             ->paginate($page_size)
@@ -571,7 +571,7 @@ class FinanceManange extends Base
                 foreach ($data['data'] as &$row){
                     $shop_money = model('Withdraw')->getMoneyByOrderSn($row['orders_sn']);//商家实际收入 = 商家收支明细表money字段
                     
-                    $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng']);//平台抽成
+                    $platform_choucheng = sprintf('%.2f',$row['money'] - $shop_money - $row['ping_fee'] - $row['shitang_choucheng'] + $row['rider_extract']);//平台抽成
 
                     $info['data'][] = [
                         'id' => $row['id'],
@@ -582,7 +582,7 @@ class FinanceManange extends Base
                         'money' => '¥'.$row['money'],
                         'cut_proportion' => $row['cut_proportion'].'%',
                         'shitang_choucheng' => '¥'.$row['shitang_choucheng'],
-                        'ping_fee' => '¥'.$row['ping_fee'],
+                        'ping_fee' => '¥'.sprintf('%.2f',$row['ping_fee'] - $row['rider_extract']),
                         'platform_choucheng' => '¥'.$platform_choucheng,
                         'shop_money' => '¥'.$shop_money,
                         'status' => in_array($row['status'],[3,5]) ? '待分账' : '已完成'
@@ -631,6 +631,97 @@ class FinanceManange extends Base
 
         $this->success('200',['platform_total_money'=>$platform_total_money,'info'=>$info,'school_list'=>$school_list]);
     }
+
+
+    /**
+     *分账管理 【饭点送跑腿】
+     */
+    // public function payment(Request $request)
+    // {
+    //     $key_word = $request->param('keyword');
+    //     $page = $request->param('page');
+    //     $page_size = $request->param('pageSize');
+    //     $status = $request->param('status');//分成状态 1:待分成 2:已完成
+    //     $school_id = $request->param('school_id/d');
+    //     $time = $request->param('time',0);
+
+    //     $start_time = date('Y-m-01',strtotime($time)).' 00:00:00';
+    //     $end_time = date('Y-m-31',strtotime($time)).' 23:59:59';
+
+    //     //搜索条件
+    //     if($key_word)  $where[] = ['a.orders_sn','like',$key_word.'%'];
+    //     if($school_id)  $where[] = ['a.school_id','=',$school_id];
+    //     if($time)  $where[] = ['a.add_time', 'between time', [$start_time, $end_time]];
+        
+
+
+    //     //分成状态
+    //     if($status == 1) {
+    //         $account_status = [3,5,6];//待分帐 对应订单状态是商家接单到骑手取餐离店 3、5
+    //     }elseif($status == 2){
+    //         $account_status = [7,8,12];//已完成 对应订单状态是骑手取餐离店到订单已完成 6、7、8
+    //     }else{
+    //         $account_status = [3,5,6,7,8,12];//全部订单
+    //     }
+
+    //     $where[] = ['a.status','in',$account_status];
+    //     $data = Db::name('Orders')
+    //         ->alias('a')
+    //         ->leftJoin('ShopInfo b','a.shop_id = b.id')
+    //         ->leftJoin('rider_payment p','p.order_id = a.id')
+    //         ->field('a.id,a.orders_sn,a.send_time,a.add_time,p.money as payment_money,b.shop_name,a.money,a.ping_fee,a.status,a.rider_extract')
+    //         ->where($where)
+    //         ->order('a.id DESC')
+    //         ->paginate($page_size)
+    //         ->toArray();
+
+    //         $info = [];
+    //         if($data['data']) {
+    //             foreach ($data['data'] as &$row){
+    //                 $platform_choucheng = sprintf('%.2f',$row['money'] - $row['payment_money'] - $row['ping_fee'] + $row['rider_extract']);//平台利润
+
+    //                 $info['data'][] = [
+    //                     'id' => $row['id'],
+    //                     'orders_sn' => $row['orders_sn'],
+    //                     'send_time' => !empty($row['send_time']) ? date('Y-m-d H:i:s',$row['send_time']) : '',
+    //                     'add_time' => date('Y-m-d H:i:s',$row['add_time']),
+    //                     'shop_name' => $row['shop_name'],
+    //                     'money' => '¥'.$row['money'],
+    //                     'ping_fee' => '¥'.sprintf('%.2f',$row['ping_fee'] - $row['rider_extract']),
+    //                     'platform_choucheng' => '¥'.$platform_choucheng,
+    //                     'status' => in_array($row['status'],[3,5,6]) ? '待分账' : '已完成'
+    //                 ];
+    //             }
+    //         }
+        
+    //     //搜索条件
+    //     $map[] = ['a.status','in',[7,8,12]];
+    //     if($key_word)  $map[] = ['a.orders_sn','like',$key_word.'%'];
+    //     if($school_id)  $map[] = ['a.school_id','=',$school_id];
+    //     if($time)  $map[] = ['a.add_time', 'between time', [$start_time, $end_time]];
+
+    //     $total_money = Db::name('Orders')->alias('a')->field('SUM(a.money) as order_money,SUM(a.ping_fee) as fee_money,SUM(a.rider_extract) as rider_extract')->where($map)->find();
+    //     $order_info = Db::name('Orders')->alias('a')->field('a.id,a.status')->where($map)->select();
+    
+    //     $order_id_arr = [];
+    //     foreach($order_info as $row) {
+    //         if(in_array($row['status'],[7,8,12])) {
+    //             $order_id_arr[] = $row['id'];
+    //         }
+    //     }
+    //     $shop_total_money = Db::name('rider_payment')->where([['order_id','in',$order_id_arr]])->sum('money');
+
+    //     $platform_total_money = sprintf('%.2f',$total_money['order_money']  - $shop_total_money - $total_money['fee_money'] + $total_money['rider_extract']);
+    //     // 学校列表
+    //     $school_list = Model('school')->getSchoolList();
+    //     //分页参数
+    //     $info['page_size'] = $data['per_page'];
+    //     $info['page'] = $data['current_page'];
+    //     $info['count'] = $data['total'];
+
+    //     $this->success('200',['platform_total_money'=>$platform_total_money,'info'=>$info,'school_list'=>$school_list]);
+    // }
+
 
     /**
      *对账管理

@@ -194,11 +194,18 @@ return [
         // 必要配置
         /** 校园外卖 */
         'app_id'             => 'wx7e84dbf300d4764d',
-        'mch_id'             => '1538416851',
-        'key'                => 'iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
+        # 校园外卖 t+7模式商户平台信息【旧】
+        // 'mch_id'             => '1538416851',
+        // 'key'                => 'iew0a4ek8d2ap5nvn78bnsoq7m3wlfcs',   // API 密钥
         // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
-        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
-        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
+        // 'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert.pem', // XXX: 绝对路径！！！！
+        // 'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key.pem',      // XXX: 绝对路径！！！！
+        # 校园外卖 t+1模式商户平台信息【新】
+        'mch_id'             => '1568372731',
+        'key'                => 'Niumogpoeui1930iojkphujpfwpwl232',   // API 密钥
+        // 如需使用敏感接口（如退款、发送红包等）需要配置 API 证书路径(登录商户平台下载 API 证书)
+        'cert_path'          => Env::get('extend_path').'/wechat/key_cert/apiclient_cert_new_t1.pem', // XXX: 绝对路径！！！！
+        'key_path'           => Env::get('extend_path').'/wechat/key_cert/apiclient_key_new_t1.pem',      // XXX: 绝对路径！！！！
         'notify_url'         => '',     // 你也可以在下单时单独设置来想覆盖它
         'sandbox' => false,
     ],

@@ -283,6 +283,7 @@ class Shop extends Model
         $total_num = $this->getOrderNum($shop_id);//总订单量
         $month_order_num = $this->getMonthNum($shop_id);//月订单量
         $day_order_num = $this->getDayNum($shop_id);//日均订单量
+
         $settlement_money = model('Withdraw')->getAcountMoney($shop_id); //结算金额
         $settlement_wait_money =  model('Withdraw')->getNotJsMoney($shop_id); //待结算金额
         $month_money = model('Withdraw')->getMonthSales($shop_id);//月销售额

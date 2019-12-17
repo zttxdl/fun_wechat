@@ -306,12 +306,12 @@ public function getDayOrderNum()
 {
     $rider_id = $this->auth->id;
     $info['at_order_num'] = Db::name('takeout')
-                            ->where('single_time','between',[strtotime(date('Y-m-d')),strtotime(date('Y-m-d 13:00:00'))])
+                            ->where('single_time','between',[strtotime(date('Y-m-d')),strtotime(date('Y-m-d 14:00:00'))])
                             ->where('status','=',6)
                             ->where('rider_id','=',$rider_id)
                             ->count();
     $info['pt_order_num'] = Db::name('takeout')
-                            ->where('single_time','>',strtotime(date('Y-m-d 13:00:00')))
+                            ->where('single_time','>',strtotime(date('Y-m-d 14:00:00')))
                             ->where('status','=',6)
                             ->where('rider_id','=',$rider_id)
                             ->count();

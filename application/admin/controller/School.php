@@ -21,7 +21,7 @@ class School extends Base
         !empty($request->param('fid')) ? $where[] = ['fid','=',$request->param('fid')] : null;
         !empty($request->get('pagesize/d')) ? $pagesize = $request->get('pagesize/d') : $pagesize = 10;
 
-        $list = Db::name('school')->where($where)->order('id','asc')->field('id,name,fid')->paginate($pagesize)->each(function ($item, $key) {
+        $list = Db::name('school')->where($where)->order('id','asc')->field('id,name,fid,rider_extract')->paginate($pagesize)->each(function ($item, $key) {
             // 区域名称
             $item['area'] = Db::name('school')->where('id','=',$item['fid'])->value('name');
             // 包含食堂
@@ -58,6 +58,7 @@ class School extends Base
         $data['latitude'] = $request->param('latitude');
         $data['completion_time'] = $request->param('completion_time');
         $data['fetch_time'] = $request->param('fetch_time');
+        $data['rider_extract'] = $request->param('rider_extract');
         $canteen = $request->param('canteen');
 
         // 验证表单数据
@@ -107,7 +108,7 @@ class School extends Base
      */
     public function edit($id)
     {
-        $info = Db::name('school')->where('id','=',$id)->field('id,name,fid,latitude,longitude,completion_time,fetch_time')->find();
+        $info = Db::name('school')->where('id','=',$id)->field('id,name,fid,latitude,longitude,completion_time,fetch_time,rider_extract')->find();
         $info['cname'] = Db::name('school')->where('id','=',$info['fid'])->value('name');
         $area_list = Db::name('school')->where('level','=',1)->field('id,name')->select();
         $canteen_list = Db::name('canteen')->where('school_id','=',$id)->select();
@@ -128,6 +129,7 @@ class School extends Base
         $data['latitude'] = $request->param('latitude');
         $data['completion_time'] = $request->param('completion_time');
         $data['fetch_time'] = $request->param('fetch_time');
+        $data['rider_extract'] = $request->param('rider_extract');
         $canteen = $request->param('canteen');
 
         // 验证表单数据
@@ -172,7 +174,7 @@ class School extends Base
      */
     public function show($id)
     {
-        $info = Db::name('school')->where('id','=',$id)->field('fid,name,longitude,latitude,completion_time,fetch_time')->find();
+        $info = Db::name('school')->where('id','=',$id)->field('fid,name,longitude,latitude,completion_time,fetch_time,rider_extract')->find();
         $info['area'] = Db::name('school')->where('id','=',$info['fid'])->value('name');
         $canteen_list = Db::name('canteen')->where('school_id','=',$id)->field('id,name,cut_proportion,account,withdraw_cycle,cleartext')->select();
 

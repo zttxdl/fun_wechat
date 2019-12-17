@@ -156,7 +156,6 @@ class Orders extends Base
 
         // 获取商家实际收入
         $shop_income_money = model('Withdraw')->getMoneyByOrderSn($list['orders_sn']);//商家实际收入 = 商家收支明细表money字段
-
         //订单信息 
         $result['order_info'] = [
             'orders_sn' => $list['orders_sn'],

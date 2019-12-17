@@ -41,7 +41,9 @@ class Shop extends MerchantsBase
         }
 
         $day_order = model('Shop')->getDayNum($shop_id);
+
         $day_sales = model('Withdraw')->getDaySales($shop_id);
+        
         $day_cancel_order = model('Shop')->getDayCancelNum($shop_id);
         $day_uv = model('Shop')->getShopVistor($shop_id);//店铺访客数
 

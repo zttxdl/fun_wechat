@@ -81,8 +81,6 @@ class Refund extends MerchantsBase
      */
     public function refund(Request $request) {
         $orders_sn = $request->param('orders_sn');
-
-        //error_log(print_r($orders_sn,1),3,Env::get('root_path')."./logs/refund.log");
         Db::startTrans();
         try{
             if(empty($orders_sn) && !isset($orders_sn)) {
@@ -111,13 +109,15 @@ class Refund extends MerchantsBase
                 if(!$res) {
                     throw new \Exception('orderStatus update fail');
                 }
+                # 【饭点送外卖 -- 暂停 起始位置】
                 //退款收支明细 add by ztt 20190814
-                $res = model('Withdraw')->refund($orders_sn);
-
-                if(!$res) {
-                    throw new \Exception('refund insert fail');
-                }
-
+                // $res = model('Withdraw')->refund($orders_sn);
+                
+                // if(!$res) {
+                //     throw new \Exception('refund insert fail');
+                // }
+                # 【饭点送外卖 -- 暂停 结束位置】
+                    
                 //统计店铺日取消订单量
                 model('Shop')->setDayCancelNum($data['shop_id']);
 

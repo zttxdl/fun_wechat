@@ -26,6 +26,16 @@ class Product extends Model
     }
 
     /**
+     * 获取单条商品价格【原价】
+     * @param $id
+     * @return mixed
+     */
+    public function getPriceById($id)
+    {
+        return $this->where('id',$id)->value('price');
+    }
+
+    /**
      *获取商品图片
      *
      */
