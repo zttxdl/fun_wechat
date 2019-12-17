@@ -668,7 +668,7 @@ class FinanceManange extends Base
         $data = Db::name('Orders')
             ->alias('a')
             ->leftJoin('ShopInfo b','a.shop_id = b.id')
-            ->leftJoin('rider_payment p','p.orders_id = a.id')
+            ->leftJoin('rider_payment p','p.order_id = a.id')
             ->field('a.id,a.orders_sn,a.send_time,a.add_time,p.money as payment_money,b.shop_name,a.money,a.ping_fee,a.status,a.rider_extract')
             ->where($where)
             ->order('a.id DESC')
