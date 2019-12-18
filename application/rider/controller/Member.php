@@ -333,7 +333,7 @@ public function getRiderPayment()
                             ->count();
 
     $info['money'] = Db::name('rider_payment')->where([['rider_id','=',$rider_id],['create_time','between',[strtotime(date('Y-m-d')),strtotime(date('Y-m-d 14:00:00'))]]])->sum('money');
-    $this->success('获取今日订单量成功',['info'=>$info]);
+    $this->success('获取代付订单信息成功',['info'=>$info]);
 }
      
      
