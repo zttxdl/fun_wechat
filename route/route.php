@@ -474,6 +474,7 @@ Route::group('r-member', function () {
     Route::get('/getSchoolLatLong', 'getSchoolLatLong');
     Route::post('/updateRiderInfo', 'updateRiderInfo');
     Route::get('/getDayOrderNum', 'getDayOrderNum');
+    Route::get('/getRiderPayment', 'getRiderPayment');
     
 })->prefix('rider/Member/');
 
