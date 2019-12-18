@@ -327,7 +327,7 @@ public function getRiderPayment()
 {
     $rider_id = $this->auth->id;
     // 今日数据
-    $todayMoney = Db::name('rider_payment')->where([['rider_id','=',$rider_id],['create_time','between',[strtotime(date('Y-m-d')),strtotime(date('Y-m-d :00:00'))]]])->column('money');
+    $todayMoney = Db::name('rider_payment')->where([['rider_id','=',$rider_id],['create_time','=',date('Y-m-d')]])->column('money');
     $todayInfo['order_num'] = count($todayMoney);
     $todayInfo['money'] = array_sum($todayMoney);
 
