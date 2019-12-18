@@ -318,6 +318,23 @@ public function getDayOrderNum()
     $this->success('获取今日订单量成功',['info'=>$info]);
 }
  
+
+/**
+ * 代付订单记录
+ * 
+ */
+public function getRiderPayment()
+{
+    $rider_id = $this->auth->id;
+    $info['order_num'] = Db::name('takeout')
+                            ->where('single_time','between',[strtotime(date('Y-m-d')),strtotime(date('Y-m-d 23:59:59'))])
+                            ->where('status','=',6)
+                            ->where('rider_id','=',$rider_id)
+                            ->count();
+
+    $info['money'] = Db::name('rider_payment')->where([['rider_id','=',$rider_id],['create_time','between',[strtotime(date('Y-m-d')),strtotime(date('Y-m-d 14:00:00'))]]])->sum('money');
+    $this->success('获取代付订单信息成功',['info'=>$info]);
+}
      
      
 }
