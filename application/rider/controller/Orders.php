@@ -744,7 +744,7 @@ class Orders extends RiderBase
                 'order_id'  => $Order->id,
                 'rider_id'  => $this->auth->id,
                 'money'     => $money,
-                'create_time' => time()
+                'create_time' => date('Y-m-d')
             ];
             Db::name('rider_payment')->insert($riderPayment);
 
