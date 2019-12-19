@@ -94,7 +94,7 @@ class Shop extends Base
 
         if ($status == 4) { // 当禁用店铺时，需判断该店铺是否存在未完结的订单往来
             // 判断该商家是否还有未完结的订单
-            $count = model('Orders')->where([['shop_id','=',$shop_id],['status','in',[2,3,5,6,10,12]]])->count();
+            $count = model('Orders')->where([['shop_id','=',$shop_id],['status','in',[2,3,5,6,10]]])->count();
             if ($count) {
                 $this->error('该商家还存在未处理的订单，暂时不可禁用此商家',202);
             }
