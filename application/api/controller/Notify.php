@@ -94,12 +94,15 @@ class Notify extends Collection
         $push = new PushEvent();
         $push->setUser('s_'.$shop_id)->setContent($orders_sn)->push();
 
-        // 获取当前商家的自动接单情况
-        $auto_print_info = model('ShopInfo')->getAutoPrintInfo($shop_id);
-        // 当是云打印机 以及 设置了自动接单、打印功能
-        if ($auto_print_info['print_device_sn'] && $auto_print_info['auto_receive']) {
-            $this->notifyAccept($orders_sn);
-        }
+        // 设置成跑腿后，无需打印机功能，此处功能暂时屏蔽
+        // // 获取当前商家的自动接单情况
+        // $auto_print_info = model('ShopInfo')->getAutoPrintInfo($shop_id);
+        // // 当是云打印机 以及 设置了自动接单、打印功能
+        // if ($auto_print_info['print_device_sn'] && $auto_print_info['auto_receive']) {
+        //     $this->notifyAccept($orders_sn);
+        // }
+        // 调取自动接单功能
+        $this->notifyAccept($orders_sn);
         return true;
     }
 
@@ -219,15 +222,16 @@ class Notify extends Collection
             $socket->setUser($rid)->setContent('new')->push();
         }
 
+        // 设置成跑腿后，无需打印机功能，此处功能暂时屏蔽
         // 调用打印
-        $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
-        $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
+        // $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
+        // $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
 
-        if ($res) {
-            return true;
-        } else {
-            return false;
-        }
+        // if ($res) {
+        //     return true;
+        // } else {
+        //     return false;
+        // }
     }
 
 
