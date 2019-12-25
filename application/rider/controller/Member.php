@@ -329,7 +329,7 @@ public function getRiderPayment()
     // 今日数据
     $todayMoney = Db::name('rider_payment')->where([['rider_id','=',$rider_id],['create_time','=',date('Y-m-d')]])->column('money');
     $todayInfo['order_num'] = count($todayMoney);
-    $todayInfo['money'] = array_sum($todayMoney);
+    $todayInfo['money'] = sprintf('%.2f',array_sum($todayMoney));
 
     // 近30天数据
     $list = Db::name('rider_payment')->where([['rider_id','=',$rider_id],['create_time','egt',date("Y-m-d",strtotime("-1 month"))]])->field('count(id) as num,sum(money) as money,create_time')->order('create_time','desc')->group('create_time')->select();
