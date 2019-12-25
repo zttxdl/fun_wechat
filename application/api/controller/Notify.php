@@ -37,7 +37,6 @@ class Notify extends Collection
 
         $response = $payment->handlePaidNotify(function ($message, $fail)
         {
-            // 根据返回的订单号查询订单数据
             $order = model('Orders')->getOrder($message['out_trade_no']);
             if (!$order) {
                 $fail('Order not exist.');
@@ -47,7 +46,6 @@ class Notify extends Collection
                 return true;
             }
             if ($message['return_code'] === 'SUCCESS') {
-                // 支付成功后的业务逻辑
                 if ($message['result_code'] === 'SUCCESS') {
 
                     $this->returnResult($message['out_trade_no'], $message['transaction_id'],$order['shop_id'],$order['user_id']);
@@ -62,47 +60,34 @@ class Notify extends Collection
         $response->send();
     }
 
-    //微信支付回调处理业务
+    
     public function returnResult($orders_sn,$wx_id,$shop_id,$user_id)
     {
         Db::startTrans();
         try {
-            //处理的业务逻辑，更新订单
             model('orders')->where('orders_sn',$orders_sn)->update(['status'=>2,'pay_status'=>1,'pay_time'=>time(),'trade_no'=>$wx_id]);
-
-            //用户下单 就更改状态
             model('User')->where('id',$user_id)->setField('new_buy',2);
-            // 判断首单红包是否使用
             $id = model('MyCoupon')->where([['user_id','=',$user_id],['first_coupon','=',1],['status','=',1]])->value('id');
             if ($id) {
                 model('MyCoupon')->where('id',$id)->setField('status',3);
             }
-            # redis 删除 【2019-11-14更新】
             $redis = Cache::store('redis');
             $key = "order_cacle";
             if ($redis->hExists($key,$orders_sn)) {
                 $redis->hDel($key,$orders_sn);
             }
-            
             Db::commit();
         } catch (\Throwable $e) {
             Db::rollback();
             trace($e->getMessage(),'error');
         }
 
-        // 向指定商家推送新订单消息
         $push = new PushEvent();
         $push->setUser('s_'.$shop_id)->setContent($orders_sn)->push();
-
-        // 设置成跑腿后，无需打印机功能，此处功能暂时屏蔽
-        // // 获取当前商家的自动接单情况
-        // $auto_print_info = model('ShopInfo')->getAutoPrintInfo($shop_id);
-        // // 当是云打印机 以及 设置了自动接单、打印功能
-        // if ($auto_print_info['print_device_sn'] && $auto_print_info['auto_receive']) {
-        //     $this->notifyAccept($orders_sn);
-        // }
-        // 调取自动接单功能
-        $this->notifyAccept($orders_sn);
+        $auto_print_info = model('ShopInfo')->getAutoPrintInfo($shop_id);
+        if ($auto_print_info['print_device_sn'] && $auto_print_info['auto_receive']) {
+            $this->notifyAccept($orders_sn);
+        }
         return true;
     }
 
@@ -115,17 +100,15 @@ class Notify extends Collection
     {
 
         $pay_config = config('wx_pay');
-        $app    = Factory::payment($pay_config);//pay_config 微信配置
+        $app    = Factory::payment($pay_config);
         $response = $app->handleRefundedNotify(function ($message, $reqInfo, $fail) {
 
             $refund_info = model('Refund')->where('out_refund_no',$reqInfo['out_refund_no'])->find();
-            if (!$refund_info || $refund_info->status== 2) {// 如果订单不存在 或者 订单已经退过款了
+            if (!$refund_info || $refund_info->status== 2) {
                 $fail('Order not exist.');
                 return true;
             }
-
             if($message['return_code']=='SUCCESS'){
-
                 if($reqInfo['refund_status']=='SUCCESS'){
                 $data= [
                     'refund_id'=> $reqInfo['refund_id'],
@@ -134,11 +117,9 @@ class Notify extends Collection
                 model('Refund')
                     ->where('out_refund_no',$reqInfo['out_refund_no'])
                     ->update($data);
-
                 }
-
             }
-            return true; // 返回 true 告诉微信“我已处理完成”
+            return true;
         });
 
         $response->send();
@@ -159,29 +140,22 @@ class Notify extends Collection
             'longitude' => $shop_info['longitude'],
             'latitude' => $shop_info['latitude'],
         ];
-
-        // 预计送达时间
         $time = model('School')->where('id',$shop_info['school_id'])->value('completion_time');
         $expected_time = time() + 60 * $time;
-
-        //启动事务
         Db::startTrans();
         try{
-            //封装外卖数据
             $takeout_info = [
                 'order_id' => $order_info['id'],
                 'shop_id' => $order_info['shop_id'],
-                'ping_fee' => $order_info['ping_fee'],//配送费
+                'ping_fee' => $order_info['ping_fee'],
                 'school_id' => $shop_info['school_id'],
-                'create_time' => time(),//商家接单时间
-                'expected_time' => $expected_time,//预计送达时间
-                'user_address' => $order_info['address'],//收货地址
-                'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),//商家地址
-                'hourse_id' => $order_info['hourse_id'],//楼栋ID
+                'create_time' => time(),
+                'expected_time' => $expected_time,
+                'user_address' => $order_info['address'],
+                'shop_address' => json_encode($shop_address,JSON_UNESCAPED_UNICODE),
+                'hourse_id' => $order_info['hourse_id'],
                 'rider_extract' => Db::name('school')->where('id','=',$shop_info['school_id'])->value('rider_extract')
             ];
-
-            //外卖数据入库
             $ret = Db::name('takeout')->insert($takeout_info);
 
             if (!$ret){
@@ -198,17 +172,13 @@ class Notify extends Collection
             throw new Exception($e->getMessage());
         }
 
-        //实例化socket
         $socket = model('PushEvent','service');
-
-        // 已成为骑手的情况
         $map1 = [
             ['school_id', '=', $shop_info['school_id']],
             ['open_status', '=', 1],
             ['status', '=', 3],
             ['','exp',Db::raw("FIND_IN_SET(".$order_info['hourse_id'].",hourse_ids)")]
         ];
-        // 暂未成为骑手的情况
         $map2 = [
             ['school_id', '=', $shop_info['school_id']],
             ['status', 'in', [0,1,2]],
@@ -216,29 +186,19 @@ class Notify extends Collection
         ];  
 
         $r_list = model('RiderInfo')->whereOr([$map1, $map2])->select();
-
         foreach ($r_list as $item) {
             $rid = 'r'.$item->id;
             $socket->setUser($rid)->setContent('new')->push();
         }
-
-        // 设置成跑腿后，无需打印机功能，此处功能暂时屏蔽
-        // 调用打印
-        // $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
-        // $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
-
-        // if ($res) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
+        $printOrderInfo = get_order_info_print($orders_sn,14,6,3,6);
+        $res = $this->feieyunPrint($shop_info['print_device_sn'],$printOrderInfo,1);
+        if ($res) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-
-    /**
-     * 飞鹅云打印 
-     * 
-     */
     public function feieyunPrint($printer_sn,$orderInfo,$times)
     {
         $user = config('feieyun')['user'];
@@ -247,7 +207,7 @@ class Notify extends Collection
         $port = config('feieyun')['port'];
         $path = config('feieyun')['path'];
 
-        $time = time();			    //请求时间
+        $time = time();	
 		$content = array(			
 			'user'=>$user,
 			'stime'=>$time,
@@ -255,16 +215,12 @@ class Notify extends Collection
 			'apiname'=>'Open_printMsg',
 			'sn'=>$printer_sn,
 			'content'=>$orderInfo,
-		    'times'=>$times // 打印次数
+		    'times'=>$times 
         );
-
-        // 调用飞鹅云打印类
         $client = new FeieYun($ip,$port);
         if(!$client->post($path,$content)){
             return false;
         }else{
-            //服务器返回的JSON字符串，建议要当做日志记录起来
-            write_log($client->getContent(),'log');
             return true;
         }
     }
