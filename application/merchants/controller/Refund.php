@@ -109,14 +109,12 @@ class Refund extends MerchantsBase
                 if(!$res) {
                     throw new \Exception('orderStatus update fail');
                 }
-                # 【饭点送外卖 -- 暂停 起始位置】
                 //退款收支明细 add by ztt 20190814
-                // $res = model('Withdraw')->refund($orders_sn);
+                $res = model('Withdraw')->refund($orders_sn);
                 
-                // if(!$res) {
-                //     throw new \Exception('refund insert fail');
-                // }
-                # 【饭点送外卖 -- 暂停 结束位置】
+                if(!$res) {
+                    throw new \Exception('refund insert fail');
+                }
                     
                 //统计店铺日取消订单量
                 model('Shop')->setDayCancelNum($data['shop_id']);
