@@ -525,7 +525,7 @@ class FinanceManange extends Base
     }
 
     /**
-     *分账管理 【饭点送外卖 -- 暂停】
+     *分账管理
      */
     public function payment(Request $request)
     {
