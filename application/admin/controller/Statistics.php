@@ -107,9 +107,7 @@ class Statistics extends Base
             }
         }
         unset($v);
-        
         create_excel($income_list,$school_name.'_'.$time);
-        $this->success('获取数据成功',["list"=>$income_list]);
     }
 
 
@@ -120,6 +118,40 @@ class Statistics extends Base
     {
         $time = $request->param('time');
         $shop_id = $request->param('shop_id');
+        $shop_name = Db::name('shop_info')->where('id','=',$shop_id)->value('shop_name');
+        $start_time = strtotime($time." 00:00:00");
+        $end_time = strtotime($time." 23:59:59");
+
+        // 获取当天收入支出集合
+        $list = Db::name('withdraw')
+            ->where('shop_id','=',$shop_id)
+            ->where('add_time','between',[$start_time,$end_time])
+            ->field('type,money,add_time,title,withdraw_sn')
+            ->order('add_time DESC')
+            ->select();
+
+
+        if(empty($list)) {
+            $this->error('暂时没有数据!');
+        }
+
+        foreach ($list as $key => &$row)
+        {
+            if ($row['type'] == '1'){ // 收入【订单收入】
+                $row['money'] = sprintf('%.2f', $row['money']);
+            }elseif ($row['type'] == '6'){ // 退款
+                $row['money'] = sprintf('%.2f', -1 * $row['money']);
+            }
+            $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
+        }
+        // 当天收入统计
+        $temp['income'] = model('withdraw')->getIncome($shop_id,$start_time,$end_time);
+        // 当天支出统计
+        $temp['expend_sum'] = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);
+        unset($row);
+        create_shop_excel($list,$shop_name.'_'.$time);
+        return "订单收入：".$temp['income'].'<br/>订单退款：'.$temp['expend_sum'].'<br/>应得收入：'. $temp['income']- $temp['expend_sum'].'<hr/>';
+
     }
 
 
