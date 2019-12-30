@@ -25,7 +25,8 @@
         "predis/predis": "^1.1",
         "phpmailer/phpmailer": "^6.0",
         "qiniu/php-sdk": "^7.2",
-        "jpush/jpush": "^3.6"
+        "jpush/jpush": "^3.6",
+        "phpoffice/phpexcel": "^1.8"
 
     },
     "autoload": {
