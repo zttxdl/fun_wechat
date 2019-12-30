@@ -227,7 +227,7 @@ Route::group('a-statistics', function () {
     Route::get('/coupon', 'coupon'); // 优惠券统计
     Route::get('/shopMoneyToday', 'shopMoneyToday'); // 当前学校的店铺今日应付金额
     Route::get('/shopMoneyTodayDetails', 'shopMoneyTodayDetails'); // 当前店铺的今天应付金额
-})->prefix('admin/Statistics/')->middleware('IsLogin');
+})->prefix('admin/Statistics/');
 
 
 
