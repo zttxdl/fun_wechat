@@ -743,7 +743,7 @@ function create_excel($data = [],$name = 'excel')
     {
         //从第二行开始写入数据（第一行为表头）
         $excel->getActiveSheet()->setCellValue('A'.($k+2),$k+1);
-        $excel->getActiveSheet()->setCellValue('B'.($k+2),$v['shop_name']);
+        $excel->getActiveSheet()->setCellValue('B'.($k+2),'【'.$v['shop_id'].'】'.$v['shop_name']);
         $excel->getActiveSheet()->setCellValue('C'.($k+2),$v['income_sum']);
         $excel->getActiveSheet()->setCellValue('D'.($k+2),$v['expend_sum']);
         $excel->getActiveSheet()->setCellValue('E'.($k+2),$v['sum']);

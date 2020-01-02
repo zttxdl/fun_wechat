@@ -68,7 +68,7 @@ class Statistics extends Base
 
 
     /**
-     * 今日应付商家金额
+     * 学校下的应付商家金额
      */
     public function shopMoneyToday(Request $request)
     {
@@ -107,6 +107,9 @@ class Statistics extends Base
             }
         }
         unset($v);
+        if(empty($income_list)) {
+            $this->error('暂时没有数据!');
+        }
         create_excel($income_list,$school_name.'_'.$time);
     }
 
@@ -149,8 +152,8 @@ class Statistics extends Base
         // 当天支出统计
         $temp['expend_sum'] = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);
         unset($row);
+        echo "订单收入：".$temp['income'].'<br/>订单退款：'.$temp['expend_sum'].'<br/>应得收入：'. $temp['income']- $temp['expend_sum'].'<hr/>';
         create_shop_excel($list,$shop_name.'_'.$time);
-        return "订单收入：".$temp['income'].'<br/>订单退款：'.$temp['expend_sum'].'<br/>应得收入：'. $temp['income']- $temp['expend_sum'].'<hr/>';
 
     }
 
