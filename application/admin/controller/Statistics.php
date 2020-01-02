@@ -147,12 +147,6 @@ class Statistics extends Base
             }
             $row['add_time'] = date('Y-m-d H:i:s',$row['add_time']);
         }
-        // 当天收入统计
-        $temp['income'] = model('withdraw')->getIncome($shop_id,$start_time,$end_time);
-        // 当天支出统计
-        $temp['expend_sum'] = model('withdraw')->getExpenditure($shop_id,$start_time,$end_time);
-        unset($row);
-        echo "订单收入：".$temp['income'].'<br/>订单退款：'.$temp['expend_sum'].'<br/>应得收入：'. $temp['income']- $temp['expend_sum'].'<hr/>';
         create_shop_excel($list,$shop_name.'_'.$time);
 
     }
