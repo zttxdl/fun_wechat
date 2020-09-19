@@ -66,4 +66,9 @@ class ApiBase extends Base
 
         return true;
     }
+
+    public function initialize()
+    {
+        $this->uid = $this->getDataCache('1');
+    }
 }

@@ -93,16 +93,18 @@ class Base extends Controller
 
     /**
      * 获取缓存
-     * @param $param
-     * @param null $options
+     * @param $key
+     * @param null $value
+     * @param int $expire
      * @return mixed
      */
-    protected function getDataCache($param, $options = null)
+    protected function getDataCache($key, $value = null, $expire = 0)
     {
-        $store = 'file'; //redis,file
-
-        return Cache::store($store)
-            ->get('api_' . $param['name']);
+        $cache = Cache::store('redis');
+        if ($value === false) $cache->rm($key);
+        elseif ($value === null) {
+            return $cache->get($key);
+        } else $cache->set($key, $value, $expire);
     }
 
     /**
