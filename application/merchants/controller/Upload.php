@@ -32,7 +32,7 @@ class Upload extends MerchantsBase
         $path = $file->getRealPath();
         $ext = pathinfo($file->getInfo('name'), PATHINFO_EXTENSION);//后缀
         // 上传到七牛后保存的文件名
-        $key = substr(md5($file->getRealPath()) , 0, 5). date('YmdHis') . rand(0, 9999) . '.' . $ext;
+        $key = substr(md5($path) , 0, 5). date('YmdHis') . rand(0, 9999) . '.' . $ext;
         $ym = config('qiniu')['domain'];
         $accessKey = config('qiniu')['accesskey'];
         $secretKey = config('qiniu')['secretkey'];
